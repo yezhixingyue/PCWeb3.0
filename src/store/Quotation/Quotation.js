@@ -78,9 +78,6 @@ export default {
     /* 初始页面字体
     -------------------------------*/
     initPageText: '',
-    /* 客户设置快捷方式
-    -------------------------------*/
-    customerShortCutList: [],
     /** 当前选中的用于报价的产品
     ---------------------------------------- */
     curProduct: null,
@@ -113,15 +110,20 @@ export default {
       });
       // 添加第三级产品内容
       const namesList = process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-new-product' ? state.productNames : state.productNames.filter(it => it.AllowCustomOrder);
-      namesList.forEach(item => level1List.forEach(leve1 => {
-        if (item.ProductClass.First === leve1.ID) {
-          leve1.children.forEach(level2 => {
-            if (item.ProductClass.Second === level2.ID) {
-              level2.children.push(item);
+      namesList.forEach(item => {
+        const _list = item.ClassifyList.filter(it => it.Type === 2);
+        _list.forEach(_it => {
+          level1List.forEach(leve1 => {
+            if (_it.FirstLevel.ID === leve1.ID) {
+              leve1.children.forEach(level2 => {
+                if (_it.SecondLevel.ID === level2.ID) {
+                  level2.children.push(item);
+                }
+              });
             }
           });
-        }
-      }));
+        });
+      });
       // 筛选去除无下属产品的分类
       level1List.forEach(
         level1 => (level1.children = level1.children.filter(
@@ -175,13 +177,14 @@ export default {
     setIsShowClassifyDia(state, bool) {
       state.isShowClassifyDia = bool;
     },
-    /* 设置当前选中的产品ID及名称及类别
+    /* 设置当前选中的产品、产品ID及名称及类别
     -------------------------------*/
     setCurProductInfo(state, payload) {
-      const { ProductID, ProductClass, ProductName } = payload; // payload为当前产品所有信息
-      state.curProductID = ProductID;
+      state.curProduct = payload;
+      const { ID, ProductClass, ShowName } = payload; // payload为当前产品所有信息
+      state.curProductID = ID;
       state.curProductClass = ProductClass;
-      state.curProductName = ProductName;
+      state.curProductName = ShowName;
     },
     /* 当前选中产品详细信息
     -------------------------------*/
@@ -853,11 +856,6 @@ export default {
     setInitPageText(state, text) {
       state.initPageText = text;
     },
-    /* 设置客户快捷方式
-    -------------------------------*/
-    setCustomerShortCutList(state, data) {
-      state.customerShortCutList = data;
-    },
     /* 注销及登录状态清理
     -------------------------------*/
     clearStateForNewCustomer(state) {
@@ -881,13 +879,7 @@ export default {
       state.isShow2PayDialog = false;
       state.isFullPayoutDisabled = false;
       state.initPageText = '';
-      state.customerShortCutList = [];
       state.curProduct = null;
-    },
-    /** 设置当前选中的用于报价的产品
-    ---------------------------------------- */
-    setCurProduct(state, data) {
-      state.curProduct = data;
     },
     /** 设置是否为点击tag标签获取产品报价信息  （ 此时不全清下单报价页面信息 只部分展示loading ）
     ---------------------------------------- */
@@ -983,7 +975,6 @@ export default {
     /* 下单 - 预下单
     -------------------------------*/
     async getOrderPreCreate({ state, commit, dispatch, rootState }, { compiledName, fileContent, callBack }) {
-      // // console.log(state, compiledName, fileContent);
       // 配置组合生成请求对象
       const _requestObj = { List: [], OrderType: 2, PayInFull: false };
       const _itemObj = {};
@@ -996,8 +987,6 @@ export default {
         _itemObj.Address.AddressID = state.addressInfo4PlaceOrder.Address.AddressID;
       } else {
         _itemObj.Address.Address = state.addressInfo4PlaceOrder.Address.Address;
-        // console.log(state.addressInfo4PlaceOrder.Address.Address.Latitude);
-        // if (!state.addressInfo4PlaceOrder.Address.Address.Latitude) alert('未定位')
       }
       _itemObj.Content = fileContent;
       commit('setCurFileContent', fileContent);
@@ -1016,12 +1005,9 @@ export default {
 
       _requestObj.List.push(_itemObj);
       const res = await api.getOrderPreCreate(_requestObj);
-      // // console.log(res);
-      // // console.log(res.data.Status);
       if (res.data.Status === 1000) {
         commit('setCurReqObj4PreCreate', _itemObj);
         commit('setPreCreateData', res.data.Data);
-        // commit('setCurProduct', null);
         const _b = rootState.common.customerBalance;
         const { FundBalance } = res.data.Data;
         if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
@@ -1038,7 +1024,6 @@ export default {
             if (resp.data.Status === 1000) {
               commit('setCurReqObj4PreCreate', _itemObj);
               commit('setPreCreateData', resp.data.Data);
-              // commit('setCurProduct', null);
               const _b = rootState.common.customerBalance;
               const { FundBalance } = resp.data.Data;
               if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
@@ -1176,23 +1161,6 @@ export default {
           },
         });
       }
-    },
-    /* 获取客户设置快捷方式
-    -------------------------------*/
-    async getCustomerShortCutList({ commit }) {
-      const res = await api.getCustomerShortCutList();
-      if (res.data.Status === 1000) {
-        // console.log(res);
-        commit('setCustomerShortCutList', res.data.Data);
-      }
-    },
-    // eslint-disable-next-line consistent-return
-    async getCustomerShortCutSave(args, data) {
-      // console.log(args);
-      const res = await api.getCustomerShortCutSave(data);
-      // console.log(res);
-      if (res.data.Status !== 1000) return false;
-      return true;
     },
   },
 };

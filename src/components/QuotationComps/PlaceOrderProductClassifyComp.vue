@@ -4,7 +4,6 @@
       <div class="product-menu-box float">
         <ul class="header">
           <li v-if="allProductClassify.length === 0" class="loading-box">
-            <!-- <img src="@/assets/images/loading2.gif" alt=""> -->
             <div class="is-font-12 is-gray"><img src="@/assets/images/loading.gif" alt="">加载中</div>
           </li>
           <template v-else>
@@ -26,7 +25,7 @@
       width="100%"
       transition="el-zoom-in-top"
       popper-class='mp-classify-pop'
-      v-model="popOpen">
+      v-model="isOpen">
       <div
           class="content"
           @mouseleave="onMouseLeave"
@@ -37,13 +36,11 @@
               <span class="title float">{{item.ClassName}} <i class="iconfont icon-iconfontyoujiantou"></i> </span>
               <div class="products">
                 <el-link :underline="false"
-                v-for="sub in item.children"
-                :key="sub.ProductID"
-                @click="selectProduct(sub)"
-                :class="curProduct && curProduct.ProductID === sub.ProductID ? 'active' : ''"
-                >
-                  <el-checkbox :value='sub.isCollected' @change="onCheckChange(sub)" v-show="curMenus.canCollect">
-                  </el-checkbox>{{sub.ProductName}}</el-link>
+                  v-for="sub in item.children"
+                  :key="sub.ProductID"
+                  @click="selectProduct(sub)"
+                  :class="curProduct && curProduct.ProductID === sub.ProductID ? 'active' : ''"
+                  >{{sub.ShowName}}</el-link>
               </div>
             </li>
           </ul>
@@ -66,10 +63,8 @@ export default {
       timer: null,
       timer2: null, // 进入时的定时器
       index: null,
-      // curProduct: null,
       hasCollectList: [],
       tempCollectList: [],
-      // canCollect: false,
       canCollectList: [],
     };
   },
@@ -84,55 +79,12 @@ export default {
     },
   },
   computed: {
-    ...mapState('Quotation', ['customerShortCutList', 'productNames', 'curProduct']),
+    ...mapState('Quotation', ['productNames', 'curProduct']),
     ...mapGetters('Quotation', ['allProductClassify']),
-    popOpen: {
-      get() {
-        return this.isOpen;
-      },
-      set(newVal) {
-        this.isOpen = newVal;
-      },
-    },
-    hasCollectIDList() {
-      const _list = this.hasCollectList.map(it => it.ProductID || it.ID);
-      return _list;
-    },
     curMenus() {
       if (!this.index && this.index !== 0) return null;
       if (this.allProductClassify.length === 0) return null;
-      const _obj = this.allProductClassify[this.index];
-      if (_obj) {
-        _obj.children.forEach(lv2 => {
-          lv2.children.forEach(lv3 => {
-            const item = lv3;
-            item.isCollected = false;
-            if (this.hasCollectIDList.includes(item.ProductID)) item.isCollected = true;
-          });
-        });
-        _obj.canCollect = false;
-        if (this.canCollectList.includes(this.index)) _obj.canCollect = true;
-        return _obj;
-      }
-      return null;
-    },
-    hasCollectList4Req() {
-      // if (this.hasCollectList.length === 0 || !this.curMenus) return null;
-      const ClassID = this.curMenus.ID;
-      // eslint-disable-next-line max-len
-      const _tempList = this.hasCollectList.filter(it => it.ClassID === ClassID || (it.ProductClass && it.ProductClass.First === ClassID));
-      const _list = _tempList.map(it => {
-        if (it.ClassID) return it;
-        return {
-          ClassID: it.ProductClass.First,
-          ID: it.ProductID,
-          Name: it.ProductName,
-        };
-      });
-      return {
-        ClassID,
-        List: _list,
-      };
+      return this.allProductClassify[this.index] || null;
     },
   },
   methods: {
@@ -140,7 +92,6 @@ export default {
       if (i || i === 0) this.index = i;
       if (this.isComHeader) {
         this.$emit('handleMouseEnter');
-        // return;
       }
       if (!this.isOpen) {
         this.timer2 = setTimeout(() => {
@@ -156,7 +107,6 @@ export default {
     onMouseLeave() {
       if (this.isComHeader) {
         this.$emit('handleMouseLeave');
-        // return;
       }
       this.timer = setTimeout(() => {
         if (this.isOpen) this.isOpen = false;
@@ -165,20 +115,8 @@ export default {
         clearTimeout(this.timer2);
         this.timer2 = null;
       }
-      //   if (this.isOpen) this.isOpen = false;
     },
     selectProduct(sub) {
-      // console.log('selectProduct -- sub', sub);
-      // console.log('sub', sub);
-      if (this.curMenus.canCollect) {
-        if (this.hasCollectIDList.includes(sub.ProductID)) {
-          this.hasCollectList = this.hasCollectList.filter(it => it.ProductID !== sub.ProductID)
-            .filter(it => it.ID !== sub.ProductID);
-        } else {
-          this.hasCollectList.push(sub);
-        }
-        return;
-      }
       clearTimeout(this.timer);
       this.timer = null;
       if (this.isComHeader) {
@@ -187,56 +125,14 @@ export default {
       } else {
         this.isOpen = false;
       }
-      if (this.curProduct && this.curProduct.ProductID === sub.ProductID && !this.isComHeader) return;
-      this.$store.commit('Quotation/setCurProduct', sub);
-      // this.curProduct = sub;
-      this.$store.commit('Quotation/setCurProductInfo', sub);
-      this.$store.dispatch('Quotation/getProductDetail');
-      this.$store.commit('Quotation/setSelectedCoupon', null);
-    },
-    onCheckChange(item) {
-      if (this.curMenus.canCollect) {
-        if (this.hasCollectIDList.includes(item.ProductID)) {
-          this.hasCollectList = this.hasCollectList.filter(it => it.ProductID !== item.ProductID)
-            .filter(it => it.ID !== item.ProductID);
-        } else {
-          this.hasCollectList = [...this.hasCollectList, item];
-        }
-      }
-    },
-    setCanCollect() {
-      this.canCollectList.push(this.index);
-      this.tempCollectList = [...this.hasCollectList];
-    },
-    onCancel() {
-      this.canCollectList = this.canCollectList.filter(it => it !== this.index);
-      this.hasCollectList = [...this.tempCollectList];
-    },
-    // async onSubmit() {
-    //   if (this.hasCollectList4Req) {
-    //     const res = await this.$store.dispatch('Quotation/getCustomerShortCutSave', this.hasCollectList4Req);
-    //     // console.log(res);
-    //     if (res) {
-    //       this.canCollectList = this.canCollectList.filter(it => it !== this.index);
-    //       // this.hasCollectList = this.hasCollectList.filter(it => it !== this.index);
-    //     }
-    //   }
-    // },
-    onShortcutClick(item) {
-      const _id = item.ID ? item.ID : item.ProductID;
-      if (this.curProduct && this.curProduct.ProductID === _id) return;
-      const _t = this.productNames.find(it => it.ProductID === _id);
-      // this.curProduct = _t;
-      this.$store.commit('Quotation/setCurProduct', _t);
-      this.$store.commit('Quotation/setCurProductInfo', _t);
-      this.$store.dispatch('Quotation/getProductDetail');
+      if (this.curProduct && this.curProduct.ID === sub.ID && !this.isComHeader) return;
+      console.log(sub);
+      // this.$store.commit('Quotation/setCurProductInfo', sub);
+      // this.$store.dispatch('Quotation/getProductDetail');
+      // this.$store.commit('Quotation/setSelectedCoupon', null);
     },
   },
   watch: {
-    customerShortCutList(newVal) {
-      this.hasCollectList = [...newVal];
-      this.tempCollectList = [...this.hasCollectList];
-    },
     showClassify(newVal) {
       if (newVal) {
         this.isOpen = true;
@@ -245,12 +141,6 @@ export default {
         this.isOpen = false;
       }
     },
-  },
-  mounted() {
-    // if (this.isComHeader) {
-    //   this.isOpen = true;
-    //   this.index = 0;
-    // }
   },
 };
 </script>
@@ -346,8 +236,6 @@ export default {
     }
   }
   > section {
-    // z-index: 999;
-    // opacity: 1 !important;
     > .content {
       width: 100%;
       margin: 0 auto;
@@ -358,7 +246,6 @@ export default {
       z-index: 999;
       transition: 0.2s;
       box-shadow: 0 5px 12px 0 rgba(0,0,0,.1);
-      // padding-bottom: 25px;
       &.active {
         display: block;
       }
@@ -454,25 +341,6 @@ export default {
     z-index: 888;
     &.isComHeader {
       top: 150px;
-    }
-  }
-  > .shortcut-list {
-    width: 1200px;
-    margin: 0 auto;
-    line-height: 30px;
-    padding: 7px 0;
-    border-top: 1px dashed #eee;
-    > li {
-      float: left;
-      margin-right: 30px;
-      font-size: 14px;
-      cursor: pointer;
-      > a {
-        color: #888;
-        &.active {
-          color: #428dfa;
-        }
-      }
     }
   }
   .mp-classify-pop {

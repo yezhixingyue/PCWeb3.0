@@ -63,7 +63,6 @@ export default {
         if (t) sub = t;
       }
       if (sub) {
-        this.$store.commit('Quotation/setCurProduct', sub);
         this.$store.commit('Quotation/setCurProductInfo', sub);
         await this.$store.dispatch('Quotation/getProductDetail', { closeloading: true });
         this.$store.commit('Quotation/setSelectedCoupon', null);

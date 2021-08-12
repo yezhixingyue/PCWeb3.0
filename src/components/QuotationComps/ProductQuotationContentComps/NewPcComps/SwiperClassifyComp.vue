@@ -59,7 +59,6 @@ export default {
       const item = this.classiftList.find(it => it.ProductID === val);
       if (item) {
         this.$store.commit('Quotation/setCurProductInfo', item);
-        this.$store.commit('Quotation/setCurProduct', item);
         this.$store.commit('Quotation/setSelectedCoupon', null);
         const key = await this.$store.dispatch('Quotation/getProductDetail', { saveOldData: true });
         if (!key) this.$store.commit('Quotation/clearCurProductInfo2Quotation');

@@ -57,18 +57,18 @@ const api = {
   /* 产品报价及下单部分api
   ----------------------------------------------------------------------------------- */
   getProductClassify() { // 获取产品分类
-    return instance.post('/Api/Constant/VersionValid', { Key: 6 }, { closeLoading: true });
+    return instance.post('/Api/Constant/VersionValid', { Key: 2 }, { closeLoading: true });
   },
   getProductLists(data = {}) { // 获取列表头部产品第三级列表
-    return instance.post('/Api/Product/ProductList', {
-      FieldType: 1,
+    return instance.post('/Api/Product/List', {
+      FieldType: 3,
       ...data,
       TakeOrderWay: 1,
     }, { closeLoading: true });
   },
-  getProductDetail([productID, closeLoading]) { // 根据产品ID获取到产品详细信息  GET /Api/Product/GetProductDetail  productID
+  getProductDetail([productID, closeLoading]) { // 根据产品ID获取到产品详细信息  GET /Api/Product/Detail  productID
     return instance.get(
-      `/Api/Product/GetProductDetail?productID=${productID}&placeOrder=${true}`,
+      `/Api/Product/Detail?productID=${productID}&placeOrder=${true}`,
       { closeLoading },
     );
   },
@@ -94,12 +94,6 @@ const api = {
   getPayResult(payCode, type) { // GET /Api/PaymentOrder/PayResult 查询付款结果
     if (!type) return instance.get(`/Api/PaymentOrder/PayResult?payCode=${payCode}`);
     return instance.get(`/Api/PaymentOrder/PayResult?payCode=${payCode}&type=${type}`);
-  },
-  getCustomerShortCutList() { // GET /Api/Customer/ShortCut/List 快捷方式列表
-    return instance.get('/Api/Customer/ShortCut/List');
-  },
-  getCustomerShortCutSave(data) { // POST /Api/Customer/ShortCut/Save
-    return instance.post('/Api/Customer/ShortCut/Save', data);
   },
 
   /* 优惠券部分api

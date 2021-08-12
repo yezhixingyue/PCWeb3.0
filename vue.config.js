@@ -8,8 +8,8 @@ module.exports = {
   devServer: {
     proxy: {
       '/Api': {
-        // target: 'http://192.168.3.68:8060',
-        target: process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-new-product' ? 'http://192.168.1.50:8050' : 'http://192.168.1.92:8055',
+        target: 'http://192.168.3.68:8050',
+        // target: process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-new-product' ? 'http://192.168.1.50:8050' : 'http://192.168.3.68:8050',
         // target: 'http://218.28.143.10:8156',
         ws: true, // 开启websockets
         changeOrigin: true, // 开启代理
