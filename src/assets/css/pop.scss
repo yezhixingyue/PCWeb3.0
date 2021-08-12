@@ -1,0 +1,374 @@
+@import "@/assets/css/var.scss";
+
+// 用于调整element弹框样式
+.el-message-box__wrapper::after {
+    vertical-align: -700px !important;
+}
+@mixin mp-ele-pop--base {
+
+    width: 400px !important;
+    min-height: 240px;
+    background-color: #fff;
+    margin: 200px auto 0;
+    border-radius: 5px;
+    display: flex !important;
+    flex-direction: column;
+    padding: 42px 0 30px 0;
+    justify-content: space-between;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+    padding-bottom: 30px !important;
+    padding-bottom: 55px\0 !important;
+    .el-message-box__header{
+        height: 36px;
+        padding: 0;
+        text-align: center;
+        >.el-message-box__title{
+            height: 36px;
+            line-height: 36px;
+            > span{
+                &::before{
+                    content: '';
+                    display: none;
+                    background: url('../images/search.png') center no-repeat;
+                    background-size: 100% 100%;
+                    height: 30px;
+                    width: 30px;
+                    margin-right: 20px;
+                    vertical-align: -27%;
+                }
+                color: $--color-text-regular;
+                font-size: 16px;
+                // font-weight: 600;
+            }
+        }
+        >.el-message-box__headerbtn{
+            position: absolute;
+            top: -28px;
+            right: 15px;
+
+        }
+    }
+    .el-message-box__content {
+        padding: 0;
+        padding-top: 25px;
+        padding-bottom: 35px;
+        flex: 1;
+        .el-message-box__container{
+            .el-message-box__status{
+                position: absolute;
+                display: none;
+            }
+            .el-message-box__message{
+                padding: 0;
+                text-align: center;
+                font-size: 12px;
+                color: $--color-text-regular;
+                > p {
+                    line-height: 18px;
+                    padding: 0 15px;
+                    font-size: 13px;
+                    color: #888;
+                }
+            }
+        }
+    }
+    .el-message-box__btns{
+        text-align: center;
+        position: absolute\0;
+        bottom: 25px\0;
+        left: 0\0;
+        right: 0\0;
+        button{
+            width: 100px;
+            height: 35px;
+            font-size: 14px;
+            padding-top: 0;
+            padding-bottom: 0;
+            // background-color: $--color-blue;
+            // border: 1px solid $--color-blue;
+            transition: .1s;
+            border-radius: 5px;
+            // &:hover {
+            //     transform: scale(1.005);
+            //     box-shadow: 0 1px 0 #0662a6, 0 1px 1px rgba(0, 0, 0, 0.2);
+            // }
+            // &:active {
+            //     color: mix($--color-white, $--color-blue, 80%);
+            //     background-color: mix($--color-white, $--color-blue, 10%);
+            // }
+            // color: $--color-white;
+            // margin-left: 35px;
+        }
+        button:only-child{
+            margin-left: 0px;
+        }
+        button:not(.el-button--primary){
+            // color: $--color-primary;
+            // background-color: $--color-white;
+            // border: 1px solid $--color-primary;
+            // &:hover {
+            //     background-color: $--color-white;
+            //     transform: scale(1.005);
+            //     box-shadow: 0px 1px 3px #ddd;
+            // }
+            // &:active {
+            //     color: mix($--color-white, $--color-primary, 10%);
+            //     background-color: rgba(168, 168, 168, 0.1);
+            // }
+        }
+    }
+
+} 
+
+// 普通样式
+@mixin normal {
+    @include mp-ele-pop--base;
+    .el-message-box__btns{
+        display: block;
+        button + button{
+            margin-left: 35px;
+        }
+        button {
+            // height: 35px;
+        }
+    }
+}
+// 反向按钮
+@mixin reverse-btn {
+    @include mp-ele-pop--base;
+    .el-message-box__btns{
+        display: flex;
+        justify-content: center;
+        flex-direction: row-reverse;
+        // display: inline-block\9\0;
+        button {
+            margin-left: 35px;
+            margin-left: 15px\9\0;
+        }
+        button + button {
+            margin-left: 0;
+            margin-left: 15px\9\0;
+        }
+
+    }
+}
+// 白底颜色单按钮
+@mixin single-btn-back-white {
+    @include mp-ele-pop--base;
+    .el-message-box__btns{
+        display: flex;
+        justify-content: center;
+        button {
+            // color: $--color-primary;
+            // background-color: $--color-white;
+            // border: 1px solid $--color-primary;
+            // &:hover {
+            //     background-color: $--color-white;
+            //     transform: scale(1.005);
+            //     box-shadow: 0px 1px 3px #ddd;
+            // }
+            // &:active {
+            //     color: mix($--color-white, $--color-primary, 10%);
+            //     background-color: rgba(168, 168, 168, 0.1);
+            // }
+        }
+    }
+}
+
+// 蓝底颜色单按钮
+@mixin single-btn-back-blue {
+    @include single-btn-back-white;
+    .el-message-box__btns{
+        button {
+            // color: $--color-white;
+            // background-color: $--color-blue;
+            // border: none;
+            // &:hover {
+            //     background-color: $--color-primary;
+            // }
+            // &:active {
+            //     background-color: #35dff9;
+            //     color: $--color-white;
+            // }
+        }
+    }
+}
+
+// 反向warn模式    ---- 订单列表删除弹框样式
+@mixin  reverse-warn {
+    .el-message-box__header{
+        >.el-message-box__title{
+            > span{
+                &::before{
+                    background-image: url('../images/warn.png') !important;
+                    display: inline-block !important;
+                }
+            }
+        }
+    }
+    @include reverse-btn;
+}
+
+// success模式弹框   --- 单按钮
+@mixin  normal-success {
+    .el-message-box__header{
+        >.el-message-box__title{
+            > span{
+                &::before{
+                    background-image: url('../images/success.png') !important;
+                    display: inline-block !important;
+                }
+            }
+        }
+    }
+    @include single-btn-back-blue;
+    width: 300px !important;
+    min-height: 175px;
+}
+
+// error模式弹框    --- 单按钮
+@mixin  normal-error {
+    .el-message-box__header{
+        >.el-message-box__title{
+            > span{
+                &::before{
+                    background-image: url('../images/error.png') !important;
+                    display: inline-block !important;
+                }
+            }
+        }
+    }
+    @include single-btn-back-white;
+}
+
+// ---------------- 测试类名
+// .el-message-box{
+//     @include normal-error;
+// }
+
+// 订单列表删除弹框样式，样式中确定和取消按键反向相反  且为 warn 类型       类名：mp-order-del-pop-reverse-warn
+.el-message-box.mp-order-del-pop-reverse-warn {
+    @include reverse-warn;
+}
+// MessageBox({
+//     showClose: true,
+//     message: this.orderDelContent,
+//     type: 'success ',
+//     confirmButtonText: '确定',
+//     title: '确定取消此订单吗 ?',
+//     customClass: 'mp-order-del-pop-reverse-warn',
+//     showCancelButton: true,
+//     cancelButtonText: '取消',
+// })
+
+// 失败的提示                                                           类名： mp-order-del-pop-reverse-fail 
+.el-message-box.mp-order-del-pop-reverse-fail {
+  @include normal-error;
+
+}
+// MessageBox({
+//     showClose: true,
+//     message: `[ 错误代码${error.response.status}：${error.response.statusText}]`,
+//     type: 'fail ',
+//     confirmButtonText: '关闭',
+//     title: '出错啦！',
+//     customClass: 'mp-order-del-pop-reverse-fail',
+// })
+
+// 没有信息内容的警告提示框                                             类名：mp-order-del-pop-reverse-warn-null
+.el-message-box.mp-order-del-pop-reverse-warn-null {
+    @include reverse-warn;
+    width: 330px !important;
+    min-height: 188px !important;
+    padding-top: 20px;
+    padding-bottom: 26px !important;
+    .el-message-box__content{
+        display: none;
+    }
+    .el-message-box__header{
+        height: 80px;
+        .el-message-box__title{
+            height: 80px;
+            line-height: 80px;
+            > span::before {
+                vertical-align: -12%;
+            }
+        }
+        > .el-message-box__headerbtn {
+            top: -18px;
+        }
+    }
+}
+// MessageBox({
+//     showClose: true,
+//     type: 'success ',
+//     confirmButtonText: '确定',
+//     title: '确定删除这张照片吗 ?',
+//     customClass: 'mp-order-del-pop-reverse-warn-null',
+//     showCancelButton: true,
+//     cancelButtonText: '取消',
+// })
+
+
+// 没有信息内容的成功提示框                                             类名：mp-order-del-pop-success
+.el-message-box.mp-order-del-pop-success {
+    @include normal-success;
+    padding-top: 35px;
+    padding-bottom: 25px !important;
+    .el-message-box__content{
+        display: none;
+    }
+    .el-message-box__header{
+        height: 46px;
+        margin-bottom: 30px;
+        .el-message-box__title{
+            height: 46px;
+            line-height: 46px;
+            font-weight: 600;
+            > span::before {
+                vertical-align: -18%;
+            }
+        }
+    }
+}
+// MessageBox({
+//     showClose: true,
+//     type: 'success ',
+//     confirmButtonText: '确定',
+//     title: '提交成功',
+//     customClass: 'mp-order-del-pop-success',
+// })
+
+
+// 没有信息内容的警告提示框  多行   标题文字小 14px                                            类名：mp-del-pop-reverse-warn-wrap-sm
+.el-message-box.mp-del-pop-reverse-warn-wrap-sm {    
+    @include reverse-warn;
+    .el-message-box__content{
+        display: none;
+    }
+    .el-message-box__header{
+        height: 80px;
+        .el-message-box__title{
+            height: 80px;
+            line-height: 26px;
+            padding: 1px 50px;
+            > span {
+              font-size: 14px;
+              &::before {
+                vertical-align: -35%;
+                margin-right: 58px;
+              }
+              &::after {
+                content: '注意:';
+                color: $--color-text-table-pending;
+                vertical-align: -27%;
+                position: absolute;
+                left: 103px;
+                top: 10px;
+              }
+            }
+        }
+    }
+}
