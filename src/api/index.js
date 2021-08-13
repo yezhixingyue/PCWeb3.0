@@ -61,7 +61,7 @@ const api = {
   },
   getProductLists(data = {}) { // 获取列表头部产品第三级列表
     return instance.post('/Api/Product/List', {
-      FieldType: 3,
+      FieldType: 2,
       ...data,
       TakeOrderWay: 1,
     }, { closeLoading: true });
@@ -77,9 +77,6 @@ const api = {
   },
   getProductPrice(data) { // 价格信息计算  POST /Api/Calculate/ProductPrice
     return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { closeLoading: true });
-  },
-  getCraftRelationList() { // GET /Api/Craft/GetCraftRelationList 获取工艺关系列表
-    return instance.get('/Api/Craft/GetCraftRelationList', { closeLoading: true });
   },
   getOrderPreCreate(data) { // POST /Api/Order/PreCreate  直接下单 - 预下单
     const { closeTip } = data;

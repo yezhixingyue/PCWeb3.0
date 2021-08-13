@@ -4,9 +4,9 @@
     <el-tabs v-model="activeName" type="card" :onTabScroll='onTabScroll' ref="tabs">
       <el-tab-pane
         v-for="item in classiftList"
-        :key="item.ProductID"
-        :label="item.ProductName"
-        :name="item.ProductID">
+        :key="item.ID"
+        :label="item.ShowName"
+        :name="item.ID">
       </el-tab-pane>
     </el-tabs>
   </section>
@@ -27,10 +27,10 @@ export default {
     ...mapGetters('Quotation', ['allProductClassify']),
     classiftList() {
       if (!this.curProductClass || !this.allProductClassify || this.allProductClassify.length === 0) return [];
-      const { First, Second } = this.curProductClass;
-      const level1 = this.allProductClassify.find(lv1 => lv1.ID === First);
+      const { FirstLevel, SecondLevel } = this.curProductClass;
+      const level1 = this.allProductClassify.find(lv1 => lv1.ID === FirstLevel.ID);
       if (level1) {
-        const level2 = level1.children.find(lv2 => lv2.ID === Second);
+        const level2 = level1.children.find(lv2 => lv2.ID === SecondLevel.ID);
         if (level2) return level2.children;
       }
       return [];
@@ -56,7 +56,7 @@ export default {
       else this.isEnd = false;
     },
     async handleProductSelected(val) {
-      const item = this.classiftList.find(it => it.ProductID === val);
+      const item = this.classiftList.find(it => it.ID === val);
       if (item) {
         this.$store.commit('Quotation/setCurProductInfo', item);
         this.$store.commit('Quotation/setSelectedCoupon', null);
@@ -66,9 +66,10 @@ export default {
     },
   },
   watch: {
-    curQueryPath(newVal) {
+    curQueryPath(newVal, oldVal) {
       if (!newVal) return;
-      this.handleProductSelected(newVal);
+      console.log(newVal, oldVal);
+      // this.handleProductSelected(newVal);
       // console.log('curQueryPath -- watch - change', newVal);
     },
   },

@@ -16,7 +16,12 @@ module.exports = {
     'linebreak-style': [0, 'error', 'window'],
     'no-underscore-dangle': 'off',
     'arrow-parens': 'off',
-    'max-len': ['error', { code: 120 }],
+    'max-len': ['error', { code: 160 }],
     'import/no-cycle': 'off',
+    'import/no-unresolved': 'off',
+    "import/extensions":  ['error', 'always', {
+      'js': 'never',
+      'vue': 'ignorePackages'
+    }]
   },
 };

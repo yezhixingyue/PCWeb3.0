@@ -73,6 +73,15 @@ export function getDateFormat2Date(date) {
 //     }
 //   }));
 // }
+/**
+ * @description: 把数字组成的数组字符串拆分开为数组
+ * @param {*} valueList
+ * @return {*}
+ */
+export const getNumberValueList = (valueList) => {
+  const reg = /\s|,|，/;
+  return valueList.split(reg).filter(it => it);
+};
 
 export default {
   isNumber,
@@ -82,4 +91,5 @@ export default {
   animateScroll,
   extname,
   getDateFormat2Date,
+  getNumberValueList,
 };

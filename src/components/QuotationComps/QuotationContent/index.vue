@@ -18,56 +18,7 @@
             </span>
           </section>
           <SwiperClassifyComp />
-          <section class="count-model-box">
-            <!-- 数量 -->
-            <ProductCountComp
-              :option="countOption"
-              :remark="obj2GetProductPrice.ProductParams.Unit"
-              v-model.trim="ProductAmount"
-            />
-            <HelpTipsComp :title="`${curProductShowNameInfo[2]}`" :tipsData='countTipsData' />
-            <ProductCountComp
-              v-if="obj2GetProductPrice.ProductParams.AllowMultyKind"
-              remark="款"
-              title="款数"
-              v-model.trim="KindCount"
-            />
-          </section>
-
-          <!-- 属性 -->
-          <attributes-comp :partID='null' v-model="AttributeList" />
-
-          <!-- 联拼行列数及是否允许多款联拼 -->
-          <multy-kind-makeup
-            :AllowMultyKindMakeup="
-              obj2GetProductPrice.ProductParams.AllowMultyKindMakeup
-            "
-            :maxColCount="
-              obj2GetProductPrice.ProductParams.MaxMakeupColumnNumber
-            "
-            :maxRowCount="obj2GetProductPrice.ProductParams.MaxMakeupRowNumber"
-          />
-
-          <!-- :list="obj2GetProductPrice.ProductParams.PropertyList"
-          @change="changeAttributes" -->
-          <!-- 必选工艺 -->
-          <craft-list-comp
-            title="必选工艺"
-            v-if="RequiredCraft"
-            :selectedArr="obj2GetProductPrice.ProductParams.CraftList2Req.First"
-            @setCraftList="setProductParamsCraftList"
-            :data="RequiredCraft"
-          />
-          <!-- 可选工艺 -->
-          <craft-list-comp
-            title="可选工艺"
-            v-if="notRequiredCraft"
-            :selectedArr="obj2GetProductPrice.ProductParams.CraftList2Req.First"
-            @setCraftList="setProductParamsCraftList"
-            :data="notRequiredCraft"
-          />
-          <!-- 部件列表组件 -->
-          <PartComps :PartList="obj2GetProductPrice.ProductParams.PartList" />
+          <PlaceOrderPanel :placeData='placeData' />
         </div>
 
         <section class="coupon-calculate-price-wrap">
@@ -233,33 +184,23 @@ import {
   mapState, mapGetters, mapMutations, mapActions,
 } from 'vuex';
 import tipEnums from '@/assets/js/utils/tipEnums';
-import MultyKindMakeup from '@/components/QuotationComps/ProductQuotationContentComps/NewPcComps/MultyKindMakeup.vue';
-import AttributesComp from '@/components/QuotationComps/ProductQuotationContentComps/NewPcComps/AttributesComp.vue';
-import CraftListComp from '@/components/QuotationComps/ProductQuotationContentComps/NewPcComps/CraftListComp.vue';
-import PartComps from '@/components/QuotationComps/ProductQuotationContentComps/NewPcComps/PartComps.vue';
 import { productJumpUrl } from '@/assets/js/setup';
-import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp.vue';
-import ProductCountComp from './NewPcComps/ProductCountComp.vue';
-import ComputedResultComp from './NewPcComps/ComputedResultComp.vue';
+import ComputedResultComp from './Comps/ComputedResultComp.vue';
 import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
 import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp.vue';
-import SwiperClassifyComp from './NewPcComps/SwiperClassifyComp.vue';
+import SwiperClassifyComp from './Comps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
+import PlaceOrderPanel from './Comps/PlaceOrderPanel/index.vue';
 
 export default {
   props: ['placeData'],
   components: {
-    ProductCountComp,
-    MultyKindMakeup,
-    AttributesComp,
-    CraftListComp,
-    PartComps,
     AddShowChangeComp,
     OrderSubmitComp,
     ComputedResultComp,
     SwiperClassifyComp,
     AsideIntroComp,
-    HelpTipsComp,
+    PlaceOrderPanel,
   },
   computed: {
     // eslint-disable-next-line max-len

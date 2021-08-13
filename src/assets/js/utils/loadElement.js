@@ -3,9 +3,10 @@ import Vue from 'vue';
 import {
   Dialog, Dropdown, DropdownMenu, DropdownItem, Select, Option, Steps, Step, Popover, Link, Radio, Collapse, Upload,
   CollapseItem, RadioGroup, Tabs, TabPane, Message, Input, Form, FormItem, Button, CheckboxGroup, Checkbox, Progress,
-  Table, TableColumn, Tooltip, DatePicker, RadioButton, Pagination, Image, Loading, Backtop, Icon, Drawer,
+  Table, TableColumn, Tooltip, DatePicker, RadioButton, Pagination, Image, Loading, Backtop, Icon, Drawer, Switch,
 } from 'element-ui';
 
+Vue.use(Switch);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(Dropdown);

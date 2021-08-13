@@ -12,7 +12,10 @@
               :key="it.ID"
               @mouseenter="onMouseEnter(i)"
               @mouseleave="onMouseLeave"
-              :class="{ active: i === index&&isOpen, selected: curProduct && it.ID === curProduct.ProductClass.First }"
+              :class="{
+                active: i === index && isOpen,
+                selected: curProductClass && it.ID === curProductClass.FirstLevel.ID
+              }"
             >
               <span>{{it.ClassName}}</span>
             </li>
@@ -37,9 +40,9 @@
               <div class="products">
                 <el-link :underline="false"
                   v-for="sub in item.children"
-                  :key="sub.ProductID"
+                  :key="sub.ID"
                   @click="selectProduct(sub)"
-                  :class="curProduct && curProduct.ProductID === sub.ProductID ? 'active' : ''"
+                  :class="curProduct && curProduct.ID === sub.ID ? 'active' : ''"
                   >{{sub.ShowName}}</el-link>
               </div>
             </li>
@@ -79,7 +82,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('Quotation', ['productNames', 'curProduct']),
+    ...mapState('Quotation', ['productNames', 'curProduct', 'curProductClass']),
     ...mapGetters('Quotation', ['allProductClassify']),
     curMenus() {
       if (!this.index && this.index !== 0) return null;
@@ -126,10 +129,9 @@ export default {
         this.isOpen = false;
       }
       if (this.curProduct && this.curProduct.ID === sub.ID && !this.isComHeader) return;
-      console.log(sub);
-      // this.$store.commit('Quotation/setCurProductInfo', sub);
-      // this.$store.dispatch('Quotation/getProductDetail');
-      // this.$store.commit('Quotation/setSelectedCoupon', null);
+      this.$store.commit('Quotation/setCurProductInfo', sub);
+      this.$store.dispatch('Quotation/getProductDetail');
+      this.$store.commit('Quotation/setSelectedCoupon', null);
     },
   },
   watch: {

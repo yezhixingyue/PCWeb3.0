@@ -31,18 +31,11 @@ function _getProperty(_arr, isGroup) { // 转换属性
       PropertyID: it.PropertyID,
       // ---- 此处有最大最小值限制 --- 需要进行校验
     });
-
-    // return ({
-    //   PropertyID: it.PropertyID,
-    //   CustomizedOptionValue: "3mm",
-    //   CustomerInputValue: it.CustomerInputValue,
-    // })
   });
 }
 
 function _setErrMsg(errMsg) {
   const msg = store.state.Quotation.curSelectStatus;
-  // console.log(store.state.Quotation.curSelectStatus);
   massage.failSingleError({ title: `${msg}失败`, msg: errMsg });
 }
 
@@ -52,85 +45,6 @@ function _checkCraft(_isRequireCraftList, item, _selectdCraftIdList, curCraftRel
     if (curCraftRelationList.length === 0) { // 肯定没有互斥工艺，进行报错及return
       return false;
     } // 存在有工艺关系的工艺
-    // let key = true;
-    // const _isRequireCraftIDsList = _isRequireCraftList.map(_it => _it.CraftID);
-    // for (let _i = 0; _i < curCraftRelationList.length; _i += 1) {
-    //   const rule = curCraftRelationList[_i];
-    //   if (rule.RelationType === 1) { // 互斥工艺关系判断
-    //     // // console.log("1213213131231 第1种方式");
-    //     const _t = rule.CraftList.find(_c => _c.CraftID === item.CraftID);
-    //     // // console.log("1213213131231 第1种方式---2", _t, rule.CraftList, item);
-    //     if (_t) {
-    //       // // console.log("1213213131231 第1种方式---2", _t, _t.CraftName);
-    //       // // console.log("rule.CraftList:", rule.CraftList)
-    //       for (let _i2 = 0; _i2 < rule.CraftList.length; _i2 += 1) {
-    //         const _subC = rule.CraftList[_i2];
-    //         if (_subC.CraftID !== _t.CraftID) {
-    //           if (_selectdCraftIdList.includes(_subC.CraftID)) {
-    //             // 能到此处 说明： 当前已选择工艺列表中存在有【当前正在判断的未勾选的必选工艺， 即此处item变量 】的互斥工艺  所以该工艺可不选
-    //             key = false;
-    //             // // console.log("---------------------------key:", key);
-    //             // eslint-disable-next-line consistent-return
-    //             return;
-    //           } if (!_selectdCraftIdList.includes(_subC.CraftID) && _isRequireCraftIDsList.includes(_subC.CraftID)) {
-    //             return _subC.CraftNickName;
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    //   if (rule.RelationType === 2) {
-    //     // 单向依赖 分2种情况：1. 它依赖与别的工艺，别的工艺不依赖与它，此时它选不选都不影响其它工艺 所以此时其不选必不通过验证
-    //     //  2. 别的工艺依赖与它  此时它应当为必选
-    //     // 所以单向依赖时  工艺都为必选
-    //     // // console.log("1213213131231 第2种方式");
-    //   }
-    //   if (rule.RelationType === 3) {
-    //     // 双向依赖 如果其在已选择列表中没有互斥的工艺存在  则继续看其双向绑定的工艺是否在需要必选的列表中，
-    //     // 如果不存在则不考虑，如果存在则继续判断该依赖的工艺在已选择的列表中是否存在互斥工艺
-    //     const _ruleList = [...rule.CraftList, rule.MasterCraft];
-    //     const _ruleIdsList = _ruleList.map(_t => _t.CraftID);
-    //     // // console.log("1213213131231 第三种方式");
-    //     if (_ruleIdsList.includes(item.CraftID)) {
-    //       // 当前未选择的工艺存在该列表中
-    //       // // console.log("1213213131231 第三种方式-1");
-    //       for (let _ruleIndex = 0; _ruleIndex < _ruleIdsList.length; _ruleIndex += 1) {
-    //         const _targetRule = _ruleList[_ruleIndex];
-    //         // // console.log("1213213131231 第三种方式-2",  _targetRule.CraftName, _targetRule);
-    //         if (_targetRule.CraftID !== item.CraftID) {
-    //           // // console.log("1213213131231 第三种方式-3", _targetRule.CraftName);
-    //           if (_isRequireCraftIDsList.includes(_targetRule.CraftID)) {
-    //             // 说明有双向绑定的工艺存在需要选择的工艺列表中 此时进行判断
-    //             // // console.log("1213213131231 第三种方式-4",  _targetRule.CraftName);
-    //             if (!_selectdCraftIdList.includes(_targetRule.CraftID)) {
-    //               // 继续判断该工艺的满足项  应当使用递归方式 下一步提取判断过程 进行循环递归调用
-    //               // // console.log("1213213131231 第三种方式-5",  _targetRule.CraftName);
-    //               const _tempRequireCraftList = _isRequireCraftList.filter(_it => _it.CraftID !== item.CraftID);
-    //               // // console.log("调用了_checkCraft方法")
-    //               return _checkCraft(_tempRequireCraftList, _targetRule, _selectdCraftIdList, curCraftRelationList);
-    //             }
-    //           }
-    //           // // console.log(_targetRule.CraftName, "-----------------------------!")
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // if (key) {
-    //   return false;
-    // }
-  }
-}
-
-function mountRelevanceInformation(list, RelevanceItem) { // 向属性中挂载关联信息
-  for (let index = 0; index < list.length; index += 1) {
-    const _PrintType = list[index];
-    // // console.log(_PrintType, RelevanceItem);
-    if (_PrintType.PropertyID === RelevanceItem.RelevanceProperty.PropertyID) {
-      if (!_PrintType.RelevanceInformation) _PrintType.RelevanceInformation = [RelevanceItem];
-      else _PrintType.RelevanceInformation.push(RelevanceItem);
-      return;
-    }
   }
 }
 
@@ -357,11 +271,7 @@ export function getRelevanceInTargetValue(targetObj, RelevanceInformation) {
     }
     if (_t.SizeGroup) {
       // 尺寸组
-      // // console.log(RelevanceIndex);
-      // // console.log(_t.SizePropertyList, Relevance, Relevance.MasterProperty, RelevanceInformation);
       const res = getValue(_t.SizePropertyList, Relevance.MasterProperty);
-      // // console.log(res);
-      // return;
       if (res && Relevance.Compare === 1) {
         const _obj = {};
         _obj.val = res.CustomerInputValue;
@@ -377,166 +287,181 @@ export function getRelevanceInTargetValue(targetObj, RelevanceInformation) {
 
 export default class QuotationClassType {
   static init(obj) {
-    // console.log(obj);
-    if (!obj) return;
+    if (!obj || Object.prototype.toString.call(obj) !== '[object Object]') return {};
     const _obj = JSON.parse(JSON.stringify(obj));
-    _obj.ProductAmount = '';
-    _obj.KindCount = 1;
-    _obj.MakeupRowNumber = 1;
-    _obj.MakeupColumnNumber = 1;
-    _obj.MultyKindMakeup = false;
-    _obj.CraftList2Req = {
-      // 产品工艺 ----------- 改名
-      First: [],
-      Second: true,
-    };
-    _obj.CraftList = _obj.CraftList.map(item => ({
-      ...item,
-      CraftList: item.CraftList.map(it2 => ({
-        ...it2,
-        disabled: false, // 是否禁用
-        historyData: null, // 存放输入历史
-        isSystemSelect: false, // 是否由系统勾选
-        PositionID: item.PositionID,
-        PropertyList: it2.PropertyList.map(it3 => ({
-          ...it3,
-          CustomizedOptionValue: null,
-        })),
-      })),
-    }));
-
-    // 设置必选工艺(不需进行额外选择的)默认勾选
-    const _needCraftList = _obj.CraftList.find(it => it.ChoiceType === 2);
-    if (_needCraftList && _needCraftList.CraftList.length > 0) {
-      _needCraftList.CraftList.forEach(it => {
-        if (it.PropertyList.length === 0) {
-          const _it = JSON.parse(JSON.stringify(it));
-          _it.PropertyList = [[]];
-          _obj.CraftList2Req.First.push(_it);
-        }
-      });
+    if (Array.isArray(_obj.DisplayList)) {
+      _obj.DisplayList = _obj.DisplayList.map(it => ({ ...it, key: Math.random().toString(36).slice(-10) }));
     }
+    return _obj;
+    // console.log(obj);
+    // if (!obj) return;
+    // const _obj = JSON.parse(JSON.stringify(obj));
+    // _obj.ProductAmount = '';
+    // _obj.KindCount = 1;
+    // _obj.MakeupRowNumber = 1;
+    // _obj.MakeupColumnNumber = 1;
+    // _obj.MultyKindMakeup = false;
+    // _obj.CraftList2Req = {
+    //   // 产品工艺 ----------- 改名
+    //   First: [],
+    //   Second: true,
+    // };
+    // _obj.CraftList = _obj.CraftList.map(item => ({
+    //   ...item,
+    //   CraftList: item.CraftList.map(it2 => ({
+    //     ...it2,
+    //     disabled: false, // 是否禁用
+    //     historyData: null, // 存放输入历史
+    //     isSystemSelect: false, // 是否由系统勾选
+    //     PositionID: item.PositionID,
+    //     PropertyList: it2.PropertyList.map(it3 => ({
+    //       ...it3,
+    //       CustomizedOptionValue: null,
+    //     })),
+    //   })),
+    // }));
 
-    _obj.PropertyList = _obj.PropertyList.map(item => ({
-      ...item,
-      CustomizedOptionValue: null,
-      CustomerInputValue: item.ValueType === 2 ? item.OptionList[0].OptionID : '',
-    }));
-    _obj.PartList = _obj.PartList.map(Part => {
-      const _CraftList = Part.CraftList.map(item => ({
-        ...item,
-        CraftList: item.CraftList.map(it2 => ({
-          ...it2,
-          disabled: false,
-          historyData: null,
-          isSystemSelect: false,
-          PositionID: item.PositionID,
-          PropertyList: it2.PropertyList.map(it3 => ({
-            ...it3,
-            CustomizedOptionValue: null,
-          })),
-        })),
-      }));
+    // // 设置必选工艺(不需进行额外选择的)默认勾选
+    // const _needCraftList = _obj.CraftList.find(it => it.ChoiceType === 2);
+    // if (_needCraftList && _needCraftList.CraftList.length > 0) {
+    //   _needCraftList.CraftList.forEach(it => {
+    //     if (it.PropertyList.length === 0) {
+    //       const _it = JSON.parse(JSON.stringify(it));
+    //       _it.PropertyList = [[]];
+    //       _obj.CraftList2Req.First.push(_it);
+    //     }
+    //   });
+    // }
 
-      const _PartCraftList2Req = {
-        // 部件工艺 ----------- 改名
-        First: [],
-        Second: true,
-      };
+    // _obj.PropertyList = _obj.PropertyList.map(item => ({
+    //   ...item,
+    //   CustomizedOptionValue: null,
+    //   CustomerInputValue: item.ValueType === 2 ? item.OptionList[0].OptionID : '',
+    // }));
+    // _obj.PartList = _obj.PartList.map(Part => {
+    //   const _CraftList = Part.CraftList.map(item => ({
+    //     ...item,
+    //     CraftList: item.CraftList.map(it2 => ({
+    //       ...it2,
+    //       disabled: false,
+    //       historyData: null,
+    //       isSystemSelect: false,
+    //       PositionID: item.PositionID,
+    //       PropertyList: it2.PropertyList.map(it3 => ({
+    //         ...it3,
+    //         CustomizedOptionValue: null,
+    //       })),
+    //     })),
+    //   }));
 
-      // eslint-disable-next-line no-shadow
-      const _needCraftList = _CraftList.find(it => it.ChoiceType === 2);
-      if (_needCraftList && _needCraftList.CraftList.length > 0) {
-        _needCraftList.CraftList.forEach(it => {
-          if (it.PropertyList.length === 0) {
-            const _it = JSON.parse(JSON.stringify(it));
-            _it.PropertyList = [[]];
-            _PartCraftList2Req.First.push(_it);
-          }
-        });
-      }
-      return ({
-        PartID: Part.PartID, // ok
-        AllowChangePartNumber: true,
-        PartList: [
-          {
-            ...Part,
-            singlePartID: Part.PartID + (`${Math.random()}`).replace('.', ''),
-            PartAmount: {
-              First: '',
-              Second: true,
-            },
-            Material: {
-              // ok 物料
-              First: Part.MaterialList && Part.MaterialList.length > 0 ? Part.MaterialList[0].MaterialID : '',
-              Second: true,
-            },
-            MaterialBrand: {
-              // ok 物料品牌
-              First: Part.BrandList && Part.BrandList.length > 0 ? Part.BrandList[0].BrandID : '',
-              Second: true,
-            },
-            Size: {
-              // 尺寸
-              First: '',
-              Second: true,
-            },
-            SizePropertyList: [],
-            PartCraftList2Req: _PartCraftList2Req,
-            PropertyGroupList: [
-              ...Part.PropertyGroupList.map(PropertyGroup => ({
-                ...PropertyGroup,
-                AllowCustomized: true,
-                PropertyList: [
-                  {
-                    Second: PropertyGroup.PropertyList.map(Property => {
-                      const _CustomerInputValue = Property.ValueType === 2 ? Property.OptionList[0].OptionID : '';
-                      return ({
-                        ...Property,
-                        CustomizedOptionValue: null,
-                        CustomerInputValue: _CustomerInputValue,
-                      });
-                    }),
-                  },
-                ],
-              })),
-            ],
-            PrintPropertyGroupList: [
-              ...Part.PrintPropertyGroupList.map(PrintPropertyGroup => ({
-                ...PrintPropertyGroup,
-                AllowCustomized: true,
-                PropertyList: [
-                  {
-                    Second: PrintPropertyGroup.PropertyList.map(Property => ({
-                      ...Property,
-                      CustomizedOptionValue: null,
-                      CustomerInputValue: Property.OptionList[0].OptionID,
-                    })),
-                  },
-                ],
-              })),
-            ],
-            PropertyList: [
-              ...Part.PropertyList.map(Property => ({
-                ...Property,
-                CustomizedOptionValue: null,
-                AllowCustomized: true,
-                CustomerInputValue: Property.ValueType === 2 ? Property.OptionList[0].OptionID : '',
-              })),
-            ],
-            CraftList: _CraftList,
-            PrintTypeList: [
-              ...Part.PrintTypeList.map(PrintType => ({
-                ...PrintType,
-                AllowCustomized: true,
-                CustomerInputValue: PrintType.OptionList[0].OptionID,
-              })),
-            ],
-          },
-        ],
-      });
-    });
+    //   const _PartCraftList2Req = {
+    //     // 部件工艺 ----------- 改名
+    //     First: [],
+    //     Second: true,
+    //   };
 
+    //   // eslint-disable-next-line no-shadow
+    //   const _needCraftList = _CraftList.find(it => it.ChoiceType === 2);
+    //   if (_needCraftList && _needCraftList.CraftList.length > 0) {
+    //     _needCraftList.CraftList.forEach(it => {
+    //       if (it.PropertyList.length === 0) {
+    //         const _it = JSON.parse(JSON.stringify(it));
+    //         _it.PropertyList = [[]];
+    //         _PartCraftList2Req.First.push(_it);
+    //       }
+    //     });
+    //   }
+    //   return ({
+    //     PartID: Part.PartID, // ok
+    //     AllowChangePartNumber: true,
+    //     PartList: [
+    //       {
+    //         ...Part,
+    //         singlePartID: Part.PartID + (`${Math.random()}`).replace('.', ''),
+    //         PartAmount: {
+    //           First: '',
+    //           Second: true,
+    //         },
+    //         Material: {
+    //           // ok 物料
+    //           First: Part.MaterialList && Part.MaterialList.length > 0 ? Part.MaterialList[0].MaterialID : '',
+    //           Second: true,
+    //         },
+    //         MaterialBrand: {
+    //           // ok 物料品牌
+    //           First: Part.BrandList && Part.BrandList.length > 0 ? Part.BrandList[0].BrandID : '',
+    //           Second: true,
+    //         },
+    //         Size: {
+    //           // 尺寸
+    //           First: '',
+    //           Second: true,
+    //         },
+    //         SizePropertyList: [],
+    //         PartCraftList2Req: _PartCraftList2Req,
+    //         PropertyGroupList: [
+    //           ...Part.PropertyGroupList.map(PropertyGroup => ({
+    //             ...PropertyGroup,
+    //             AllowCustomized: true,
+    //             PropertyList: [
+    //               {
+    //                 Second: PropertyGroup.PropertyList.map(Property => {
+    //                   const _CustomerInputValue = Property.ValueType === 2 ? Property.OptionList[0].OptionID : '';
+    //                   return ({
+    //                     ...Property,
+    //                     CustomizedOptionValue: null,
+    //                     CustomerInputValue: _CustomerInputValue,
+    //                   });
+    //                 }),
+    //               },
+    //             ],
+    //           })),
+    //         ],
+    //         PrintPropertyGroupList: [
+    //           ...Part.PrintPropertyGroupList.map(PrintPropertyGroup => ({
+    //             ...PrintPropertyGroup,
+    //             AllowCustomized: true,
+    //             PropertyList: [
+    //               {
+    //                 Second: PrintPropertyGroup.PropertyList.map(Property => ({
+    //                   ...Property,
+    //                   CustomizedOptionValue: null,
+    //                   CustomerInputValue: Property.OptionList[0].OptionID,
+    //                 })),
+    //               },
+    //             ],
+    //           })),
+    //         ],
+    //         PropertyList: [
+    //           ...Part.PropertyList.map(Property => ({
+    //             ...Property,
+    //             CustomizedOptionValue: null,
+    //             AllowCustomized: true,
+    //             CustomerInputValue: Property.ValueType === 2 ? Property.OptionList[0].OptionID : '',
+    //           })),
+    //         ],
+    //         CraftList: _CraftList,
+    //         PrintTypeList: [
+    //           ...Part.PrintTypeList.map(PrintType => ({
+    //             ...PrintType,
+    //             AllowCustomized: true,
+    //             CustomerInputValue: PrintType.OptionList[0].OptionID,
+    //           })),
+    //         ],
+    //       },
+    //     ],
+    //   });
+    // });
+
+    // return _obj;
+  }
+
+  static initOriginData(obj) {
+    if (!obj || Object.prototype.toString.call(obj) !== '[object Object]') return {};
+    const _obj = JSON.parse(JSON.stringify(obj));
+    if (Array.isArray(_obj.DisplayList)) {
+      _obj.DisplayList = _obj.DisplayList.map(it => ({ ...it, key: Math.random().toString(36).slice(-10) }));
+    }
     return _obj;
   }
 
@@ -666,18 +591,11 @@ export default class QuotationClassType {
         const _selectdCraftIdList = obj.CraftList2Req.First.map(it => it.CraftID);
         for (let i = 0; i < _isRequireCraftList.length; i += 1) {
           const item = _isRequireCraftList[i];
-          // // console.log(`第${i}次调用外部------------------_checkCraft方法，当前判断的工艺为ite${item.CraftName}`)
-          // // console.log(_isRequireCraftList, item, _selectdCraftIdList, curCraftRelationList, "接上面")
           const res = _checkCraft(_isRequireCraftList, item, _selectdCraftIdList, curCraftRelationList);
-          // // console.log(res);
           if (res === false) {
             _setErrMsg(`主产品中[ ${item.CraftNickName} ]是必选工艺!`);
             return false;
           }
-          // if (typeof res === 'string') {
-          //   _setErrMsg(`主产品中[ ${item.CraftNickName} ]和[ ${res} ]两种工艺需要选择其中一种!`);
-          //   return false;
-          // }
         }
       }
     }
@@ -865,49 +783,13 @@ export default class QuotationClassType {
           const _isRequireCraftList = _PartCraftList[0].CraftList;
           if (_isRequireCraftList.length > 0) {
             const _selectdCraftIdList = Part.PartCraftList2Req.First.map(it => it.CraftID);
-            // console.log(_isRequireCraftList, _selectdCraftIdList, _PartCraftList, Part.CraftList);
             for (let i = 0; i < _isRequireCraftList.length; i += 1) {
               const item = _isRequireCraftList[i];
               const res = _checkCraft(_isRequireCraftList, item, _selectdCraftIdList, curCraftRelationList);
-              // // console.log(res);
               if (res === false) {
                 _setErrMsg(`${_PartName}中[ ${item.CraftNickName} ]是必选工艺!`);
                 return false;
               }
-              // if (typeof res === 'string') {
-              //   _setErrMsg(`${_PartName}中[ ${item.CraftNickName} ]和[ ${res} ]两种工艺需要选择其中一种!`);
-              //   return false;
-              // }
-              // if (!_selectdCraftIdList.includes(item.CraftID)) {
-              //   if (curCraftRelationList.length === 0) {
-              //     _setErrMsg(`${Part.PartName}中${item.CraftNickName}是必选工艺!`);
-              //     return false;
-              //   } else {
-              //     // 只判断互斥关系即可
-              //     let key = true;
-              //     for (let _i = 0; _i < curCraftRelationList.length; _i += 1) {
-              //       const rule = curCraftRelationList[_i];
-              //       if (rule.RelationType === 1) {
-              //         const _t = rule.CraftList.find(_c => _c.CraftID === item.CraftID);
-              //         if (_t) {
-              //           for (let _i2 = 0; _i2 < rule.CraftList.length; _i2 += 1) {
-              //             const _subC = rule.CraftList[_i2];
-              //             if (_subC.CraftID !== _t.CraftID) {
-              //               if (_selectdCraftIdList.includes(_subC.CraftID)) {
-              //                 key = false;
-              //                 break;
-              //               };
-              //             }
-              //           }
-              //         }
-              //       }
-              //     }
-              //     if (key) {
-              //       _setErrMsg(`${Part.PartName}中${item.CraftNickName}是必选工艺!`);
-              //       return false;
-              //     }
-              //   }
-              // }
             }
           }
         }
@@ -1013,201 +895,5 @@ export default class QuotationClassType {
       });
     });
     return _obj;
-  }
-
-  // 设置回填默认产品
-  static backfillDefaultProduct(obj, item) {
-    // console.log(obj, item);
-    // 1. 回填产品工艺信息  -----  根据客户端情况来看： 工艺禁用不做判断(含部件工艺)
-    // eslint-disable-next-line max-len
-    const requiredCraftIDList = obj.CraftList.find(it => it.ChoiceType === 2) ? obj.CraftList.find(it => it.ChoiceType === 2).CraftList.map(it => it.CraftID) : [];
-    obj.CraftList2Req.First = obj.CraftList2Req.First.filter(it => requiredCraftIDList.includes(it.CraftID));
-    if (item.CraftList.First.length > 0) {
-      const _listData = obj.CraftList.find(it => it.ChoiceType === 1);
-      _listData.AllowCustomized = item.CraftList.Second;
-      item.CraftList.First.forEach(it => {
-        if (obj.CraftList2Req.First.find(_it => _it.CraftID === it.CraftID)) return;
-        const _t = _listData.CraftList.find(_it => _it.CraftID === it.CraftID);
-        if (_t) {
-          if (obj.CraftList2Req.First) obj.CraftList2Req.First.push(_t);
-        }
-      });
-    }
-
-    // 2. 回填产品部件信息
-    item.PartList.forEach((partItem) => {
-      const _t = obj.PartList.find(it => it.PartID === partItem.PartID);
-      // 是否允许增减部件数量
-      _t.AllowChangePartNumber = partItem.AllowChangePartNumber;
-
-      // 删除多余的
-      if (_t.PartList.length > partItem.PartList.length) {
-        const _num = _t.PartList.length - partItem.PartList.length;
-        _t.PartList.splice(partItem.PartList.length, _num);
-      }
-
-      partItem.PartList.forEach((part, i) => {
-        if (!_t.PartList[i] && i === 0) return;
-        if (!_t.PartList[i] && i > 0) _t.PartList[i].push(JSON.parse(JSON.stringify(_t.PartList[0])));
-
-        // 2.1 回填部件数量
-        if (part.PartAmount.First) {
-          _t.PartList[i].PartAmount.First = part.PartAmount.First;
-          _t.PartList[i].PartAmount.Second = part.PartAmount.Second; // 判断是否允许客户自定义输入
-        }
-
-        // 2.2 回填部件尺寸组
-        if (part.Size.First !== '00000000-0000-0000-0000-000000000000') {
-          _t.PartList[i].Size.First = part.Size.First;
-          _t.PartList[i].Size.Second = part.Size.Second;
-        }
-
-        // 2.2 回填部件物料
-        if (part.Material.First !== '00000000-0000-0000-0000-000000000000') {
-          _t.PartList[i].Material.First = part.Material.First;
-          _t.PartList[i].Material.Second = part.Material.Second;
-        }
-
-        // 2.3 回填印刷属性 和 普通属性
-        if (part.PropertyList.length > 0) {
-          part.PropertyList.forEach(prop => {
-            let _tProp;
-            _tProp = _t.PartList[i].PrintTypeList.find(_it => _it.PropertyID === prop.PropertyID);
-            if (!_tProp) _tProp = _t.PartList[i].PropertyList.find(_it => _it.PropertyID === prop.PropertyID);
-            if (_tProp) {
-              _tProp.CustomerInputValue = prop.CustomerInputValue;
-              _tProp.AllowCustomized = prop.AllowCustomized;
-            }
-          });
-        }
-
-        // 2.4 回填印刷属性组 和 普通属性组
-        if (part.PropertyGroupList.length > 0) {
-          part.PropertyGroupList.forEach(prop => {
-            let _tGroup;
-            _tGroup = _t.PartList[i].PrintPropertyGroupList.find(_it => _it.GroupID === prop.GroupID);
-            if (!_tGroup) _tGroup = _t.PartList[i].PropertyGroupList.find(_it => _it.GroupID === prop.GroupID);
-            if (_tGroup) {
-              _tGroup.AllowCustomized = prop.AllowCustomized;
-
-              // 删除多余的
-              if (_tGroup.PropertyList.length > prop.PropertyList.length) {
-                const _num = _tGroup.PropertyList.length - prop.PropertyList.length;
-                _tGroup.PropertyList.splice(prop.PropertyList.length, _num);
-              }
-
-              prop.PropertyList.forEach((item, i) => {
-                if (!_tGroup.PropertyList[i] && i === 0) return;
-                if (!_tGroup.PropertyList[i] && i > 0) _tGroup.PropertyList.push(JSON.parse(JSON.stringify(_tGroup.PropertyList[0])));
-
-                item.Second.forEach(subItem => {
-                  const _tProp = _tGroup.PropertyList[i].Second.find(it => it.PropertyID === subItem.PropertyID);
-                  if (_tProp) {
-                    _tProp.AllowCustomized = subItem.AllowCustomized;
-                    _tProp.CustomerInputValue = subItem.CustomerInputValue;
-                  }
-                });
-              });
-            }
-          });
-        }
-
-        // 2.5 回填工艺信息 PartList
-
-        const craftList2NoRequire = _t.PartList[i].CraftList.find(it => it.ChoiceType === 2);
-        const requiredCraftIDList = craftList2NoRequire ? craftList2NoRequire.CraftList.map(it => it.CraftID) : [];
-        _t.PartList[i].PartCraftList2Req.First = _t.PartList[i].PartCraftList2Req.First.filter(it => requiredCraftIDList.includes(it.CraftID));
-        if (part.CraftList.First.length > 0) {
-          const _listData = _t.PartList[i].CraftList.find(it => it.ChoiceType === 1);
-          _listData.AllowCustomized = part.CraftList.Second;
-          part.CraftList.First.forEach(it => {
-            if (_t.PartList[i].PartCraftList2Req.First.find(_it => _it.CraftID === it.CraftID)) return;
-            const _target = _listData.CraftList.find(_it => _it.CraftID === it.CraftID);
-            if (_target) {
-              if (_t.PartList[i].PartCraftList2Req.First) _t.PartList[i].PartCraftList2Req.First.push(_target);
-            }
-          });
-        }
-      });
-    });
-  }
-
-  // 处理属性关联， 给有属性关联信息的属性上添加上相关信息
-  static handlePropertyRelevanceList(obj) {
-    if (!obj) return;
-    const _obj = obj;
-    if (_obj.PropertyRelevanceList.length === 0) return _obj;
-    _obj.PropertyRelevanceList.forEach(Relevance => {
-      // console.log(Relevance);
-      if (Relevance.Compare && Relevance.MasterProperty.PropertyID === Relevance.RelevanceProperty.PropertyID && Relevance.MasterProperty.PartID === Relevance.RelevanceProperty.PartID) return;
-      const _t = _obj.PartList.find((item) => Relevance.RelevanceProperty.PartID === item.PartID);
-      if (_t.PrintPropertyGroupList.length > 0) {
-        // 印刷属性组
-        for (let index = 0; index < _t.PrintPropertyGroupList.length; index += 1) {
-          const element = _t.PrintPropertyGroupList[index];
-          mountRelevanceInformation(element.PropertyList, Relevance);
-        }
-      }
-      if (_t.PrintTypeList.length > 0) {
-        // 印刷属性
-        mountRelevanceInformation(_t.PrintTypeList, Relevance);
-      }
-      if (_t.PropertyGroupList.length > 0) {
-        // 属性组
-        for (let index = 0; index < _t.PropertyGroupList.length; index += 1) {
-          const element = _t.PropertyGroupList[index];
-          mountRelevanceInformation(element.PropertyList, Relevance);
-        }
-      }
-      if (_t.PropertyList.length > 0) {
-        mountRelevanceInformation(_t.PropertyList, Relevance);
-      }
-      if (_t.SizeGroup) {
-        // 尺寸组
-        mountRelevanceInformation(_t.SizeGroup.PropertyList, Relevance);
-      }
-    });
-  }
-
-  // 处理工艺上的条件判断，给设置有条件判断的工艺上添加相关信息
-  static handleCraftConditionList(obj) {
-    if (!obj) return {};
-    const _obj = obj;
-    if (_obj.CraftConditionList.length > 0) {
-      _obj.CraftConditionList.forEach(it => {
-        it.CraftList.forEach(craftId => {
-          _obj.CraftList.forEach(CraftItemList => {
-            if (CraftItemList.ChoiceType === 2) return;
-            const _t = CraftItemList.CraftList.find(_Craft => _Craft.CraftID === craftId);
-            if (_t) {
-              if (!_t.CraftCondition) {
-                _t.CraftCondition = [{ ...it, type: 'isMain' }];
-              } else {
-                _t.CraftCondition.push({ ...it, type: 'isMain' });
-              }
-            }
-          });
-        });
-      });
-    }
-    _obj.PartList.forEach(part => {
-      if (part.CraftConditionList && part.CraftConditionList.length > 0) {
-        part.CraftConditionList.forEach(it => {
-          it.CraftList.forEach(craftId => {
-            part.CraftList.forEach(CraftItemList => {
-              if (CraftItemList.ChoiceType === 2) return;
-              const _t = CraftItemList.CraftList.find(_Craft => _Craft.CraftID === craftId);
-              if (_t) {
-                if (!_t.CraftCondition) {
-                  _t.CraftCondition = [{ ...it }];
-                } else {
-                  _t.CraftCondition.push({ ...it });
-                }
-              }
-            });
-          });
-        });
-      }
-    });
   }
 }

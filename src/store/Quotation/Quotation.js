@@ -87,6 +87,20 @@ export default {
     // /** 报价页面产品右侧边栏推荐信息
     // ---------------------------------------- */
     // productAsideIntroData: null,
+    /**
+     * 产品元素映射
+     */
+    ProductElementTypeList: [
+      { Name: '数量', ID: 0 },
+      { Name: '款数', ID: 1 },
+    ],
+    ProductDisplayPropertyTypeList: [
+      { Name: '元素', ID: 0 },
+      { Name: '元素组', ID: 1 },
+      { Name: '物料', ID: 3 },
+      { Name: '工艺', ID: 4 },
+      { Name: '工厂', ID: 5 },
+    ],
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -137,15 +151,12 @@ export default {
     },
     /* 当前选中产品名称信息，用于报价页头文字展示
     -------------------------------*/
-    curProductShowNameInfo(state, getters) {
+    curProductShowNameInfo(state) {
       if (!state.curProductClass) return [];
-      const { First, Second } = state.curProductClass;
-      const level1Item = getters.allProductClassify.find(
-        item => item.ID === First,
-      );
-      if (!level1Item) return [];
-      const level2Item = level1Item.children.find(item => item.ID === Second);
-      return [level1Item.ClassName, level2Item.ClassName, state.curProductName];
+      const { FirstLevel, SecondLevel } = state.curProductClass;
+      const FirstName = FirstLevel.Name;
+      const SecondName = SecondLevel.Name;
+      return [FirstName, SecondName, state.curProductName];
     },
     /* 当前选中产品工艺关系列表
     -------------------------------*/
@@ -181,18 +192,18 @@ export default {
     -------------------------------*/
     setCurProductInfo(state, payload) {
       state.curProduct = payload;
-      const { ID, ProductClass, ShowName } = payload; // payload为当前产品所有信息
+      const { ID, ClassifyList, ShowName } = payload; // payload为当前产品所有信息
+      const t = ClassifyList.find(it => it.Type === 2);
       state.curProductID = ID;
-      state.curProductClass = ProductClass;
+      state.curProductClass = t || null;
       state.curProductName = ShowName;
     },
     /* 当前选中产品详细信息
     -------------------------------*/
     setCurProductInfo2Quotation(state, data) {
       if (!data && data !== null) return;
-      QuotationClassType.handlePropertyRelevanceList(data);
-      QuotationClassType.handleCraftConditionList(data);
-      state.curProductInfo2Quotation = data;
+      // 处理产品信息
+      state.curProductInfo2Quotation = QuotationClassType.initOriginData(data);
       state.obj2GetProductPrice.ProductParams = QuotationClassType.init(data);
       state.initPageText = '';
     },
@@ -758,12 +769,6 @@ export default {
     setWatchTarget2DelCraft(state) {
       state.watchTarget2DelCraft += 1;
     },
-    /* 设置默认产品
-    -------------------------------*/
-    setDefaultProductInfo(state, item) {
-      // state.obj2GetProductPrice.ProductParams =
-      QuotationClassType.backfillDefaultProduct(state.obj2GetProductPrice.ProductParams, item);
-    },
     /* 设置下单地址相关信息
     -------------------------------*/
     setAddressInfo4PlaceOrder(state, data) {
@@ -911,11 +916,11 @@ export default {
     },
     /* 获取产品详情
     -------------------------------*/
-    async getProductDetail({ state, commit }, config = {}) {
+    async getProductDetail({ state, commit }, [config = {}, id = ''] = []) {
       const { saveOldData, closeloading } = { saveOldData: false, closeloading: false, ...config };
       if (!saveOldData) commit('clearCurProductInfo2Quotation');
       let isError = false;
-      const res = await api.getProductDetail([state.curProductID, closeloading]).catch(() => isError = true); // !saveOldData
+      const res = await api.getProductDetail([id || state.curProductID, closeloading]).catch(() => isError = true); // !saveOldData
       if (saveOldData) commit('setIsFetchingPartProductData', false);
       if (isError) {
         if (saveOldData) commit('setIsFetchingPartProductData', false);
@@ -923,12 +928,10 @@ export default {
       }
       if (res.data.Status !== 1000) return false;
       commit('setCurProductInfo2Quotation', res.data.Data);
-      // console.log(router.currentRoute.query.id);
-      if (!router.currentRoute.query.id || router.currentRoute.query.id !== state.curProductID) {
-        // console.log('change place query -----');
-        router.push(`?id=${state.curProductID}`);
+      if (!router.currentRoute.query.id || router.currentRoute.query.id !== (id || state.curProductID)) {
+        router.push(`?id=${id || state.curProductID}`);
       }
-      return true;
+      return res.data.Data;
     },
     /* 获取产品报价信息
     -------------------------------*/

@@ -4,7 +4,7 @@
       <PlaceOrderProductClassifyComp />
     </header>
     <div class="content">
-      <ProductQuotationContentComp v-if="curProductInfo2Quotation" :placeData='curProductInfo2Quotation' />
+      <QuotationContent v-if="curProductInfo2Quotation" :placeData='curProductInfo2Quotation' />
       <div v-else-if='initPageText && !curProductInfo2Quotation' class="empty">
         <span class="iconfont icon-wancheng is-success"></span>
         <span>{{initPageText}}</span>
@@ -23,14 +23,13 @@
 
 <script>
 import PlaceOrderProductClassifyComp from '@/components/QuotationComps/PlaceOrderProductClassifyComp.vue';
-// eslint-disable-next-line max-len
-import ProductQuotationContentComp from '@/components/QuotationComps/ProductQuotationContentComps/ProductQuotationContentComp.vue';
+import QuotationContent from '@/components/QuotationComps/QuotationContent';
 import { mapState } from 'vuex';
 
 export default {
   components: {
     PlaceOrderProductClassifyComp,
-    ProductQuotationContentComp,
+    QuotationContent,
   },
   computed: {
     ...mapState('Quotation', ['curProductInfo2Quotation', 'initPageText', 'productNames']),
@@ -45,28 +44,12 @@ export default {
     async handlePathDataFetch() {
       const productID = this.$route.query.id;
       if (!productID) return;
-      let sub = null;
-      let key = true;
       this.initLoading = true;
-      if (this.productNames.length === 0) {
-        const res = await this.api.getProductLists({ ID: productID }).catch(() => { key = false; });
-        if (!key || !res || res.data.Status !== 1000) {
-          this.initLoading = false;
-          return;
-        }
-        if (res.data.Data.length === 1) {
-          const [t] = res.data.Data;
-          sub = t;
-        }
-      } else {
-        const t = this.productNames.find(it => it.ProductID === productID);
-        if (t) sub = t;
+      const detailData = await this.$store.dispatch('Quotation/getProductDetail', [{ closeloading: true }, productID]);
+      if (detailData) {
+        this.$store.commit('Quotation/setCurProductInfo', detailData);
       }
-      if (sub) {
-        this.$store.commit('Quotation/setCurProductInfo', sub);
-        await this.$store.dispatch('Quotation/getProductDetail', { closeloading: true });
-        this.$store.commit('Quotation/setSelectedCoupon', null);
-      }
+      this.$store.commit('Quotation/setSelectedCoupon', null);
       this.initLoading = false;
     },
   },

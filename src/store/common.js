@@ -9,9 +9,6 @@ import Cookie from '@/assets/js/Cookie';
 export default {
   namespaced: true,
   state: {
-    /** 工艺关系列表信息
-    ---------------------------------------- */
-    CraftRelationList: [],
     /** 单位类型列表
     ---------------------------------------- */
     UnitTypeList: [
@@ -254,11 +251,6 @@ export default {
   getters: {
   },
   mutations: {
-    /** 设置工艺条件信息
-    ---------------------------------------- */
-    setCraftRelationList(state, data) {
-      state.CraftRelationList = data;
-    },
     /** 设置客户信息
     ---------------------------------------- */
     setCustomerInfo(state, [data, bool]) {
@@ -362,7 +354,6 @@ export default {
     /* 注销及登录状态清理
     -------------------------------*/
     clearStateForNewCustomer(state) {
-      state.CraftRelationList = [];
       state.customerInfo = null;
       state.customerAccountList = [];
       state.customerBalance = null;
@@ -402,15 +393,6 @@ export default {
 
   },
   actions: {
-    async getCraftRelationList({ state, commit }) {
-      if (state.CraftRelationList.length > 0) return;
-      const res = await api.getCraftRelationList();
-      if (res.data.Status === 1000) {
-        commit('setCraftRelationList', res.data.Data);
-        return true;
-      }
-      return false;
-    },
     async getCustomerDetail({ state, commit }, key = false) { // 获取账号基本信息
       if (state.customerInfo && !key) return;
       if (key) {
