@@ -1,7 +1,8 @@
 <template>
-  <el-form-item :label="label" prop="name" v-if="target">
+  <el-form-item :label="label" prop="name" v-if="target && !hidden" :label-width='labelWidth' class="mp-place-order-panel-form-item-comp-wrap">
     <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel />
-    <ElementGroupTypeComp v-if="curTypeName==='元素组'" :Property='target' />
+    <ElementGroupTypeComp v-if="curTypeName==='元素组' && target.ElementList" :Property='target' />
+    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :Property='target' />
     <MaterialTypeComp v-if="curTypeName==='物料'" />
     <CraftTypeComp v-if="curTypeName==='工艺'" />
   </el-form-item>
@@ -11,6 +12,7 @@
 import { mapState } from 'vuex';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
+import SizeGroupComp from './SizeGroupComp/index.vue';
 import MaterialTypeComp from './MaterialTypeComp.vue';
 import CraftTypeComp from './CraftTypeComp.vue';
 
@@ -28,6 +30,7 @@ export default {
   components: {
     ElementTypeComp,
     ElementGroupTypeComp,
+    SizeGroupComp,
     MaterialTypeComp,
     CraftTypeComp,
   },
@@ -65,10 +68,24 @@ export default {
       return targetProp || null;
     },
     label() {
-      if (this.curTypeName === '物料') return this.placeData.MaterialDisplayName || '物料';
-      if (this.target.Name) return this.target.Name;
-      if (this.target.GroupInfo?.Name) return this.target.GroupInfo.Name;
-      return '';
+      let str = '';
+      if (this.curTypeName === '物料') str = this.placeData.MaterialDisplayName || '物料';
+      if (this.target.Name) str = this.target.Name;
+      if (this.target.GroupInfo?.Name) str = this.target.GroupInfo.Name;
+      if (Object.prototype.toString.call(this.target) === '[object Object]' && this.target.IsNameHidden) {
+        str = '';
+      }
+      return str ? `${str}：` : '';
+    },
+    labelWidth() {
+      // return this.label.length > 5 ? `${this.label.length + 0}em` : '100px';
+      return '100px';
+    },
+    hidden() {
+      if (Object.prototype.toString.call(this.target) === '[object Object]') {
+        return this.target.HiddenToCustomer;
+      }
+      return false;
     },
   },
   data() {
@@ -79,4 +96,9 @@ export default {
 };
 </script>
 <style lang='scss'>
+.mp-place-order-panel-form-item-comp-wrap {
+  > label {
+    white-space: nowrap;
+  }
+}
 </style>

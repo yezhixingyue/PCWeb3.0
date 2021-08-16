@@ -3,8 +3,8 @@
     v-model="switchValue"
     active-color="#428dfa"
     inactive-color="#DCDFE6"
-    :active-value="OpenValue"
-    :inactive-value="CloseValue"
+    :active-value="`${OpenValue}`"
+    :inactive-value="`${CloseValue}`"
     :active-text="Words"
     class="mp-erp-switch-type-element-display-select-comp">
   </el-switch>

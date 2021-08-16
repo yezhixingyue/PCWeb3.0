@@ -101,6 +101,7 @@ export default {
       { Name: '工艺', ID: 4 },
       { Name: '工厂', ID: 5 },
     ],
+    isOrderRestore: false,
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示

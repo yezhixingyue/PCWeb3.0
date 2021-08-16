@@ -1,8 +1,7 @@
 <template>
-  <section v-if="Property.ElementList">
+  <section>
     <ElementTypeComp v-for="it in Property.ElementList" :key="it.ID" :Property='it' />
   </section>
-  <section v-else-if="Property.SizeList">尺寸组类型</section>
 </template>
 
 <script>

@@ -1,26 +1,13 @@
 <template>
-  <el-select
-   v-model="checkVal"
-   :placeholder="placeholder"
-   filterable
-   default-first-option
-   :allow-create='Allow'
-   v-if="!isRadio"
-   size="small"
-   class="mp-erp-option-type-element-display-select-comp">
-    <el-option
-      v-for="item in options"
-      :key="item.ID"
-      :label="item.Name"
-      :value="item.ID">
-    </el-option>
-  </el-select>
+  <CanFreeCreateSelectComp v-if="!isRadio" v-model="checkVal" :placeholder="placeholder" :allow-create='Allow' :options='options' :isMultiple='isMultiple' />
   <el-radio-group v-model="checkVal" v-else>
     <el-radio v-for="item in options" :key="item.ID" :label="item.ID">{{item.Name}}</el-radio>
   </el-radio-group>
 </template>
 
 <script>
+import CanFreeCreateSelectComp from './CanFreeCreateSelectComp.vue';
+
 export default {
   model: {
     prop: 'value',
@@ -36,14 +23,21 @@ export default {
       type: Array,
       default: () => [],
     },
-    isRadio: {
-      type: Boolean,
-      default: true,
+    SelectMode: {
+      type: Number,
+      default: 1,
     },
     Allow: { // 是否允许自定义
       type: Boolean,
       default: false,
     },
+    isMultiple: { // 是否可多选
+      type: Boolean,
+      default: false,
+    },
+  },
+  components: {
+    CanFreeCreateSelectComp,
   },
   computed: {
     checkVal: {
@@ -54,16 +48,13 @@ export default {
         this.$emit('change', val);
       },
     },
+    isRadio() {
+      const SelectModeEnum = [{ Name: '单选按钮', ID: 0 }, { Name: '下拉框', ID: 1 }];
+      const t = SelectModeEnum.find(it => it.ID === this.SelectMode);
+      return t && t.Name === '单选按钮' && !this.isMultiple;
+    },
   },
 };
 </script>
 <style lang='scss'>
-.mp-erp-option-type-element-display-select-comp {
-  .el-input__inner {
-    font-size: 12px;
-    &::placeholder {
-      font-size: 12px;
-    }
-  }
-}
 </style>
