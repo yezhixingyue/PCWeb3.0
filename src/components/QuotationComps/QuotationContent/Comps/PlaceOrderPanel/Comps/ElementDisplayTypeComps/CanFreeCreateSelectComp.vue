@@ -1,7 +1,7 @@
 <template>
   <el-select
     v-model="content"
-    filterable
+    :filterable='AllowCreate'
     default-first-option
     :multiple='isMultiple'
     :allow-create='AllowCreate'
@@ -39,6 +39,10 @@ export default {
     isMultiple: { // 是否可多选
       type: Boolean,
       default: false,
+    },
+    filterable: { // 是否可多选
+      type: Boolean,
+      default: true,
     },
   },
   computed: {

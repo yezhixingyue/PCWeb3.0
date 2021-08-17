@@ -67,7 +67,6 @@ export default {
       set(val) {
         if (this.Property.Type !== 2) { // 非选项类型
           const temp = { Value: `${val}` };
-          // this.elementValue = [temp];
           this.$emit('input', [temp]);
         } else if (this.Property.OptionAttribute && this.Property.OptionAttribute.IsRadio) {
           const temp = { ID: '', Name: '' };
@@ -79,11 +78,9 @@ export default {
           } else {
             temp.Name = val;
           }
-          // this.elementValue = [temp];
           this.$emit('input', [temp]);
         } else if (this.Property.OptionAttribute && !this.Property.OptionAttribute.IsRadio) {
           // 多选  此时不允许自定义
-          // this.elementValue = Array.isArray(val) ? val.map(ID => ({ ID })) : [];
           this.$emit('input', Array.isArray(val) ? val.map(ID => ({ ID })) : []);
         }
       },
@@ -91,22 +88,24 @@ export default {
   },
   data() {
     return {
-      elementValue: [],
     };
   },
   methods: {
     handleDefaultValueInit() {
       if (this.Property.Type === 2 && this.Property.OptionAttribute) { // 选项值 单选 | 多选
-        this.elementValue = this.Property.OptionAttribute.OptionList?.filter(it => it.IsChecked).map(it => ({ ID: it.ID })) || [];
+        const ValueList = this.Property.OptionAttribute.OptionList?.filter(it => it.IsChecked).map(it => ({ ID: it.ID })) || [];
+        this.$emit('input', ValueList);
       }
       if (this.Property.Type === 1 && this.Property.NumbericAttribute) { // 数字值
         let Value = this.Property.NumbericAttribute.CheckedValue;
         if (!Value && Value !== 0) Value = '';
-        this.elementValue = [{ Value: `${Value}` }];
+        const ValueList = [{ Value: `${Value}` }];
+        this.$emit('input', ValueList);
       }
       if (this.Property.Type === 3 && this.Property.SwitchAttribute) { // 开关
         const Value = this.Property.SwitchAttribute.DefaultOpen ? this.Property.SwitchAttribute.OpenValue : this.Property.SwitchAttribute.CloseValue;
-        this.elementValue = [{ Value: `${Value}` }];
+        const ValueList = [{ Value: `${Value}` }];
+        this.$emit('input', ValueList);
       }
     },
   },

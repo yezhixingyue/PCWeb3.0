@@ -536,3 +536,16 @@ body .el-radio__inner, body .el-checkbox__inner {
     opacity: 1;
   }
 }
+
+.blue-span {
+  color: #428dfa;
+  cursor: pointer;
+  user-select: none;
+  &:hover {
+    opacity: 0.8;
+  }
+  &:active {
+    color: #0b58ca;
+    opacity: 1;
+  }
+}

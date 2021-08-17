@@ -1,10 +1,17 @@
 <template>
-  <el-form-item :label="label" prop="name" v-if="target && !hidden" :label-width='labelWidth' class="mp-place-order-panel-form-item-comp-wrap">
+  <el-form-item :label="label" prop="name"
+   v-if="target && !hidden"
+   :label-width='labelWidth'
+   class="mp-place-order-panel-form-item-comp-wrap"
+   :class="{isNormalGroup:isNormalGroup}">
     <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel />
-    <ElementGroupTypeComp v-if="curTypeName==='元素组' && target.ElementList" :Property='target' />
+    <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' />
     <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :Property='target' />
-    <MaterialTypeComp v-if="curTypeName==='物料'" />
-    <CraftTypeComp v-if="curTypeName==='工艺'" />
+    <MaterialTypeComp v-if="curTypeName==='物料'" :MaterialList='target.filter(it => !it.HiddenToCustomer)' />
+    <CraftTypeComp v-if="curTypeName==='工艺'"
+     :CraftData='target'
+     :CraftList='placeData.CraftList || []'
+     :CraftConditionList='placeData.CraftConditionList || []' />
   </el-form-item>
 </template>
 
@@ -13,8 +20,8 @@ import { mapState } from 'vuex';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
-import MaterialTypeComp from './MaterialTypeComp.vue';
-import CraftTypeComp from './CraftTypeComp.vue';
+import MaterialTypeComp from './MaterialTypeComp/index.vue';
+import CraftTypeComp from './CraftTypeComp/index.vue';
 
 export default {
   props: {
@@ -39,6 +46,9 @@ export default {
     curTypeName() {
       const t = this.ProductDisplayPropertyTypeList.find(it => it.ID === this.itemData.Type);
       return t ? t.Name : '';
+    },
+    isNormalGroup() {
+      return this.curTypeName === '元素组' && this.target.ElementList;
     },
     target() {
       let targetProp;
@@ -99,6 +109,33 @@ export default {
 .mp-place-order-panel-form-item-comp-wrap {
   > label {
     white-space: nowrap;
+  }
+  > .el-form-item__content {
+    > .mp-place-order-panel-element-group-setup-comp-wrap {
+      margin-left: -100px;
+      > ul {
+        > li {
+          > div {
+            &:first-of-type {
+              > label {
+                width: 88px;
+                padding-right: 12px;
+                white-space: nowrap;
+              }
+            }
+          }
+        }
+      }
+      > div {
+        margin-left: 106px;
+        margin-bottom: 4px;
+        height: 30px;
+      }
+    }
+  }
+  &.isNormalGroup > label {
+    font-weight: 700;
+    color: #333 !important;
   }
 }
 </style>

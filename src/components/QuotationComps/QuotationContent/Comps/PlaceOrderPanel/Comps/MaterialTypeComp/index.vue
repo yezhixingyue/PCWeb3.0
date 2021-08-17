@@ -1,0 +1,88 @@
+<template>
+  <section>
+    <MaterialSingleSelector :list='showList' v-model="selectedMaterial" />
+  </section>
+</template>
+
+<script>
+// 该组件暂不支持数据还原 及 指定默认物料功能，后续需要时再补充(订单编辑等功能) - 默认物料功能可以通过顺序调整至第一个实现（排序目前仅支持一级大类排序）
+import MaterialSingleSelector from './MaterialSingleSelector.vue';
+
+export default {
+  props: {
+    MaterialList: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  components: {
+    MaterialSingleSelector,
+  },
+  computed: {
+    showList() {
+      const list = [];
+      // const showLabel = true; // 是否显示属性名称，如 克重、颜色等
+      const getNameByElementList = _list => { // 给予一个元素列表，获取该列表名称
+        const _Name = _list.map(_it => {
+          const _label = !_it.IsNameHidden ? _it.Name || '' : '';
+          const _value = _it.DisplayContent || '';
+          const _unit = _it.Unit || '';
+          return `${_label}${_value}${_unit}`;
+        }).join(' ');
+        return _Name;
+      };
+      this.MaterialList.forEach(lv1 => {
+        const { Type, ID } = lv1;
+        const { UnionShowList, Name, ElementList } = Type;
+        // 1. 寻找已有相同分类
+        let t1 = list.find(it => it.ID === Type.ID);
+        if (!t1) { // 2.如果没有则添加
+          const temp = {
+            ID: Type.ID,
+            Name,
+            children: [],
+          };
+          list.push(temp);
+        }
+        // 3. 重新寻找一遍 此时肯定会找着
+        t1 = list.find(it => it.ID === Type.ID);
+        if (t1) {
+          if (UnionShowList.length === 0) {
+            const item = {
+              ID,
+              Name: getNameByElementList(ElementList),
+            };
+            t1.children.push(item);
+          } else {
+            let _list;
+            UnionShowList.forEach((_unionShowArr, i) => {
+              const _Name = getNameByElementList(ElementList.filter(_it => _unionShowArr.includes(_it.ID)));
+              const _ItemID = i < UnionShowList.length - 1 ? `${JSON.stringify(_unionShowArr)}${_Name}` : ID;
+              const tempList = _list || t1.children;
+              let target = tempList.find(_it => _it.ID === _ItemID);
+              if (!target) {
+                const _item = {
+                  ID: _ItemID,
+                  Name: _Name,
+                };
+                if (i < UnionShowList.length - 1) _item.children = [];
+                tempList.push(_item);
+              }
+              target = tempList.find(_it => _it.ID === _ItemID);
+              _list = target.children;
+            });
+          }
+        }
+      });
+      return list;
+    },
+  },
+  data() {
+    return {
+      selectedMaterial: '',
+    };
+  },
+};
+</script>
+<style lang='scss'>
+</style>

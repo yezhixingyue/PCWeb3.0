@@ -184,6 +184,7 @@ export default {
     > .unit {
       color: #888;
       margin-right: 6px;
+      font-size: 12px;
     }
     > i {
       margin: 0 10px;

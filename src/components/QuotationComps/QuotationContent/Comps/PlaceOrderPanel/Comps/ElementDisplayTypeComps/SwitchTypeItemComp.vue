@@ -56,5 +56,8 @@ export default {
   //     margin-left: -14px;
   //   }
   // }
+  input {
+    width: unset !important;
+  }
 }
 </style>
