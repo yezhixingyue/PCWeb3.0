@@ -43,6 +43,10 @@ export default {
       default: false,
     },
     value: {},
+    needInit: {
+      type: Boolean,
+      default: true,
+    },
   },
   components: {
     NumberTypeItemComp,
@@ -111,7 +115,7 @@ export default {
   },
   mounted() {
     // 1. 后续需要有一个枚举值来确定是否需要初始化该默认数据(如编辑或还原时需保留原数据，不可使用默认数据处理)
-    if (!this.isOrderRestore) {
+    if (!this.isOrderRestore && this.needInit) {
       this.handleDefaultValueInit();
     }
   },

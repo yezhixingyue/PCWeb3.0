@@ -3,14 +3,18 @@
     <div><span class="blue-span" v-show="List.length === 0" @click="onAddClick">+ 添加</span></div>
     <ul>
       <li v-for="(item, index) in List" :key="item.key" :class="{f: index === 0}">
-        <ElementTypeComp v-for="(it, i) in Property.ElementList" :key="it.ID" :Property='it' v-model="item.List[i].CustomerInputValues" />
-          <div class="ctrl">
-            <div @click="onDelClick(index)" v-show="List.length > minLength">
-              <i class="iconfont icon-shanchu is-pink"></i>
-              <span>删除</span>
-            </div>
-            <span class="blue-span" @click="onAddClick" v-show="index === List.length - 1 && List.length < maxLength">+ 添加</span>
-          </div>
+        <ElementTypeComp v-for="(it, i) in Property.ElementList" :key="it.ID" :needInit='needInit' :Property='it' v-model="item.List[i].CustomerInputValues" />
+          <ul class="ctrl">
+            <li class="f">
+              <div @click="onDelClick(index)" v-show="List.length > minLength">
+                <i class="iconfont icon-shanchu is-pink"></i>
+                <span>删除</span>
+              </div>
+            </li>
+            <li>
+              <span class="blue-span" @click="onAddClick" v-show="index === List.length - 1 && List.length < maxLength">+ 添加</span>
+            </li>
+          </ul>
       </li>
     </ul>
   </section>
@@ -24,6 +28,14 @@ export default {
     Property: {
       type: Object,
       required: true,
+    },
+    value: {
+      type: Array,
+      default: () => [],
+    },
+    needInit: {
+      type: Boolean,
+      default: true,
     },
   },
   components: {
@@ -40,27 +52,38 @@ export default {
       const { MinValue } = this.Property.UseTimes;
       return MinValue || MinValue === 0 ? MinValue : 1;
     },
+    List: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit('input', val);
+      },
+    },
   },
   data() {
     return {
-      List: [],
+      // List: [],
     };
   },
   methods: {
     onAddClick() {
       const temp = {
-        List: this.Property.ElementList.map(it => ({ ElementID: it.ID, CustomerInputValues: { ID: '', Name: '', Value: '' } })),
+        List: this.Property.ElementList.map(it => ({ ElementID: it.ID, CustomerInputValues: [{ ID: '', Name: '', Value: '' }] })),
         key: Math.random().toString(36).slice(-10),
       };
-      this.List.push(temp);
+      this.List = [...this.List, temp];
     },
     onDelClick(index) {
-      this.List.splice(index, 1);
+      this.List = this.List.filter((it, i) => i !== index);
     },
   },
   mounted() {
-    for (let i = 0; i < this.minLength; i += 1) {
-      this.onAddClick();
+    // 应限定条件 编辑时不需要下面操作
+    if (this.needInit) {
+      for (let i = 0; i < this.minLength; i += 1) {
+        this.onAddClick();
+      }
     }
   },
 };
@@ -71,24 +94,32 @@ export default {
     > li {
       > .ctrl {
         display: inline-block;
-        > div {
+        margin-left: 25px;
+        > li {
           display: inline-block;
-          margin-right: 24px;
-          cursor: pointer;
-          > span {
-            color: #aaa;
-            margin-left: 9px;
-            user-select: none;
-            transition: color 0.1s ease-in-out;
-          }
-          > i {
-            position: relative;
-            top: -1px;
-          }
-          &:hover {
+          width: 45px;
+          > div {
+            display: inline-block;
+            cursor: pointer;
             > span {
-              color: #585858;
+              color: #aaa;
+              margin-left: 9px;
+              user-select: none;
+              transition: color 0.1s ease-in-out;
             }
+            > i {
+              position: relative;
+              top: -1px;
+            }
+            &:hover {
+              > span {
+                color: #585858;
+              }
+            }
+          }
+          &.f {
+            width: 52px;
+            margin-right: 24px;
           }
         }
       }

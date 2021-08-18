@@ -18,7 +18,7 @@
             </span>
           </section>
           <SwiperClassifyComp />
-          <PlaceOrderPanel :placeData='placeData' />
+          <PlaceOrderPanel :placeData='placeData' :submitData='obj2GetProductPrice.ProductParams' />
         </div>
 
         <section class="coupon-calculate-price-wrap">

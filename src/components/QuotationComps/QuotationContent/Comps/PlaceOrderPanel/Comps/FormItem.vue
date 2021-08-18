@@ -33,6 +33,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    submitData: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   components: {
     ElementTypeComp,
@@ -96,6 +100,37 @@ export default {
         return this.target.HiddenToCustomer;
       }
       return false;
+    },
+    itemValue: {
+      get() {
+        let target;
+        if (this.curTypeName) {
+          switch (this.curTypeName) {
+            case '元素':
+              target = this.placeData.ElementList.find(it => it.ID === this.itemData.Property.ID);
+              break;
+            case '元素组': // 元素组  也可能为尺寸
+              target = this.placeData.GroupList.find(it => it.ID === this.itemData.Property.ID);
+              if (!target && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property.ID) target = this.placeData.SizeGroup;
+              break;
+            case '物料':
+              target = this.placeData.MaterialList || [];
+              break;
+            case '工艺':
+              target = this.placeData.CraftGroupList.find(it => it.ID === this.itemData.Property.ID);
+              break;
+            case '工厂': // 工厂隐藏
+              target = this.placeData.FactoryList;
+              break;
+            default:
+              break;
+          }
+        }
+        return target;
+      },
+      set(val) {
+        console.log('itemValue', val);
+      },
     },
   },
   data() {
