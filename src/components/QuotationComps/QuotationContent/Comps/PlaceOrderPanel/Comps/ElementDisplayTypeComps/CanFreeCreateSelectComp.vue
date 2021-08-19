@@ -8,6 +8,8 @@
     :placeholder='placeholder'
     @blur.native='onBlur'
     @change.native='onBlur'
+    @focus.native="onFocus"
+    @blur="onBlur"
     ref="oSelect"
     size="small"
     class="mp-erp-option-type-element-display-select-comp">
@@ -58,6 +60,10 @@ export default {
   methods: {
     onBlur(e) {
       this.$emit('input', e.target.value);
+      this.$emit('blur');
+    },
+    onFocus() {
+      this.$emit('focus');
     },
   },
   mounted() {

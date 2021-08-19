@@ -3,7 +3,7 @@
     <li
       v-for="(it, i) in ElementList"
       :key="it.ID"
-      :class="{ active: i === activeIndex || ElementValues[i] }"
+      :class="{ active: i === activeIndex || ElementValueActiveList[i] }"
       ref="oLis"
     >
       <span
@@ -12,7 +12,7 @@
         :class="{ fixed: it.Type === 1, n: it.Type === 2 && i > 0 }"
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
       >
-      <el-input
+      <!-- <el-input
         size="mini"
         v-if="it.Type === 1"
         @focus="onFocus(i)"
@@ -27,24 +27,24 @@
         :value="ElementValues[i]"
         @input="onInput($event, it)"
         :options="it.OptionAttribute.OptionList"
-      />
-      <!-- <ElementTypeComp :Property='it' :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel /> -->
-      <span
+      /> -->
+      <ElementTypeComp @focus="onFocus(i)" @blur="onBlur" isNumberic :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
+      <!-- <span
         class="unit"
         v-if="
           it.Unit &&
           ((isSameUnit && i === ElementList.length - 1) || !isSameUnit)
         "
         >{{ it.Unit }}</span
-      >
+      > -->
       <i v-if="i < ElementList.length - 1">×</i>
     </li>
   </ul>
 </template>
 
 <script>
-// import ElementTypeComp from '@/components/QuotationComps/QuotationContent/Comps/PlaceOrderPanel/Comps/ElementTypeComp';
-import CanFreeCreateSelectComp from '../ElementDisplayTypeComps/CanFreeCreateSelectComp.vue';
+import ElementTypeComp from '@/components/QuotationComps/QuotationContent/Comps/PlaceOrderPanel/Comps/ElementTypeComp';
+// import CanFreeCreateSelectComp from '../ElementDisplayTypeComps/CanFreeCreateSelectComp.vue';
 
 export default {
   props: {
@@ -58,8 +58,8 @@ export default {
     },
   },
   components: {
-    CanFreeCreateSelectComp,
-    // ElementTypeComp,
+    // CanFreeCreateSelectComp,
+    ElementTypeComp,
   },
   data() {
     return {
@@ -79,6 +79,9 @@ export default {
     ElementValues() {
       return this.ElementList.map((it) => this.getValue(it));
     },
+    ElementValueActiveList() {
+      return this.ElementValues.map(it => this.getIsActive(it));
+    },
   },
   methods: {
     onFocus(index) {
@@ -89,51 +92,19 @@ export default {
     },
     getValue(it) {
       const t = this.value.find((_it) => _it.ElementID === it.ID);
-      if (t) {
-        if (it.Type === 1) return t.CustomerInputValues[0].Value;
-        if (it.Type === 2) return t.CustomerInputValues[0].Name || t.CustomerInputValues[0].ID;
-      }
-      return '';
+      // if (t) {
+      //   if (it.Type === 1) return t.CustomerInputValues[0]?.Value || '';
+      //   if (it.Type === 2) return t.CustomerInputValues[0]?.Name || t.CustomerInputValues[0]?.ID || '';
+      // }
+      return t?.CustomerInputValues || [];
     },
     onInput(e, item) {
-      console.log(e);
-      let value = e.trim();
-      if (item.Type === 1) value = value.replace(/[^\d]/g, '');
-      let type = '';
-      if (item.Type === 1) type = 'isValue';
-      if (item.Type === 2) {
-        if (item.OptionAttribute?.AllowCustomer) {
-          const options = item.OptionAttribute?.OptionList?.filter(
-            (it) => !it.HiddenToCustomer,
-          ) || [];
-          const _t = options.find((it) => it.ID === e);
-          if (_t) type = 'isID';
-          else type = 'isName';
-        } else {
-          type = 'isID';
-        }
-      }
-
       const temp = JSON.parse(JSON.stringify(this.value));
       const t = temp.find((it) => it.ElementID === item.ID);
-      // 可能需要赋值Value（输入框）  也可能需要赋值ID（下列选项时） 也可能赋值给Name(下列选框自定义时)  是哪种展示形式需要进行判断  需要提前判断出来
       if (t) {
-        t.CustomerInputValues[0].Value = '';
-        t.CustomerInputValues[0].ID = '';
-        t.CustomerInputValues[0].Name = '';
-        if (type === 'isValue') t.CustomerInputValues[0].Value = value;
-        if (type === 'isName') t.CustomerInputValues[0].Name = value;
-        if (type === 'isID') t.CustomerInputValues[0].ID = value;
+        t.CustomerInputValues = e;
       } else {
-        const _obj = {
-          Value: '',
-          ID: '',
-          Name: '',
-        };
-        if (type === 'isValue') _obj.Value = value;
-        if (type === 'isName') _obj.Name = value;
-        if (type === 'isID') _obj.ID = value;
-        temp.push({ ElementID: item.ID, CustomerInputValues: [_obj] });
+        temp.push({ ElementID: item.ID, CustomerInputValues: e });
       }
       this.$emit('input', temp);
     },
@@ -141,6 +112,11 @@ export default {
       const t = this.ElementList[i];
       if (t.Type !== 1) return;
       this.$refs.oLis[i].getElementsByTagName('input')[0].focus();
+    },
+    getIsActive(list) {
+      if (!list || list.length === 0) return false;
+      const [{ Name, ID, Value }] = list;
+      return Name || ID || Value;
     },
   },
 };
@@ -153,13 +129,15 @@ export default {
   > li {
     display: inline-block;
     position: relative;
-    > .el-input {
-      > input {
-        width: 90px !important;
+    .mp-erp-number-type-element-option-display-input-comp,
+    .mp-erp-number-type-element-display-input-comp {
+      input {
+        width: 80px !important;
         border: none;
         border-bottom: 1px solid rgb(229, 229, 229);
         border-radius: 0;
-        padding-left: 18px !important;
+        padding-left: 10px !important;
+        padding-right: 4px !important;
         &:focus {
           border-color: #428dfa;
         }
@@ -187,11 +165,11 @@ export default {
       font-size: 12px;
     }
     > i {
-      margin: 0 10px;
+      margin: 0 12px;
     }
     &.active {
       > .fixed {
-        left: 2px;
+        left: -3px;
         top: -5px;
         font-size: 12px;
       }

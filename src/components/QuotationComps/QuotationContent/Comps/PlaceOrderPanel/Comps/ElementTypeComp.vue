@@ -6,6 +6,9 @@
      v-if="Property.Type === 1"
      v-model="PropValue"
      :InputContent='Property.NumbericAttribute.InputContent'
+     @focus="onFocus"
+     @blur="onBlur"
+     :isNumberic='isNumberic'
      :Allow="Property.NumbericAttribute.AllowCustomer" />
     <!-- 选项类型 -->
     <OptionTypeItemComp
@@ -46,6 +49,10 @@ export default {
     needInit: {
       type: Boolean,
       default: true,
+    },
+    isNumberic: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -112,12 +119,18 @@ export default {
         this.$emit('input', ValueList);
       }
     },
+    onFocus() {
+      this.$emit('focus');
+    },
+    onBlur() {
+      this.$emit('blur');
+    },
   },
   mounted() {
     // 1. 后续需要有一个枚举值来确定是否需要初始化该默认数据(如编辑或还原时需保留原数据，不可使用默认数据处理)
-    if (!this.isOrderRestore && this.needInit) {
-      this.handleDefaultValueInit();
-    }
+    // if (!this.isOrderRestore && this.needInit) {
+    //   this.handleDefaultValueInit();
+    // }
   },
 };
 </script>

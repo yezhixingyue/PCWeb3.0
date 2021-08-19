@@ -1,6 +1,23 @@
 <template>
-  <el-input v-model.trim="content" v-if="!InputContent" size="small" class="mp-erp-number-type-element-display-input-comp" maxlength="9"></el-input>
-  <CanFreeCreateSelectComp v-else :allow-create='Allow' :placeholder='placeholder' v-model="content" :options='options' />
+  <el-input
+    @focus="onFocus"
+    @blur="onBlur"
+    v-model.trim="content"
+    v-if="!InputContent || isNumberic"
+    size="small"
+    class="mp-erp-number-type-element-display-input-comp"
+    maxlength="9"
+  ></el-input>
+  <CanFreeCreateSelectComp
+    v-else
+    :allow-create="Allow"
+    :placeholder="placeholder"
+    v-model="content"
+    @focus="onFocus"
+    @blur="onBlur"
+    class="mp-erp-number-type-element-option-display-input-comp"
+    :options="options"
+  />
 </template>
 
 <script>
@@ -16,15 +33,21 @@ export default {
       type: String,
       default: '',
     },
-    InputContent: { // 选项列表
+    InputContent: {
+      // 选项列表
       type: String,
       default: '',
     },
-    Allow: { // 是否允许自定义
+    Allow: {
+      // 是否允许自定义
       type: Boolean,
       default: false,
     },
     value: {},
+    isNumberic: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     CanFreeCreateSelectComp,
@@ -42,6 +65,14 @@ export default {
       set(val) {
         this.$emit('change', val);
       },
+    },
+  },
+  methods: {
+    onFocus() {
+      this.$emit('focus');
+    },
+    onBlur() {
+      this.$emit('blur');
     },
   },
 };

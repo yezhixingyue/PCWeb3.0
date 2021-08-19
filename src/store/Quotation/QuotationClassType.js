@@ -92,7 +92,7 @@ export default class QuotationClassType {
                 if (isSize) temp.Size = getSizeSubmitData(Prop); // 尺寸组
                 else {
                   if (!temp.GroupList) temp.GroupList = [];
-                  temp.GroupList.push(getGroupItemSubmitData(Prop)); // 元素组
+                  temp.GroupList.push(this.getGroupItemSubmitData(Prop)); // 元素组
                 }
               }
               break;
@@ -118,7 +118,7 @@ export default class QuotationClassType {
                     }));
                   }
                   if (Array.isArray(_craft.GroupList)) {
-                    GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => getGroupItemSubmitData(_it));
+                    GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => this.getGroupItemSubmitData(_it));
                   }
                   const _item = {
                     CraftID: _craft.ID,
@@ -139,6 +139,30 @@ export default class QuotationClassType {
       });
     }
     return temp;
+  }
+
+  static getGroupItemSubmitData(Prop, isItem = false) { // 获取元素组提交数据
+    const { UseTimes, ID, ElementList } = Prop;
+    const getItem = () => {
+      const _item = {
+        List: [],
+        key: Math.random().toString(36).slice(-10),
+      };
+      _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: this.getInitCustomerInputValues(_it) }));
+      return _item;
+    };
+    if (isItem) return getItem();
+    const _groupItem = {
+      GroupID: ID,
+      List: [], // 此处一项代表一行
+    };
+    if (UseTimes && UseTimes.MinValue > 0) {
+      for (let i = 0; i < UseTimes.MinValue; i += 1) {
+        const _item = getItem();
+        _groupItem.List.push(_item);
+      }
+    }
+    return _groupItem;
   }
 }
 
@@ -175,21 +199,21 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
   return { ID, isCustomize, List };
 };
 
-const getGroupItemSubmitData = (Prop) => { // 获取元素组提交数据
-  const { UseTimes, ID, ElementList } = Prop;
-  const _groupItem = {
-    GroupID: ID,
-    List: [], // 此处一项代表一行
-  };
-  if (UseTimes && UseTimes.MinValue > 0) {
-    for (let i = 0; i < UseTimes.MinValue; i += 1) {
-      const _item = {
-        List: [],
-        key: Math.random().toString(36).slice(-10),
-      };
-      _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: QuotationClassType.getInitCustomerInputValues(_it) }));
-      _groupItem.List.push(_item);
-    }
-  }
-  return _groupItem;
-};
+// const getGroupItemSubmitData = (Prop) => { // 获取元素组提交数据
+//   const { UseTimes, ID, ElementList } = Prop;
+//   const _groupItem = {
+//     GroupID: ID,
+//     List: [], // 此处一项代表一行
+//   };
+//   if (UseTimes && UseTimes.MinValue > 0) {
+//     for (let i = 0; i < UseTimes.MinValue; i += 1) {
+//       const _item = {
+//         List: [],
+//         key: Math.random().toString(36).slice(-10),
+//       };
+//       _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: QuotationClassType.getInitCustomerInputValues(_it) }));
+//       _groupItem.List.push(_item);
+//     }
+//   }
+//   return _groupItem;
+// };

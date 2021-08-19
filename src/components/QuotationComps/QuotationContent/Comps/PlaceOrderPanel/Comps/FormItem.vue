@@ -4,11 +4,13 @@
    :label-width='labelWidth'
    class="mp-place-order-panel-form-item-comp-wrap"
    :class="{isNormalGroup:isNormalGroup}">
-    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel />
-    <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' />
-    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :Property='target' />
-    <MaterialTypeComp v-if="curTypeName==='物料'" :MaterialList='target.filter(it => !it.HiddenToCustomer)' />
-    <CraftTypeComp v-if="curTypeName==='工艺'"
+    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" />
+    <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" />
+    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :Property='target' v-model="itemValue" />
+    <MaterialTypeComp v-if="curTypeName==='物料'" :MaterialList='target.filter(it => !it.HiddenToCustomer)' v-model="itemValue" />
+    <CraftTypeComp
+     v-if="curTypeName==='工艺'"
+     v-model="itemValue"
      :CraftData='target'
      :CraftList='placeData.CraftList || []'
      :CraftConditionList='placeData.CraftConditionList || []' />
@@ -37,6 +39,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    PartID: {
+      type: String,
+      default: '',
+    },
+    PartIndex: {
+      type: Number,
+      default: 0,
+    },
   },
   components: {
     ElementTypeComp,
@@ -46,7 +56,7 @@ export default {
     CraftTypeComp,
   },
   computed: {
-    ...mapState('Quotation', ['ProductDisplayPropertyTypeList']),
+    ...mapState('Quotation', ['ProductDisplayPropertyTypeList', 'obj2GetProductPrice']),
     curTypeName() {
       const t = this.ProductDisplayPropertyTypeList.find(it => it.ID === this.itemData.Type);
       return t ? t.Name : '';
@@ -103,33 +113,39 @@ export default {
     },
     itemValue: {
       get() {
-        let target;
+        let value;
+        let t;
         if (this.curTypeName) {
           switch (this.curTypeName) {
             case '元素':
-              target = this.placeData.ElementList.find(it => it.ID === this.itemData.Property.ID);
+              t = this.submitData.ElementList.find(it => it.ElementID === this.itemData.Property.ID);
+              if (t) value = t.CustomerInputValues;
               break;
             case '元素组': // 元素组  也可能为尺寸
-              target = this.placeData.GroupList.find(it => it.ID === this.itemData.Property.ID);
-              if (!target && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property.ID) target = this.placeData.SizeGroup;
+              t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
+              if (t) value = t.List;
+              if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property.ID) value = this.submitData.Size;
               break;
             case '物料':
-              target = this.placeData.MaterialList || [];
+              value = this.submitData.Material.ID;
               break;
             case '工艺':
-              target = this.placeData.CraftGroupList.find(it => it.ID === this.itemData.Property.ID);
+              value = this.submitData.CraftList;
               break;
             case '工厂': // 工厂隐藏
-              target = this.placeData.FactoryList;
+              // value = this.placeData.FactoryList;
               break;
             default:
               break;
           }
         }
-        return target;
+        return value || {};
       },
       set(val) {
-        console.log('itemValue', val);
+        // console.log('itemValue', this.curTypeName, val, this.obj2GetProductPrice.ProductParams);
+        let type = this.curTypeName;
+        if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
+        this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);
       },
     },
   },

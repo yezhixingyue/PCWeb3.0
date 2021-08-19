@@ -25,6 +25,7 @@
         :key="it.ID"
         :Property="it"
         :needInit="!setupData"
+        fillWidth
         :value="getGroupVal(it)"
         @input="handleGroupChange($event, it)"
       />

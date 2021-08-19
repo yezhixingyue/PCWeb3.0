@@ -892,6 +892,35 @@ export default {
     setIsFetchingPartProductData(state, bool) {
       state.isFetchingPartProductData = bool;
     },
+    /** 设置产品报价面板信息
+    ---------------------------------------- */
+    setObj2GetProductPriceProductParams(state, [PartID, PartIndex, Type, ID, Value]) {
+      console.log(state.obj2GetProductPrice.ProductParams, PartID, Type, ID, Value);
+      let TargetPart;
+      if (!PartID) TargetPart = state.obj2GetProductPrice.ProductParams;
+      else {
+        const t = state.obj2GetProductPrice.ProductParams.PartList.find(it => it.PartID === PartID);
+        if (t && t.List && t.List[PartIndex]) TargetPart = t[PartIndex];
+        TargetPart = t.List[PartIndex];
+      }
+      if (!TargetPart) return;
+      let target;
+      switch (Type) {
+        case '元素':
+          target = TargetPart.ElementList.find(it => it.ElementID === ID);
+          if (target) target.CustomerInputValues = Value;
+          break;
+        case '元素组':
+          target = TargetPart.GroupList.find(it => it.GroupID === ID);
+          if (target) target.List = Value;
+          break;
+        case '尺寸组':
+          TargetPart.Size = Value;
+          break;
+        default:
+          break;
+      }
+    },
   },
   actions: {
     /* 产品分类相关 getProductClassify getProductLists

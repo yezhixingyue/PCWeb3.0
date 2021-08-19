@@ -17,6 +17,10 @@ export default {
       type: Object,
       required: true,
     },
+    value: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   components: {
     CanFreeCreateSelectComp,
@@ -24,9 +28,6 @@ export default {
   },
   data() {
     return {
-      sizeValID: '', // AllowCustomerCustomize 允许客户自定义
-      mode: this.Property.IsCheckedCustomerCustomize, // 也需要存放在仓库中
-      customizeList: [],
     };
   },
   computed: {
@@ -34,14 +35,38 @@ export default {
     CustomerSizeList() {
       return this.Property?.SizeList?.filter(it => !it.HiddenToCustomer) || [];
     },
+    mode: {
+      get() {
+        return this.value.isCustomize;
+      },
+      set(isCustomize) {
+        this.$emit('input', { ...this.value, isCustomize });
+      },
+    },
+    sizeValID: {
+      get() {
+        return this.value.ID;
+      },
+      set(ID) {
+        this.$emit('input', { ...this.value, ID });
+      },
+    },
+    customizeList: {
+      get() {
+        return this.value.List;
+      },
+      set(List) {
+        this.$emit('input', { ...this.value, List });
+      },
+    },
   },
   mounted() {
-    if (!this.isOrderRestore) {
-      // 非还原  执行数据初始化
-      if (this.CustomerSizeList.length > 0) {
-        this.sizeValID = this.CustomerSizeList[0].ID;
-      }
-    }
+    // if (!this.isOrderRestore) {
+    //   // 非还原  执行数据初始化
+    //   if (this.CustomerSizeList.length > 0) {
+    //     this.sizeValID = this.CustomerSizeList[0].ID;
+    //   }
+    // }
   },
 };
 </script>

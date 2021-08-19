@@ -23,6 +23,8 @@
         v-for="it in placeData.DisplayList"
         :key="it.key"
         :itemData="it"
+        :PartID='PartID'
+        :PartIndex='PartIndex'
         :placeData="placeData"
         :submitData="submitData"
       />
@@ -43,6 +45,14 @@ export default {
     submitData: {
       type: Object,
       default: () => ({}),
+    },
+    PartID: {
+      type: String,
+      default: '',
+    },
+    PartIndex: {
+      type: Number,
+      default: 0,
     },
   },
   components: {
