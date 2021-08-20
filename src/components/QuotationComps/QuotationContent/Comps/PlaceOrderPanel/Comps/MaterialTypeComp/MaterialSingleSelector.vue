@@ -1,6 +1,6 @@
 <template>
   <div v-if="list && list.length > 0" class="mp-place-order-panel-material-select-single-select-comp-wrap">
-    <CanFreeCreateSelectComp v-if="list" :options='list' v-model="val" :filterable='false'/>
+    <CanFreeCreateSelectComp v-show="!(list.length===1&&hiddenOption)" v-if="list" :options='list' v-model="val" :filterable='false'/>
     <MaterialSingleSelector :list='nextList' :key="val" @input="handleInput" />
   </div>
 </template>
@@ -16,6 +16,10 @@ export default {
       default: null,
     },
     value: {},
+    hiddenOption: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     CanFreeCreateSelectComp,

@@ -13,18 +13,19 @@ export default class QuotationClassType {
     if (!obj || Object.prototype.toString.call(obj) !== '[object Object]') return {};
     const _obj = JSON.parse(JSON.stringify(obj));
 
-    const ProductInfo = this.getPartSubmitData(_obj); // 生成产品本身数据
+    const ProductInfo = this.getPartSubmitData(_obj) || {}; // 生成产品本身数据
     const partSubmitDatas = _obj.PartList.map(part => { // 生成部件列表数据
       const List = [];
       const PartID = part.ID;
+      const showPart = !!this.getPartSubmitData(part);
       if (part.UseTimes && part.UseTimes.MinValue > 0) {
         for (let i = 0; i < part.UseTimes.MinValue; i += 1) {
           const item = this.getPartSubmitData(part);
-          List.push({ ...item, key: Math.random().toString(36).slice(-10) });
+          if (showPart) List.push({ ...item, key: Math.random().toString(36).slice(-10) });
         }
       }
-      return { PartID, List };
-    });
+      return { PartID, List, showPart };
+    }).filter(it => it.showPart);
     return {
       ProductID: _obj.ID,
       ...ProductInfo,
@@ -69,8 +70,30 @@ export default class QuotationClassType {
 
   static getPartSubmitData(PartData) { // 转换产品|部件数据为提交数据
     const { ProductDisplayPropertyTypeList } = store.state.Quotation;
-    const temp = {};
-    if (Array.isArray(PartData.DisplayList)) {
+    let temp;
+    if (Array.isArray(PartData.DisplayList) && PartData.DisplayList.length > 0) {
+      // 去除无效数据，比如物料数组长度为0的物料属性
+      const _DisplayList = PartData.DisplayList.filter(item => {
+        const t = ProductDisplayPropertyTypeList.find(it => it.ID === item.Type);
+        let bool = false;
+        if (t) {
+          bool = true;
+          const TypeName = t.Name;
+          switch (TypeName) {
+            case '物料':
+              if (!PartData.MaterialList || PartData.MaterialList.filter(it => !it.HiddenToCustomer).length === 0) {
+                bool = false;
+              }
+              break;
+
+            default:
+              break;
+          }
+        }
+        return bool;
+      });
+      if (_DisplayList.length === 0) return null;
+      temp = {};
       PartData.DisplayList.forEach(item => {
         const t = ProductDisplayPropertyTypeList.find(it => it.ID === item.Type);
         if (t) {
@@ -97,7 +120,7 @@ export default class QuotationClassType {
               }
               break;
             case '物料':
-              // 暂不用操作
+              // 此处获取该部件物料列表数据(筛选过后)，如果长度为0 则不生成下面数据 -- 已在上面筛选判断
               temp.Material = { ID: '' };
               break;
             case '工艺':
@@ -183,7 +206,7 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
   const {
     AllowCustomerCustomize, IsCheckedCustomerCustomize, GroupInfo, SizeList,
   } = Prop;
-  if (Array.isArray(SizeList) && SizeList.length > 0) ID = SizeList[0].ID;
+  if (Array.isArray(SizeList) && SizeList.filter(it => !it.HiddenToCustomer).length > 0) ID = SizeList.filter(it => !it.HiddenToCustomer)[0].ID;
   if (AllowCustomerCustomize && IsCheckedCustomerCustomize) {
     isCustomize = true;
   }

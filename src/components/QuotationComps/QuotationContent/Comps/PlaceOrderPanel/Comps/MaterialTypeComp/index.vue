@@ -1,6 +1,6 @@
 <template>
-  <section>
-    <MaterialSingleSelector :list='showList' v-model="selectedMaterial" />
+  <section v-if="MaterialList.length > 0">
+    <MaterialSingleSelector :list='showList' v-model="selectedMaterial" hiddenOption />
   </section>
 </template>
 
@@ -13,6 +13,10 @@ export default {
     MaterialList: {
       type: Array,
       default: () => [],
+    },
+    value: {
+      type: String,
+      default: '',
     },
   },
   components: {
@@ -36,9 +40,11 @@ export default {
         const { UnionShowList, Name, ElementList } = Type;
         // 1. 寻找已有相同分类
         let t1 = list.find(it => it.ID === Type.ID);
+        // let t1 = list.find(it => it.ID === 'Type');
         if (!t1) { // 2.如果没有则添加
           const temp = {
             ID: Type.ID,
+            // ID: 'Type',
             Name,
             children: [],
           };
@@ -46,6 +52,7 @@ export default {
         }
         // 3. 重新寻找一遍 此时肯定会找着
         t1 = list.find(it => it.ID === Type.ID);
+        // t1 = list.find(it => it.ID === 'Type');
         if (t1) {
           if (UnionShowList.length === 0) {
             const item = {
@@ -76,10 +83,17 @@ export default {
       });
       return list;
     },
+    selectedMaterial: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit('input', val);
+      },
+    },
   },
   data() {
     return {
-      selectedMaterial: '',
     };
   },
 };

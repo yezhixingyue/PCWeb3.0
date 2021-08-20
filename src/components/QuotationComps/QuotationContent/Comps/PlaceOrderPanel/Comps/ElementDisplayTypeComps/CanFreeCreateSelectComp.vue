@@ -56,10 +56,17 @@ export default {
         this.$emit('input', val);
       },
     },
+    optionLabels() {
+      return this.options.map(it => it.Name);
+    },
   },
   methods: {
     onBlur(e) {
-      this.$emit('input', e.target.value);
+      if (e.target.value && this.AllowCreate) {
+        const t = this.options.find(it => it.Name === e.target.value);
+        const _val = t ? t.ID : e.target.value;
+        this.$emit('input', _val);
+      }
       this.$emit('blur');
     },
     onFocus() {

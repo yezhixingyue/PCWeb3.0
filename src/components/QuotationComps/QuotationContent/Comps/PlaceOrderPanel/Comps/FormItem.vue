@@ -1,7 +1,10 @@
 <template>
   <el-form-item :label="label" prop="name"
-   v-if="target && !hidden"
+   v-if="target && !hidden && showFormItem"
    :label-width='labelWidth'
+   :rules="[
+      { validator: validateFormItem, trigger: 'blur' }
+    ]"
    class="mp-place-order-panel-form-item-comp-wrap"
    :class="{isNormalGroup:isNormalGroup}">
     <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" />
@@ -19,6 +22,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { checkElementType } from '@/store/Quotation/Checker';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
@@ -62,7 +66,7 @@ export default {
       return t ? t.Name : '';
     },
     isNormalGroup() {
-      return this.curTypeName === '元素组' && this.target.ElementList;
+      return !!(this.curTypeName === '元素组' && this.target.ElementList && this.target.ElementList.length > 0);
     },
     target() {
       let targetProp;
@@ -118,19 +122,23 @@ export default {
         if (this.curTypeName) {
           switch (this.curTypeName) {
             case '元素':
-              t = this.submitData.ElementList.find(it => it.ElementID === this.itemData.Property.ID);
-              if (t) value = t.CustomerInputValues;
+              if (Array.isArray(this.submitData.ElementList)) {
+                t = this.submitData.ElementList.find(it => it.ElementID === this.itemData.Property.ID);
+                if (t) value = t.CustomerInputValues;
+              }
               break;
             case '元素组': // 元素组  也可能为尺寸
-              t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
-              if (t) value = t.List;
-              if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property.ID) value = this.submitData.Size;
+              if (Array.isArray(this.submitData.GroupList)) {
+                t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
+                if (t) value = t.List;
+              }
+              if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property?.ID) value = this.submitData.Size;
               break;
             case '物料':
-              value = this.submitData.Material.ID;
+              value = this.submitData.Material?.ID || '';
               break;
             case '工艺':
-              value = this.submitData.CraftList;
+              value = this.submitData.CraftList || [];
               break;
             case '工厂': // 工厂隐藏
               // value = this.placeData.FactoryList;
@@ -139,7 +147,7 @@ export default {
               break;
           }
         }
-        return value || {};
+        return value;
       },
       set(val) {
         // console.log('itemValue', this.curTypeName, val, this.obj2GetProductPrice.ProductParams);
@@ -148,11 +156,30 @@ export default {
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);
       },
     },
+    showFormItem() { // 判断在什么时候隐藏该子项目
+      if (this.curTypeName === '物料' && this.target.filter(it => !it.HiddenToCustomer).length === 0) {
+        return false;
+      }
+      return true;
+    },
   },
   data() {
     return {
 
     };
+  },
+  methods: {
+    validateFormItem(rule, value, callback) {
+      console.log(this.itemValue, this.curTypeName, this.target);
+      if (this.curTypeName === '元素') {
+        const res = checkElementType(this.itemValue, this.target);
+        if (res && typeof res === 'string') {
+          callback(new Error(res));
+          return;
+        }
+      }
+      callback();
+    },
   },
 };
 </script>
@@ -182,6 +209,9 @@ export default {
         margin-bottom: 4px;
         height: 30px;
       }
+    }
+    .el-form-item__error {
+      margin-left: 6px;
     }
   }
   &.isNormalGroup > label {

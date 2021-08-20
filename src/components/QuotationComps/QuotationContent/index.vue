@@ -18,7 +18,10 @@
             </span>
           </section>
           <SwiperClassifyComp />
-          <PlaceOrderPanel :placeData='placeData' :submitData='obj2GetProductPrice.ProductParams' />
+          <PlaceOrderPanel ref="oProductPanel" :placeData='placeData' :submitData='obj2GetProductPrice.ProductParams' />
+          <template v-if='!isSetupError'>
+            <PartComp ref="oPartPanels" v-for="item in obj2GetProductPrice.ProductParams.PartList" :key="item.PartID" :PartData='item' :placeData='placeData' />
+          </template>
         </div>
 
         <section class="coupon-calculate-price-wrap">
@@ -28,6 +31,7 @@
               @click.native="go2GetProductPrice"
               :loading="isGettingPrice"
               class="get-price-btn"
+              :disabled='isSetupError'
             >
               <template v-if="isGettingPrice"> 计算中</template>
               <template v-else>计算价格</template>
@@ -191,6 +195,7 @@ import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp.vue';
 import SwiperClassifyComp from './Comps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
 import PlaceOrderPanel from './Comps/PlaceOrderPanel/index.vue';
+import PartComp from './Comps/PartComp.vue';
 
 export default {
   props: ['placeData'],
@@ -201,6 +206,7 @@ export default {
     SwiperClassifyComp,
     AsideIntroComp,
     PlaceOrderPanel,
+    PartComp,
   },
   computed: {
     // eslint-disable-next-line max-len
@@ -328,6 +334,13 @@ export default {
       if (!t) return null;
       return t;
     },
+    isSetupError() { // 是否有配置上的错误
+      if (!this.placeData) return true;
+      if (!Array.isArray(this.placeData.FactoryList)) return true;
+      if (this.placeData.FactoryList.length === 0) return true;
+      // if (!this.placeData.FactoryList || this.placeDate.FactoryList.length === 0) return true; // 暂时只判断工厂， 其它后面补充
+      return false;
+    },
   },
   data() {
     return {
@@ -358,7 +371,11 @@ export default {
       this.$refs.AddShowChangeComp.handleSetPositionOnMap(cb);
     },
     async go2GetProductPrice() {
-      this.getProductPriceLocal();
+      // 此处校验
+      this.$refs.oProductPanel.$refs.ruleForm.validate((bool, obj) => {
+        console.log(bool, obj);
+        if (bool) this.getProductPriceLocal();
+      });
     },
     async getProductPriceLocal() {
       this.priceGetErrMsg = '';
@@ -526,6 +543,7 @@ export default {
     padding-bottom:9999px;
     margin-bottom:-9999px;
     > article > .content {
+      padding-bottom: 25px;
       > .content-title {
         > div {
           color: #333;

@@ -895,7 +895,7 @@ export default {
     /** 设置产品报价面板信息
     ---------------------------------------- */
     setObj2GetProductPriceProductParams(state, [PartID, PartIndex, Type, ID, Value]) {
-      console.log(state.obj2GetProductPrice.ProductParams, PartID, Type, ID, Value);
+      // console.log(state.obj2GetProductPrice.ProductParams, PartID, Type, ID, Value);
       let TargetPart;
       if (!PartID) TargetPart = state.obj2GetProductPrice.ProductParams;
       else {
@@ -903,6 +903,7 @@ export default {
         if (t && t.List && t.List[PartIndex]) TargetPart = t[PartIndex];
         TargetPart = t.List[PartIndex];
       }
+      // console.log(state.obj2GetProductPrice.ProductParams, TargetPart, PartID, PartIndex, Type, ID, Value);
       if (!TargetPart) return;
       let target;
       switch (Type) {
@@ -917,8 +918,25 @@ export default {
         case '尺寸组':
           TargetPart.Size = Value;
           break;
+        case '物料':
+          TargetPart.Material.ID = Value;
+          break;
+        case '工艺':
+          TargetPart.CraftList = Value;
+          break;
         default:
           break;
+      }
+    },
+    /** 设置产品报价面板信息 -- 部件添加与删除
+    ---------------------------------------- */
+    setObj2GetProductPriceProductParamsPartChange(state, [PartID, index, item]) {
+      const t = state.obj2GetProductPrice.ProductParams.PartList.find(it => it.PartID === PartID);
+      if (!t) return;
+      if (!item) { // 删除
+        t.List.splice(index, 1);
+      } else { // 添加
+        t.List.push(item);
       }
     },
   },
@@ -969,15 +987,14 @@ export default {
       // console.log(curSelectStatus);
       const productData = state.obj2GetProductPrice.ProductParams;
       commit('setCurSelectStatus', '报价');
-      if (QuotationClassType.check(productData) === false) return;
+      // if (QuotationClassType.check(productData) === false) return; // 校验 后面填写
       const _data = {};
       commit('setWatchTarget2DelCraft');
       await dispatch('delay', 10);
-      _data.ProductParams = QuotationClassType.filter(
-        QuotationClassType.transform(productData),
-      );
-      // const { CustomerID } = this.state.account.accountObj;
-      // _data.Customer = { CustomerID };
+      // _data.ProductParams = QuotationClassType.filter( // 数据转换与筛选 后面补充
+      //   QuotationClassType.transform(productData),
+      // );
+      _data.ProductParams = { ...productData, FactoryID: 55 };
       commit('setProductQuotationResult', null);
       commit('setProductQuotationDetail', null);
       if (state.addressInfo4PlaceOrder && state.addressInfo4PlaceOrder.Address.Address.Consignee && state.addressInfo4PlaceOrder.Address.Address.Latitude) {

@@ -21,6 +21,7 @@ export default {
       type: Array,
       default: () => [],
     },
+    value: {},
   },
   components: {
     CraftItemComp,
@@ -30,10 +31,17 @@ export default {
       if (!this.CraftData || !Array.isArray(this.CraftData.List) || this.CraftList.length === 0) return [];
       return this.CraftList.filter(it => this.CraftData.List.includes(it.ID) && !it.HiddenToCustomer);
     },
+    selectedCraftList: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit('input', val);
+      },
+    },
   },
   data() {
     return {
-      selectedCraftList: [],
     };
   },
   methods: {

@@ -1,7 +1,7 @@
 <template>
   <section class="mp-place-order-panel-form-item-size-group-comp-wrap">
-    <CanFreeCreateSelectComp v-show="!mode && CustomerSizeList.length > 0" v-model="sizeValID" :options='CustomerSizeList' />
-    <CustomizeSizeGroupComp v-show="mode||CustomerSizeList.length===0" v-model="customizeList" class="customize" :ElementList='Property.GroupInfo.ElementList'/>
+    <CanFreeCreateSelectComp v-show="!mode" v-model="sizeValID" :options='CustomerSizeList' />
+    <CustomizeSizeGroupComp v-show="mode" v-model="customizeList" class="customize" :ElementList='Property.GroupInfo.ElementList'/>
     <el-checkbox  v-model="mode" v-if="Property.AllowCustomerCustomize && Property.GroupInfo.ElementList.length > 0">自定义</el-checkbox>
   </section>
 </template>

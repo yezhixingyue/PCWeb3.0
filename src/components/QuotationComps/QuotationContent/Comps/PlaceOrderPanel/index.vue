@@ -5,18 +5,18 @@
   >
     <div
       class="setting-error is-pink"
-      v-if="!placeData.TypeList || placeData.TypeList.length === 0"
+      v-if="!PartID && (!placeData.FactoryList || placeData.FactoryList.length === 0)"
     >
       <i class="el-icon-warning"></i>
-      <span>产品未设置元素，请到产品管理中设置产品元素 ！</span>
+      <span>当前产品未设置工厂，请到产品管理中设置工厂 ！</span>
     </div>
     <el-form
       :model="ruleForm"
       :rules="rules"
       ref="ruleForm"
+      v-else
       label-width="100px"
       class="place-order-ruleForm"
-      v-else
       size="mini"
     >
       <FormItem
