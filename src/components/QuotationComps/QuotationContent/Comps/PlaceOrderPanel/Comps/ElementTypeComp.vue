@@ -14,7 +14,7 @@
     <OptionTypeItemComp
      v-if="Property.Type === 2"
      v-model="PropValue"
-     :options='Property.OptionAttribute.OptionList'
+     :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
      :Allow='Property.OptionAttribute.AllowCustomer'
      :isMultiple='!Property.OptionAttribute.IsRadio'
      :SelectMode='Property.OptionAttribute.SelectMode' />

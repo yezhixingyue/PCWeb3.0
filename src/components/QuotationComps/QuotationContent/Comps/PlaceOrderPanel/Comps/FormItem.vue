@@ -1,15 +1,17 @@
 <template>
-  <el-form-item :label="label" prop="name"
+  <el-form-item :label="label" :prop="propName"
    v-if="target && !hidden && showFormItem"
    :label-width='labelWidth'
    :rules="[
-      { validator: validateFormItem, trigger: 'blur' }
+      { validator: validateFormItem, trigger: 'change' }
     ]"
    class="mp-place-order-panel-form-item-comp-wrap"
    :class="{isNormalGroup:isNormalGroup}">
     <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" />
-    <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" />
-    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :Property='target' v-model="itemValue" />
+    <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
+     :errorElementID='errorElementID' :errorIndex='errorIndex' />
+    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList"
+     :Property='target' v-model="itemValue" :errorElementID='errorElementID' />
     <MaterialTypeComp v-if="curTypeName==='物料'" :MaterialList='target.filter(it => !it.HiddenToCustomer)' v-model="itemValue" />
     <CraftTypeComp
      v-if="curTypeName==='工艺'"
@@ -22,7 +24,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import { checkElementType } from '@/store/Quotation/Checker';
+import {
+  checkElement, checkElementGroup, checkSizeGroup, checkCraft,
+} from '@/store/Quotation/Checker';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
@@ -111,7 +115,7 @@ export default {
     },
     hidden() {
       if (Object.prototype.toString.call(this.target) === '[object Object]') {
-        return this.target.HiddenToCustomer;
+        return this.target.HiddenToCustomer || (this.target.GroupInfo && this.target.GroupInfo.HiddenToCustomer);
       }
       return false;
     },
@@ -154,6 +158,9 @@ export default {
         let type = this.curTypeName;
         if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);
+        if (this.curTypeName === '工艺') {
+          this.$emit('changeValidate', this.placeData.CraftGroupList.map(it => it.Name));
+        }
       },
     },
     showFormItem() { // 判断在什么时候隐藏该子项目
@@ -162,23 +169,60 @@ export default {
       }
       return true;
     },
+    propName() {
+      if (!this.target) return 'propName';
+      if (this.target.Name) return this.target.Name;
+      if (this.target.GroupInfo) return this.target.GroupInfo.Name || 'propName';
+      return 'propName';
+    },
   },
   data() {
     return {
-
+      errorElementID: '',
+      errorIndex: '',
     };
   },
   methods: {
     validateFormItem(rule, value, callback) {
-      console.log(this.itemValue, this.curTypeName, this.target);
+      this.errorElementID = '';
+      this.errorIndex = '';
       if (this.curTypeName === '元素') {
-        const res = checkElementType(this.itemValue, this.target);
+        const res = checkElement(this.itemValue, this.target);
         if (res && typeof res === 'string') {
           callback(new Error(res));
           return;
         }
       }
+      if (this.curTypeName === '元素组' && this.isNormalGroup) {
+        const res = checkElementGroup(this.itemValue, this.target);
+        if (res && typeof res === 'object' && res.msg) {
+          this.errorElementID = res.ElementID;
+          this.errorIndex = res.index;
+          callback(new Error(res.msg));
+          return;
+        }
+      }
+      if (this.curTypeName === '元素组' && !this.isNormalGroup) { // 尺寸组
+        const res = checkSizeGroup(this.itemValue, this.target);
+        if (res && typeof res === 'object' && res.msg) {
+          this.errorElementID = res.ElementID;
+          callback(new Error(res.msg));
+          return;
+        }
+      }
+      if (this.curTypeName === '工艺') { // 尺寸组
+        if (Array.isArray(this.placeData.CraftConditionList) && this.placeData.CraftConditionList.length > 0) {
+          const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList);
+          if (res && typeof res === 'string') {
+            callback(new Error(res));
+            return;
+          }
+        }
+      }
       callback();
+    },
+    onChangeValidate() { // 重新单独校验
+      this.$emit('changeValidate', this.propName);
     },
   },
 };
@@ -217,6 +261,9 @@ export default {
   &.isNormalGroup > label {
     font-weight: 700;
     color: #333 !important;
+  }
+  &.el-form-item--mini .el-form-item__error {
+    padding-top: 2px;
   }
 }
 </style>

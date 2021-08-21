@@ -12,23 +12,47 @@
       <span>{{ dialogTitle }}</span>
     </header>
     <main v-if="localSetupData && showMain">
-      <ElementTypeComp
-        v-for="it in ElementList"
-        :key="it.ID"
-        :Property="it"
-        :needInit="!setupData"
-        :value="getElementVal(it)"
-        @input="handleElementChange($event, it)"
-      />
-      <ElementGroupTypeComp
-        v-for="it in GroupList"
-        :key="it.ID"
-        :Property="it"
-        :needInit="!setupData"
-        fillWidth
-        :value="getGroupVal(it)"
-        @input="handleGroupChange($event, it)"
-      />
+      <el-form
+        :model="craftForm"
+        ref="craftForm"
+        label-width="100px"
+        class="place-order-ruleForm"
+        size="mini"
+      >
+        <el-form-item
+          v-for="it in ElementList"
+          :key="it.ID"
+          :label="it.Name && !it.IsNameHidden ? `${it.Name}：` : ''"
+          :prop="it.ID"
+          :rules="[{ validator: validateCraftValueItem, trigger: 'change' }]"
+        >
+          <ElementTypeComp
+            hiddenLabel
+            :Property="it"
+            :value="craftForm[it.ID].Value"
+            @input="handleElementChange($event, it)"
+          />
+        </el-form-item>
+        <el-form-item
+          v-for="it in GroupList"
+          :key="it.ID"
+          :label="it.Name && !it.IsNameHidden ? `${it.Name}：` : ''"
+          :prop="it.ID"
+          :rules="[{ validator: validateCraftValueItem, trigger: 'change' }]"
+          class="group"
+        >
+          <ElementGroupTypeComp
+            :Property="it"
+            fillWidth
+            :errorElementID='errorElementID'
+            :errorIndex='errorIndex'
+            :showTop='it.Name && !it.IsNameHidden'
+            :value="craftForm[it.ID].Value"
+            @input="handleGroupChange($event, it)"
+            @changeValidate='onChangeValidate(it.ID)'
+          />
+        </el-form-item>
+      </el-form>
     </main>
     <footer>
       <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -38,6 +62,8 @@
 </template>
 
 <script>
+import { checkElement, checkElementGroup } from '@/store/Quotation/Checker';
+import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import ElementTypeComp from '../ElementTypeComp.vue';
 import ElementGroupTypeComp from '../ElementGroupTypeComp.vue';
 
@@ -80,33 +106,46 @@ export default {
     GroupList() {
       return this.Craft?.GroupList || [];
     },
+    craftForm() {
+      const temp = {};
+      const data = this.localSetupData;
+      this.ElementList.forEach(it => {
+        temp[it.ID] = {
+          Value: this.getElementVal(it, data),
+          ID: it.ID,
+          Type: 'Element',
+        };
+      });
+      this.GroupList.forEach(it => {
+        temp[it.ID] = {
+          Value: this.getGroupVal(it, data),
+          ID: it.ID,
+          Type: 'Group',
+        };
+      });
+      return temp;
+    },
   },
   data() {
     return {
       localSetupData: null,
       showMain: false,
+      errorElementID: '',
+      errorIndex: '',
     };
   },
   methods: {
     onSubmit() {
-      this.$emit('submit', this.localSetupData);
+      this.$refs.craftForm.validate((bool) => {
+        if (bool) this.$emit('submit', this.localSetupData);
+      });
     },
-    generateInitSetupData() {
-      // 生成及初始化设置数据
-      const ElementList = this.ElementList.map((it) => ({
-        ElementID: it.ID,
-        CustomerInputValues: [],
-      }));
-      const GroupList = this.GroupList.map((it) => ({
-        GroupID: it.ID,
-        List: [],
-      }));
-      const temp = {
-        CraftID: this.Craft.ID,
-        ElementList,
-        GroupList,
-      };
-      this.localSetupData = temp;
+    generateInitSetupData() { // 生成及初始化设置数据
+      if (this.Craft) {
+        this.localSetupData = QuotationClassType.getCraftItemSubmitData(
+          this.Craft,
+        );
+      }
     },
     onOpen() {
       if (!this.setupData) this.generateInitSetupData();
@@ -119,14 +158,14 @@ export default {
     onClosed() {
       this.showMain = false;
     },
-    getElementVal({ ID }) {
-      const t = this.localSetupData.ElementList.find(
+    getElementVal({ ID }, data) {
+      const t = data.ElementList.find(
         (it) => it.ElementID === ID,
       );
       return t ? t.CustomerInputValues : [];
     },
-    getGroupVal({ ID }) {
-      const t = this.localSetupData.GroupList.find((it) => it.GroupID === ID);
+    getGroupVal({ ID }, data) {
+      const t = data.GroupList.find((it) => it.GroupID === ID);
       return t ? t.List : [];
     },
     handleElementChange(CustomerInputValues, el) {
@@ -144,6 +183,41 @@ export default {
       if (t) {
         t.List = List;
       }
+    },
+    validateCraftValueItem(rule, value, callback) {
+      this.errorElementID = '';
+      this.errorIndex = '';
+      if (value) {
+        const { ID, Type, Value } = value;
+        if (Type === 'Element') {
+          const target = this.ElementList.find(it => it.ID === ID);
+          if (target) {
+            const res = checkElement(Value, target);
+            if (res && typeof res === 'string') {
+              callback(new Error(res));
+              return;
+            }
+          }
+        }
+        if (Type === 'Group') {
+          const target = this.GroupList.find(it => it.ID === ID);
+          if (target) {
+            const res = checkElementGroup(Value, target);
+            if (res && typeof res === 'object' && res.msg) {
+              this.errorElementID = res.ElementID;
+              this.errorIndex = res.index;
+              callback(new Error(res.msg));
+              return;
+            }
+          }
+        }
+      }
+      callback();
+    },
+    onChangeValidate(key) {
+      this.$nextTick(() => {
+        this.$refs.craftForm.validateField(key);
+      });
     },
   },
 };
@@ -164,7 +238,7 @@ export default {
     }
     > .el-dialog__body {
       margin-left: 20px;
-      margin-right: 20px;
+      margin-right: 35px;
       padding-bottom: 25px;
       margin-left: 15px\0;
       margin-right: 15px\0;
@@ -174,8 +248,35 @@ export default {
             width: unset;
           }
         }
-        > .mp-place-order-content-element-type-show-item-comp-wrap {
-          margin-bottom: 15px;
+        // .mp-place-order-panel-element-group-setup-comp-wrap {
+        //   margin-left: 5px;
+        // }
+        .mp-place-order-panel-element-group-setup-comp-wrap {
+          margin-left: -100px;
+          > ul {
+            > li {
+              > div {
+                &:first-of-type {
+                  > label {
+                    width: 88px;
+                    padding-right: 12px;
+                    white-space: nowrap;
+                  }
+                }
+              }
+            }
+          }
+          > div {
+            margin-left: 106px;
+            margin-bottom: 4px;
+            height: 30px;
+          }
+        }
+        .group {
+          > label {
+            font-weight: 700;
+            color: #333 !important;
+          }
         }
       }
       > footer {

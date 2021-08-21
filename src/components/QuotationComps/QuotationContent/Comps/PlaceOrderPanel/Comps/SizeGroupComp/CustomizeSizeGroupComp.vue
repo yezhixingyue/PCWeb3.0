@@ -28,7 +28,8 @@
         @input="onInput($event, it)"
         :options="it.OptionAttribute.OptionList"
       /> -->
-      <ElementTypeComp @focus="onFocus(i)" @blur="onBlur" isNumberic :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
+      <ElementTypeComp :class="{canError: errorElementID === it.ID}"
+       @focus="onFocus(i)" @blur="onBlur" isNumberic :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
       <!-- <span
         class="unit"
         v-if="
@@ -55,6 +56,10 @@ export default {
     value: {
       type: Array,
       default: () => [],
+    },
+    errorElementID: {
+      type: String,
+      default: '',
     },
   },
   components: {
@@ -166,6 +171,7 @@ export default {
     }
     > i {
       margin: 0 12px;
+      color: #585858;
     }
     &.active {
       > .fixed {

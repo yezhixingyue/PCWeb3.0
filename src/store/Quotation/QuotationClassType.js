@@ -46,7 +46,7 @@ export default class QuotationClassType {
         }
         break;
       case 2: // 选项值
-        temp = el.OptionAttribute?.OptionList?.filter(it => it.IsChecked).map(it => ({ ID: it.ID })) || temp;
+        temp = el.OptionAttribute?.OptionList?.filter(it => it.IsChecked && !it.HiddenToCustomer).map(it => ({ ID: it.ID })) || temp;
         break;
       case 3: // 开关
         if (el.SwitchAttribute) {
@@ -94,6 +94,7 @@ export default class QuotationClassType {
       });
       if (_DisplayList.length === 0) return null;
       temp = {};
+      let isCraftInited = false;
       PartData.DisplayList.forEach(item => {
         const t = ProductDisplayPropertyTypeList.find(it => it.ID === item.Type);
         if (t) {
@@ -124,36 +125,32 @@ export default class QuotationClassType {
               temp.Material = { ID: '' };
               break;
             case '工艺':
+              if (isCraftInited) return;
+              temp.CraftList = [];
+              if (Array.isArray(PartData.CraftConditionList) && PartData.CraftConditionList.length > 0) {
+                PartData.CraftConditionList.forEach(it => {
+                  if (it.IsRequired && it.DefaultCraft) {
+                    const _craft = PartData.CraftList.find(_it => _it.ID === it.DefaultCraft && !_it.HiddenToCustomer);
+                    if (_craft && (!_craft.ElementList || _craft.ElementList.length === 0) && (!_craft.GroupList || _craft.GroupList.length === 0)) {
+                      const _data = this.getCraftItemSubmitData(_craft);
+                      temp.CraftList.push(_data);
+                    }
+                  }
+                });
+              }
+              isCraftInited = true;
               // 其实是工艺显示分组，所以
               // 1 首先要找到该分组
-              target = PartData.CraftGroupList.find(it => it.ID === item.Property.ID);
-              if (target && Array.isArray(target.List)) {
-                // 2 找到该分组对应到的工艺组成的列表，并筛选掉需要对客户隐藏的工艺
-                const _craftList = PartData.CraftList.filter(it => target.List.includes(it.ID) && !it.HiddenToCustomer);
-                // 3. 把工艺分组转换成需要提交的数据格式
-                const _list = _craftList.map(_craft => {
-                  let GroupList = [];
-                  let ElementList = [];
-                  if (Array.isArray(_craft.ElementList)) {
-                    ElementList = _craft.ElementList.filter(el => !el.HiddenToCustomer).map(el => ({
-                      ElementID: el.ID,
-                      CustomerInputValues: this.getInitCustomerInputValues(el),
-                    }));
-                  }
-                  if (Array.isArray(_craft.GroupList)) {
-                    GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => this.getGroupItemSubmitData(_it));
-                  }
-                  const _item = {
-                    CraftID: _craft.ID,
-                    GroupList,
-                    ElementList,
-                  };
-                  return _item;
-                });
-                // 4. 把该列表数据加入到总数据的CraftList中
-                if (!temp.CraftList) temp.CraftList = [];
-                temp.CraftList.push(..._list);
-              }
+              // target = PartData.CraftGroupList.find(it => it.ID === item.Property.ID);
+              // if (target && Array.isArray(target.List)) {
+              //   // 2 找到该分组对应到的工艺组成的列表，并筛选掉需要对客户隐藏的工艺
+              //   const _craftList = PartData.CraftList.filter(it => target.List.includes(it.ID) && !it.HiddenToCustomer);
+              //   // 3. 把工艺分组转换成需要提交的数据格式
+              //   const _list = _craftList.map(_craft => this.getCraftItemSubmitData(_craft));
+              //   // 4. 把该列表数据加入到总数据的CraftList中
+              //   if (!temp.CraftList) temp.CraftList = [];
+              //   temp.CraftList.push(..._list);
+              // }
               break;
             default:
               break;
@@ -186,6 +183,26 @@ export default class QuotationClassType {
       }
     }
     return _groupItem;
+  }
+
+  static getCraftItemSubmitData(_craft) {
+    let GroupList = [];
+    let ElementList = [];
+    if (Array.isArray(_craft.ElementList)) {
+      ElementList = _craft.ElementList.filter(el => !el.HiddenToCustomer).map(el => ({
+        ElementID: el.ID,
+        CustomerInputValues: this.getInitCustomerInputValues(el),
+      }));
+    }
+    if (Array.isArray(_craft.GroupList)) {
+      GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => this.getGroupItemSubmitData(_it));
+    }
+    const _item = {
+      CraftID: _craft.ID,
+      GroupList,
+      ElementList,
+    };
+    return _item;
   }
 }
 
@@ -221,22 +238,3 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
   }
   return { ID, isCustomize, List };
 };
-
-// const getGroupItemSubmitData = (Prop) => { // 获取元素组提交数据
-//   const { UseTimes, ID, ElementList } = Prop;
-//   const _groupItem = {
-//     GroupID: ID,
-//     List: [], // 此处一项代表一行
-//   };
-//   if (UseTimes && UseTimes.MinValue > 0) {
-//     for (let i = 0; i < UseTimes.MinValue; i += 1) {
-//       const _item = {
-//         List: [],
-//         key: Math.random().toString(36).slice(-10),
-//       };
-//       _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: QuotationClassType.getInitCustomerInputValues(_it) }));
-//       _groupItem.List.push(_item);
-//     }
-//   }
-//   return _groupItem;
-// };

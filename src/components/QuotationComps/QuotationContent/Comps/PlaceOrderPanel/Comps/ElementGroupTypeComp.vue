@@ -1,6 +1,6 @@
 <template>
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
-    <div>
+    <div v-show="List.length === 0 || showTop">
       <span class="blue-span" v-show="List.length === 0" @click="onAddClick"
         >+ 添加</span
       >
@@ -18,8 +18,9 @@
           :Property="it"
           :value="getItemValue(index, it)"
           @input="onItemValueChange(index, it, $event)"
+          :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
         />
-        <ul class="ctrl" :class="{fillWidth:fillWidth}">
+        <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!(List.length === minLength && List.length === maxLength)">
           <li class="f" >
             <div @click="onDelClick(index)" v-show="List.length > minLength">
               <i class="iconfont icon-shanchu is-pink"></i>
@@ -62,6 +63,15 @@ export default {
       type: Boolean,
       default: false,
     },
+    showTop: {
+      type: Boolean,
+      default: true,
+    },
+    errorElementID: {
+      type: String,
+      default: '',
+    },
+    errorIndex: {},
   },
   components: {
     ElementTypeComp,
@@ -95,9 +105,11 @@ export default {
     onAddClick() {
       const temp = QuotationClassType.getGroupItemSubmitData(this.Property, true);
       this.List = [...this.List, temp];
+      this.$emit('changeValidate');
     },
     onDelClick(index) {
       this.List = this.List.filter((it, i) => i !== index);
+      this.$emit('changeValidate');
     },
     onItemValueChange(lv1Index, it, value) {
       const temp = JSON.parse(JSON.stringify(this.value));

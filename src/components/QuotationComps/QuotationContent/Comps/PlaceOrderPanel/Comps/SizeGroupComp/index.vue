@@ -1,8 +1,9 @@
 <template>
   <section class="mp-place-order-panel-form-item-size-group-comp-wrap">
-    <CanFreeCreateSelectComp v-show="!mode" v-model="sizeValID" :options='CustomerSizeList' />
-    <CustomizeSizeGroupComp v-show="mode" v-model="customizeList" class="customize" :ElementList='Property.GroupInfo.ElementList'/>
-    <el-checkbox  v-model="mode" v-if="Property.AllowCustomerCustomize && Property.GroupInfo.ElementList.length > 0">自定义</el-checkbox>
+    <CanFreeCreateSelectComp v-show="!isCustomize" v-model="ID" :options='CustomerSizeList' />
+    <CustomizeSizeGroupComp v-show="isCustomize" v-model="List" class="customize"
+     :ElementList='Property.GroupInfo.ElementList' :errorElementID='errorElementID' />
+    <el-checkbox  v-model="isCustomize" v-if="Property.AllowCustomerCustomize && Property.GroupInfo.ElementList.length > 0">自定义</el-checkbox>
   </section>
 </template>
 
@@ -21,6 +22,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    errorElementID: {
+      type: String,
+      default: '',
+    },
   },
   components: {
     CanFreeCreateSelectComp,
@@ -35,7 +40,7 @@ export default {
     CustomerSizeList() {
       return this.Property?.SizeList?.filter(it => !it.HiddenToCustomer) || [];
     },
-    mode: {
+    isCustomize: {
       get() {
         return this.value.isCustomize;
       },
@@ -43,7 +48,7 @@ export default {
         this.$emit('input', { ...this.value, isCustomize });
       },
     },
-    sizeValID: {
+    ID: {
       get() {
         return this.value.ID;
       },
@@ -51,7 +56,7 @@ export default {
         this.$emit('input', { ...this.value, ID });
       },
     },
-    customizeList: {
+    List: {
       get() {
         return this.value.List;
       },
@@ -64,7 +69,7 @@ export default {
     // if (!this.isOrderRestore) {
     //   // 非还原  执行数据初始化
     //   if (this.CustomerSizeList.length > 0) {
-    //     this.sizeValID = this.CustomerSizeList[0].ID;
+    //     this.ID = this.CustomerSizeList[0].ID;
     //   }
     // }
   },

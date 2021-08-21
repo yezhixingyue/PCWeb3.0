@@ -1,3 +1,4 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable object-curly-newline */
 
 const pointStartNumberReg = /^\.\d+$/;
@@ -32,7 +33,7 @@ export const getNumberValueList = (valueList) => {
  * @param {*} element 所赋值的元素
  * @return {*}
  */
-export const elementTypeChecker = (value, element) => {
+const _elementTypeChecker = (value, element) => {
   if (!value && value !== 0) return { msg: '值未设置', result: false };
   const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer } = element; // 开关类型暂未判断 或可不需要
   if (Type === 1) { // 数值类型元素
@@ -92,7 +93,7 @@ export const elementTypeChecker = (value, element) => {
  * @param {*}
  * @return {*}
  */
-export const checkElementType = (values, prop) => {
+export const checkElement = (values, prop) => {
   let IsRequired = false;
   if (prop.NumbericAttribute && prop.NumbericAttribute.IsRequired) IsRequired = true;
   if (prop.OptionAttribute && prop.OptionAttribute.IsRequired) IsRequired = true;
@@ -120,14 +121,124 @@ export const checkElementType = (values, prop) => {
     const [{ ID, Name, Value }] = values;
     if (!ID && !Name && !Value && IsRequired) return `请设置${prop.Name}`;
     if (Name || Value) {
-      const res = elementTypeChecker(Name || Value, prop);
+      const res = _elementTypeChecker(Name || Value, prop);
       if (res) return res.msg;
     }
   }
   return '';
 };
 
+const getElementValue = CustomerInputValues => { // 返回字符串 或 数组 （可多选且多选时返回的数组）
+  if (!Array.isArray(CustomerInputValues) || CustomerInputValues.length === 0) return '';
+  const getSingleValue = (item) => {
+    const { ID, Name, Value } = item;
+    if (!ID && !Name && !Value) return '';
+    return ID || Value || Name;
+  };
+  if (CustomerInputValues.length === 1) {
+    return getSingleValue(CustomerInputValues[0]);
+  }
+  return CustomerInputValues.map(it => getSingleValue(it));
+};
+
+const getStrArrIsRepeat = arr => { // 判断字符串组成的数组是否有重复项
+  if (!Array.isArray(arr) || arr.length <= 1) return false;
+  const obj = {};
+  arr.forEach(it => {
+    if (obj[it]) obj[it] += 1;
+    else obj[it] = 0;
+  });
+  return Object.keys(obj).length < arr.length;
+};
+
+export const checkElementGroup = (valueList, prop) => {
+  if (valueList && valueList.length > 0 && prop && prop.ElementList && prop.ElementList.length > 0) {
+    for (let i = 0; i < valueList.length; i += 1) {
+      const itemValues = valueList[i]; // 单行所有元素组成的值列表
+      for (let index = 0; index < itemValues.List.length; index += 1) {
+        const { ElementID, CustomerInputValues } = itemValues.List[index];
+        const _Element = prop.ElementList.find(it => it.ID === ElementID);
+        const msg = checkElement(CustomerInputValues, _Element);
+        if (msg) return { msg, ElementID, index: i };
+      }
+    }
+    for (let i = 0; i < prop.ElementList.length; i += 1) {
+      const Element = prop.ElementList[i];
+      if (Element.ForbidRepeat && valueList.length > 1) {
+        const values = valueList.map(it => {
+          const t = it.List.find(_it => _it.ElementID === Element.ID);
+          if (t) {
+            return JSON.stringify(getElementValue(t.CustomerInputValues));
+          }
+          return '';
+        });
+        if (getStrArrIsRepeat(values)) {
+          return {
+            msg: `${Element.Name}值不允许重复，请检查`,
+            ElementID: Element.ID,
+            index: 'all',
+          };
+        }
+      }
+    }
+  }
+  return '';
+};
+
+export const checkSizeGroup = (value, prop) => {
+  if (value && prop) {
+    const { List, isCustomize } = value;
+    if (isCustomize && prop.GroupInfo && prop.GroupInfo.ElementList) {
+      for (let i = 0; i < List.length; i += 1) {
+        const { ElementID, CustomerInputValues } = List[i];
+        const _Element = prop.GroupInfo.ElementList.find(it => it.ID === ElementID);
+        const msg = checkElement(CustomerInputValues, _Element);
+        if (msg) return { msg, ElementID, index: 0 };
+      }
+    }
+  }
+  return '';
+};
+
+export const checkCraft = (value, prop, CraftConditionList, CraftList) => {
+  // 判断是否有必选的单选工艺组，判断其是否已有选择，如果无则报错
+  if (prop && Array.isArray(prop.List) && prop.List.length > 0 && Array.isArray(CraftList) && CraftList.length > 0) {
+    const requiredList = CraftConditionList.filter(it => it.IsRequired);
+    if (requiredList.length > 0) {
+      for (let i = 0; i < requiredList.length; i += 1) {
+        const { List } = requiredList[i];
+        if (List && List.length > 0) {
+          let bool;
+          List.forEach(_it => {
+            if (!bool && prop.List.includes(_it)) bool = true;
+          });
+          if (bool) {
+            let target;
+            for (let index = 0; index < List.length; index += 1) {
+              const craftID = List[index];
+              const _t = value.find(_it => _it.CraftID === craftID);
+              if (_t) {
+                target = _t;
+                break;
+              }
+            }
+            if (!target) {
+              const craftNames = List.map(_craftID => CraftList.find(_it => _it.ID === _craftID))
+                .filter(_it => _it && !_it.HiddenToCustomer).map(_it => _it.ShowName);
+              if (craftNames.length === 1) return `${craftNames[0]}为必选工艺`;
+              return `${craftNames.join('、')}等${craftNames.length}种工艺中应至少选择一种工艺`;
+            }
+          }
+        }
+      }
+    }
+  }
+  return '';
+};
+
 export default {
-  elementTypeChecker,
-  checkElementType,
+  checkElement,
+  checkElementGroup,
+  checkSizeGroup,
+  checkCraft,
 };

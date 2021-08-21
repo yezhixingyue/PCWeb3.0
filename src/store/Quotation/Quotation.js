@@ -994,7 +994,7 @@ export default {
       // _data.ProductParams = QuotationClassType.filter( // 数据转换与筛选 后面补充
       //   QuotationClassType.transform(productData),
       // );
-      _data.ProductParams = { ...productData, FactoryID: 55 };
+      _data.ProductParams = { ...productData };
       commit('setProductQuotationResult', null);
       commit('setProductQuotationDetail', null);
       if (state.addressInfo4PlaceOrder && state.addressInfo4PlaceOrder.Address.Address.Consignee && state.addressInfo4PlaceOrder.Address.Address.Latitude) {
