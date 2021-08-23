@@ -1,9 +1,28 @@
 <template>
   <section class="mp-place-order-panel-form-item-size-group-comp-wrap">
-    <CanFreeCreateSelectComp v-show="!isCustomize" v-model="ID" :options='CustomerSizeList' />
-    <CustomizeSizeGroupComp v-show="isCustomize" v-model="List" class="customize"
-     :ElementList='Property.GroupInfo.ElementList' :errorElementID='errorElementID' />
-    <el-checkbox  v-model="isCustomize" v-if="Property.AllowCustomerCustomize && Property.GroupInfo.ElementList.length > 0">自定义</el-checkbox>
+    <CanFreeCreateSelectComp
+      v-show="
+        !isCustomize &&
+        (CustomerSizeList.length > 0 || !Property.AllowCustomerCustomize)
+      "
+      v-model="ID"
+      :options="CustomerSizeList"
+    />
+    <CustomizeSizeGroupComp
+      v-show="isCustomize"
+      v-model="List"
+      class="customize"
+      :ElementList="Property.GroupInfo.ElementList"
+      :errorElementID="errorElementID"
+    />
+    <el-checkbox
+      v-model="isCustomize"
+      v-if="
+        Property.AllowCustomerCustomize &&
+        Property.GroupInfo.ElementList.length > 0
+      "
+      >自定义</el-checkbox
+    >
   </section>
 </template>
 
@@ -32,13 +51,14 @@ export default {
     CustomizeSizeGroupComp,
   },
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     ...mapState('Quotation', ['isOrderRestore']),
     CustomerSizeList() {
-      return this.Property?.SizeList?.filter(it => !it.HiddenToCustomer) || [];
+      return (
+        this.Property?.SizeList?.filter((it) => !it.HiddenToCustomer) || []
+      );
     },
     isCustomize: {
       get() {
@@ -66,7 +86,7 @@ export default {
     },
   },
   mounted() {
-    // if (!this.isOrderRestore) {
+    // if (!this.isOrderRestore) { // 弃用
     //   // 非还原  执行数据初始化
     //   if (this.CustomerSizeList.length > 0) {
     //     this.ID = this.CustomerSizeList[0].ID;
@@ -82,7 +102,6 @@ export default {
     > li {
       display: inline-block;
     }
-
   }
 }
 </style>

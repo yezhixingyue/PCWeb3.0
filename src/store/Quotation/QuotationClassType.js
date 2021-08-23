@@ -168,7 +168,8 @@ export default class QuotationClassType {
         List: [],
         key: Math.random().toString(36).slice(-10),
       };
-      _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: this.getInitCustomerInputValues(_it) }));
+      _item.List = ElementList.filter(_it => !_it.HiddenToCustomer)
+        .map(_it => ({ ElementID: _it.ID, CustomerInputValues: this.getInitCustomerInputValues(_it) }));
       return _item;
     };
     if (isItem) return getItem();
@@ -204,6 +205,121 @@ export default class QuotationClassType {
     };
     return _item;
   }
+
+  static transformToSubmit(obj, curProductInfo2Quotation) {
+    if (!obj || !curProductInfo2Quotation) return obj;
+    const clearEmpty = false; // 是否清除掉数值列表为空的元素
+
+    const temp = JSON.parse(JSON.stringify(obj));
+    const getSizeData = (Size, partData) => {
+      if (Size && !Size.isCustomize && Size.ID && partData.SizeGroup && Array.isArray(partData.SizeGroup.SizeList)) {
+        const t = partData.SizeGroup.SizeList.find(_it => _it.ID === Size.ID);
+        if (t && t.List) {
+          return { ...Size, List: [...t.List] };
+        }
+      }
+      return Size;
+    };
+    // 转换产品尺寸
+    if (temp.Size) temp.Size = getSizeData(temp.Size, curProductInfo2Quotation);
+    if (Array.isArray(temp.PartList) && temp.PartList.length > 0) {
+      // 转换部件尺寸
+      const OriginPartList = curProductInfo2Quotation.PartList || [];
+      temp.PartList.forEach(it => {
+        if (Array.isArray(it.List) && it.List.length > 0) {
+          const { PartID } = it;
+          const targetOriginPart = OriginPartList.find(_it => _it.ID === PartID);
+          if (targetOriginPart) {
+            it.List.forEach(itemPartData => {
+              const _itemPartData = itemPartData;
+              if (itemPartData.Size) _itemPartData.Size = getSizeData(itemPartData.Size, targetOriginPart);
+            });
+          }
+        }
+      });
+    }
+    // 转换数值 清除为空的元素值等
+    const getSingleElementClearValue = ElVal => {
+      if (!ElVal || !Array.isArray(ElVal.CustomerInputValues) || ElVal.CustomerInputValues.length === 0) return null;
+      const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value }) => {
+        if (ID) return { ID };
+        if (Name) return { Name };
+        if (Value) return { Value };
+        return null;
+      }).filter(it => it);
+      if (CustomerInputValues.length === 0 && clearEmpty) return null;
+      return {
+        ...ElVal,
+        CustomerInputValues,
+      };
+    };
+    const getElementListValueFilter = ElementList => {
+      if (!ElementList || !Array.isArray(ElementList)) return [];
+      return ElementList.map(it => getSingleElementClearValue(it)).filter(it => it);
+    };
+    const getGroupListValueFilter = GroupList => {
+      if (!GroupList || !Array.isArray(GroupList)) return [];
+      return GroupList.map(Group => {
+        if (!Array.isArray(Group.List) || Group.List.length === 0) return null;
+        const List = Group.List.map(item => {
+          const itemList = getElementListValueFilter(item.List);
+          if (itemList.length === 0) return null;
+          return {
+            ...item,
+            List: itemList,
+          };
+        }).filter(it => it);
+        if (List.length === 0) return null;
+        return {
+          ...Group,
+          List,
+        };
+      }).filter(it => it);
+    };
+    const getCraftListValueFilter = CraftList => CraftList.map(Craft => ({
+      ...Craft,
+      ElementList: getElementListValueFilter(Craft.ElementList),
+      GroupList: getGroupListValueFilter(Craft.GroupList),
+    }));
+    const getClearPartEmptyValues = (Part) => {
+      if (!Part || Object.prototype.toString.call(Part) !== '[object Object]') return Part;
+      const _Part = Part;
+      if (Array.isArray(_Part.ElementList)) {
+        _Part.ElementList = getElementListValueFilter(_Part.ElementList);
+      }
+      if (Array.isArray(_Part.GroupList)) {
+        _Part.GroupList = getGroupListValueFilter(_Part.GroupList);
+      }
+      if (Array.isArray(_Part.CraftList)) {
+        _Part.CraftList = getCraftListValueFilter(_Part.CraftList);
+      }
+      if (_Part.Size && typeof _Part.Size === 'object') {
+        _Part.Size = {
+          ..._Part.Size,
+          List: getElementListValueFilter(_Part.Size.List),
+        };
+      }
+      // 物料暂不处理
+      return _Part;
+    };
+    const _temp = getClearPartEmptyValues(temp);
+    const PartList = temp.PartList.map(part => getClearPartEmptyValues(part));
+
+    return {
+      ..._temp,
+      PartList,
+    };
+  }
+
+  static getEffectiveControlList(ProductParams, curProductInfo2Quotation) {
+    if (!ProductParams || !curProductInfo2Quotation) return null;
+    const { ControlList } = curProductInfo2Quotation;
+    if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
+    const InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
+    console.log('获取有效交互列表', ProductParams, InteractionControlList);
+    const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams));
+    return list;
+  }
 }
 
 const getTargetGroup = (item, SizeGroup, GroupList) => { // 根据Display中的属性组信息获取到对应的尺寸组或元素组数据 并对其以区分
@@ -224,7 +340,7 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
     AllowCustomerCustomize, IsCheckedCustomerCustomize, GroupInfo, SizeList,
   } = Prop;
   if (Array.isArray(SizeList) && SizeList.filter(it => !it.HiddenToCustomer).length > 0) ID = SizeList.filter(it => !it.HiddenToCustomer)[0].ID;
-  if (AllowCustomerCustomize && IsCheckedCustomerCustomize) {
+  if (AllowCustomerCustomize && (IsCheckedCustomerCustomize || SizeList.filter(_it => !_it.HiddenToCustomer).length === 0)) {
     isCustomize = true;
   }
   if (Array.isArray(GroupInfo?.ElementList)) {
@@ -237,4 +353,13 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
     });
   }
   return { ID, isCustomize, List };
+};
+
+const judgeWhetherItWork = (ControlItem, ProductParams) => {
+  if (!ControlItem) return false;
+  const { Constraint } = ControlItem;
+  if (!Constraint) return false;
+  const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
+  console.log('判断是否生效', FilterType === 1 ? 'all' : 'one', ItemList, ProductParams);
+  return true;
 };

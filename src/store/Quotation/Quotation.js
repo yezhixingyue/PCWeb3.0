@@ -927,6 +927,7 @@ export default {
         default:
           break;
       }
+      console.log(QuotationClassType.getEffectiveControlList(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation));
     },
     /** 设置产品报价面板信息 -- 部件添加与删除
     ---------------------------------------- */
@@ -938,6 +939,7 @@ export default {
       } else { // 添加
         t.List.push(item);
       }
+      console.log(QuotationClassType.getEffectiveControlList(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation));
     },
   },
   actions: {
@@ -994,7 +996,7 @@ export default {
       // _data.ProductParams = QuotationClassType.filter( // 数据转换与筛选 后面补充
       //   QuotationClassType.transform(productData),
       // );
-      _data.ProductParams = { ...productData };
+      _data.ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation);
       commit('setProductQuotationResult', null);
       commit('setProductQuotationDetail', null);
       if (state.addressInfo4PlaceOrder && state.addressInfo4PlaceOrder.Address.Address.Consignee && state.addressInfo4PlaceOrder.Address.Address.Latitude) {

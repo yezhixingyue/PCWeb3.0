@@ -370,12 +370,21 @@ export default {
       // // console.log(cb, 'cb func ----');
       this.$refs.AddShowChangeComp.handleSetPositionOnMap(cb);
     },
-    async go2GetProductPrice() {
-      // 此处校验
-      this.$refs.oProductPanel.$refs.ruleForm.validate((bool, obj) => {
-        console.log(bool, obj);
-        if (bool) this.getProductPriceLocal();
-      });
+    async getCheckResult() {
+      const bool1 = await this.$refs.oProductPanel.$refs.ruleForm.validate().catch(() => {});
+      let partResults = [];
+      if (this.$refs.oPartPanels) {
+        partResults = await Promise.all(this.$refs.oPartPanels.map(oPart => oPart.onSubmitCheck()));
+      }
+      const list = [bool1 || false, ...partResults];
+      const failLen = list.filter(it => !it).length;
+      return failLen === 0;
+    },
+    async go2GetProductPrice() { // 计算价格
+      // 校验
+      const bool = await this.getCheckResult();
+      // 如果验证通过 执行算价
+      if (bool) this.getProductPriceLocal();
     },
     async getProductPriceLocal() {
       this.priceGetErrMsg = '';

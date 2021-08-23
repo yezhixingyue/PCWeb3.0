@@ -4,7 +4,7 @@
     <!-- 数字类型 -->
     <NumberTypeItemComp
      v-if="Property.Type === 1"
-     v-model="PropValue"
+     v-model.lazy="PropValue"
      :InputContent='Property.NumbericAttribute.InputContent'
      @focus="onFocus"
      @blur="onBlur"
@@ -13,7 +13,7 @@
     <!-- 选项类型 -->
     <OptionTypeItemComp
      v-if="Property.Type === 2"
-     v-model="PropValue"
+     v-model.lazy="PropValue"
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
      :Allow='Property.OptionAttribute.AllowCustomer'
      :isMultiple='!Property.OptionAttribute.IsRadio'
@@ -21,7 +21,7 @@
     <!-- 开关 -->
     <SwitchTypeItemComp
      v-if="Property.Type === 3"
-     v-model="PropValue"
+     v-model.lazy="PropValue"
      :OpenValue="Property.SwitchAttribute.OpenValue"
      :CloseValue="Property.SwitchAttribute.CloseValue"
      :Words="Property.SwitchAttribute.Words || ''" />

@@ -38,7 +38,7 @@ const _elementTypeChecker = (value, element) => {
   const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer } = element; // 开关类型暂未判断 或可不需要
   if (Type === 1) { // 数值类型元素
     const { AllowDecimal, SectionList, InputContent, Allow, AllowCustomer } = NumbericAttribute;
-    const isConformNumberType = getValueIsOrNotNumber(+value, !AllowDecimal);
+    const isConformNumberType = getValueIsOrNotNumber(value, !AllowDecimal);
     if (!isConformNumberType) {
       const msg = `输入值错误，请输入正确的数字类型（${AllowDecimal ? '允许小数' : '不允许小数'}）`;
       return { msg, result: false };
@@ -94,6 +94,7 @@ const _elementTypeChecker = (value, element) => {
  * @return {*}
  */
 export const checkElement = (values, prop) => {
+  if (!prop) return '';
   let IsRequired = false;
   if (prop.NumbericAttribute && prop.NumbericAttribute.IsRequired) IsRequired = true;
   if (prop.OptionAttribute && prop.OptionAttribute.IsRequired) IsRequired = true;
@@ -111,8 +112,8 @@ export const checkElement = (values, prop) => {
         const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;
         if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
           // 项数不符合
-          if (MinValue === MaxValue) return `${prop.Name}项数选择不正确，应选择${MinValue}项`;
-          return `${prop.Name}项数选择不正确，应选择${MinValue}至${MaxValue}项`;
+          if (MinValue === MaxValue) return `项数选择不符合要求，应选择${MinValue}项，当前选择${len}项`;
+          return `项数选择不符合要求，应选择${MinValue}至${MaxValue}项，当前选择${len}项`;
         }
       }
     }
@@ -153,28 +154,32 @@ const getStrArrIsRepeat = arr => { // 判断字符串组成的数组是否有重
 
 export const checkElementGroup = (valueList, prop) => {
   if (valueList && valueList.length > 0 && prop && prop.ElementList && prop.ElementList.length > 0) {
+    const CustomerCanUseElementList = prop.ElementList.filter(it => !it.HiddenToCustomer);
     for (let i = 0; i < valueList.length; i += 1) {
       const itemValues = valueList[i]; // 单行所有元素组成的值列表
       for (let index = 0; index < itemValues.List.length; index += 1) {
         const { ElementID, CustomerInputValues } = itemValues.List[index];
-        const _Element = prop.ElementList.find(it => it.ID === ElementID);
+        const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
         const msg = checkElement(CustomerInputValues, _Element);
         if (msg) return { msg, ElementID, index: i };
       }
     }
-    for (let i = 0; i < prop.ElementList.length; i += 1) {
-      const Element = prop.ElementList[i];
+    for (let i = 0; i < CustomerCanUseElementList.length; i += 1) {
+      const Element = CustomerCanUseElementList[i];
       if (Element.ForbidRepeat && valueList.length > 1) {
         const values = valueList.map(it => {
           const t = it.List.find(_it => _it.ElementID === Element.ID);
           if (t) {
-            return JSON.stringify(getElementValue(t.CustomerInputValues));
+            let _val = getElementValue(t.CustomerInputValues);
+            const isNumber = getValueIsOrNotNumber(_val);
+            if (isNumber) _val = +_val;
+            return _val ? JSON.stringify(_val) : _val;
           }
           return '';
-        });
+        }).filter(it => it !== '');
         if (getStrArrIsRepeat(values)) {
           return {
-            msg: `${Element.Name}值不允许重复，请检查`,
+            msg: `${Element.Name}值不允许重复，请检查重复值`,
             ElementID: Element.ID,
             index: 'all',
           };

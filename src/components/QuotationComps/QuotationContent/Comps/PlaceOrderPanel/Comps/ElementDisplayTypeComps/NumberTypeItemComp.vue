@@ -2,7 +2,7 @@
   <el-input
     @focus="onFocus"
     @blur="onBlur"
-    v-model.trim="content"
+    v-model.trim.lazy="content"
     v-if="!InputContent || isNumberic"
     size="small"
     class="mp-erp-number-type-element-display-input-comp"

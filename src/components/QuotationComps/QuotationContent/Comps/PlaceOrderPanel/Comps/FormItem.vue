@@ -154,6 +154,7 @@ export default {
         return value;
       },
       set(val) {
+        console.log('formItem itemValue 触发改变', val);
         // console.log('itemValue', this.curTypeName, val, this.obj2GetProductPrice.ProductParams);
         let type = this.curTypeName;
         if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';

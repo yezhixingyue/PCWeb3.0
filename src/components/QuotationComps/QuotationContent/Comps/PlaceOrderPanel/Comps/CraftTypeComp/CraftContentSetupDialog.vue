@@ -101,10 +101,10 @@ export default {
         : '工艺参数设置';
     },
     ElementList() {
-      return this.Craft?.ElementList || [];
+      return this.Craft?.ElementList?.filter(it => !it.HiddenToCustomer) || [];
     },
     GroupList() {
-      return this.Craft?.GroupList || [];
+      return this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer) || [];
     },
     craftForm() {
       const temp = {};
@@ -277,6 +277,9 @@ export default {
             font-weight: 700;
             color: #333 !important;
           }
+        }
+        .el-form-item__label {
+          white-space: nowrap;
         }
       }
       > footer {

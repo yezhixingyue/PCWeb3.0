@@ -9,7 +9,7 @@
       <p>
         <label>// {{PartName}}{{i > 0 ? ` - ${i + 1}` : ''}}</label>
       </p>
-      <PlaceOrderPanel :PartID='PartData.PartID' :PartIndex='i' :placeData='DisplayPartData' :submitData='it' />
+      <PlaceOrderPanel :PartID='PartData.PartID' :PartIndex='i' :placeData='DisplayPartData' :submitData='it' ref='oPartPanelArray' />
       <!-- <div class="ctrl" v-if="!(hiddenDelete && hiddenAdd)"> -->
       <div class="ctrl">
         <div v-if="!hiddenDelete">
@@ -81,6 +81,16 @@ export default {
       if (!_item) return;
       const item = { ..._item, key: Math.random().toString(36).slice(-10) };
       this.$store.commit('Quotation/setObj2GetProductPriceProductParamsPartChange', [this.PartData.PartID, i, item]);
+    },
+    async onSubmitCheck() {
+      if (this.$refs.oPartPanelArray) {
+        const resultList = await Promise.all(this.$refs.oPartPanelArray.map(it => it.$refs.ruleForm.validate().catch(() => {})));
+        const len1 = resultList.length;
+        const len2 = resultList.filter(_it => _it).length;
+        return len1 === len2;
+      }
+      return true;
+      // return this.$refs.oPartPanelArray.$refs.ruleForm.validate();
     },
   },
 };

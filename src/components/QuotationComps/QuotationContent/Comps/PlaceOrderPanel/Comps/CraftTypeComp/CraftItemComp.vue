@@ -40,8 +40,14 @@ export default {
     };
   },
   computed: {
+    filteredElementShowList() { // 筛选后可用于客户设置的工艺元素列表 如果长度为0则没有元素或不需要设置元素
+      return this.Craft?.ElementList?.filter(_it => !_it.HiddenToCustomer) || [];
+    },
+    filteredGroupShowList() { // 筛选后可用于客户设置的工艺元素组列表
+      return this.Craft?.GroupList?.filter(_it => !_it.HiddenToCustomer) || [];
+    },
     withoutContent() {
-      return this.Craft.ElementList.length === 0 && this.Craft.GroupList.length === 0;
+      return this.filteredElementShowList.length === 0 && this.filteredGroupShowList.length === 0;
     },
     craftTitle() {
       return this.getCraftContentName();
@@ -68,28 +74,30 @@ export default {
       this.visible = true;
     },
     getElementValueText(CustomerInputValues, Element) {
-      console.log(CustomerInputValues, Element);
+      // console.log(CustomerInputValues, Element);
+      const { IsNameHidden } = Element;
+      const EleName = IsNameHidden ? '' : Element.Name;
       if (!CustomerInputValues || CustomerInputValues.length === 0 || !Element) return '';
       if (CustomerInputValues.length === 1) {
         const [{ ID, Name, Value }] = CustomerInputValues;
         if (Element.Type === 3) { // 开关
-          if (Element.SwitchAttribute && `${Element.SwitchAttribute.OpenValue}` === Value) return Element.Name;
+          if (Element.SwitchAttribute && `${Element.SwitchAttribute.OpenValue}` === Value) return Element.SwitchAttribute.Words || Element.Name;
         }
         if (Element.Type === 1 && Value) { // 数值
-          return `${Value}${Element.Unit}`;
+          return `${EleName}${EleName ? '：' : ''}${Value}${Element.Unit}`;
         }
         if (Element.Type === 2 && Element.OptionAttribute && Element.OptionAttribute.IsRadio && Element.OptionAttribute.OptionList) {
           if (ID) {
             const t = Element.OptionAttribute.OptionList.find(_it => _it.ID === ID);
-            if (t) return t.Name;
+            if (t) return `${EleName}${EleName ? '：' : ''}${t.Name}`;
           }
-          if (Name) return Name;
+          if (Name) return `${EleName}${EleName ? '：' : ''}${Name}`;
         }
       }
       if (Element.Type === 2 && Element.OptionAttribute && !Element.OptionAttribute.IsRadio && Element.OptionAttribute.OptionList) {
         const ids = CustomerInputValues.map(it => it.ID).filter(it => it);
         if (ids.length > 0) {
-          const names = ids.map(id => Element.OptionAttribute.OptionList.find(it => it.ID === id)).filter(it => it);
+          const names = ids.map(id => Element.OptionAttribute.OptionList.find(it => it.ID === id)).filter(it => it).map(it => it.Name);
           return names.join('，');
         }
       }
@@ -107,7 +115,7 @@ export default {
             if (text) arr.push(text);
           }
         });
-        if (arr.length > 0) return `${Group.Name} [ ${arr.join(' ')} ]`;
+        if (arr.length > 0) return `${Group.IsNameHidden ? '' : Group.Name} [ ${arr.join('；')} ]`;
       }
       return '';
     },
@@ -118,18 +126,20 @@ export default {
       if ((!Array.isArray(ElementList) || ElementList.length === 0) && (!Array.isArray(GroupList) || GroupList.length === 0)) return this.Craft.Name;
       const ElContent = [];
       const GroupContent = [];
-      if (Array.isArray(ElementList) && ElementList.length > 0) {
+      const hasElementList = Array.isArray(ElementList) && ElementList.length > 0;
+      const hasGroupList = Array.isArray(GroupList) && GroupList.length > 0;
+      if (hasElementList) {
         ElementList.forEach(it => {
-          const t = this.Craft.ElementList.find(_it => _it.ID === it.ElementID);
+          const t = this.filteredElementShowList.find(_it => _it.ID === it.ElementID);
           if (t) {
             const text = this.getElementValueText(it.CustomerInputValues, t);
             if (text) ElContent.push(text);
           }
         });
       }
-      if (Array.isArray(GroupList) && GroupList.length > 0) {
+      if (hasGroupList) {
         GroupList.forEach(it => {
-          const t = this.Craft.GroupList.find(_it => _it.ID === it.GroupID);
+          const t = this.filteredGroupShowList.find(_it => _it.ID === it.GroupID);
           if (t) {
             const text = this.getGroupValueText(it.List, t);
             if (text) GroupContent.push(text);
@@ -139,6 +149,9 @@ export default {
       if (ElContent.length > 0 || GroupContent.length > 0) {
         return `${this.Craft.Name} ${ElContent.join(' ')} ${GroupContent.join('')}`;
       }
+      // if (ElContent.length === 0 && GroupContent.length === 0 && (filteredElementShowList.length > 0 || filteredGroupShowList.length > 0)) {
+      //   return `${this.Craft.Name} 未设置参数`;
+      // }
       return this.Craft.Name;
     },
   },
