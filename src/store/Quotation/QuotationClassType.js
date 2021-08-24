@@ -311,12 +311,12 @@ export default class QuotationClassType {
     };
   }
 
-  static getEffectiveControlList(ProductParams, curProductInfo2Quotation) {
+  static getEffectiveControlList(ProductParams, curProductInfo2Quotation) { // 获取当前生效的交互列表
     if (!ProductParams || !curProductInfo2Quotation) return null;
     const { ControlList } = curProductInfo2Quotation;
     if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
     const InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
-    console.log('获取有效交互列表', ProductParams, InteractionControlList);
+    // console.log('获取有效交互列表', ProductParams, InteractionControlList);
     const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams));
     return list;
   }
@@ -360,6 +360,8 @@ const judgeWhetherItWork = (ControlItem, ProductParams) => {
   const { Constraint } = ControlItem;
   if (!Constraint) return false;
   const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
-  console.log('判断是否生效', FilterType === 1 ? 'all' : 'one', ItemList, ProductParams);
+  if (ItemList.length > 0) {
+    console.log('判断是否生效', FilterType === 1 ? 'all' : 'one', ItemList, ProductParams);
+  }
   return true;
 };

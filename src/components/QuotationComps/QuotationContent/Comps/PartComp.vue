@@ -105,16 +105,16 @@ export default {
       line-height: 20px;
       font-size: 14px;
       color: #333;
-      &::before {
-        position: absolute;
-        content: '';
-        top: 9.5px;
-        right: 0;
-        left: 0;
-        height: 1px;
-        background: linear-gradient(to right, #eee, #eee 5px, transparent 1px, transparent);
-        background-size: 6px 100%;
-      }
+      // &::before {
+      //   position: absolute;
+      //   content: '';
+      //   top: 9.5px;
+      //   right: 0;
+      //   left: 0;
+      //   height: 1px;
+      //   // background: linear-gradient(to right, #eee, #eee 5px, transparent 1px, transparent);
+      //   // background-size: 6px 100%;
+      // }
       > label {
         display: inline-block;
         padding-left: 28px;

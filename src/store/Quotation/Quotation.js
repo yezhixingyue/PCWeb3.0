@@ -927,7 +927,7 @@ export default {
         default:
           break;
       }
-      console.log(QuotationClassType.getEffectiveControlList(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation));
+      console.log('获取有效交互列表', QuotationClassType.getEffectiveControlList(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation));
     },
     /** 设置产品报价面板信息 -- 部件添加与删除
     ---------------------------------------- */
