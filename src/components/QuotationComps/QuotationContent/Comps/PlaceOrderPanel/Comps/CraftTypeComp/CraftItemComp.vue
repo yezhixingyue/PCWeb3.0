@@ -121,9 +121,9 @@ export default {
     },
     getCraftContentName() {
       if (!this.Craft) return '工艺';
-      if (!this.value) return this.Craft.Name;
+      if (!this.value) return this.Craft.ShowName;
       const { ElementList, GroupList } = this.value;
-      if ((!Array.isArray(ElementList) || ElementList.length === 0) && (!Array.isArray(GroupList) || GroupList.length === 0)) return this.Craft.Name;
+      if ((!Array.isArray(ElementList) || ElementList.length === 0) && (!Array.isArray(GroupList) || GroupList.length === 0)) return this.Craft.ShowName;
       const ElContent = [];
       const GroupContent = [];
       const hasElementList = Array.isArray(ElementList) && ElementList.length > 0;
@@ -147,12 +147,12 @@ export default {
         });
       }
       if (ElContent.length > 0 || GroupContent.length > 0) {
-        return `${this.Craft.Name} ${ElContent.join(' ')} ${GroupContent.join('')}`;
+        return `${this.Craft.ShowName} ${ElContent.join(' ')} ${GroupContent.join('')}`;
       }
       // if (ElContent.length === 0 && GroupContent.length === 0 && (filteredElementShowList.length > 0 || filteredGroupShowList.length > 0)) {
-      //   return `${this.Craft.Name} 未设置参数`;
+      //   return `${this.Craft.ShowName} 未设置参数`;
       // }
-      return this.Craft.Name;
+      return this.Craft.ShowName;
     },
   },
 };
