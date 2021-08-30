@@ -60,9 +60,20 @@ const _elementTypeChecker = (value, element) => {
         const { MinValue, MaxValue, IsGeneralValue, Increment } = section;
         if (+value > MinValue && (+value <= MaxValue || MaxValue === -1)) { // 符合范围区间 进入判断
           isInSection = true;
-          if (!IsGeneralValue && (+value - MinValue) % Increment !== 0) {
-            const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
-            return { msg, result: false };
+          // if (!IsGeneralValue && (+value - MinValue) % Increment !== 0) {
+          //   const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
+          //   return { msg, result: false };
+          // }
+          if (!IsGeneralValue) {
+            let T = Increment.toString().indexOf('.');
+            T = T === -1 ? 0 : Increment.toString().length - T - 1;
+            const arr = new Array(T);
+            arr.fill('0');
+            T = `1${arr.join('')}`;
+            if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
+              const msg = `输入值不合法，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
+              return { msg, result: false };
+            }
           }
           if (IsGeneralValue) {
             const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应从${valueList}对应区间中取值`;

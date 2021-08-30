@@ -70,7 +70,7 @@
               </div>
               <div class="add-2">
                 <el-form-item prop="AddressDetail">
-                <el-input v-model.trim="newAdd.AddressDetail" maxlength="60"
+                <el-input v-model.trim="AddressDetail" maxlength="60"
                   show-word-limit placeholder="详细地址 (不包含省市区)"></el-input>
                 </el-form-item>
                 <el-button
@@ -83,6 +83,9 @@
           </el-form>
         </section>
       </li>
+      <li v-if="openType === 'tempAdd' && addressDisplayContent">
+        <span class="is-gray is-font-13">当前设置地址：{{addressDisplayContent}}</span>
+      </li>
       <li class="map-wrap">
         <div class="map-content" id="map-container"
          v-show="newAdd.HavePosition || openType==='tempAdd'" v-loading="mapIsLoading">
@@ -93,7 +96,10 @@
       </li>
     </ul>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="handleSubmit('ruleForm')">确定</el-button>
+      <el-button type="primary"
+       @click="handleSubmit('ruleForm')"
+       :disabled='HaveAddressContentChange'
+       :title="HaveAddressContentChange ? '省市区地址发生变动，请重新定位' : ''">确定</el-button>
       <el-button v-if="openType !== 'tempAdd'" @click="handleBeforeDiaClose">取消</el-button>
     </div>
   </el-dialog>
@@ -103,6 +109,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-undef */
 /* eslint-disable object-curly-newline */
+import { amapAppkey } from '@/assets/js/setup';
 
 export default {
   props: {
@@ -116,6 +123,22 @@ export default {
     },
     curEditInfo: {
       type: Object,
+      default: null,
+    },
+    isTemp: {
+      type: Boolean,
+      default: false,
+    },
+    PropRegionalList: {
+      type: Array,
+      default: null,
+    },
+    PropCityList: {
+      type: Array,
+      default: null,
+    },
+    PropCountyList: {
+      type: Array,
       default: null,
     },
   },
@@ -202,6 +225,7 @@ export default {
       map: null,
       initNum: 0,
       loadingAddInfo: false,
+      HaveAddressContentChange: false,
     };
   },
   computed: {
@@ -215,6 +239,7 @@ export default {
     },
     title() {
       if (this.openType === 'edit') {
+        if (this.isTemp) return '地图定位';
         return '编辑配送地址';
       }
       if (this.openType === 'new') {
@@ -224,6 +249,24 @@ export default {
         return '地图定位';
       }
       return '';
+    },
+    addressDisplayContent() {
+      if (!this.curEditInfo || !this.curEditInfo.ExpressArea) return '';
+      const { ExpressArea, AddressDetail } = this.curEditInfo;
+      const { RegionalName, CityName, CountyName } = ExpressArea;
+      if (RegionalName && CityName && CountyName && AddressDetail) {
+        return `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
+      }
+      return '';
+    },
+    AddressDetail: {
+      get() {
+        return this.newAdd.AddressDetail;
+      },
+      set(val) {
+        this.newAdd.AddressDetail = val;
+        // this.HaveAddressContentChange = true;
+      },
     },
   },
   methods: {
@@ -236,6 +279,7 @@ export default {
       this.newAdd.ExpressArea.CountyName = '';
       this.CityList = [];
       this.CountyList = [];
+      this.HaveAddressContentChange = true;
 
       if (this.CityList.length === 0 || this.CityList[0].ParentID !== e) {
         this.loadingAddInfo = true;
@@ -252,6 +296,7 @@ export default {
       this.newAdd.ExpressArea.CountyID = '';
       this.newAdd.ExpressArea.CountyName = '';
       this.CountyList = [];
+      this.HaveAddressContentChange = true;
 
       if (this.CountyList.length === 0 || this.CountyList[0].ParentID !== e) {
         this.loadingAddInfo = true;
@@ -265,9 +310,10 @@ export default {
     handleCountyChange(e) {
       const _t = this.CountyList.find(it => it.ID === e);
       this.newAdd.ExpressArea.CountyName = _t.Name;
+      this.HaveAddressContentChange = true;
     },
     handleClose() {
-      this.$emit('changeStatus', false);
+      this.$emit('update:visible', false);
     },
     async handleSubmit(formName) {
       if (this.openType === 'new') {
@@ -313,19 +359,32 @@ export default {
         //   });
         //   return;
         // }
-        const _obj = JSON.parse(JSON.stringify(this.newAdd));
-        const res = await this.api.getCustomerAddress(_obj);
-        // // console.log(res);
-        if (res.data.Status === 1000) {
-          this.messageBox.successSingle({
-            title: '地址修改成功',
-            successFunc: () => {
-              // // console.log('successFunc');
-              this.$store.commit('common/handleAddOrEditAddressOnStore', [this.newAdd, 'edit']);
-              this.handleBeforeDiaClose();
-            },
-          });
-        }
+        this.$refs[formName].validate(async (valid) => {
+          if (valid) {
+            const _obj = JSON.parse(JSON.stringify(this.newAdd));
+            if (this.isTemp) {
+              this.$message({
+                message: '已定位',
+                type: 'success',
+              });
+              // eslint-disable-next-line max-len
+              this.$emit('submit', { ..._obj, RegionalList: this.RegionalList, CityList: this.CityList, CountyList: this.CountyList });
+              return;
+            }
+            const res = await this.api.getCustomerAddress(_obj);
+            // // console.log(res);
+            if (res.data.Status === 1000) {
+              this.messageBox.successSingle({
+                title: '地址修改成功',
+                successFunc: () => {
+                  // // console.log('successFunc');
+                  this.$store.commit('common/handleAddOrEditAddressOnStore', [this.newAdd, 'edit']);
+                  this.handleBeforeDiaClose();
+                },
+              });
+            }
+          }
+        });
       }
     },
     setPositionIndex(lng, lat, flag = true) {
@@ -345,6 +404,7 @@ export default {
     },
     onSearchResult(pois) {
       this.mapIsLoading = false;
+      this.HaveAddressContentChange = false;
       if (pois.length > 0) {
         const { lng, lat } = pois[0];
         this.setPositionIndex(lng, lat);
@@ -381,7 +441,7 @@ export default {
           } else {
             this.messageBox.failSingleError({
               title: '定位失败',
-              msg: '搜索不到地址，请尝试修改搜索关键词!',
+              msg: '搜索不到地址，请更改关键词并重新定位!',
               successFunc: () => {
                 this.$emit('handleMapSearchError');
               },
@@ -397,6 +457,7 @@ export default {
     async handleDialogOpen() {
       this.initNum = 0;
       this.lastSearchWords = '';
+      this.HaveAddressContentChange = false;
       this.$nextTick(() => {
         this.map = new AMap.Map('map-container', {
           center: [this.lng, this.lat],
@@ -413,6 +474,7 @@ export default {
         this.map.add(this.marker);
         this.map.on('click', this.handleMapClick);
         if (this.openType === 'tempAdd') this.handleMapLocationClick();
+        if (this.openType === 'edit' && this.isTemp) this.handleMapLocationClick();
       });
       // }
       if (this.openType === 'edit') {
@@ -435,6 +497,7 @@ export default {
         this.newAdd.ExpressArea.CityID = CityID;
         this.newAdd.ExpressArea.CountyName = CountyName;
         this.newAdd.ExpressArea.CountyID = CountyID;
+        if (this.isTemp) this.canClose = false;
         if (Latitude && Longitude) {
           this.lng = Longitude;
           this.lat = Latitude;
@@ -443,21 +506,25 @@ export default {
         }
         if (ExpressArea) {
           this.loadingAddInfo = true;
-          const res = await Promise.all([
-            this.api.getAddressIDList(-1),
-            this.api.getAddressIDList(RegionalID),
-            this.api.getAddressIDList(CityID),
-          ]);
-          this.loadingAddInfo = false;
-          const _list = res.map(it => {
-            if (it.data.Status === 1000) {
-              return it.data.Data;
+          const handleList = async (list, parentID) => {
+            if (Array.isArray(list) && list.length > 0) {
+              if (list[0].ParentID === parentID) return list;
+            }
+            if (parentID || parentID === 0) {
+              const res = await this.api.getAddressIDList(parentID).catch(() => {});
+              if (res && it.data.Status === 1000) return it.data.Data;
             }
             return [];
-          });
-          this.RegionalList = [..._list[0]];
-          this.CityList = [..._list[1]];
-          this.CountyList = [..._list[2]];
+          };
+          const respList = await Promise.all([
+            handleList(this.PropRegionalList, -1),
+            handleList(this.PropCityList, RegionalID),
+            handleList(this.PropCountyList, CityID),
+          ]);
+          this.loadingAddInfo = false;
+          this.RegionalList = [...respList[0]];
+          this.CityList = [...respList[1]];
+          this.CountyList = [...respList[2]];
         }
       } else if (this.openType === 'tempAdd') {
         if (!this.curEditInfo) return;
@@ -493,7 +560,7 @@ export default {
       }
     },
     handleBeforeDiaClose() {
-      if (this.openType === 'tempAdd' && !this.canClose) {
+      if ((this.openType === 'tempAdd') && !this.canClose) {
         this.messageBox.failSingleError({
           title: '新增地址需要定位',
           msg: '请在地图中保存收货地址定位!',
@@ -524,6 +591,29 @@ export default {
       this.$refs.ruleForm.resetFields();
       this.handleClose();
     },
+    getAmapMount() {
+      // 09966c2b866f9783b49969af19102d91 geren
+      // eslint-disable-next-line max-len
+      const url = `https://webapi.amap.com/maps?v=1.4.15&key=${amapAppkey}&plugin=AMap.PlaceSearch,AMap.Geocoder&callback=initMap`;
+
+      let key = true;
+      const oSrc = document.getElementsByTagName('script');
+      oSrc.forEach(it => {
+        if (!key) return;
+        if (it.src === url) {
+          key = false;
+          this.isMapLoaded = true;
+        }
+      });
+      if (!key) return;
+      window.initMap = () => {
+        this.isMapLoaded = true;
+      };
+      const jsapi = document.createElement('script');
+      jsapi.charset = 'utf-8';
+      jsapi.src = url;
+      document.head.appendChild(jsapi);
+    },
   },
   watch: {
     visible(newVal) {
@@ -534,28 +624,8 @@ export default {
       if (this.marker) this.marker.setPosition(this.mapCenter);
     },
   },
-  mounted() {
-    // 09966c2b866f9783b49969af19102d91 geren
-    // eslint-disable-next-line max-len
-    const url = 'https://webapi.amap.com/maps?v=1.4.15&key=d1de441473f06000bd61463102442b1e&plugin=AMap.PlaceSearch&callback=initMap';
-
-    let key = true;
-    const oSrc = document.getElementsByTagName('script');
-    oSrc.forEach(it => {
-      if (!key) return;
-      if (it.src === url) {
-        key = false;
-        this.isMapLoaded = true;
-      }
-    });
-    if (!key) return;
-    window.initMap = () => {
-      this.isMapLoaded = true;
-    };
-    const jsapi = document.createElement('script');
-    jsapi.charset = 'utf-8';
-    jsapi.src = url;
-    document.head.appendChild(jsapi);
+  created() {
+    this.getAmapMount();
   },
 };
 </script>

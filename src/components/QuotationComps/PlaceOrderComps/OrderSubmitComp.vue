@@ -10,7 +10,7 @@
           <span class="title gray">文件内容：</span>
           <el-input
            v-model.trim="fileContent"
-           maxlength="100"
+           maxlength="130"
            show-word-limit
            placeholder="1.请填写文件中“具有明显特征”的名称；2.此名称不作为最终制作要求，请正确点选制作要求；"></el-input>
         </li>
@@ -28,26 +28,6 @@
         <el-button type="danger" @click="onSubmitOrder">直接下单</el-button>
         <ComputedResultComp
           :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
-        <!-- <div class="result" v-if="ProductQuotationResult">
-          <span>成交价<em class="is-gray is-font-12">（不含运费）</em>：
-            <i class="is-pink is-bold is-font-20">{{Cost}}</i>
-            <i class="is-pink is-font-14"> 元</i>
-          </span>
-          （
-          <span>产品原价：<i>{{ProductQuotationResult.OriginalCost}}元，</i></span>
-          <span>优惠券：<i :class="coupon && coupon > 0 ? 'is-pink' : ''">
-            <template v-if="coupon && coupon > 0">-</template>
-            <template v-show='coupon'>{{'' + (coupon ? coupon : 0)}}元</template>
-            </i>
-          </span>
-          <span v-if="ProductQuotationResult.OriginalCost - ProductQuotationResult.CurrentCost > 0">
-            ，活动：<i class="is-pink">-{{+(ProductQuotationResult.OriginalCost
-               - ProductQuotationResult.CurrentCost).toFixed(2)}}元</i>
-          </span>
-          <span v-if="ProductQuotationResult.ExpressCost || ProductQuotationResult.ExpressCost === 0"
-            >，运费：<i>{{ProductQuotationResult.ExpressCost}}元</i></span>
-          <span class="mg-left"> ）</span>
-        </div> -->
       </div>
     </div>
   </section>
@@ -67,6 +47,10 @@ export default {
     isSpotGoods: {
       type: Boolean,
       default: false,
+    },
+    asyncInputchecker: {
+      type: Function,
+      default: () => {},
     },
   },
   computed: {
@@ -137,23 +121,18 @@ export default {
     async getProductPriceLocal() { // 校验函数  用来判断是否可以进行下单
       if (!this.fileContent && !this.isSpotGoods) return '请输入文件内容';
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
+      const asyncInputchecker = await this.asyncInputchecker();
+      if (!asyncInputchecker) return '有内容未识别，请先识别或清除';
       if (this.addressInfo4PlaceOrder.OutPlate && this.addressInfo4PlaceOrder.OutPlate.Second) {
-        const reg = /(^\d{13}$)|(^\d{18}$)|(^\d{19}$)|(^\d{6}-\d{15}$)/;
+        const reg = /(^\d{18}$)|(^\d{19}$)|(^\d{6}-\d{15}$)/;
         if (!reg.test(this.addressInfo4PlaceOrder.OutPlate.Second)) {
           return '平台单号格式不正确';
         }
       }
-
-      // const key = await this.$store.dispatch('Quotation/getProductPrice', this.title);
-      // return key;
       return true;
     },
     saveFile2Store(file) {
       this.$store.commit('Quotation/setOrderFile4PreCreateData', file);
-      // handleMapPosition $emit  可调用地图定位
-    },
-    handleMapPosition(cb) {
-      this.$emit('handleMapPosition', cb);
     },
   },
 };

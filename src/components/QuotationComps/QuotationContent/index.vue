@@ -167,9 +167,10 @@
           </footer>
         </section>
       </article>
-      <AddShowChangeComp ref="AddShowChangeComp" />
+      <!-- <AddShowChangeComp ref="AddShowChangeComp" /> -->
+      <ConsigneeAddressSetpComp ref="oConsigneeAddressSetpComp" />
       <OrderSubmitComp
-        @handleMapPosition="handleMapPosition"
+        :asyncInputchecker='asyncInputchecker'
         :isSpotGoods="placeData.IsSpotGoods"
       />
     </section>
@@ -190,7 +191,8 @@ import {
 import tipEnums from '@/assets/js/utils/tipEnums';
 import { productJumpUrl } from '@/assets/js/setup';
 import ComputedResultComp from './Comps/ComputedResultComp.vue';
-import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
+// import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
+import ConsigneeAddressSetpComp from '../PlaceOrderComps/ConsigneeAddressSetpComp/index.vue';
 import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp.vue';
 import SwiperClassifyComp from './Comps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
@@ -200,13 +202,14 @@ import PartComp from './Comps/PartComp.vue';
 export default {
   props: ['placeData'],
   components: {
-    AddShowChangeComp,
+    // AddShowChangeComp,
     OrderSubmitComp,
     ComputedResultComp,
     SwiperClassifyComp,
     AsideIntroComp,
     PlaceOrderPanel,
     PartComp,
+    ConsigneeAddressSetpComp,
   },
   computed: {
     // eslint-disable-next-line max-len
@@ -366,10 +369,6 @@ export default {
       'setProductParamsCraftList',
     ]),
     ...mapActions('Quotation', ['getProductPrice']),
-    handleMapPosition(cb) {
-      // // console.log(cb, 'cb func ----');
-      this.$refs.AddShowChangeComp.handleSetPositionOnMap(cb);
-    },
     async getCheckResult() {
       const bool1 = await this.$refs.oProductPanel.$refs.ruleForm.validate().catch(() => {});
       let partResults = [];
@@ -486,6 +485,10 @@ export default {
     },
     onHomeDetailClick() {
       window.open(`${productJumpUrl}product?productID=${this.placeData.ProductID}`);
+    },
+    async asyncInputchecker() {
+      const resp = await this.$refs.oConsigneeAddressSetpComp.inputChecker();
+      return resp;
     },
   },
   mounted() {

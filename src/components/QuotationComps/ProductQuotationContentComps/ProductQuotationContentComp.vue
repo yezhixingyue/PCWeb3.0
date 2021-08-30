@@ -212,9 +212,10 @@
           </footer>
         </section>
       </article>
-      <AddShowChangeComp ref="AddShowChangeComp" />
+      <!-- <AddShowChangeComp ref="AddShowChangeComp" /> -->
+      <ConsigneeAddressSetpComp ref="oConsigneeAddressSetpComp" />
       <OrderSubmitComp
-        @handleMapPosition="handleMapPosition"
+        :asyncInputchecker='asyncInputchecker'
         :isSpotGoods="placeData.IsSpotGoods"
       />
     </section>
@@ -241,7 +242,8 @@ import { productJumpUrl } from '@/assets/js/setup';
 import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp.vue';
 import ProductCountComp from './NewPcComps/ProductCountComp.vue';
 import ComputedResultComp from './NewPcComps/ComputedResultComp.vue';
-import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
+// import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
+import ConsigneeAddressSetpComp from '../PlaceOrderComps/ConsigneeAddressSetpComp/index.vue';
 import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp.vue';
 import SwiperClassifyComp from './NewPcComps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
@@ -254,12 +256,13 @@ export default {
     AttributesComp,
     CraftListComp,
     PartComps,
-    AddShowChangeComp,
+    // AddShowChangeComp,
     OrderSubmitComp,
     ComputedResultComp,
     SwiperClassifyComp,
     AsideIntroComp,
     HelpTipsComp,
+    ConsigneeAddressSetpComp,
   },
   computed: {
     // eslint-disable-next-line max-len
@@ -412,10 +415,6 @@ export default {
       'setProductParamsCraftList',
     ]),
     ...mapActions('Quotation', ['getProductPrice']),
-    handleMapPosition(cb) {
-      // // console.log(cb, 'cb func ----');
-      this.$refs.AddShowChangeComp.handleSetPositionOnMap(cb);
-    },
     async go2GetProductPrice() {
       this.getProductPriceLocal();
     },
@@ -519,6 +518,10 @@ export default {
     },
     onHomeDetailClick() {
       window.open(`${productJumpUrl}product?productID=${this.placeData.ProductID}`);
+    },
+    async asyncInputchecker() {
+      const resp = await this.$refs.oConsigneeAddressSetpComp.inputChecker();
+      return resp;
     },
   },
   mounted() {

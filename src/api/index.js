@@ -92,6 +92,9 @@ const api = {
     if (!type) return instance.get(`/Api/PaymentOrder/PayResult?payCode=${payCode}`);
     return instance.get(`/Api/PaymentOrder/PayResult?payCode=${payCode}&type=${type}`);
   },
+  getAnalysisOutPlateNo(outPlateNo) { // 解析电商平台单号收件人信息   GET /Api/Analysis/OutPlateNo
+    return instance.get('/Api/Analysis/OutPlateNo', { params: { outPlateNo } });
+  },
 
   /* 优惠券部分api
   ----------------------------------------------------------------------------------- */

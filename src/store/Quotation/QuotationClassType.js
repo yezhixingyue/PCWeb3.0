@@ -1,6 +1,8 @@
+/* eslint-disable object-curly-newline */
 /* eslint-disable no-use-before-define */
 import massage from '@/assets/js/utils/message';
 import store from '@/store';
+import { judgeWhetherItWork } from './EffectiveControlList';
 
 // eslint-disable-next-line no-unused-vars
 function _setErrMsg(errMsg) {
@@ -17,7 +19,7 @@ export default class QuotationClassType {
     const partSubmitDatas = _obj.PartList.map(part => { // 生成部件列表数据
       const List = [];
       const PartID = part.ID;
-      const showPart = !!this.getPartSubmitData(part);
+      const showPart = !!this.getPartSubmitData(part); // showPart用来指定去除一些无效数据
       if (part.UseTimes && part.UseTimes.MinValue > 0) {
         for (let i = 0; i < part.UseTimes.MinValue; i += 1) {
           const item = this.getPartSubmitData(part);
@@ -311,7 +313,7 @@ export default class QuotationClassType {
     };
   }
 
-  static getEffectiveControlList(ProductParams, curProductInfo2Quotation) { // 获取当前生效的交互列表
+  static getEffectiveControlList(ProductParams, curProductInfo2Quotation) { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
     if (!ProductParams || !curProductInfo2Quotation) return null;
     const { ControlList } = curProductInfo2Quotation;
     if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
@@ -353,15 +355,4 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
     });
   }
   return { ID, isCustomize, List };
-};
-
-const judgeWhetherItWork = (ControlItem, ProductParams) => {
-  if (!ControlItem) return false;
-  const { Constraint } = ControlItem;
-  if (!Constraint) return false;
-  const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
-  if (ItemList.length > 0) {
-    console.log('判断是否生效', FilterType === 1 ? 'all' : 'one', ItemList, ProductParams);
-  }
-  return true;
 };

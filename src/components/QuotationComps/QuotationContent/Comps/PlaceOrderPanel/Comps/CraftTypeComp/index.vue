@@ -29,9 +29,7 @@ export default {
   computed: {
     localCraftList() {
       if (!this.CraftData || !Array.isArray(this.CraftData.List) || this.CraftList.length === 0) return [];
-      const list = this.CraftData.List.map(it => this.CraftList.find(_it => _it.ID === it)).filter(it => it && !it.HiddenToCustomer);
-      // return this.CraftList.filter(it => this.CraftData.List.includes(it.ID) && !it.HiddenToCustomer);
-      return list;
+      return this.CraftList.filter(it => this.CraftData.List.includes(it.ID) && !it.HiddenToCustomer);
     },
     selectedCraftList: {
       get() {

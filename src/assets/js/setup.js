@@ -4,14 +4,14 @@ const mode = process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 't
 /**
  * 生产 ---- 测试环境
  */
-let _homeUrl = 'http://192.168.1.92:8056/';
+let _homeUrl = 'http://192.168.1.92:8030/';
 let _domain = '';
 let _imgUrl = 'http://192.168.1.92:8055/';
-let _productJumpUrl = 'http://192.168.1.92:8056/';
+let _productJumpUrl = 'http://192.168.1.92:8030/';
 let _agreementID = '60';
 let _statementID = '61';
 let _baseUrl = '/';
-let _rightOpenUrl = 'http://192.168.1.92:8057/';
+let _rightOpenUrl = 'http://192.168.1.92:8030/';
 
 /**
  * 生产 ---- 正式环境
@@ -24,7 +24,7 @@ if (mode === 'production') {
   _agreementID = '3';
   _statementID = '4';
   _baseUrl = '/';
-  _rightOpenUrl = 'https://order.mpzj.cn/';
+  _rightOpenUrl = 'https://order.mpzj.cn/'; // 正确打开地址 如果不是将会自动跳转至该地址
 }
 
 /**
@@ -50,6 +50,7 @@ export const agreementID = _agreementID; // 用户协议文章ID
 export const statementID = _statementID; // 权责声明文章ID
 export const baseUrl = _baseUrl; // 接口请求地址
 export const rightOpenUrl = _rightOpenUrl; // 如果登录接口不是通过域名登录的话 在打开登录页面时自动跳转该地址； -- 正确打开地址
+export const amapAppkey = 'd1de441473f06000bd61463102442b1e';
 
 export default {
   homeUrl,
@@ -61,4 +62,5 @@ export default {
   agreementID,
   statementID,
   rightOpenUrl,
+  amapAppkey,
 };
