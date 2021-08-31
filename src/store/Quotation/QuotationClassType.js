@@ -124,7 +124,7 @@ export default class QuotationClassType {
               break;
             case '物料':
               // 此处获取该部件物料列表数据(筛选过后)，如果长度为0 则不生成下面数据 -- 已在上面筛选判断
-              temp.Material = { ID: '' };
+              temp.MaterialID = '';
               break;
             case '工艺':
               if (isCraftInited) return;
@@ -319,7 +319,7 @@ export default class QuotationClassType {
     if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
     const InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
     // console.log('获取有效交互列表', ProductParams, InteractionControlList);
-    const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams));
+    const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation));
     return list;
   }
 }

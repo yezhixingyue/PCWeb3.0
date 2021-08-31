@@ -517,7 +517,7 @@ export default {
       }
     },
     onHomeDetailClick() {
-      window.open(`${productJumpUrl}product?productID=${this.placeData.ProductID}`);
+      window.open(`${productJumpUrl}product.html?productID=${this.placeData.ProductID}`);
     },
     async asyncInputchecker() {
       const resp = await this.$refs.oConsigneeAddressSetpComp.inputChecker();

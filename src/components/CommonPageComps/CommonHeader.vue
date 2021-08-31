@@ -13,16 +13,16 @@
           <a>快捷下单</a>
         </li>
         <li>
-          <a :href='`${homeUrl}productIntro`' target="_blank">产品介绍</a>
+          <a :href='`${homeUrl}productIntro.html`' target="_blank">产品介绍</a>
         </li>
         <li>
-          <a :href='`${homeUrl}news`' target="_blank">新闻中心</a>
+          <a :href='`${homeUrl}news.html`' target="_blank">新闻中心</a>
         </li>
         <li>
-          <a :href='`${homeUrl}about`' target="_blank">关于我们</a>
+          <a :href='`${homeUrl}about.html`' target="_blank">关于我们</a>
         </li>
         <li>
-          <a :href='`${homeUrl}help`' target="_blank">帮助中心</a>
+          <a :href='`${homeUrl}help.html`' target="_blank">帮助中心</a>
         </li>
       </ul>
       <!-- <span v-if="customerInfo"><i></i>{{customerInfo.CustomerName}}</span> -->

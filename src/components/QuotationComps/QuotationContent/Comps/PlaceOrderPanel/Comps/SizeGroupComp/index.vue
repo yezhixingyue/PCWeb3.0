@@ -19,7 +19,7 @@
       v-model="isCustomize"
       v-if="
         Property.AllowCustomerCustomize &&
-        Property.GroupInfo.ElementList.length > 0
+        Property.SizeList.length > 0
       "
       >自定义</el-checkbox
     >

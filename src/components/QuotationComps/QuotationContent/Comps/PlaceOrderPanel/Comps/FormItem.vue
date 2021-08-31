@@ -139,7 +139,7 @@ export default {
               if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property?.ID) value = this.submitData.Size;
               break;
             case '物料':
-              value = this.submitData.Material?.ID || '';
+              value = this.submitData.MaterialID || '';
               break;
             case '工艺':
               value = this.submitData.CraftList || [];
@@ -155,7 +155,6 @@ export default {
       },
       set(val) {
         console.log('formItem itemValue 触发改变', val);
-        // console.log('itemValue', this.curTypeName, val, this.obj2GetProductPrice.ProductParams);
         let type = this.curTypeName;
         if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);

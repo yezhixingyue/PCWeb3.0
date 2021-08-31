@@ -51,14 +51,14 @@ export default {
   methods: {
     onHomeDetailClick() {
       if (!this.asideIntroData) return;
-      window.open(`${productJumpUrl}product?productID=${this.asideIntroData.Product.ID}`);
+      window.open(`${productJumpUrl}product.html?productID=${this.asideIntroData.Product.ID}`);
     },
     onNewGetClick() {
       this.$emit('getProductAsideIntroData');
     },
     onJumpProductOrder(id) {
       // window.open(`/#/placeOrder?id=${id}`);id
-      window.open(`${productJumpUrl}product?productID=${id}`);
+      window.open(`${productJumpUrl}product.html?productID=${id}`);
     },
   },
 };

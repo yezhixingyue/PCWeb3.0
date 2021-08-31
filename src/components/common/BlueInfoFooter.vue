@@ -38,10 +38,10 @@ export default {
   },
   data() {
     return {
-      concact: `${homeUrl}contact-us#contact-top`,
-      opinion: `${homeUrl}contact-us#opinion`,
-      statement: `${homeUrl}help/${statementID}`,
-      agreement: `${homeUrl}help/${agreementID}`,
+      concact: `${homeUrl}contact-us.html#contact-top`,
+      opinion: `${homeUrl}contact-us.html#opinion`,
+      statement: `${homeUrl}help.html/${statementID}`,
+      agreement: `${homeUrl}help.html/${agreementID}`,
     };
   },
 };

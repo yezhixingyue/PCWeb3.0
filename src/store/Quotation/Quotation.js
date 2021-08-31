@@ -919,7 +919,8 @@ export default {
           TargetPart.Size = Value;
           break;
         case '物料':
-          TargetPart.Material.ID = Value;
+          // console.log('MaterialID', Value);
+          TargetPart.MaterialID = Value;
           break;
         case '工艺':
           TargetPart.CraftList = Value;
