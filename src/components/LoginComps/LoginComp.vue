@@ -210,8 +210,9 @@ export default {
     },
   },
   mounted() {
+    // console.log(process.env.VUE_APP_BASE_URL);
     const reg = new RegExp(`^${rightOpenUrl}`);
-    if (!reg.test(window.location.href)) {
+    if (rightOpenUrl && !reg.test(window.location.href)) {
       // eslint-disable-next-line max-len
       const url = this.$router.mode === 'hash' ? `${rightOpenUrl}#${this.$route.fullPath}` : `${rightOpenUrl}${this.$route.fullPath}`;
       window.location.href = url;

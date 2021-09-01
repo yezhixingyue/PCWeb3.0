@@ -217,7 +217,16 @@ export default class QuotationClassType {
       if (Size && !Size.isCustomize && Size.ID && partData.SizeGroup && Array.isArray(partData.SizeGroup.SizeList)) {
         const t = partData.SizeGroup.SizeList.find(_it => _it.ID === Size.ID);
         if (t && t.List) {
-          return { ...Size, List: [...t.List] };
+          const _list = t.List.map(({ First, Second }) => {
+            const _t = partData.SizeGroup.GroupInfo.ElementList.find(_it => _it.ID === First);
+            const _temp = { Value: '', ID: '' };
+            if (_t) {
+              if (_t.Type === 2) _temp.ID = Second;
+              else _temp.Value = Second;
+            }
+            return { ElementID: First, CustomerInputValues: [_temp] };
+          });
+          return { ...Size, List: _list };
         }
       }
       return Size;
@@ -306,7 +315,6 @@ export default class QuotationClassType {
     };
     const _temp = getClearPartEmptyValues(temp);
     const PartList = temp.PartList.map(part => getClearPartEmptyValues(part));
-
     return {
       ..._temp,
       PartList,

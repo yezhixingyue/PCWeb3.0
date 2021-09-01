@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-const mode = process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-production' ? 'test' : process.env.NODE_ENV;
-
+// const mode = process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-production' ? 'test' : process.env.NODE_ENV;
+const mode = process.env.VUE_APP_BASE_URL || process.env.NODE_ENV;
 /**
  * 生产 ---- 测试环境
  */
@@ -11,7 +11,13 @@ let _productJumpUrl = 'http://192.168.1.92:8030/';
 let _agreementID = '60';
 let _statementID = '61';
 let _baseUrl = '/';
-let _rightOpenUrl = 'http://192.168.1.92:8030/';
+let _rightOpenUrl = '';
+
+// if (mode === 'test-production-8050') {
+//   _homeUrl = 'http://192.168.1.92:8050/';
+//   _productJumpUrl = 'http://192.168.1.92:8050/';
+//   _rightOpenUrl = '';
+// }
 
 /**
  * 生产 ---- 正式环境
@@ -38,7 +44,7 @@ if (mode === 'development') {
   // _agreementID = '60'; // 和测试生产环境保持相同 故此处不再修改
   // _statementID = '61'; // 和测试生产环境保持相同 故此处不再修改
   _baseUrl = '/';
-  _rightOpenUrl = 'http://192.168.3.85:8055/';
+  // _rightOpenUrl = 'http://192.168.3.85:8055/';
 }
 
 export const homeUrl = _homeUrl; // 网站地址
