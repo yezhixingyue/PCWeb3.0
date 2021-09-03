@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define */
 import massage from '@/assets/js/utils/message';
 import store from '@/store';
-import { judgeWhetherItWork } from './EffectiveControlList';
+import { getPropertiesAffectedByInteraction } from './EffectiveControlList';
 
 // eslint-disable-next-line no-unused-vars
 function _setErrMsg(errMsg) {
@@ -315,20 +315,15 @@ export default class QuotationClassType {
     };
     const _temp = getClearPartEmptyValues(temp);
     const PartList = temp.PartList.map(part => getClearPartEmptyValues(part));
+    // 后面或可需要在此处处理用于转换受交互限制的属性值修改任务...
     return {
       ..._temp,
       PartList,
     };
   }
 
-  static getEffectiveControlList(ProductParams, curProductInfo2Quotation) { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
-    if (!ProductParams || !curProductInfo2Quotation) return null;
-    const { ControlList } = curProductInfo2Quotation;
-    if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
-    const InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
-    // console.log('获取有效交互列表', ProductParams, InteractionControlList);
-    const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation));
-    return list;
+  static getPropertiesAffectedByInteraction(ProductParams, curProductInfo2Quotation) { // 获取到当前受到交互影响的需要处理的属性列表
+    return getPropertiesAffectedByInteraction(ProductParams, curProductInfo2Quotation);
   }
 }
 

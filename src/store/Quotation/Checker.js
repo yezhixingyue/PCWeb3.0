@@ -1,31 +1,7 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable object-curly-newline */
 
-const pointStartNumberReg = /^\.\d+$/;
-
-/**
- * @description: 给一个值，判断该值是否为数字类型，返回布尔值结果 但isInteger值为true时则判断是否为整数类型 为true则为数字类型
- * @param {*} val
- * @return {*}
- */
-export const getValueIsOrNotNumber = (val, isInteger) => {
-  if (!val && val !== 0) return false;
-  if (pointStartNumberReg.test(val)) return false;
-  const _val = typeof val === 'number' ? val : +val;
-  let _bool = !Number.isNaN(_val);
-  if (_bool && isInteger) _bool = Number.isInteger(_val);
-  return _bool;
-};
-
-/**
- * @description: 把数字组成的数组字符串拆分开为数组
- * @param {*} valueList
- * @return {*}
- */
-export const getNumberValueList = (valueList) => {
-  const reg = /\s|,|，/;
-  return valueList.split(reg).filter(it => it);
-};
+import { getNumberValueList, getValueIsOrNotNumber } from '@/assets/js/utils/utils';
 
 /**
  * @description: 检查元素值是否符合规范
@@ -82,7 +58,8 @@ const _elementTypeChecker = (value, element) => {
         }
       }
       if (!isInSection) {
-        const msg = '输入值不正确，不在分段控制范围内';
+        const _arrText = SectionList.map(({ MinValue, MaxValue }) => `（ ${MinValue}, ${MaxValue} ]`).join('、');
+        const msg = `输入值不正确，不在取值范围内，可选取值范围有：${_arrText}`;
         return { msg, result: false };
       }
     }

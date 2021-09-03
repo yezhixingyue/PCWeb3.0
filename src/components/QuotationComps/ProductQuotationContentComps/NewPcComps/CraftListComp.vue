@@ -760,7 +760,7 @@ export default {
     > .el-dialog.set-craft-dia {
       width: unset;
       width: auto\0;
-      min-width: 450px;
+      min-width: 520px;
       display: table;
       border-radius: 5px;
       > .el-dialog__body {

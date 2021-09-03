@@ -16,7 +16,7 @@
           <a :href='`${homeUrl}productIntro.html`' target="_blank">产品介绍</a>
         </li>
         <li>
-          <a :href='`${homeUrl}news.html`' target="_blank">新闻中心</a>
+          <a :href='`${homeUrl}news/1.html`' target="_blank">新闻中心</a>
         </li>
         <li>
           <a :href='`${homeUrl}about.html`' target="_blank">关于我们</a>

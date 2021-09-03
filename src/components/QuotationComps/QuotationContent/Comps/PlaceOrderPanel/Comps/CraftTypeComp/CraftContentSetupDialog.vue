@@ -227,7 +227,7 @@ export default {
   > .el-dialog.set-craft-dia.mp-place-order-panel-comp-craft-type-item-dialog-comp-wrap {
     width: unset;
     width: auto\0;
-    min-width: 450px;
+    min-width: 520px;
     display: table;
     border-radius: 5px;
     > .el-dialog__header {

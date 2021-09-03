@@ -4,8 +4,8 @@ export function isNumber(val) {
   return /^[0-9]+.?[0-9]*$/.test(val);
 }
 
-const { UnitTypeList } = store.state.common;
 export function getUnit(unitID) {
+  const { UnitTypeList } = store.state.common;
   const _target = UnitTypeList.find(it => it.value === unitID);
   if (!_target) return '';
   return _target.label;
@@ -83,7 +83,50 @@ export const getNumberValueList = (valueList) => {
   return valueList.split(reg).filter(it => it);
 };
 
+/**
+ * @description: 给一个值，判断该值是否为数字类型，返回布尔值结果 但isInteger值为true时则判断是否为整数类型 为true则为数字类型
+ * @param {*} val
+ * @return {*}
+ */
+export const getValueIsOrNotNumber = (val, isInteger) => {
+  const pointStartNumberReg = /^\.\d+$/;
+  if (!val && val !== 0) return false;
+  if (pointStartNumberReg.test(val)) return false;
+  const _val = typeof val === 'number' ? val : +val;
+  let _bool = !Number.isNaN(_val);
+  if (_bool && isInteger) _bool = Number.isInteger(_val);
+  return _bool;
+};
+
+/**
+ * @description: 判断两个普通值（非对象、数组）是否相等
+ * @param {*}
+ * @return {*}
+ */
+export const isEqual = (a, b) => {
+  if (getValueIsOrNotNumber(a) && getValueIsOrNotNumber(b)) return +a === +b;
+  return a === b;
+};
+
+/**
+ * @description: 判断a 是否 大于 b； 如果其中一个不为数字则返回false
+ * @param {*}
+ * @return {*}
+ */
+export const isGreatThen = (a, b) => {
+  if (getValueIsOrNotNumber(a) && getValueIsOrNotNumber(b)) return +a > +b;
+  return false;
+};
+
+export const isLessThen = (a, b) => {
+  if (getValueIsOrNotNumber(a) && getValueIsOrNotNumber(b)) return +a < +b;
+  return false;
+};
+
 export default {
+  isEqual,
+  isGreatThen,
+  isLessThen,
   isNumber,
   getUnit,
   handleSelect,
@@ -92,4 +135,5 @@ export default {
   extname,
   getDateFormat2Date,
   getNumberValueList,
+  getValueIsOrNotNumber,
 };

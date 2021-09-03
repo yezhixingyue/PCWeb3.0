@@ -27,8 +27,8 @@ if (mode === 'production') {
   _domain = 'mpzj.cn';
   _imgUrl = 'https://order.mpzj.cn:8157/';
   _productJumpUrl = 'https://www.mpzj.cn/';
-  _agreementID = '3';
-  _statementID = '4';
+  _agreementID = '4';
+  _statementID = '3';
   _baseUrl = '/';
   _rightOpenUrl = 'https://order.mpzj.cn/'; // 正确打开地址 如果不是将会自动跳转至该地址
 }

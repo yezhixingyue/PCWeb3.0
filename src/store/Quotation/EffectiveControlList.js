@@ -1,4 +1,6 @@
+/* eslint-disable max-len */
 /* eslint-disable object-curly-newline */
+import { isEqual, isGreatThen, isLessThen } from '@/assets/js/utils/utils';
 
 /**
  * @description: 获取元素的值，仅多选选项元素选取本身结果时返回数组；其它均返回单一值
@@ -202,6 +204,7 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       break;
     case 5: // 物料
       temp = targetPartItem.MaterialID;
+      console.log(temp);
       break;
     case 6: // 尺寸组
       temp = getSiztTypeValue(targetPartItem.Size, targetPartData.SizeGroup, Element, FixedType);
@@ -210,22 +213,88 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       break;
   }
 
-  if (temp) console.log('temp----- ', temp);
-  return true;
+  // if (temp) console.log('temp----- ', temp);
+  return temp;
 };
 
 /**
- * @description: 判断交互中的单个条件是否满足
+ * @description: 判断 值、关系、对比结果 是否相匹配
+ * @param {*}  value: 多选元素 或 多次使用元素组的单选元素返回都为ID组成的数组 其它都为值
+ * @return {*} 返回匹配结果：布尔值
+ */
+const matchValueWithValueList = (value, Operator, ValueList) => {
+  const getIsEqual = () => { // 判断是否相等
+    if (Array.isArray(value) && ValueList.length === 1) { // 可多次出现并等于
+      const _list = [...new Set(value)];
+      if (_list.length > 1) return false;
+      return _list[0] === ValueList[0].Value;
+    }
+    if (!Array.isArray(value) && ValueList.length === 1) { // 单次出现
+      return isEqual(value, ValueList[0].Value);
+    }
+    if (ValueList.length > 1) { // 等于对比列表中其中一种
+      if (!Array.isArray(value)) { // 目前只比对不可多次出现目标
+        return ValueList.map(it => it.Value).includes(value);
+      }
+    }
+    return false;
+  };
+
+  let bool = false;
+  switch (Operator) {
+    case 1: // 等于
+      bool = getIsEqual();
+      break;
+
+    case 2: // 不等于
+      bool = !getIsEqual();
+      break;
+    case 3: // 大于
+      bool = isGreatThen(value, ValueList[0].Value);
+      break;
+    case 4: // 大于等于
+      bool = isGreatThen(value, ValueList[0].Value) || isEqual(value, ValueList[0].Value);
+      break;
+    case 5: // 小于
+      bool = isLessThen(value, ValueList[0].Value);
+      break;
+    case 6: // 小于等于
+      bool = isLessThen(value, ValueList[0].Value) || isEqual(value, ValueList[0].Value);
+      break;
+    case 7: // 包含...
+      if (Array.isArray(value)) {
+        bool = value.includes(ValueList[0].Value);
+      }
+      break;
+    case 8: // 不包含...
+      if (Array.isArray(value)) {
+        bool = !value.includes(ValueList[0].Value);
+      }
+      break;
+    case 9: // 选中...
+      if (typeof value === 'boolean') bool = value;
+      break;
+    case 10: // 不选中...
+      if (typeof value === 'boolean') bool = !value;
+      break;
+    default:
+      break;
+  }
+  return bool;
+};
+
+/**
+ * @description: 判断交互中的单个条件是否满足和匹配
  * @param {*}
  * @return {*}  boolean
  */
-export const getSingleItemListIsRight = (item, ProductParams, curProductInfo2Quotation) => {
+export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation) => {
   if (!item || !ProductParams) return false;
   const { Property, Operator, ValueList } = item;
-  if (!Property || !Operator || !ValueList) return false;
+  if (!Property || (!Operator && Operator !== 0) || !ValueList) return false;
   const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation);
-  if (!targetValue) return false;
-  return true;
+  if (!targetValue && targetValue !== 0 && typeof targetValue !== 'boolean') return false;
+  return matchValueWithValueList(targetValue, Operator, ValueList);
 };
 
 /**
@@ -240,12 +309,87 @@ export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Qu
   const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
   if (ItemList.length > 0) {
     if (FilterType === 1) { // 满足所有
-      const inconformityItem = ItemList.find(it => !getSingleItemListIsRight(it, ProductParams, curProductInfo2Quotation)); // 找到不符合的项目
+      const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation)); // 找到不符合的项目
       return !inconformityItem;
     }
     // 满足任一
-    const conformityItem = ItemList.find(it => getSingleItemListIsRight(it, ProductParams, curProductInfo2Quotation)); // 找到不符合的项目
+    const conformityItem = ItemList.find(it => getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation)); // 找到符合的项目
     return !!conformityItem;
   }
   return true;
+};
+
+/**
+ * @description: 获取到当前生效的交互列表
+ * @param {*}
+ * @return {*}
+ */
+export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
+  if (!ProductParams || !curProductInfo2Quotation) return null;
+  const { ControlList } = curProductInfo2Quotation;
+  if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
+  const InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
+  const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation))
+    .sort((f, s) => f.Priority - s.Priority); // 按照优先级进行排序
+  return list;
+};
+
+export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyList) => {
+  if (!imperfectProp || !PropertyList || !Array.isArray(PropertyList) || PropertyList.length === 0) return null;
+  const t = PropertyList.find(it => {
+    const { Product, Part, Craft, Material, Group, Element, FixedType, Type, TableData, Cost, Constraint, Formula } = it;
+    if (!((!Product && Product === imperfectProp.Product) || (Product && imperfectProp.Product && Product.ID === imperfectProp.Product.ID))) return false;
+    if (!((!Part && Part === imperfectProp.Part) || (Part && imperfectProp.Part && Part.ID === imperfectProp.Part.ID))) return false;
+    if (!((!Craft && Craft === imperfectProp.Craft) || (Craft && imperfectProp.Craft && Craft.ID === imperfectProp.Craft.ID))) return false;
+    if (!((!Material && Material === imperfectProp.Material) || (Material && imperfectProp.Material && Material.ID === imperfectProp.Material.ID))) return false;
+    if (!((!Group && Group === imperfectProp.Group) || (Group && imperfectProp.Group && Group.ID === imperfectProp.Group.ID))) return false;
+    if (!((!Element && Element === imperfectProp.Element) || (Element && imperfectProp.Element && Element.ID === imperfectProp.Element.ID))) return false;
+    if (!((!TableData && TableData === imperfectProp.TableData) || (TableData && imperfectProp.TableData && TableData.ID === imperfectProp.TableData.ID))) return false;
+    if (!((!Cost && Cost === imperfectProp.Cost) || (Cost && imperfectProp.Cost && Cost.ID === imperfectProp.Cost.ID))) return false;
+    if (!((!Constraint && Constraint === imperfectProp.Constraint) || (Constraint && imperfectProp.Constraint && Constraint.ID === imperfectProp.Constraint.ID))) return false;
+    if (!((!Formula && Formula === imperfectProp.Formula) || (Formula && imperfectProp.Formula && Formula.ID === imperfectProp.Formula.ID))) return false;
+    if (FixedType !== imperfectProp.FixedType) return false;
+    if (Type !== imperfectProp.Type) return false;
+    return true;
+  });
+  if (t) {
+    if (t.FixedType === 255) { // 常量
+      const { DefaultValue } = imperfectProp;
+      return { ...t, DefaultValue };
+    }
+    if (t.Type === 9) {
+      const { CraftOptionList } = imperfectProp;
+      if (CraftOptionList && t.CraftOptionList) {
+        const list = t.CraftOptionList.map(it => {
+          const _t = CraftOptionList.find(_it => _it.ID === it.ID && JSON.stringify(_it.Part) === JSON.stringify(it.Part));
+          return _t || it;
+        });
+        return { ...t, CraftOptionList: list };
+      }
+    }
+    return t;
+  }
+  return null;
+};
+
+/**
+ * @description: 对获取到的正在生效的交互列表根据优先级进行筛选，筛选出需要受到影响的属性列表
+ * @param {*}
+ * @return {*}
+ */
+export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo2Quotation) => {
+  // 获取到当前  正在生效的  且  已按照优先级从重要到不重要的顺序进行排序的  交互列表
+  const EffectiveControlList = getEffectiveControlList(ProductParams, curProductInfo2Quotation);
+  if (!EffectiveControlList) return [];
+  const arr = [];
+  EffectiveControlList.forEach(({ List }) => {
+    if (Array.isArray(List)) {
+      List.forEach(it => {
+        const _list = arr.map(_it => _it.Property);
+        const t = getPerfectPropertyByImperfectProperty(it.Property, _list);
+        if (!t) arr.push(it);
+      });
+    }
+  });
+  return arr;
 };

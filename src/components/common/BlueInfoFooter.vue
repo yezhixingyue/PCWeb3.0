@@ -40,8 +40,8 @@ export default {
     return {
       concact: `${homeUrl}contact-us.html#contact-top`,
       opinion: `${homeUrl}contact-us.html#opinion`,
-      statement: `${homeUrl}help.html/${statementID}`,
-      agreement: `${homeUrl}help.html/${agreementID}`,
+      statement: `${homeUrl}help/${statementID}.html`,
+      agreement: `${homeUrl}help/${agreementID}.html`,
     };
   },
 };

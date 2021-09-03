@@ -102,6 +102,9 @@ export default {
       { Name: '工厂', ID: 5 },
     ],
     isOrderRestore: false,
+    /** 受到交互影响的属性列表数据
+    ---------------------------------------- */
+    PropertiesAffectedByInteraction: [],
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -207,6 +210,8 @@ export default {
       state.curProductInfo2Quotation = QuotationClassType.initOriginData(data);
       state.obj2GetProductPrice.ProductParams = QuotationClassType.init(data);
       state.initPageText = '';
+      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
+      state.PropertiesAffectedByInteraction = list;
     },
     /* 清除选中产品详细信息
     -------------------------------*/
@@ -895,15 +900,14 @@ export default {
     /** 设置产品报价面板信息
     ---------------------------------------- */
     setObj2GetProductPriceProductParams(state, [PartID, PartIndex, Type, ID, Value]) {
-      // console.log(state.obj2GetProductPrice.ProductParams, PartID, Type, ID, Value);
       let TargetPart;
       if (!PartID) TargetPart = state.obj2GetProductPrice.ProductParams;
       else {
         const t = state.obj2GetProductPrice.ProductParams.PartList.find(it => it.PartID === PartID);
-        if (t && t.List && t.List[PartIndex]) TargetPart = t[PartIndex];
-        TargetPart = t.List[PartIndex];
+        // if (t && t.List && t.List[PartIndex]) TargetPart = t[PartIndex]; // ------------------------- ???? 为什么加了这一行代码呢
+        // TargetPart = t.List[PartIndex];
+        if (t && t.List && t.List[PartIndex]) TargetPart = t.List[PartIndex];
       }
-      // console.log(state.obj2GetProductPrice.ProductParams, TargetPart, PartID, PartIndex, Type, ID, Value);
       if (!TargetPart) return;
       let target;
       switch (Type) {
@@ -919,7 +923,6 @@ export default {
           TargetPart.Size = Value;
           break;
         case '物料':
-          // console.log('MaterialID', Value);
           TargetPart.MaterialID = Value;
           break;
         case '工艺':
@@ -928,7 +931,9 @@ export default {
         default:
           break;
       }
-      console.log('获取有效交互列表', QuotationClassType.getEffectiveControlList(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation));
+      // 获取受交互影响属性列表
+      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
+      state.PropertiesAffectedByInteraction = list;
     },
     /** 设置产品报价面板信息 -- 部件添加与删除
     ---------------------------------------- */
@@ -940,7 +945,8 @@ export default {
       } else { // 添加
         t.List.push(item);
       }
-      console.log(QuotationClassType.getEffectiveControlList(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation));
+      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
+      state.PropertiesAffectedByInteraction = list;
     },
   },
   actions: {

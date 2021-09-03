@@ -19,6 +19,7 @@
      :CraftData='target'
      :CraftList='placeData.CraftList || []'
      :CraftConditionList='placeData.CraftConditionList || []' />
+     {{localAffectedPropList.length}}
   </el-form-item>
 </template>
 
@@ -64,7 +65,7 @@ export default {
     CraftTypeComp,
   },
   computed: {
-    ...mapState('Quotation', ['ProductDisplayPropertyTypeList', 'obj2GetProductPrice']),
+    ...mapState('Quotation', ['ProductDisplayPropertyTypeList', 'obj2GetProductPrice', 'PropertiesAffectedByInteraction']),
     curTypeName() {
       const t = this.ProductDisplayPropertyTypeList.find(it => it.ID === this.itemData.Type);
       return t ? t.Name : '';
@@ -154,7 +155,7 @@ export default {
         return value;
       },
       set(val) {
-        console.log('formItem itemValue 触发改变', val);
+        // console.log('formItem itemValue 触发改变', val);
         let type = this.curTypeName;
         if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);
@@ -174,6 +175,15 @@ export default {
       if (this.target.Name) return this.target.Name;
       if (this.target.GroupInfo) return this.target.GroupInfo.Name || 'propName';
       return 'propName';
+    },
+    localAffectedPropList() {
+      if (!Array.isArray(this.PropertiesAffectedByInteraction) || this.PropertiesAffectedByInteraction.length === 0) return [];
+      return this.PropertiesAffectedByInteraction.filter(({ Property }) => {
+        const isSamePart = (!this.PartID && !Property.Part) || (this.PartID && Property.Part && Property.Part.ID === this.PartID);
+        if (!isSamePart) return false;
+        const isSameTarget = this.getIsSameTarget(Property);
+        return isSameTarget;
+      });
     },
   },
   data() {
@@ -224,6 +234,24 @@ export default {
     onChangeValidate() { // 重新单独校验
       this.$emit('changeValidate', this.propName);
     },
+    getIsSameTarget(Property) {
+      if (this.curTypeName === '元素' && Property.Type === 3 && Property.Element) {
+        return Property.Element.ID === this.target.ID;
+      }
+      if (this.curTypeName === '元素组' && Property.Type === 2 && Property.Group) {
+        return Property.Group.ID === this.target.ID;
+      }
+      if (this.curTypeName === '工艺' && Property.Type === 4 && Property.Craft) {
+        return this.target.List.includes(Property.Craft.ID);
+      }
+      if (this.curTypeName === '物料' && Property.Type === 5) {
+        return true;
+      }
+      if (this.curTypeName === '元素组' && !this.target.ElementList && this.target.SizeList && Property.Type === 6) {
+        return true;
+      }
+      return false;
+    },
   },
 };
 </script>
@@ -256,6 +284,7 @@ export default {
     }
     .el-form-item__error {
       margin-left: 6px;
+      white-space: nowrap;
     }
   }
   &.isNormalGroup > label {
