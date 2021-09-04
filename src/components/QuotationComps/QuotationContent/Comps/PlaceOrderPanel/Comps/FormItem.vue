@@ -7,19 +7,25 @@
     ]"
    class="mp-place-order-panel-form-item-comp-wrap"
    :class="{isNormalGroup:isNormalGroup}">
-    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" />
+    <!-- 元素 -->
+    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" :AffectedPropList='localAffectedPropList' />
+    <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
-     :errorElementID='errorElementID' :errorIndex='errorIndex' />
-    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList"
+     :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList' />
+     <!-- 尺寸 -->
+    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :AffectedPropList='localAffectedPropList'
      :Property='target' v-model="itemValue" :errorElementID='errorElementID' />
-    <MaterialTypeComp v-if="curTypeName==='物料'" :MaterialList='target.filter(it => !it.HiddenToCustomer)' v-model="itemValue" />
+     <!-- 物料 -->
+    <MaterialTypeComp v-if="curTypeName==='物料'"
+     :AffectedPropList='localAffectedPropList' :MaterialList='target.filter(it => !it.HiddenToCustomer)' v-model="itemValue"/>
+    <!-- 工艺 -->
     <CraftTypeComp
      v-if="curTypeName==='工艺'"
      v-model="itemValue"
      :CraftData='target'
      :CraftList='placeData.CraftList || []'
+     :AffectedPropList='localAffectedPropList'
      :CraftConditionList='placeData.CraftConditionList || []' />
-     {{localAffectedPropList.length}}
   </el-form-item>
 </template>
 
@@ -28,6 +34,7 @@ import { mapState } from 'vuex';
 import {
   checkElement, checkElementGroup, checkSizeGroup, checkCraft,
 } from '@/store/Quotation/Checker';
+import InterAction from '@/store/Quotation/Interaction';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
@@ -116,7 +123,7 @@ export default {
     },
     hidden() {
       if (Object.prototype.toString.call(this.target) === '[object Object]') {
-        return this.target.HiddenToCustomer || (this.target.GroupInfo && this.target.GroupInfo.HiddenToCustomer);
+        return this.target.HiddenToCustomer || (this.target.GroupInfo && this.target.GroupInfo.HiddenToCustomer) || this.AffectedHidden;
       }
       return false;
     },
@@ -185,6 +192,21 @@ export default {
         return isSameTarget;
       });
     },
+    AffectedHidden() {
+      if (this.localAffectedPropList.length > 0) {
+        if (this.curTypeName === '元素') { // 是否元素隐藏
+          return InterAction.getIsHiddenOrNot(this.localAffectedPropList);
+        }
+        if (this.curTypeName === '元素组') { // 是否元素组和尺寸组隐藏
+          const _AffectedPropList = this.localAffectedPropList
+            .filter((_it) => _it.Property && !_it.Property.Element && _it.Property.Group && !_it.Property.FixedType && _it.Property.FixedType !== 0);
+          if (_AffectedPropList.length === 1) {
+            return _AffectedPropList[0].Operator === 22;
+          }
+        }
+      }
+      return false;
+    },
   },
   data() {
     return {
@@ -194,10 +216,14 @@ export default {
   },
   methods: {
     validateFormItem(rule, value, callback) {
+      if (this.AffectedHidden) { // 如果该项目隐藏了，则直接通过验证
+        callback();
+        return;
+      }
       this.errorElementID = '';
       this.errorIndex = '';
       if (this.curTypeName === '元素') {
-        const res = checkElement(this.itemValue, this.target);
+        const res = checkElement(this.itemValue, this.target, this.localAffectedPropList);
         if (res && typeof res === 'string') {
           callback(new Error(res));
           return;
@@ -220,7 +246,7 @@ export default {
           return;
         }
       }
-      if (this.curTypeName === '工艺') { // 尺寸组
+      if (this.curTypeName === '工艺') { // 工艺
         if (Array.isArray(this.placeData.CraftConditionList) && this.placeData.CraftConditionList.length > 0) {
           const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList);
           if (res && typeof res === 'string') {

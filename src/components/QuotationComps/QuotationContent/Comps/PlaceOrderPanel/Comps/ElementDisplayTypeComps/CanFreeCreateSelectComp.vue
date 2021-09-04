@@ -6,6 +6,7 @@
     :multiple='isMultiple'
     :allow-create='AllowCreate'
     :placeholder='placeholder'
+    :disabled='isDisabled'
     @blur.native='onBlur'
     @change.native='onBlur'
     @focus.native="onFocus"
@@ -17,6 +18,7 @@
       v-for="item in options"
       :key="item.ID || item"
       :label="item.Name || item"
+      :disabled='DisabledOptionList.includes(item.ID || item)'
       :value="item.ID || item">
     </el-option>
   </el-select>
@@ -45,6 +47,14 @@ export default {
     filterable: { // 是否可多选
       type: Boolean,
       default: true,
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    DisabledOptionList: {
+      type: Array,
+      default: () => [],
     },
   },
   computed: {

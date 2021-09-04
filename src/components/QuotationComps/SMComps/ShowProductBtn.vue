@@ -27,7 +27,6 @@ export default {
 </script>
 
 <style lang="scss">
-// @import "@/assets/css/Common/var.scss";
 .mp-show-product-btn-wrap {
   min-width: calc(24vw - 14px);
   height: 28px;
@@ -50,8 +49,11 @@ export default {
   }
   &.disabled {
     // color: $--color-text-light;
-    // border-color: $--color-text-light;
-    pointer-events: none;
+    background-color: #eee;
+    // pointer-events: none;
+    cursor: not-allowed;
+    color: #a2a2a2 !important;
+    border-color: #dbdee3 !important;
   }
 }
 // @media screen and (-webkit-min-device-pixel-ratio: 2) {

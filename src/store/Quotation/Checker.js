@@ -2,6 +2,7 @@
 /* eslint-disable object-curly-newline */
 
 import { getNumberValueList, getValueIsOrNotNumber } from '@/assets/js/utils/utils';
+import InterAction from '@/store/Quotation/Interaction';
 
 /**
  * @description: 检查元素值是否符合规范
@@ -81,8 +82,20 @@ const _elementTypeChecker = (value, element) => {
  * @param {*}
  * @return {*}
  */
-export const checkElement = (values, prop) => {
+export const checkElement = (values, prop, AffectedPropList) => {
   if (!prop) return '';
+  if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+    // 如果已经被禁用，则直接返回空字符串，不再进行验证
+    if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
+    if (prop.Type === 2) { // 选项元素，判断是否有值在禁用或隐藏列表中
+      const disabledList = InterAction.getDisabledOptionList(AffectedPropList);
+      const hiddenList = InterAction.getHiddenedOptionList(AffectedPropList);
+      const arr = [...disabledList, ...hiddenList];
+      if (arr.length > 0) {
+        console.log(arr);
+      }
+    }
+  }
   let IsRequired = false;
   if (prop.NumbericAttribute && prop.NumbericAttribute.IsRequired) IsRequired = true;
   if (prop.OptionAttribute && prop.OptionAttribute.IsRequired) IsRequired = true;

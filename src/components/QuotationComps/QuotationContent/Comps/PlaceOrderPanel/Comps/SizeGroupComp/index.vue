@@ -7,6 +7,7 @@
       "
       v-model="ID"
       :options="CustomerSizeList"
+      :DisabledOptionList='DisabledOptionList'
     />
     <CustomizeSizeGroupComp
       v-show="isCustomize"
@@ -28,6 +29,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import InterAction from '@/store/Quotation/Interaction';
 import CanFreeCreateSelectComp from '../ElementDisplayTypeComps/CanFreeCreateSelectComp.vue';
 import CustomizeSizeGroupComp from './CustomizeSizeGroupComp.vue';
 
@@ -45,6 +47,11 @@ export default {
       type: String,
       default: '',
     },
+    AffectedPropList: {
+      // 受到交互影响的尺寸属性列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     CanFreeCreateSelectComp,
@@ -55,9 +62,15 @@ export default {
   },
   computed: {
     ...mapState('Quotation', ['isOrderRestore']),
+    DisabledOptionList() { // 禁用的选项
+      return InterAction.getDisabledOptionList(this.AffectedPropList);
+    },
+    HiddenOptionList() { // 隐藏的选项
+      return InterAction.getHiddenedOptionList(this.AffectedPropList);
+    },
     CustomerSizeList() {
       return (
-        this.Property?.SizeList?.filter((it) => !it.HiddenToCustomer) || []
+        this.Property?.SizeList?.filter((it) => !it.HiddenToCustomer && !this.HiddenOptionList.includes(it.ID)) || []
       );
     },
     isCustomize: {

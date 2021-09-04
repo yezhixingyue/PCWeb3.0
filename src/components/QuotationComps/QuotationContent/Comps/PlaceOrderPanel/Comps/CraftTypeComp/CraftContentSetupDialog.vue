@@ -30,6 +30,7 @@
             hiddenLabel
             :Property="it"
             :value="craftForm[it.ID].Value"
+            :AffectedPropList='getElementAffectedPropList(it)'
             @input="handleElementChange($event, it)"
           />
         </el-form-item>
@@ -48,6 +49,7 @@
             :errorIndex='errorIndex'
             :showTop='it.Name && !it.IsNameHidden'
             :value="craftForm[it.ID].Value"
+            :AffectedPropList='it.AffectedPropList'
             @input="handleGroupChange($event, it)"
             @changeValidate='onChangeValidate(it.ID)'
           />
@@ -81,6 +83,11 @@ export default {
       type: Object,
       default: null,
     },
+    AffectedPropList: {
+      // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     ElementTypeComp,
@@ -104,7 +111,10 @@ export default {
       return this.Craft?.ElementList?.filter(it => !it.HiddenToCustomer) || [];
     },
     GroupList() {
-      return this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer) || [];
+      const list = this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer)
+        .map(it => ({ ...it, AffectedPropList: this.getGroupAffectedPropList(it) }))
+        .filter(it => this.getClearedHiddenItemData(it));
+      return list || [];
     },
     craftForm() {
       const temp = {};
@@ -124,6 +134,14 @@ export default {
         };
       });
       return temp;
+    },
+    ElementAffectedPropList() {
+      if (this.AffectedPropList.length === 0) return [];
+      return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Element && !it.Property.Group);
+    },
+    GroupAffectedPropList() {
+      if (this.AffectedPropList.length === 0) return [];
+      return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Group);
     },
   },
   data() {
@@ -218,6 +236,22 @@ export default {
       this.$nextTick(() => {
         this.$refs.craftForm.validateField(key);
       });
+    },
+    getElementAffectedPropList(el) { // 获取元素受影响交互列表
+      if (this.ElementAffectedPropList.length === 0) return [];
+      return this.ElementAffectedPropList.filter(it => it.Property?.Element?.ID === el.ID);
+    },
+    getGroupAffectedPropList(group) { // 获取元素组受影响的交互列表
+      if (this.GroupAffectedPropList.length === 0) return [];
+      return this.GroupAffectedPropList.filter(it => it.Property?.Group?.ID === group.ID);
+    },
+    getClearedHiddenItemData(it) {
+      const { AffectedPropList } = it;
+      const _AffectedPropList = AffectedPropList.filter((_it) => _it.Property && !_it.Property.Element && _it.Property.Group);
+      if (_AffectedPropList.length === 1) {
+        return _AffectedPropList[0].Operator !== 22;
+      }
+      return true;
     },
   },
 };

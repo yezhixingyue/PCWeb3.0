@@ -18,11 +18,31 @@ export default {
       type: String,
       default: '',
     },
+    AffectedPropList: {
+      // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     MaterialSingleSelector,
   },
   computed: {
+    hiddenMatarialList() { // 隐藏物料列表  Operator 21 禁用    22 隐藏    23 必选
+      if (this.AffectedPropList.length === 0) return [];
+      if (this.AffectedPropList[0].Operator === 22 && this.AffectedPropList[0].OptionList.length > 0) {
+        return this.AffectedPropList[0].OptionList;
+      }
+      return [];
+    },
+    disabledMatarialList() { // 隐藏物料列表  Operator 21 禁用    22 隐藏    23 必选
+      if (this.AffectedPropList.length === 0) return [];
+      if (this.AffectedPropList[0].Operator === 21 && this.AffectedPropList[0].OptionList.length > 0) {
+        const lastList = this.AffectedPropList[0].OptionList;
+        return lastList;
+      }
+      return [];
+    },
     showList() {
       const list = [];
       // const showLabel = true; // 是否显示属性名称，如 克重、颜色等
@@ -35,7 +55,7 @@ export default {
         }).join(' ');
         return _Name;
       };
-      this.MaterialList.forEach(lv1 => {
+      this.MaterialList.filter(it => !this.hiddenMatarialList.includes(it.ID)).forEach(lv1 => {
         const { Type, ID } = lv1;
         const { UnionShowList, Name, ElementList } = Type;
         // 1. 寻找已有相同分类
@@ -58,6 +78,7 @@ export default {
             const item = {
               ID,
               Name: getNameByElementList(ElementList),
+              disabled: this.disabledMatarialList.includes(ID),
             };
             t1.children.push(item);
           } else {
@@ -71,6 +92,7 @@ export default {
                 const _item = {
                   ID: _ItemID,
                   Name: _Name,
+                  disabled: i === UnionShowList.length - 1 ? this.disabledMatarialList.includes(ID) : false,
                 };
                 if (i < UnionShowList.length - 1) _item.children = [];
                 tempList.push(_item);
@@ -81,6 +103,18 @@ export default {
           }
         }
       });
+      const getIsDisabled = arr => arr.filter(it => !it.disabled).length === 0;
+      const setListDisabled = item => {
+        if (item.children && !item.children[0].children) {
+          const _item = item;
+          _item.disabled = getIsDisabled(item.children);
+        } else {
+          item.children.forEach(it => setListDisabled(it));
+          const _item = item;
+          _item.disabled = getIsDisabled(item.children);
+        }
+      };
+      list.forEach(it => setListDisabled(it));
       return list;
     },
     selectedMaterial: {

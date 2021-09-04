@@ -1,5 +1,5 @@
 <template>
-  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer">
+  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden">
     <label v-if="!hiddenLabel && !Property.IsNameHidden">{{Property.Name}}：</label>
     <!-- 数字类型 -->
     <NumberTypeItemComp
@@ -9,6 +9,7 @@
      @focus="onFocus"
      @blur="onBlur"
      :isNumberic='isNumberic'
+     :isDisabled='isDisabled || disabled'
      :Allow="Property.NumbericAttribute.AllowCustomer" />
     <!-- 选项类型 -->
     <OptionTypeItemComp
@@ -17,6 +18,9 @@
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
      :Allow='Property.OptionAttribute.AllowCustomer'
      :isMultiple='!Property.OptionAttribute.IsRadio'
+     :isDisabled='isDisabled || disabled'
+     :DisabledOptionList='DisabledOptionList'
+     :HiddenOptionList='HiddenOptionList'
      :SelectMode='Property.OptionAttribute.SelectMode' />
     <!-- 开关 -->
     <SwitchTypeItemComp
@@ -24,6 +28,7 @@
      v-model.lazy="PropValue"
      :OpenValue="Property.SwitchAttribute.OpenValue"
      :CloseValue="Property.SwitchAttribute.CloseValue"
+     :isDisabled='isDisabled || disabled'
      :Words="Property.SwitchAttribute.Words || ''" />
     <span v-if="Property.Unit">{{Property.Unit}}</span>
   </div>
@@ -31,6 +36,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import InterAction from '@/store/Quotation/Interaction';
 import NumberTypeItemComp from './ElementDisplayTypeComps/NumberTypeItemComp.vue';
 import OptionTypeItemComp from './ElementDisplayTypeComps/OptionTypeItemComp.vue';
 import SwitchTypeItemComp from './ElementDisplayTypeComps/SwitchTypeItemComp.vue';
@@ -53,6 +59,14 @@ export default {
     isNumberic: {
       type: Boolean,
       default: false,
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    AffectedPropList: { // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
     },
   },
   components: {
@@ -95,6 +109,18 @@ export default {
           this.$emit('input', Array.isArray(val) ? val.map(ID => ({ ID })) : []);
         }
       },
+    },
+    disabled() { // 禁用
+      return InterAction.getDisabledOrNot(this.AffectedPropList);
+    },
+    hidden() { // 隐藏
+      return InterAction.getIsHiddenOrNot(this.AffectedPropList);
+    },
+    DisabledOptionList() { // 禁用的选项
+      return InterAction.getDisabledOptionList(this.AffectedPropList);
+    },
+    HiddenOptionList() { // 隐藏的选项
+      return InterAction.getHiddenedOptionList(this.AffectedPropList);
     },
   },
   data() {

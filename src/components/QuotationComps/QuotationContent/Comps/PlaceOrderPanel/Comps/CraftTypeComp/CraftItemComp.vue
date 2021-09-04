@@ -3,15 +3,19 @@
     <ShowProductBtn
       @click.native="handleClick"
       :title="craftTitle"
-      :disabled="false"
+      :disabled="disabled"
       :isActive="!!value"
     />
-    <template
-      v-if="value && !withoutContent"
-    >
+    <template v-if="value && !withoutContent">
       <i class="iconfont icon-bianji is-cyan" @click="handleEditClick"></i>
     </template>
-    <CraftContentSetupDialog :visible.sync='visible' :Craft='Craft' :setupData='value' @submit="handleDialogSubmit" />
+    <CraftContentSetupDialog
+      :visible.sync="visible"
+      :Craft="Craft"
+      :setupData="value"
+      :AffectedPropList="ChildUseAffectedPropList"
+      @submit="handleDialogSubmit"
+    />
   </li>
 </template>
 
@@ -29,6 +33,11 @@ export default {
       type: Object,
       default: null,
     },
+    AffectedPropList: {
+      // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     ShowProductBtn,
@@ -37,31 +46,56 @@ export default {
   data() {
     return {
       visible: false,
+      disabled: false,
+      required: false,
     };
   },
   computed: {
-    filteredElementShowList() { // 筛选后可用于客户设置的工艺元素列表 如果长度为0则没有元素或不需要设置元素
-      return this.Craft?.ElementList?.filter(_it => !_it.HiddenToCustomer) || [];
+    filteredElementShowList() {
+      // 筛选后可用于客户设置的工艺元素列表 如果长度为0则没有元素或不需要设置元素
+      return (
+        this.Craft?.ElementList?.filter((_it) => !_it.HiddenToCustomer) || []
+      );
     },
-    filteredGroupShowList() { // 筛选后可用于客户设置的工艺元素组列表
-      return this.Craft?.GroupList?.filter(_it => !_it.HiddenToCustomer) || [];
+    filteredGroupShowList() {
+      // 筛选后可用于客户设置的工艺元素组列表
+      return (
+        this.Craft?.GroupList?.filter((_it) => !_it.HiddenToCustomer) || []
+      );
     },
     withoutContent() {
-      return this.filteredElementShowList.length === 0 && this.filteredGroupShowList.length === 0;
+      return (
+        this.filteredElementShowList.length === 0
+        && this.filteredGroupShowList.length === 0
+      );
     },
     craftTitle() {
       return this.getCraftContentName();
     },
+    OwnUseAffectedPropList() {
+      // 工艺自身交互限制  可能为必选或者禁用 目前该数组最多只有一个
+      if (this.AffectedPropList.length === 0) return [];
+      return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && !it.Property.Element && !it.Property.Group);
+    },
+    ChildUseAffectedPropList() {
+      if (this.disabled || this.AffectedPropList.length === 0) return [];
+      return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && (it.Property.Element || it.Property.Group));
+    },
   },
   methods: {
     handleClick() {
+      if (this.disabled) return;
       if (this.value) {
         this.$emit('change', null);
         return;
       }
       if (this.withoutContent) {
         // 无元素和元素组工艺
-        this.$emit('change', { CraftID: this.Craft.ID, ElementList: [], GroupList: [] });
+        this.$emit('change', {
+          CraftID: this.Craft.ID,
+          ElementList: [],
+          GroupList: [],
+        });
         return;
       }
       this.visible = true;
@@ -80,24 +114,44 @@ export default {
       if (!CustomerInputValues || CustomerInputValues.length === 0 || !Element) return '';
       if (CustomerInputValues.length === 1) {
         const [{ ID, Name, Value }] = CustomerInputValues;
-        if (Element.Type === 3) { // 开关
-          if (Element.SwitchAttribute && `${Element.SwitchAttribute.OpenValue}` === Value) return Element.SwitchAttribute.Words || Element.Name;
+        if (Element.Type === 3) {
+          // 开关
+          if (
+            Element.SwitchAttribute
+            && `${Element.SwitchAttribute.OpenValue}` === Value
+          ) return Element.SwitchAttribute.Words || Element.Name;
         }
-        if (Element.Type === 1 && Value) { // 数值
+        if (Element.Type === 1 && Value) {
+          // 数值
           return `${EleName}${EleName ? '：' : ''}${Value}${Element.Unit}`;
         }
-        if (Element.Type === 2 && Element.OptionAttribute && Element.OptionAttribute.IsRadio && Element.OptionAttribute.OptionList) {
+        if (
+          Element.Type === 2
+          && Element.OptionAttribute
+          && Element.OptionAttribute.IsRadio
+          && Element.OptionAttribute.OptionList
+        ) {
           if (ID) {
-            const t = Element.OptionAttribute.OptionList.find(_it => _it.ID === ID);
+            const t = Element.OptionAttribute.OptionList.find(
+              (_it) => _it.ID === ID,
+            );
             if (t) return `${EleName}${EleName ? '：' : ''}${t.Name}`;
           }
           if (Name) return `${EleName}${EleName ? '：' : ''}${Name}`;
         }
       }
-      if (Element.Type === 2 && Element.OptionAttribute && !Element.OptionAttribute.IsRadio && Element.OptionAttribute.OptionList) {
-        const ids = CustomerInputValues.map(it => it.ID).filter(it => it);
+      if (
+        Element.Type === 2
+        && Element.OptionAttribute
+        && !Element.OptionAttribute.IsRadio
+        && Element.OptionAttribute.OptionList
+      ) {
+        const ids = CustomerInputValues.map((it) => it.ID).filter((it) => it);
         if (ids.length > 0) {
-          const names = ids.map(id => Element.OptionAttribute.OptionList.find(it => it.ID === id)).filter(it => it).map(it => it.Name);
+          const names = ids
+            .map((id) => Element.OptionAttribute.OptionList.find((it) => it.ID === id))
+            .filter((it) => it)
+            .map((it) => it.Name);
           return names.join('，');
         }
       }
@@ -109,13 +163,17 @@ export default {
         const item = List[0];
         const arr = [];
         item.List.forEach(({ ElementID, CustomerInputValues }) => {
-          const t = Group.ElementList.find(_it => _it.ID === ElementID);
+          const t = Group.ElementList.find((_it) => _it.ID === ElementID);
           if (t) {
             const text = this.getElementValueText(CustomerInputValues, t);
             if (text) arr.push(text);
           }
         });
-        if (arr.length > 0) return `${Group.IsNameHidden ? '' : Group.Name} [ ${arr.join('；')} ]`;
+        if (arr.length > 0) {
+          return `${Group.IsNameHidden ? '' : Group.Name} [ ${arr.join(
+            '；',
+          )} ]`;
+        }
       }
       return '';
     },
@@ -123,14 +181,19 @@ export default {
       if (!this.Craft) return '工艺';
       if (!this.value) return this.Craft.ShowName;
       const { ElementList, GroupList } = this.value;
-      if ((!Array.isArray(ElementList) || ElementList.length === 0) && (!Array.isArray(GroupList) || GroupList.length === 0)) return this.Craft.ShowName;
+      if (
+        (!Array.isArray(ElementList) || ElementList.length === 0)
+        && (!Array.isArray(GroupList) || GroupList.length === 0)
+      ) return this.Craft.ShowName;
       const ElContent = [];
       const GroupContent = [];
       const hasElementList = Array.isArray(ElementList) && ElementList.length > 0;
       const hasGroupList = Array.isArray(GroupList) && GroupList.length > 0;
       if (hasElementList) {
-        ElementList.forEach(it => {
-          const t = this.filteredElementShowList.find(_it => _it.ID === it.ElementID);
+        ElementList.forEach((it) => {
+          const t = this.filteredElementShowList.find(
+            (_it) => _it.ID === it.ElementID,
+          );
           if (t) {
             const text = this.getElementValueText(it.CustomerInputValues, t);
             if (text) ElContent.push(text);
@@ -138,8 +201,10 @@ export default {
         });
       }
       if (hasGroupList) {
-        GroupList.forEach(it => {
-          const t = this.filteredGroupShowList.find(_it => _it.ID === it.GroupID);
+        GroupList.forEach((it) => {
+          const t = this.filteredGroupShowList.find(
+            (_it) => _it.ID === it.GroupID,
+          );
           if (t) {
             const text = this.getGroupValueText(it.List, t);
             if (text) GroupContent.push(text);
@@ -147,12 +212,45 @@ export default {
         });
       }
       if (ElContent.length > 0 || GroupContent.length > 0) {
-        return `${this.Craft.ShowName} ${ElContent.join(' ')} ${GroupContent.join('')}`;
+        return `${this.Craft.ShowName} ${ElContent.join(
+          ' ',
+        )} ${GroupContent.join('')}`;
       }
       // if (ElContent.length === 0 && GroupContent.length === 0 && (filteredElementShowList.length > 0 || filteredGroupShowList.length > 0)) {
       //   return `${this.Craft.ShowName} 未设置参数`;
       // }
       return this.Craft.ShowName;
+    },
+  },
+  watch: {
+    OwnUseAffectedPropList(newVal) {
+      if (newVal.length === 1) {
+        // 目前只考虑长度为1的情况，因为目前对一个工艺只允许设置一条交互，必选或者禁用
+        const { Operator } = newVal[0]; // Operator 21 禁用    22 隐藏    23 必选
+        if (Operator === 21) {
+          this.disabled = true;
+          this.required = false;
+        }
+        if (Operator === 23) {
+          this.disabled = false;
+          this.required = true;
+        }
+      } else {
+        this.disabled = false;
+        this.required = false;
+      }
+    },
+    required(newVal, oldVal) {
+      if (newVal && !!this.value) return;
+      if (newVal) {
+        // 此处应执行必选，建议不自动执行勾选，以触发提示
+      } else if (oldVal) {
+        // 从必选变为非必选， 触发提示
+      }
+    },
+    ChildUseAffectedPropList() { // 监听子元素或子元素组上交互属性列表 当其发生变化时：
+    //  1. 查看当前是否已选，如果已选则检查取值是否符合交互，不符合则提示报错；2.当原来有提示，现在交互为空则重新触发提示进行取消 -- 可用一个状态来记录是否已触发错误提示
+
     },
   },
 };

@@ -5,6 +5,7 @@
     inactive-color="#DCDFE6"
     :active-value="`${OpenValue}`"
     :inactive-value="`${CloseValue}`"
+    :disabled='isDisabled'
     :active-text="Words"
     class="mp-erp-switch-type-element-display-select-comp">
   </el-switch>
@@ -26,6 +27,10 @@ export default {
       required: true,
     },
     value: {},
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     switchValue: {

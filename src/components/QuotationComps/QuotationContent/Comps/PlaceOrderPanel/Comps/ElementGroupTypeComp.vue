@@ -1,7 +1,7 @@
 <template>
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="List.length === 0 || showTop">
-      <span class="blue-span" v-show="List.length === 0" @click="onAddClick"
+      <span class="blue-span" v-show="List.length === 0" @click="onAddClick" :class="{disabled:disabled}"
         >+ 添加</span
       >
     </div>
@@ -17,10 +17,12 @@
           :needInit="needInit"
           :Property="it"
           :value="getItemValue(index, it)"
+          :isDisabled='disabled'
           @input="onItemValueChange(index, it, $event)"
+          :AffectedPropList='getChildUseAffectedPropList(it)'
           :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
         />
-        <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!(List.length === minLength && List.length === maxLength)">
+        <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!(List.length === minLength && List.length === maxLength)" v-show="!disabled">
           <li class="f" >
             <div @click="onDelClick(index)" v-show="List.length > minLength">
               <i class="iconfont icon-shanchu is-pink"></i>
@@ -72,6 +74,10 @@ export default {
       default: '',
     },
     errorIndex: {},
+    AffectedPropList: { // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     ElementTypeComp,
@@ -95,14 +101,25 @@ export default {
         this.$emit('input', val);
       },
     },
+    OwnUseAffectedPropList() {
+      // 自身交互限制  可能为必选或者禁用 目前该数组最多只有一个
+      if (this.AffectedPropList.length === 0) return [];
+      return this.AffectedPropList.filter((it) => it.Property && !it.Property.Element && it.Property.Group);
+    },
+    ChildUseAffectedPropList() {
+      if (this.disabled || this.AffectedPropList.length === 0) return [];
+      return this.AffectedPropList.filter((it) => it.Property && it.Property.Element && it.Property.Group);
+    },
   },
   data() {
     return {
       // List: [],
+      disabled: false,
     };
   },
   methods: {
     onAddClick() {
+      if (this.disabled) return;
       const temp = QuotationClassType.getGroupItemSubmitData(this.Property, true);
       this.List = [...this.List, temp];
       this.$emit('changeValidate');
@@ -121,14 +138,26 @@ export default {
       const t = this.List[index].List.find(_it => _it.ElementID === it.ID);
       return t ? t.CustomerInputValues : {};
     },
+    getChildUseAffectedPropList(it) {
+      return this.ChildUseAffectedPropList.filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
+    },
   },
-  mounted() {
-    // 应限定条件 编辑时不需要下面操作
-    // if (this.needInit) {
-    //   for (let i = 0; i < this.minLength; i += 1) {
-    //     this.onAddClick();
-    //   }
-    // }
+  watch: {
+    OwnUseAffectedPropList: {
+      handler(newVal) { // 元素组自身交互 目前只考虑长度为1的情况，因为目前对一个元素组只允许设置一条交互，隐藏或者禁用 --- 元素组隐藏已在上一级进行处理
+        if (newVal.length === 1) {
+          const { Operator } = newVal[0]; // Operator 21 禁用    22 隐藏    23 必选
+          if (Operator === 21) {
+            this.disabled = true;
+          } else {
+            this.disabled = false;
+          }
+        } else {
+          this.disabled = false;
+        }
+      },
+      immediate: true,
+    },
   },
 };
 </script>

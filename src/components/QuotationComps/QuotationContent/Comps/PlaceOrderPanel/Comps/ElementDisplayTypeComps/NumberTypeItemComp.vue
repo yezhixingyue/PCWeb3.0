@@ -7,6 +7,7 @@
     size="small"
     class="mp-erp-number-type-element-display-input-comp"
     maxlength="9"
+    :disabled='isDisabled'
   ></el-input>
   <CanFreeCreateSelectComp
     v-else
@@ -17,6 +18,7 @@
     @blur="onBlur"
     class="mp-erp-number-type-element-option-display-input-comp"
     :options="options"
+    :isDisabled='isDisabled'
   />
 </template>
 
@@ -45,6 +47,10 @@ export default {
     },
     value: {},
     isNumberic: {
+      type: Boolean,
+      default: false,
+    },
+    isDisabled: {
       type: Boolean,
       default: false,
     },
