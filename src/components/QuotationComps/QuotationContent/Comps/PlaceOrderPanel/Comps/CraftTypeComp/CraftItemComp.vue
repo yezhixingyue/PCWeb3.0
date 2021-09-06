@@ -158,7 +158,9 @@ export default {
       return '';
     },
     getGroupValueText(List, Group) {
-      if (List.length > 1) return `${Group.Name}${List.length}处`;
+      if (List.length > 1) {
+        return `${Group.Name}${List.length}处`;
+      }
       if (List.length === 1) {
         const item = List[0];
         const arr = [];

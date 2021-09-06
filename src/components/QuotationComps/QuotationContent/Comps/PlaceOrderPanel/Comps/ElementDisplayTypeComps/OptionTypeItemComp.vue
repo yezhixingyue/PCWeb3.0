@@ -10,7 +10,8 @@
     :DisabledOptionList='DisabledOptionList'
   />
   <el-radio-group v-model="checkVal" v-else :disabled="isDisabled">
-    <el-radio v-for="item in localOptions" :key="item.ID" :label="item.ID" :disabled='DisabledOptionList.includes(item.ID)'>{{
+    <el-radio v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID"
+     @click.native.stop="onRadioItemClick(item)" :disabled='DisabledOptionList.includes(item.ID)'>{{
       item.Name
     }}</el-radio>
   </el-radio-group>
@@ -48,6 +49,11 @@ export default {
       type: Boolean,
       default: false,
     },
+    IsRequired: {
+      // 是否必选
+      type: Boolean,
+      default: false,
+    },
     isDisabled: {
       type: Boolean,
       default: false,
@@ -82,7 +88,26 @@ export default {
       return t && t.Name === '单选按钮' && !this.isMultiple;
     },
     localOptions() {
-      return this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it));
+      // const _options = this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it)
+      //  || (this.value === it.ID || this.value === it || (Array.isArray(this.value) && this.value.includes(it.ID || it))));
+      const _options = this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it));
+      if (!this.IsRequired && !this.isMultiple && !this.isRadio) _options.unshift({ ID: '', Name: '请选择' });
+      return _options;
+    },
+  },
+  data() {
+    return {
+      timer: null,
+    };
+  },
+  methods: {
+    onRadioItemClick(e) {
+      if (!this.value || this.IsRequired || this.value !== e.ID) return;
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        this.checkVal = '';
+        this.timer = null;
+      }, 0);
     },
   },
 };

@@ -12,32 +12,8 @@
         :class="{ fixed: it.Type === 1, n: it.Type === 2 && i > 0 }"
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
       >
-      <!-- <el-input
-        size="mini"
-        v-if="it.Type === 1"
-        @focus="onFocus(i)"
-        @blur="onBlur"
-        maxlength="9"
-        :value="ElementValues[i]"
-        @input="onInput($event, it)"
-      ></el-input>
-      <CanFreeCreateSelectComp
-        v-if="it.Type === 2"
-        :AllowCreate="it.OptionAttribute.AllowCustomer"
-        :value="ElementValues[i]"
-        @input="onInput($event, it)"
-        :options="it.OptionAttribute.OptionList"
-      /> -->
-      <ElementTypeComp :class="{canError: errorElementID === it.ID}"
+      <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled'
        @focus="onFocus(i)" @blur="onBlur" isNumberic :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
-      <!-- <span
-        class="unit"
-        v-if="
-          it.Unit &&
-          ((isSameUnit && i === ElementList.length - 1) || !isSameUnit)
-        "
-        >{{ it.Unit }}</span
-      > -->
       <i v-if="i < ElementList.length - 1">×</i>
     </li>
   </ul>
@@ -60,6 +36,10 @@ export default {
     errorElementID: {
       type: String,
       default: '',
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {

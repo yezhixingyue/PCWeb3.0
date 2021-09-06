@@ -7,12 +7,14 @@
       "
       v-model="ID"
       :options="CustomerSizeList"
+      :isDisabled='isDisabled'
       :DisabledOptionList='DisabledOptionList'
     />
     <CustomizeSizeGroupComp
       v-show="isCustomize"
       v-model="List"
       class="customize"
+      :isDisabled='isDisabled'
       :ElementList="Property.GroupInfo.ElementList"
       :errorElementID="errorElementID"
     />
@@ -96,6 +98,12 @@ export default {
       set(List) {
         this.$emit('input', { ...this.value, List });
       },
+    },
+    isDisabled() {
+      if (Array.isArray(this.AffectedPropList) && this.AffectedPropList.length > 0) {
+        return InterAction.getDisabledOrNot(this.AffectedPropList);
+      }
+      return false;
     },
   },
   mounted() {

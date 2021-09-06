@@ -16,10 +16,10 @@
     class="mp-erp-option-type-element-display-select-comp">
     <el-option
       v-for="item in options"
-      :key="item.ID || item"
+      :key="typeof item === 'string'?item:(item.ID||item.Name)"
       :label="item.Name || item"
-      :disabled='DisabledOptionList.includes(item.ID || item)'
-      :value="item.ID || item">
+      :disabled="DisabledOptionList.includes(typeof item === 'string'?item:item.ID)"
+      :value="typeof item === 'string'?item:item.ID">
     </el-option>
   </el-select>
 </template>

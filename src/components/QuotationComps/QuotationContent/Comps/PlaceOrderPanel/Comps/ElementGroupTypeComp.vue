@@ -102,7 +102,7 @@ export default {
       },
     },
     OwnUseAffectedPropList() {
-      // 自身交互限制  可能为必选或者禁用 目前该数组最多只有一个
+      // 自身交互限制  可能为隐藏或者禁用 目前该数组最多只有一个
       if (this.AffectedPropList.length === 0) return [];
       return this.AffectedPropList.filter((it) => it.Property && !it.Property.Element && it.Property.Group);
     },

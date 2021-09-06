@@ -66,6 +66,7 @@
 <script>
 import { checkElement, checkElementGroup } from '@/store/Quotation/Checker';
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
+import InterAction from '@/store/Quotation/Interaction';
 import ElementTypeComp from '../ElementTypeComp.vue';
 import ElementGroupTypeComp from '../ElementGroupTypeComp.vue';
 
@@ -155,7 +156,12 @@ export default {
   methods: {
     onSubmit() {
       this.$refs.craftForm.validate((bool) => {
-        if (bool) this.$emit('submit', this.localSetupData);
+        if (bool) {
+          const ElementList = InterAction.setElementListClear4Craft(this.localSetupData.ElementList, this.ElementAffectedPropList);
+          const GroupList = InterAction.setElementGroupListClear4Craft(this.localSetupData.GroupList, this.GroupAffectedPropList);
+          console.log(GroupList);
+          this.$emit('submit', { ...this.localSetupData, ElementList, GroupList });
+        }
       });
     },
     generateInitSetupData() { // 生成及初始化设置数据
@@ -210,7 +216,8 @@ export default {
         if (Type === 'Element') {
           const target = this.ElementList.find(it => it.ID === ID);
           if (target) {
-            const res = checkElement(Value, target);
+            const list = this.getElementAffectedPropList(target);
+            const res = checkElement(Value, target, list);
             if (res && typeof res === 'string') {
               callback(new Error(res));
               return;
@@ -220,7 +227,7 @@ export default {
         if (Type === 'Group') {
           const target = this.GroupList.find(it => it.ID === ID);
           if (target) {
-            const res = checkElementGroup(Value, target);
+            const res = checkElementGroup(Value, target, target.AffectedPropList);
             if (res && typeof res === 'object' && res.msg) {
               this.errorElementID = res.ElementID;
               this.errorIndex = res.index;

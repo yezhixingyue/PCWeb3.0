@@ -230,7 +230,7 @@ export default {
         }
       }
       if (this.curTypeName === '元素组' && this.isNormalGroup) {
-        const res = checkElementGroup(this.itemValue, this.target);
+        const res = checkElementGroup(this.itemValue, this.target, this.localAffectedPropList);
         if (res && typeof res === 'object' && res.msg) {
           this.errorElementID = res.ElementID;
           this.errorIndex = res.index;
@@ -239,7 +239,7 @@ export default {
         }
       }
       if (this.curTypeName === '元素组' && !this.isNormalGroup) { // 尺寸组
-        const res = checkSizeGroup(this.itemValue, this.target);
+        const res = checkSizeGroup(this.itemValue, this.target, this.localAffectedPropList);
         if (res && typeof res === 'object' && res.msg) {
           this.errorElementID = res.ElementID;
           callback(new Error(res.msg));
@@ -248,7 +248,7 @@ export default {
       }
       if (this.curTypeName === '工艺') { // 工艺
         if (Array.isArray(this.placeData.CraftConditionList) && this.placeData.CraftConditionList.length > 0) {
-          const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList);
+          const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList, this.localAffectedPropList);
           if (res && typeof res === 'string') {
             callback(new Error(res));
             return;

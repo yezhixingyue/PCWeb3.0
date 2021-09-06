@@ -18,6 +18,7 @@
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
      :Allow='Property.OptionAttribute.AllowCustomer'
      :isMultiple='!Property.OptionAttribute.IsRadio'
+     :IsRequired='Property.OptionAttribute.IsRequired'
      :isDisabled='isDisabled || disabled'
      :DisabledOptionList='DisabledOptionList'
      :HiddenOptionList='HiddenOptionList'
@@ -96,7 +97,7 @@ export default {
         } else if (this.Property.OptionAttribute && this.Property.OptionAttribute.IsRadio) {
           const temp = { ID: '', Name: '' };
           // 此处应判断是否为ID，在options中则为ID， 否则为Name
-          if (Array.isArray(this.Property.OptionAttribute.OptionList)) {
+          if (Array.isArray(this.Property.OptionAttribute.OptionList) && val) {
             const t = this.Property.OptionAttribute.OptionList.find(it => it.ID === val);
             if (t) temp.ID = val;
             else temp.Name = val;
@@ -179,6 +180,9 @@ export default {
   > span {
     font-size: 12px;
     color: #888;
+  }
+  .el-input.is-disabled .el-input__inner {
+    color: rgba($color: #000000, $alpha: 0);
   }
 }
 </style>
