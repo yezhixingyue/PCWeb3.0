@@ -9,6 +9,7 @@
       :options="CustomerSizeList"
       :isDisabled='isDisabled'
       :DisabledOptionList='DisabledOptionList'
+      @blur="onTriggerInteractionClick"
     />
     <CustomizeSizeGroupComp
       v-show="isCustomize"
@@ -17,6 +18,7 @@
       :isDisabled='isDisabled'
       :ElementList="Property.GroupInfo.ElementList"
       :errorElementID="errorElementID"
+      @triggerInteraction='onTriggerInteractionClick'
     />
     <el-checkbox
       v-model="isCustomize"
@@ -81,6 +83,7 @@ export default {
       },
       set(isCustomize) {
         this.$emit('input', { ...this.value, isCustomize });
+        this.onTriggerInteractionClick();
       },
     },
     ID: {
@@ -104,6 +107,33 @@ export default {
         return InterAction.getDisabledOrNot(this.AffectedPropList);
       }
       return false;
+    },
+  },
+  methods: {
+    onTriggerInteractionClick(e) {
+      this.$nextTick(() => {
+        this.$emit('triggerInteraction', e);
+      });
+    },
+    handleInterAction(list) {
+      if (!Array.isArray(list) || list.length === 0) return;
+      if (list.includes(this.value.ID)) { // 常规尺寸无默认值
+        this.$emit('input', { ...this.value, ID: '' });
+      }
+    },
+  },
+  watch: {
+    DisabledOptionList: {
+      handler(val) {
+        this.handleInterAction(val);
+      },
+      immediate: true,
+    },
+    HiddenOptionList: {
+      handler(val) {
+        this.handleInterAction(val);
+      },
+      immediate: true,
     },
   },
   mounted() {

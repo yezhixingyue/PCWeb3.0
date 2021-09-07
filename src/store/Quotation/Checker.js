@@ -241,11 +241,11 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
     const t = requiredCraftIDs.find(it => !selectedCraftIDs.includes(it));
     if (t) {
       const targetCraft = CraftList.find(it => it.ID === t);
-      if (targetCraft) return `请选中 [ ${targetCraft.ShowName} ] 工艺`;
+      if (targetCraft) return `[ ${targetCraft.ShowName} ] 工艺必选`;
     }
   }
   // 判断是否有必选的单选工艺组，判断其是否已有选择，如果无则报错
-  if (prop && Array.isArray(prop.List) && prop.List.length > 0 && Array.isArray(CraftList) && CraftList.length > 0) {
+  if (prop && Array.isArray(prop.List) && Array.isArray(CraftConditionList) && prop.List.length > 0 && Array.isArray(CraftList) && CraftList.length > 0) {
     const requiredList = CraftConditionList.filter(it => it.IsRequired);
     if (requiredList.length > 0) {
       for (let i = 0; i < requiredList.length; i += 1) {

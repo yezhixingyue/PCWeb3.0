@@ -22,7 +22,8 @@
      :isDisabled='isDisabled || disabled'
      :DisabledOptionList='DisabledOptionList'
      :HiddenOptionList='HiddenOptionList'
-     :SelectMode='Property.OptionAttribute.SelectMode' />
+     :SelectMode='Property.OptionAttribute.SelectMode'
+     @blur="onBlur" />
     <!-- 开关 -->
     <SwitchTypeItemComp
      v-if="Property.Type === 3"
@@ -30,7 +31,8 @@
      :OpenValue="Property.SwitchAttribute.OpenValue"
      :CloseValue="Property.SwitchAttribute.CloseValue"
      :isDisabled='isDisabled || disabled'
-     :Words="Property.SwitchAttribute.Words || ''" />
+     :Words="Property.SwitchAttribute.Words || ''"
+     @blur="onBlur" />
     <span v-if="Property.Unit">{{Property.Unit}}</span>
   </div>
 </template>
@@ -126,6 +128,7 @@ export default {
   },
   data() {
     return {
+      val: '',
     };
   },
   methods: {
@@ -149,8 +152,12 @@ export default {
     onFocus() {
       this.$emit('focus');
     },
-    onBlur() {
-      this.$emit('blur');
+    onBlur(e) {
+      if (this.val === e) return;
+      this.val = e;
+      this.$nextTick(() => {
+        this.$emit('blur');
+      });
     },
   },
   mounted() {

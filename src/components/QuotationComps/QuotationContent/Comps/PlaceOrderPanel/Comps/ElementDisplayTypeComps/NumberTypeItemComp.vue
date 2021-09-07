@@ -1,6 +1,6 @@
 <template>
   <el-input
-    @focus="onFocus"
+    @focus="onFocus($event, 'inp')"
     @blur="onBlur"
     v-model.trim.lazy="content"
     v-if="!InputContent || isNumberic"
@@ -16,6 +16,7 @@
     v-model="content"
     @focus="onFocus"
     @blur="onBlur"
+    @change="onSelectChange"
     class="mp-erp-number-type-element-option-display-input-comp"
     :options="options"
     :isDisabled='isDisabled'
@@ -74,11 +75,15 @@ export default {
     },
   },
   methods: {
-    onFocus() {
+    onFocus(e, type) {
       this.$emit('focus');
+      if (type === 'inp' && typeof e === 'object') e.target.select();
     },
     onBlur() {
-      this.$emit('blur');
+      this.$emit('blur', this.value);
+    },
+    onSelectChange(e) {
+      this.$emit('blur', e);
     },
   },
 };

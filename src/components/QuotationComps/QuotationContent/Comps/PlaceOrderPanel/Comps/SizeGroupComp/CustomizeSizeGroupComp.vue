@@ -74,6 +74,7 @@ export default {
     },
     onBlur() {
       this.activeIndex = '';
+      this.$emit('triggerInteraction');
     },
     getValue(it) {
       const t = this.value.find((_it) => _it.ElementID === it.ID);

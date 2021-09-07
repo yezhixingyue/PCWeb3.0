@@ -932,8 +932,8 @@ export default {
           break;
       }
       // 获取受交互影响属性列表
-      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
-      state.PropertiesAffectedByInteraction = list;
+      // const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
+      // state.PropertiesAffectedByInteraction = list;
     },
     /** 设置产品报价面板信息 -- 部件添加与删除
     ---------------------------------------- */
@@ -945,6 +945,10 @@ export default {
       } else { // 添加
         t.List.push(item);
       }
+      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
+      state.PropertiesAffectedByInteraction = list;
+    },
+    setPropertiesAffectedByInteraction(state) { // 获取受交互影响属性列表
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
     },

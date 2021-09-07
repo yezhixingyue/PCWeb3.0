@@ -108,10 +108,12 @@ export default {
         if (item.children && !item.children[0].children) {
           const _item = item;
           _item.disabled = getIsDisabled(item.children);
+          _item.lastList = [...item.children];
         } else {
           item.children.forEach(it => setListDisabled(it));
           const _item = item;
           _item.disabled = getIsDisabled(item.children);
+          _item.lastList = item.children.reduce((prev, next) => ({ lastList: [...prev.lastList, ...next.lastList] }), { lastList: [] }).lastList;
         }
       };
       list.forEach(it => setListDisabled(it));
@@ -123,12 +125,44 @@ export default {
       },
       set(val) {
         this.$emit('input', val);
+        this.$nextTick(() => {
+          this.$emit('triggerInteraction');
+        });
       },
+    },
+    curMaterialList() {
+      if (!this.showList) return [];
+      const t = this.showList.find(it => it.lastList.map(_it => _it.ID).includes(this.value));
+      return t ? t.lastList : [];
     },
   },
   data() {
     return {
     };
+  },
+  methods: {
+    handleInterAction(list) {
+      if (!Array.isArray(list) || list.length === 0) return;
+      if (list.includes(this.value)) {
+        let t = this.curMaterialList.find(it => it.disabled && it.ID !== this.value && !list.includes(it.ID));
+        if (!t) t = this.MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !list.includes(it.ID));
+        this.selectedMaterial = t ? t.ID : '';
+      }
+    },
+  },
+  watch: {
+    disabledMatarialList: {
+      handler(val) {
+        this.handleInterAction(val);
+      },
+      immediate: true,
+    },
+    hiddenMatarialList: {
+      handler(val) {
+        this.handleInterAction(val);
+      },
+      immediate: true,
+    },
   },
 };
 </script>

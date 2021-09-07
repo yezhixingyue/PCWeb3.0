@@ -19,6 +19,7 @@
           :value="getItemValue(index, it)"
           :isDisabled='disabled'
           @input="onItemValueChange(index, it, $event)"
+          @blur="onTriggerInteractionClick"
           :AffectedPropList='getChildUseAffectedPropList(it)'
           :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
         />
@@ -123,10 +124,12 @@ export default {
       const temp = QuotationClassType.getGroupItemSubmitData(this.Property, true);
       this.List = [...this.List, temp];
       this.$emit('changeValidate');
+      this.onTriggerInteractionClick();
     },
     onDelClick(index) {
       this.List = this.List.filter((it, i) => i !== index);
       this.$emit('changeValidate');
+      this.onTriggerInteractionClick();
     },
     onItemValueChange(lv1Index, it, value) {
       const temp = JSON.parse(JSON.stringify(this.value));
@@ -140,6 +143,11 @@ export default {
     },
     getChildUseAffectedPropList(it) {
       return this.ChildUseAffectedPropList.filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
+    },
+    onTriggerInteractionClick() { // 触发交互
+      this.$nextTick(() => {
+        this.$emit('triggerInteraction');
+      });
     },
   },
   watch: {

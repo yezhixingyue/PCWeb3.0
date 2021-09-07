@@ -8,15 +8,17 @@
    class="mp-place-order-panel-form-item-comp-wrap"
    :class="{isNormalGroup:isNormalGroup}">
     <!-- 元素 -->
-    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" :AffectedPropList='localAffectedPropList' />
+    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue"
+     :AffectedPropList='localAffectedPropList' @blur="onTriggerInteractionClick" />
     <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
-     :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList' />
+     :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList'
+     @triggerInteraction='onTriggerInteractionClick' />
      <!-- 尺寸 -->
     <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :AffectedPropList='localAffectedPropList'
-     :Property='target' v-model="itemValue" :errorElementID='errorElementID' />
+     :Property='target' v-model="itemValue" :errorElementID='errorElementID' @triggerInteraction='onTriggerInteractionClick' />
      <!-- 物料 -->
-    <MaterialTypeComp v-if="curTypeName==='物料'"
+    <MaterialTypeComp v-if="curTypeName==='物料'" @triggerInteraction='onTriggerInteractionClick'
      :AffectedPropList='localAffectedPropList' :MaterialList='target.filter(it => !it.HiddenToCustomer)' v-model="itemValue"/>
     <!-- 工艺 -->
     <CraftTypeComp
@@ -25,7 +27,8 @@
      :CraftData='target'
      :CraftList='placeData.CraftList || []'
      :AffectedPropList='localAffectedPropList'
-     :CraftConditionList='placeData.CraftConditionList || []' />
+     :CraftConditionList='placeData.CraftConditionList || []'
+     @triggerInteraction='onTriggerInteractionClick' />
   </el-form-item>
 </template>
 
@@ -247,12 +250,10 @@ export default {
         }
       }
       if (this.curTypeName === '工艺') { // 工艺
-        if (Array.isArray(this.placeData.CraftConditionList) && this.placeData.CraftConditionList.length > 0) {
-          const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList, this.localAffectedPropList);
-          if (res && typeof res === 'string') {
-            callback(new Error(res));
-            return;
-          }
+        const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList, this.localAffectedPropList);
+        if (res && typeof res === 'string') {
+          callback(new Error(res));
+          return;
         }
       }
       callback();
@@ -277,6 +278,9 @@ export default {
         return true;
       }
       return false;
+    },
+    onTriggerInteractionClick() {
+      this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
     },
   },
 };

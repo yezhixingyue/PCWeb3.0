@@ -7,10 +7,11 @@
     :allow-create='AllowCreate'
     :placeholder='placeholder'
     :disabled='isDisabled'
-    @blur.native='onBlur'
-    @change.native='onBlur'
+    @blur.native='onNativeChange'
+    @change.native='onNativeChange'
     @focus.native="onFocus"
     @blur="onBlur"
+    @change="onChange"
     ref="oSelect"
     size="small"
     class="mp-erp-option-type-element-display-select-comp">
@@ -72,15 +73,28 @@ export default {
   },
   methods: {
     onBlur(e) {
+      this.handleBlur(e);
+      this.$nextTick(() => {
+        this.$emit('blur');
+      });
+    },
+    handleBlur(e) {
       if (e.target.value && this.AllowCreate) {
         const t = this.options.find(it => it.Name === e.target.value);
         const _val = t ? t.ID : e.target.value;
         this.$emit('input', _val);
       }
-      this.$emit('blur');
     },
     onFocus() {
       this.$emit('focus');
+    },
+    onChange(e) {
+      this.$nextTick(() => {
+        this.$emit('change', e);
+      });
+    },
+    onNativeChange(e) {
+      this.handleBlur(e);
     },
   },
   mounted() {

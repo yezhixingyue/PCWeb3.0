@@ -86,6 +86,9 @@ export default {
         temp.push(e);
       }
       this.selectedCraftList = temp;
+      this.$nextTick(() => {
+        this.$emit('triggerInteraction');
+      });
     },
     getCraftAffectedPropList(ID) {
       if (!Array.isArray(this.AffectedPropList) || this.AffectedPropList.length === 0) return [];

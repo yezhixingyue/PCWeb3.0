@@ -8,8 +8,10 @@
     :options="localOptions"
     :isMultiple="isMultiple"
     :DisabledOptionList='DisabledOptionList'
+    @blur="onBlur"
+    @change="onSelectChange"
   />
-  <el-radio-group v-model="checkVal" v-else :disabled="isDisabled">
+  <el-radio-group v-model="checkVal" v-else :disabled="isDisabled" @change="onSelectChange">
     <el-radio v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID"
      @click.native.stop="onRadioItemClick(item)" :disabled='DisabledOptionList.includes(item.ID)'>{{
       item.Name
@@ -106,8 +108,38 @@ export default {
       if (this.timer) clearTimeout(this.timer);
       this.timer = setTimeout(() => {
         this.checkVal = '';
+        this.$emit('blur', '');
         this.timer = null;
       }, 0);
+    },
+    onBlur() {
+      this.$emit('blur', this.value);
+    },
+    onSelectChange(e) {
+      this.$emit('blur', e);
+    },
+    handleInterAction(list) {
+      if (!Array.isArray(list) || list.length === 0) return;
+      if (list.includes(this.value)) {
+        const t = this.localOptions.find(it => it.IsChecked); // 找到默认值
+        let _defaultVal = '';
+        if (t && !list.includes(t.ID)) _defaultVal = t.ID;
+        this.$emit('change', _defaultVal);
+      }
+    },
+  },
+  watch: {
+    DisabledOptionList: {
+      handler(val) {
+        this.handleInterAction(val);
+      },
+      immediate: true,
+    },
+    HiddenOptionList: {
+      handler(val) {
+        this.handleInterAction(val);
+      },
+      immediate: true,
     },
   },
 };

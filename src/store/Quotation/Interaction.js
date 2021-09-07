@@ -83,7 +83,7 @@ export default class InterAction {
         ...it,
         List: it.List.map(lv1 => ({
           ...lv1,
-          List: this.setElementListClear(lv1.List, GroupAffectedPropList),
+          List: this.setElementListClear4Craft(lv1.List, GroupAffectedPropList),
         })),
       };
     });

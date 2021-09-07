@@ -14,15 +14,22 @@ export default class QuotationClassType {
   static init(obj) {
     if (!obj || Object.prototype.toString.call(obj) !== '[object Object]') return {};
     const _obj = JSON.parse(JSON.stringify(obj));
-
-    const ProductInfo = this.getPartSubmitData(_obj) || {}; // 生成产品本身数据
+    const ControlList = obj.ControlList?.filter(it => it.ControlType === 0 && it.Constraint?.ItemList?.length === 0);
+    console.log(_obj, ControlList);
+    const requiredCraftList = ControlList && ControlList.length > 0
+      ? ControlList
+        .map(it => it.List.filter(_it => _it.Operator === 23 && _it.Property.Craft && !_it.Property.Element && !_it.Property.Group))
+        .reduce((prev, next) => [...prev, ...next], [])
+      : []; // 必选工艺列表
+    console.log(requiredCraftList);
+    const ProductInfo = this.getPartSubmitData(_obj, requiredCraftList) || {}; // 生成产品本身数据
     const partSubmitDatas = _obj.PartList.map(part => { // 生成部件列表数据
       const List = [];
       const PartID = part.ID;
       const showPart = !!this.getPartSubmitData(part); // showPart用来指定去除一些无效数据
       if (part.UseTimes && part.UseTimes.MinValue > 0) {
         for (let i = 0; i < part.UseTimes.MinValue; i += 1) {
-          const item = this.getPartSubmitData(part);
+          const item = this.getPartSubmitData(part, requiredCraftList);
           if (showPart) List.push({ ...item, key: Math.random().toString(36).slice(-10) });
         }
       }
@@ -70,7 +77,7 @@ export default class QuotationClassType {
     return _obj;
   }
 
-  static getPartSubmitData(PartData) { // 转换产品|部件数据为提交数据
+  static getPartSubmitData(PartData, requiredCraftList) { // 转换产品|部件数据为提交数据
     const { ProductDisplayPropertyTypeList } = store.state.Quotation;
     let temp;
     if (Array.isArray(PartData.DisplayList) && PartData.DisplayList.length > 0) {
@@ -124,7 +131,8 @@ export default class QuotationClassType {
               break;
             case '物料':
               // 此处获取该部件物料列表数据(筛选过后)，如果长度为0 则不生成下面数据 -- 已在上面筛选判断
-              temp.MaterialID = '';
+              target = PartData.MaterialList.filter(it => !it.HiddenToCustomer);
+              if (target.length > 0) temp.MaterialID = target[0].ID;
               break;
             case '工艺':
               if (isCraftInited) return;
@@ -136,6 +144,19 @@ export default class QuotationClassType {
                     if (_craft && (!_craft.ElementList || _craft.ElementList.length === 0) && (!_craft.GroupList || _craft.GroupList.length === 0)) {
                       const _data = this.getCraftItemSubmitData(_craft);
                       temp.CraftList.push(_data);
+                    }
+                  }
+                });
+              }
+              if (Array.isArray(requiredCraftList)) {
+                requiredCraftList.forEach(({ Property }) => {
+                  if ((!Property.Part && PartData.ProductClass) || (Property.Part && Property.Part.ID === PartData.ID)) {
+                    // 同为产品 或 同一部件
+                    // 接着判断是否已勾选
+                    const _craft = PartData.CraftList.find(_it => _it.ID === Property.Craft.ID && !_it.HiddenToCustomer);
+                    if (_craft && _craft.ElementList.length === 0 && _craft.GroupList.length === 0) {
+                      const _t = temp.CraftList.find(it => it.CraftID === Property.Craft.ID);
+                      if (!_t) temp.CraftList.push(this.getCraftItemSubmitData(_craft));
                     }
                   }
                 });

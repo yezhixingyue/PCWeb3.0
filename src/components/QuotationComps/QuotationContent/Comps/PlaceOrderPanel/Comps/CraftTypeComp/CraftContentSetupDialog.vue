@@ -159,8 +159,8 @@ export default {
         if (bool) {
           const ElementList = InterAction.setElementListClear4Craft(this.localSetupData.ElementList, this.ElementAffectedPropList);
           const GroupList = InterAction.setElementGroupListClear4Craft(this.localSetupData.GroupList, this.GroupAffectedPropList);
-          console.log(GroupList);
           this.$emit('submit', { ...this.localSetupData, ElementList, GroupList });
+          this.onTriggerInteractionClick();
         }
       });
     },
@@ -259,6 +259,8 @@ export default {
         return _AffectedPropList[0].Operator !== 22;
       }
       return true;
+    },
+    onTriggerInteractionClick() { // 工艺index统一处理
     },
   },
 };
