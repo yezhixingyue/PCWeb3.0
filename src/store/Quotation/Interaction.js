@@ -43,10 +43,26 @@ export default class InterAction {
       .map(it => it.Property.Craft.ID);
   }
 
-  static getRequiredCraftIDList(AffectedPropList) {
+  static getRequiredCraftIDList(AffectedPropList) { // 找必选工艺前 应先看看其是否已被更优先级更高的交互条目禁用
     if (!Array.isArray(AffectedPropList)) return [];
-    return AffectedPropList.filter(it => it.Property && it.Property.Craft && !it.Property.Element && !it.Property.Group && it.Operator === 23)
-      .map(it => it.Property.Craft.ID);
+    const disabledCraftList = AffectedPropList
+      .map(it => {
+        if (it.Property && it.Property.Craft && !it.Property.Element && !it.Property.Group && it.Operator === 21) return it;
+        return null;
+      }).map((it, i) => {
+        if (it) return { index: i, ID: it.Property.Craft.ID };
+        return null;
+      }).filter(it => it);
+    return AffectedPropList.filter((it, i) => {
+      const bool = it.Property && it.Property.Craft && !it.Property.Element && !it.Property.Group && it.Operator === 23;
+      if (bool) {
+        const t = disabledCraftList.find(_it => _it.ID === it.Property.Craft.ID);
+        console.log(t);
+        if (t && t.index <= i) return false; // 在必选时已先被禁用
+        return true;
+      }
+      return false;
+    }).map(it => it.Property.Craft.ID);
   }
 
   static setElementListClear4Craft(ElementList, ElementAffectedPropList) {
@@ -88,5 +104,50 @@ export default class InterAction {
       };
     });
     return _GroupList;
+  }
+
+  static getDisabledOrHiddenedElementIDList(AffectedPropList) {
+    if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+      const list = AffectedPropList
+        .filter(it => [21, 22].includes(it.Operator) && it.Property.Element && (!it.Property.FixedType && it.Property.FixedType !== 0))
+        .map(it => it.Property.Element.ID)
+        .filter(it => it);
+      return list;
+    }
+    return [];
+  }
+
+  static getGroupTypeAffectedPropList(AffectedPropList) {
+    if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+      return AffectedPropList.filter(it => it.Property.Group && !it.Property.Craft);
+    }
+    return [];
+  }
+
+  static getDisabledOrHiddenedGroupIDList(AffectedPropList) {
+    if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+      return AffectedPropList
+        .filter(it => [21, 22].includes(it.Operator) && it.Property.Group && !it.Property.Element)
+        .map(it => it.Property.Group.ID)
+        .filter(it => it);
+    }
+    return [];
+  }
+
+  static getCraftTypeAffectedPropList(AffectedPropList) {
+    if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+      return AffectedPropList.filter(it => it.Property.Craft);
+    }
+    return [];
+  }
+
+  static getDisabledOrHiddenedCraftIDList(AffectedPropList) {
+    if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+      return AffectedPropList
+        .filter(it => [21, 22].includes(it.Operator) && it.Property.Craft && !it.Property.Group && !it.Property.Element)
+        .map(it => it.Property.Craft.ID)
+        .filter(it => it);
+    }
+    return [];
   }
 }

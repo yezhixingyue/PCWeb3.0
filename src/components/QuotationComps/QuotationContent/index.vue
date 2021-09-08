@@ -496,6 +496,7 @@ export default {
       const _count = this.countOption[0].value;
       this.setProductParams(['ProductAmount', `${_count}`]);
     }
+    this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
     // this.getCraftRelationList();
   },
   watch: {

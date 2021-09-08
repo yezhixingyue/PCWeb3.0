@@ -3,6 +3,7 @@
 import massage from '@/assets/js/utils/message';
 import store from '@/store';
 import { getPropertiesAffectedByInteraction } from './EffectiveControlList';
+import InterAction from './Interaction';
 
 // eslint-disable-next-line no-unused-vars
 function _setErrMsg(errMsg) {
@@ -15,21 +16,20 @@ export default class QuotationClassType {
     if (!obj || Object.prototype.toString.call(obj) !== '[object Object]') return {};
     const _obj = JSON.parse(JSON.stringify(obj));
     const ControlList = obj.ControlList?.filter(it => it.ControlType === 0 && it.Constraint?.ItemList?.length === 0);
-    console.log(_obj, ControlList);
     const requiredCraftList = ControlList && ControlList.length > 0
       ? ControlList
         .map(it => it.List.filter(_it => _it.Operator === 23 && _it.Property.Craft && !_it.Property.Element && !_it.Property.Group))
         .reduce((prev, next) => [...prev, ...next], [])
       : []; // 必选工艺列表
-    console.log(requiredCraftList);
-    const ProductInfo = this.getPartSubmitData(_obj, requiredCraftList) || {}; // 生成产品本身数据
+    const subControlList = obj.ControlList?.filter(it => it.ControlType === 1) || []; // 子交互列表
+    const ProductInfo = this.getPartSubmitData(_obj, requiredCraftList, subControlList) || {}; // 生成产品本身数据
     const partSubmitDatas = _obj.PartList.map(part => { // 生成部件列表数据
       const List = [];
       const PartID = part.ID;
-      const showPart = !!this.getPartSubmitData(part); // showPart用来指定去除一些无效数据
+      const showPart = !!this.getPartSubmitData(part, []); // showPart用来指定去除一些无效数据
       if (part.UseTimes && part.UseTimes.MinValue > 0) {
         for (let i = 0; i < part.UseTimes.MinValue; i += 1) {
-          const item = this.getPartSubmitData(part, requiredCraftList);
+          const item = this.getPartSubmitData(part, requiredCraftList, subControlList);
           if (showPart) List.push({ ...item, key: Math.random().toString(36).slice(-10) });
         }
       }
@@ -77,7 +77,7 @@ export default class QuotationClassType {
     return _obj;
   }
 
-  static getPartSubmitData(PartData, requiredCraftList) { // 转换产品|部件数据为提交数据
+  static getPartSubmitData(PartData, requiredCraftList, subControlList) { // 转换产品|部件数据为提交数据
     const { ProductDisplayPropertyTypeList } = store.state.Quotation;
     let temp;
     if (Array.isArray(PartData.DisplayList) && PartData.DisplayList.length > 0) {
@@ -104,6 +104,13 @@ export default class QuotationClassType {
       if (_DisplayList.length === 0) return null;
       temp = {};
       let isCraftInited = false;
+      let _list = [];
+      if (Array.isArray(subControlList)) _list = subControlList.filter(it => (!it.PartID && PartData.ProductClass) || it.PartID === PartData.ID);
+      // 部件本身的子交互：
+      temp.SubControlList = _list.filter(_it => _it.PartID && !_it.GroupID && !_it.CraftID);
+      // 部件上元素组 或 部件工艺元素组上的子交互
+      const otherSubControlList = _list.filter(_it => _it.GroupID);
+      temp.ChildSubControlList = otherSubControlList;
       PartData.DisplayList.forEach(item => {
         const t = ProductDisplayPropertyTypeList.find(it => it.ID === item.Type);
         if (t) {
@@ -125,7 +132,7 @@ export default class QuotationClassType {
                 if (isSize) temp.Size = getSizeSubmitData(Prop); // 尺寸组
                 else {
                   if (!temp.GroupList) temp.GroupList = [];
-                  temp.GroupList.push(this.getGroupItemSubmitData(Prop)); // 元素组
+                  temp.GroupList.push(this.getGroupItemSubmitData(Prop, false, otherSubControlList)); // 元素组
                 }
               }
               break;
@@ -142,7 +149,7 @@ export default class QuotationClassType {
                   if (it.IsRequired && it.DefaultCraft) {
                     const _craft = PartData.CraftList.find(_it => _it.ID === it.DefaultCraft && !_it.HiddenToCustomer);
                     if (_craft && (!_craft.ElementList || _craft.ElementList.length === 0) && (!_craft.GroupList || _craft.GroupList.length === 0)) {
-                      const _data = this.getCraftItemSubmitData(_craft);
+                      const _data = this.getCraftItemSubmitData(_craft, otherSubControlList);
                       temp.CraftList.push(_data);
                     }
                   }
@@ -156,7 +163,7 @@ export default class QuotationClassType {
                     const _craft = PartData.CraftList.find(_it => _it.ID === Property.Craft.ID && !_it.HiddenToCustomer);
                     if (_craft && _craft.ElementList.length === 0 && _craft.GroupList.length === 0) {
                       const _t = temp.CraftList.find(it => it.CraftID === Property.Craft.ID);
-                      if (!_t) temp.CraftList.push(this.getCraftItemSubmitData(_craft));
+                      if (!_t) temp.CraftList.push(this.getCraftItemSubmitData(_craft, otherSubControlList));
                     }
                   }
                 });
@@ -184,7 +191,7 @@ export default class QuotationClassType {
     return temp;
   }
 
-  static getGroupItemSubmitData(Prop, isItem = false) { // 获取元素组提交数据
+  static getGroupItemSubmitData(Prop, isItem = false, otherSubControlList) { // 获取元素组提交数据
     const { UseTimes, ID, ElementList } = Prop;
     const getItem = () => {
       const _item = {
@@ -199,6 +206,7 @@ export default class QuotationClassType {
     const _groupItem = {
       GroupID: ID,
       List: [], // 此处一项代表一行
+      SubControlList: [],
     };
     if (UseTimes && UseTimes.MinValue > 0) {
       for (let i = 0; i < UseTimes.MinValue; i += 1) {
@@ -206,10 +214,13 @@ export default class QuotationClassType {
         _groupItem.List.push(_item);
       }
     }
+    if (otherSubControlList.length > 0) {
+      _groupItem.SubControlList = otherSubControlList.filter(it => it.GroupID === Prop.ID);
+    }
     return _groupItem;
   }
 
-  static getCraftItemSubmitData(_craft) {
+  static getCraftItemSubmitData(_craft, otherSubControlList) {
     let GroupList = [];
     let ElementList = [];
     if (Array.isArray(_craft.ElementList)) {
@@ -219,7 +230,8 @@ export default class QuotationClassType {
       }));
     }
     if (Array.isArray(_craft.GroupList)) {
-      GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => this.getGroupItemSubmitData(_it));
+      const _otherSubControlList = otherSubControlList.filter(it => it.CraftID === _craft.ID);
+      GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => this.getGroupItemSubmitData(_it, false, _otherSubControlList));
     }
     const _item = {
       CraftID: _craft.ID,
@@ -229,7 +241,7 @@ export default class QuotationClassType {
     return _item;
   }
 
-  static transformToSubmit(obj, curProductInfo2Quotation) {
+  static transformToSubmit(obj, curProductInfo2Quotation, PropertiesAffectedByInteraction) {
     if (!obj || !curProductInfo2Quotation) return obj;
     const clearEmpty = false; // 是否清除掉数值列表为空的元素
 
@@ -285,16 +297,20 @@ export default class QuotationClassType {
         CustomerInputValues,
       };
     };
-    const getElementListValueFilter = ElementList => {
+    const getElementListValueFilter = (ElementList, disabledElementIDs = []) => {
       if (!ElementList || !Array.isArray(ElementList)) return [];
-      return ElementList.map(it => getSingleElementClearValue(it)).filter(it => it);
+      return ElementList.map(it => (disabledElementIDs.includes(it.ElementID) ? null : getSingleElementClearValue(it))).filter(it => it);
     };
-    const getGroupListValueFilter = GroupList => {
+    const getGroupListValueFilter = (GroupList, GroupAffectedPropList = []) => {
       if (!GroupList || !Array.isArray(GroupList)) return [];
+      const disabledGroupIDs = InterAction.getDisabledOrHiddenedGroupIDList(GroupAffectedPropList);
       return GroupList.map(Group => {
         if (!Array.isArray(Group.List) || Group.List.length === 0) return null;
         const List = Group.List.map(item => {
-          const itemList = getElementListValueFilter(item.List);
+          if (disabledGroupIDs.includes(item.GroupID)) return null;
+          const groupItemAffectedPropList = GroupAffectedPropList.filter(it => it.Property.Group.ID === item.GroupID);
+          const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
+          const itemList = getElementListValueFilter(item.List, disabledElementIDs);
           if (itemList.length === 0) return null;
           return {
             ...item,
@@ -308,22 +324,41 @@ export default class QuotationClassType {
         };
       }).filter(it => it);
     };
-    const getCraftListValueFilter = CraftList => CraftList.map(Craft => ({
-      ...Craft,
-      ElementList: getElementListValueFilter(Craft.ElementList),
-      GroupList: getGroupListValueFilter(Craft.GroupList),
-    }));
-    const getClearPartEmptyValues = (Part) => {
+    const getCraftListValueFilter = (CraftList, CraftAffectedPropList = []) => {
+      const disabledCraftIDs = InterAction.getDisabledOrHiddenedCraftIDList(CraftAffectedPropList);
+      return CraftList.map(Craft => {
+        if (disabledCraftIDs.includes(Craft.CraftID)) return null;
+        const CraftItemAffectedList = CraftAffectedPropList.filter(it => it.Property.Craft.ID === Craft.CraftID);
+        const GroupAffectedPropList = InterAction.getGroupTypeAffectedPropList(CraftItemAffectedList);
+        const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(CraftItemAffectedList);
+        return {
+          ...Craft,
+          ElementList: getElementListValueFilter(Craft.ElementList, disabledElementIDs),
+          GroupList: getGroupListValueFilter(Craft.GroupList, GroupAffectedPropList),
+        };
+      }).filter(it => it);
+    };
+
+    const getClearPartEmptyValues = (Part, PartID) => {
       if (!Part || Object.prototype.toString.call(Part) !== '[object Object]') return Part;
+      // 找出作用与当前部件的交互列表数据
+      let InterActionData = [];
+      if (Array.isArray(PropertiesAffectedByInteraction) && PropertiesAffectedByInteraction.length > 0) {
+        InterActionData = PropertiesAffectedByInteraction
+          .filter(it => (!it.Property.Part && !PartID) || (it.Property.Part && it.Property.Part.ID === PartID));
+      }
       const _Part = Part;
       if (Array.isArray(_Part.ElementList)) {
-        _Part.ElementList = getElementListValueFilter(_Part.ElementList);
+        const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(InterActionData);
+        _Part.ElementList = getElementListValueFilter(_Part.ElementList, disabledElementIDs);
       }
       if (Array.isArray(_Part.GroupList)) {
-        _Part.GroupList = getGroupListValueFilter(_Part.GroupList);
+        const GroupAffectedPropList = InterAction.getGroupTypeAffectedPropList(InterActionData);
+        _Part.GroupList = getGroupListValueFilter(_Part.GroupList, GroupAffectedPropList);
       }
       if (Array.isArray(_Part.CraftList)) {
-        _Part.CraftList = getCraftListValueFilter(_Part.CraftList);
+        const CraftAffectedPropList = InterAction.getCraftTypeAffectedPropList(InterActionData);
+        _Part.CraftList = getCraftListValueFilter(_Part.CraftList, CraftAffectedPropList);
       }
       if (_Part.Size && typeof _Part.Size === 'object') {
         _Part.Size = {
@@ -335,7 +370,10 @@ export default class QuotationClassType {
       return _Part;
     };
     const _temp = getClearPartEmptyValues(temp);
-    const PartList = temp.PartList.map(part => getClearPartEmptyValues(part));
+    const PartList = temp.PartList.map(part => ({
+      ...part,
+      List: part.List.map(it => getClearPartEmptyValues(it, part.PartID)),
+    }));
     // 后面或可需要在此处处理用于转换受交互限制的属性值修改任务...
     return {
       ..._temp,

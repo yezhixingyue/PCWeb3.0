@@ -14,6 +14,7 @@
       :Craft="Craft"
       :setupData="value"
       :AffectedPropList="ChildUseAffectedPropList"
+      :ChildSubControlList='ChildSubControlList'
       @submit="handleDialogSubmit"
     />
   </li>
@@ -36,6 +37,10 @@ export default {
     },
     AffectedPropList: {
       // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
+    },
+    ChildSubControlList: { // 子交互列表
       type: Array,
       default: () => [],
     },
@@ -73,7 +78,7 @@ export default {
     },
     craftTitle() {
       const list = this.ChildUseAffectedPropList;
-      return this.getCraftContentName(list);
+      return this.getCraftContentName(list, this.disabled);
     },
     OwnUseAffectedPropList() {
       // 工艺自身交互限制  可能为必选或者禁用 目前该数组最多只有一个
@@ -194,9 +199,9 @@ export default {
       }
       return '';
     },
-    getCraftContentName(ChildUseAffectedPropList) {
+    getCraftContentName(ChildUseAffectedPropList, disabled) {
       if (!this.Craft) return '工艺';
-      if (!this.value) return this.Craft.ShowName;
+      if (!this.value || disabled) return this.Craft.ShowName;
       const { ElementList, GroupList } = this.value;
       if (
         (!Array.isArray(ElementList) || ElementList.length === 0)

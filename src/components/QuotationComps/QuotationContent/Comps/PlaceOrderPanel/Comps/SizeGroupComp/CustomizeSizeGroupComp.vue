@@ -12,7 +12,7 @@
         :class="{ fixed: it.Type === 1, n: it.Type === 2 && i > 0 }"
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
       >
-      <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled'
+      <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled' @interaction="handleInteraction"
        @focus="onFocus(i)" @blur="onBlur" isNumberic :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
       <i v-if="i < ElementList.length - 1">×</i>
     </li>
@@ -74,6 +74,8 @@ export default {
     },
     onBlur() {
       this.activeIndex = '';
+    },
+    handleInteraction() {
       this.$emit('triggerInteraction');
     },
     getValue(it) {

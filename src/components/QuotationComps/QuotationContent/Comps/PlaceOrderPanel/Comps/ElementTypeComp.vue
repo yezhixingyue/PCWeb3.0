@@ -153,10 +153,11 @@ export default {
       this.$emit('focus');
     },
     onBlur(e) {
+      this.$emit('blur');
       if (this.val === e) return;
       this.val = e;
       this.$nextTick(() => {
-        this.$emit('blur');
+        this.$emit('interaction');
       });
     },
   },

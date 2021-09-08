@@ -9,6 +9,7 @@
       :Craft="it"
       :value="getCraftValue(it)"
       :AffectedPropList='getCraftAffectedPropList(it.ID)'
+      :ChildSubControlList='ChildSubControlList'
       @change="onCraftItemChange($event, it)"
     />
   </ul>
@@ -34,6 +35,10 @@ export default {
     value: {},
     AffectedPropList: {
       // 受到交互影响的工艺列表
+      type: Array,
+      default: () => [],
+    },
+    ChildSubControlList: { // 子交互列表
       type: Array,
       default: () => [],
     },

@@ -115,15 +115,13 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
     // 需要判断 1. 必选情况下 未选值 (长度为0)
     if (len === 0 && IsRequired) return `请选择${prop.Name}`;
     // 2. 在已选择的情况下(长度大于0)，选项的数量与限制数量不符合
-    if (len > 0) {
-      if (prop.OptionAttribute.UseTimes) {
-        const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;
-        if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
-          // 项数不符合
-          if (MinValue === MaxValue) return `${showPropName ? prop.Name : ''}必须选择${MinValue}项`;
-          if (MaxValue === -1) return `${showPropName ? prop.Name : ''}至少选择${MinValue}项`;
-          return `${showPropName ? prop.Name : ''}必须选择${MinValue}至${MaxValue}项`;
-        }
+    if (prop.OptionAttribute.UseTimes) {
+      const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;
+      if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
+        // 项数不符合
+        if (MinValue === MaxValue) return `${showPropName ? prop.Name : ''}必须选择${MinValue}项`;
+        if (MaxValue === -1) return `${showPropName ? prop.Name : ''}至少选择${MinValue}项`;
+        return `${showPropName ? prop.Name : ''}至少选择${MinValue}至${MaxValue}项`;
       }
     }
   }
@@ -276,8 +274,50 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
       }
     }
   }
-  // 参数发生变动，请重新设置某某工艺参数
-  // console.log(value);
+  // 参数发生变动，请重新设置某某工艺参数 ---- 对工艺参数进行校验及报错
+  if (prop && Array.isArray(prop.List) && prop.List.length > 0 && Array.isArray(CraftList) && CraftList.length > 0 && _value.length > 0) {
+    // 1. 找出当前正在校验的工艺分组列表条目
+    const list = _value.filter(it => prop.List.includes(it.CraftID));
+    for (let i = 0; i < list.length; i += 1) {
+      const craftValItem = list[i];
+      // 2. 找到该工艺对应的参数数据
+      const craftDataItem = CraftList.find(it => it.ID === craftValItem.CraftID);
+      // 3. 筛选出带参数的工艺进行校验
+      if (Array.isArray(craftDataItem.ElementList) && craftDataItem.ElementList.length > 0) {
+        // 工艺上带有元素
+        for (let elIndex = 0; elIndex < craftValItem.ElementList.length; elIndex += 1) {
+          const elValItem = craftValItem.ElementList[elIndex];
+          const elDataItem = craftDataItem.ElementList.find(_it => _it.ID === elValItem.ElementID);
+          if (elDataItem) {
+            // 4. 找出对应的交互限制 需要
+            const _elAffectedPropList = AffectedPropList
+              .filter(_it => _it.Property.Craft && _it.Property.Craft.ID === craftDataItem.ID
+                 && !_it.Property.Group
+                 && _it.Property.Element && _it.Property.Element.ID === elDataItem.ID);
+            const errMsg = checkElement(elValItem.CustomerInputValues || [], elDataItem, _elAffectedPropList);
+            // 5. 对工艺设置参数进行校验并返回结果
+            if (errMsg) return `[ ${craftDataItem.Name} ] 工艺里面，${errMsg}`;
+          }
+        }
+      }
+      if (Array.isArray(craftDataItem.GroupList) && craftDataItem.GroupList.length > 0) {
+        // 工艺上带有元素组
+        for (let groupIndex = 0; groupIndex < craftValItem.GroupList.length; groupIndex += 1) {
+          const groupValItem = craftValItem.GroupList[groupIndex];
+          const groupDataItem = craftDataItem.GroupList.find(_it => _it.ID === groupValItem.GroupID);
+          if (groupDataItem) {
+            // 4. 找出对应的交互限制 需要
+            const _groupAffectedPropList = AffectedPropList
+              .filter(_it => _it.Property.Craft && _it.Property.Craft.ID === craftDataItem.ID
+                 && _it.Property.Group && _it.Property.Group.ID === groupDataItem.ID);
+            const errMsg = checkElementGroup(groupValItem.List || [], groupDataItem, _groupAffectedPropList);
+            // 5. 对工艺设置参数进行校验并返回结果
+            if (errMsg.msg) return `[ ${craftDataItem.Name} ] 工艺里面，${errMsg.msg}`;
+          }
+        }
+      }
+    }
+  }
   return '';
 };
 

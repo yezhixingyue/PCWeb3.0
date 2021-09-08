@@ -9,7 +9,7 @@
    :class="{isNormalGroup:isNormalGroup}">
     <!-- 元素 -->
     <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue"
-     :AffectedPropList='localAffectedPropList' @blur="onTriggerInteractionClick" />
+     :AffectedPropList='localAffectedPropList' @interaction="onTriggerInteractionClick" />
     <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
      :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList'
@@ -28,6 +28,7 @@
      :CraftList='placeData.CraftList || []'
      :AffectedPropList='localAffectedPropList'
      :CraftConditionList='placeData.CraftConditionList || []'
+     :ChildSubControlList='submitData.ChildSubControlList'
      @triggerInteraction='onTriggerInteractionClick' />
   </el-form-item>
 </template>

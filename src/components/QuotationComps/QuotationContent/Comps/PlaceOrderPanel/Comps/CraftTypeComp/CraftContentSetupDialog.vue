@@ -50,6 +50,7 @@
             :showTop='it.Name && !it.IsNameHidden'
             :value="craftForm[it.ID].Value"
             :AffectedPropList='it.AffectedPropList'
+            :SubControlList='it.SubControlList'
             @input="handleGroupChange($event, it)"
             @changeValidate='onChangeValidate(it.ID)'
           />
@@ -89,6 +90,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    ChildSubControlList: { // 子交互列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     ElementTypeComp,
@@ -113,7 +118,7 @@ export default {
     },
     GroupList() {
       const list = this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer)
-        .map(it => ({ ...it, AffectedPropList: this.getGroupAffectedPropList(it) }))
+        .map(it => ({ ...it, AffectedPropList: this.getGroupAffectedPropList(it), SubControlList: this.getSubControlList(it) }))
         .filter(it => this.getClearedHiddenItemData(it));
       return list || [];
     },
@@ -168,6 +173,7 @@ export default {
       if (this.Craft) {
         this.localSetupData = QuotationClassType.getCraftItemSubmitData(
           this.Craft,
+          this.ChildSubControlList,
         );
       }
     },
@@ -261,6 +267,11 @@ export default {
       return true;
     },
     onTriggerInteractionClick() { // 工艺index统一处理
+    },
+    getSubControlList(it) {
+      const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
+      if (t && t.SubControlList) return t.SubControlList;
+      return [];
     },
   },
 };

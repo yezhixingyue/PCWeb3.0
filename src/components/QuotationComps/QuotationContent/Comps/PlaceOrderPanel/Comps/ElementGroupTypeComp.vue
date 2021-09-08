@@ -19,7 +19,7 @@
           :value="getItemValue(index, it)"
           :isDisabled='disabled'
           @input="onItemValueChange(index, it, $event)"
-          @blur="onTriggerInteractionClick"
+          @interaction="onTriggerInteractionClick"
           :AffectedPropList='getChildUseAffectedPropList(it)'
           :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
         />
