@@ -50,7 +50,7 @@
             :showTop='it.Name && !it.IsNameHidden'
             :value="craftForm[it.ID].Value"
             :AffectedPropList='it.AffectedPropList'
-            :SubControlList='it.SubControlList'
+            :subGroupAffectedPropList='getSubControlList(it)'
             @input="handleGroupChange($event, it)"
             @changeValidate='onChangeValidate(it.ID)'
           />
@@ -65,9 +65,11 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import { checkElement, checkElementGroup } from '@/store/Quotation/Checker';
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import InterAction from '@/store/Quotation/Interaction';
+import { getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
 import ElementTypeComp from '../ElementTypeComp.vue';
 import ElementGroupTypeComp from '../ElementGroupTypeComp.vue';
 
@@ -100,6 +102,7 @@ export default {
     ElementGroupTypeComp,
   },
   computed: {
+    ...mapState('Quotation', ['curProductInfo2Quotation']),
     localVisible: {
       get() {
         return this.visible;
@@ -118,7 +121,7 @@ export default {
     },
     GroupList() {
       const list = this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer)
-        .map(it => ({ ...it, AffectedPropList: this.getGroupAffectedPropList(it), SubControlList: this.getSubControlList(it) }))
+        .map(it => ({ ...it, AffectedPropList: this.getGroupAffectedPropList(it) }))
         .filter(it => this.getClearedHiddenItemData(it));
       return list || [];
     },
@@ -270,7 +273,11 @@ export default {
     },
     getSubControlList(it) {
       const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
-      if (t && t.SubControlList) return t.SubControlList;
+      if (t && t.SubControlList) {
+        const _list = t.List.map(_it => ({ CraftList: [{ GroupList: [{ GroupID: t.GroupID, List: [_it] }], CraftID: this.Craft.ID }] }))
+          .map(_it => getPropertiesAffectedByInteraction(_it, this.curProductInfo2Quotation, t.SubControlList));
+        return _list;
+      }
       return [];
     },
   },

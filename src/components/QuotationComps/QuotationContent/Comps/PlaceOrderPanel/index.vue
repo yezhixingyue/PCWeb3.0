@@ -26,6 +26,7 @@
         :PartIndex='PartIndex'
         :placeData="placeData"
         :submitData="submitData"
+        :PartAffectedPropList='PartAffectedPropList'
         @changeValidate='handleChangeValidate'
       />
     </el-form>
@@ -34,6 +35,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
 import FormItem from './Comps/FormItem.vue';
 
 export default {
@@ -62,7 +64,13 @@ export default {
     ...mapState('Quotation', [
       'ProductElementTypeList',
       'ProductDisplayPropertyTypeList',
+      'curProductInfo2Quotation',
     ]),
+    PartAffectedPropList() {
+      const SubControlList = this.submitData?.SubControlList || [];
+      const res = getPropertiesAffectedByInteraction(this.submitData, this.curProductInfo2Quotation, SubControlList);
+      return res;
+    },
   },
   data() {
     return {

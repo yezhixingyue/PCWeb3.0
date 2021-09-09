@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import QuotationClassType from '@/store/Quotation/QuotationClassType';
+import QuotationClassType, { getRequiredCraftListAndSubControlList } from '@/store/Quotation/QuotationClassType';
 import PlaceOrderPanel from './PlaceOrderPanel';
 
 export default {
@@ -77,7 +77,8 @@ export default {
       this.$store.commit('Quotation/setObj2GetProductPriceProductParamsPartChange', [this.PartData.PartID, i]);
     },
     onPartAddClick(i) {
-      const _item = QuotationClassType.getPartSubmitData(this.DisplayPartData);
+      const { requiredCraftList, subControlList } = getRequiredCraftListAndSubControlList(this.placeData);
+      const _item = QuotationClassType.getPartSubmitData(this.DisplayPartData, requiredCraftList, subControlList);
       if (!_item) return;
       const item = { ..._item, key: Math.random().toString(36).slice(-10) };
       this.$store.commit('Quotation/setObj2GetProductPriceProductParamsPartChange', [this.PartData.PartID, i, item]);

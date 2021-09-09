@@ -11,17 +11,22 @@ function _setErrMsg(errMsg) {
   massage.failSingleError({ title: `${msg}失败`, msg: errMsg });
 }
 
+export const getRequiredCraftListAndSubControlList = (obj) => {
+  const ControlList = obj.ControlList?.filter(it => it.ControlType === 0 && it.Constraint?.ItemList?.length === 0);
+  const requiredCraftList = ControlList && ControlList.length > 0
+    ? ControlList
+      .map(it => it.List.filter(_it => _it.Operator === 23 && _it.Property.Craft && !_it.Property.Element && !_it.Property.Group))
+      .reduce((prev, next) => [...prev, ...next], [])
+    : []; // 必选工艺列表
+  const subControlList = obj.ControlList?.filter(it => it.ControlType === 1) || []; // 子交互列表
+  return { requiredCraftList, subControlList };
+};
+
 export default class QuotationClassType {
   static init(obj) {
     if (!obj || Object.prototype.toString.call(obj) !== '[object Object]') return {};
     const _obj = JSON.parse(JSON.stringify(obj));
-    const ControlList = obj.ControlList?.filter(it => it.ControlType === 0 && it.Constraint?.ItemList?.length === 0);
-    const requiredCraftList = ControlList && ControlList.length > 0
-      ? ControlList
-        .map(it => it.List.filter(_it => _it.Operator === 23 && _it.Property.Craft && !_it.Property.Element && !_it.Property.Group))
-        .reduce((prev, next) => [...prev, ...next], [])
-      : []; // 必选工艺列表
-    const subControlList = obj.ControlList?.filter(it => it.ControlType === 1) || []; // 子交互列表
+    const { requiredCraftList, subControlList } = getRequiredCraftListAndSubControlList(obj);
     const ProductInfo = this.getPartSubmitData(_obj, requiredCraftList, subControlList) || {}; // 生成产品本身数据
     const partSubmitDatas = _obj.PartList.map(part => { // 生成部件列表数据
       const List = [];

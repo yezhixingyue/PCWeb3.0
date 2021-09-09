@@ -12,7 +12,7 @@
      :AffectedPropList='localAffectedPropList' @interaction="onTriggerInteractionClick" />
     <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
-     :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList'
+     :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList' :subGroupAffectedPropList='subGroupAffectedPropList'
      @triggerInteraction='onTriggerInteractionClick' />
      <!-- 尺寸 -->
     <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :AffectedPropList='localAffectedPropList'
@@ -39,6 +39,7 @@ import {
   checkElement, checkElementGroup, checkSizeGroup, checkCraft,
 } from '@/store/Quotation/Checker';
 import InterAction from '@/store/Quotation/Interaction';
+import { getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
@@ -67,6 +68,10 @@ export default {
       type: Number,
       default: 0,
     },
+    PartAffectedPropList: { // 部件子交互生效属性控制信息列表
+      type: Array,
+      default: null,
+    },
   },
   components: {
     ElementTypeComp,
@@ -76,7 +81,7 @@ export default {
     CraftTypeComp,
   },
   computed: {
-    ...mapState('Quotation', ['ProductDisplayPropertyTypeList', 'obj2GetProductPrice', 'PropertiesAffectedByInteraction']),
+    ...mapState('Quotation', ['ProductDisplayPropertyTypeList', 'obj2GetProductPrice', 'PropertiesAffectedByInteraction', 'curProductInfo2Quotation']),
     curTypeName() {
       const t = this.ProductDisplayPropertyTypeList.find(it => it.ID === this.itemData.Type);
       return t ? t.Name : '';
@@ -187,7 +192,30 @@ export default {
       if (this.target.GroupInfo) return this.target.GroupInfo.Name || 'propName';
       return 'propName';
     },
+    subGroupAffectedPropList() { // 元素组子交互
+      if (this.isNormalGroup && Array.isArray(this.submitData.ChildSubControlList)) {
+        const list = this.submitData.ChildSubControlList.filter(it => !it.CraftID && it.GroupID === this.target.ID);
+        // return list;
+        const t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
+        if (t) {
+          const _list = t.List.map(it => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
+            .map(it => getPropertiesAffectedByInteraction(it, this.curProductInfo2Quotation, list));
+          return _list;
+        }
+      }
+      return [];
+    },
+    CraftAffectedPropList() { // 工艺子交互
+      if (this.curTypeName === '工艺') {
+        const list = this.submitData.ChildSubControlList.filter(it => it.CraftID && this.target.List.includes(it.CraftID));
+        return list;
+      }
+      return [];
+    },
     localAffectedPropList() {
+      // this.PartAffectedPropList // 部件子交互生效属性控制信息列表    合并1 -- 部件子交互
+      // this.subGroupAffectedPropList  合并2 -- 元素组子交互  ------------- 不能在此处合并 或可使用数组形式？
+      // this.CraftAffectedPropList  合并3 -- 工艺子交互
       if (!Array.isArray(this.PropertiesAffectedByInteraction) || this.PropertiesAffectedByInteraction.length === 0) return [];
       return this.PropertiesAffectedByInteraction.filter(({ Property }) => {
         const isSamePart = (!this.PartID && !Property.Part) || (this.PartID && Property.Part && Property.Part.ID === this.PartID);

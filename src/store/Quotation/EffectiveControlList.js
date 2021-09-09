@@ -166,10 +166,10 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
 
 /**
  * @description: 获取到目标Value值
- * @param {*}
+ * @param {*} isSubControl 是否是子交互
  * @return {*}
  */
-export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotation) => {
+export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotation, isSubControl) => {
   /**
   * 寻找目标步骤：
   * 1. 寻找到目标部件（产品或部件）： 通过Part来确定；如果部件使用次数大于1则返回null
@@ -180,7 +180,8 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
 
   const { Part, Type, Craft, Group, Element, FixedType } = Property;
   // 寻找到目标部件，产品本身也调整数据格式后做为部件返回
-  const targetPart = !Part ? { List: [ProductParams] } : (ProductParams.PartList?.find(it => it.PartID === Part.ID) || null);
+  let targetPart = !Part ? { List: [ProductParams] } : (ProductParams.PartList?.find(it => it.PartID === Part.ID) || null);
+  if (isSubControl) targetPart = { List: [ProductParams] }; // --------------- 修改部分
   const targetPartData = !Part ? curProductInfo2Quotation : (curProductInfo2Quotation.PartList?.find(it => it.ID === Part.ID) || null);
   if (!targetPart || !targetPartData) return null;
   if (targetPart.List.length !== 1) return null; // 只判断单次使用， 多次使用直接返回null
@@ -204,7 +205,6 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       break;
     case 5: // 物料
       temp = targetPartItem.MaterialID;
-      console.log(temp);
       break;
     case 6: // 尺寸组
       temp = getSiztTypeValue(targetPartItem.Size, targetPartData.SizeGroup, Element, FixedType);
@@ -288,11 +288,11 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
  * @param {*}
  * @return {*}  boolean
  */
-export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation) => {
+export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation, isSubControl) => {
   if (!item || !ProductParams) return false;
   const { Property, Operator, ValueList } = item;
   if (!Property || (!Operator && Operator !== 0) || !ValueList) return false;
-  const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation);
+  const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl);
   if (!targetValue && targetValue !== 0 && typeof targetValue !== 'boolean') return false;
   return matchValueWithValueList(targetValue, Operator, ValueList);
 };
@@ -302,18 +302,18 @@ export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Q
  * @param {*}
  * @return {*} 返回匹配结果: bool值
  */
-export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Quotation) => {
+export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Quotation, isSubControl) => {
   if (!ControlItem) return false;
   const { Constraint } = ControlItem;
   if (!Constraint) return false;
   const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
   if (ItemList.length > 0) {
     if (FilterType === 1) { // 满足所有
-      const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation)); // 找到不符合的项目
+      const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl)); // 找到不符合的项目
       return !inconformityItem;
     }
     // 满足任一
-    const conformityItem = ItemList.find(it => getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation)); // 找到符合的项目
+    const conformityItem = ItemList.find(it => getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl)); // 找到符合的项目
     return !!conformityItem;
   }
   return true;
@@ -324,12 +324,20 @@ export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Qu
  * @param {*}
  * @return {*}
  */
-export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
+export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation, SubControlList) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
   if (!ProductParams || !curProductInfo2Quotation) return null;
-  const { ControlList } = curProductInfo2Quotation;
-  if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
-  const InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
-  const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation))
+  let InteractionControlList;
+  let isSubControl = false;
+  if (Array.isArray(SubControlList)) {
+    InteractionControlList = SubControlList;
+    isSubControl = true;
+  } else {
+    const { ControlList } = curProductInfo2Quotation;
+    if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
+    InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
+  }
+
+  const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation, isSubControl))
     .sort((f, s) => f.Priority - s.Priority); // 按照优先级进行排序
   return list;
 };
@@ -377,9 +385,9 @@ export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyLis
  * @param {*}
  * @return {*}
  */
-export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo2Quotation) => {
+export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo2Quotation, SubControlList) => {
   // 获取到当前  正在生效的  且  已按照优先级从重要到不重要的顺序进行排序的  交互列表
-  const EffectiveControlList = getEffectiveControlList(ProductParams, curProductInfo2Quotation);
+  const EffectiveControlList = getEffectiveControlList(ProductParams, curProductInfo2Quotation, SubControlList);
   if (!EffectiveControlList) return [];
   const arr = [];
   EffectiveControlList.forEach(({ List }) => {
@@ -392,4 +400,8 @@ export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo
     }
   });
   return arr;
+};
+
+export const combineAffectedPropList = (AffectedPropList, PartAffectedPropList, CraftAffectedPropList, GroupAffectedPropList) => {
+  console.log('合并 交互 与 子交互', AffectedPropList, PartAffectedPropList, CraftAffectedPropList, GroupAffectedPropList);
 };

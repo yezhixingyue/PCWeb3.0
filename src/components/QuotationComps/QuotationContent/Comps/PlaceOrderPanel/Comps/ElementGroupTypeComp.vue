@@ -75,7 +75,11 @@ export default {
       default: '',
     },
     errorIndex: {},
-    AffectedPropList: { // 受到交互影响的工艺列表
+    AffectedPropList: { // 受到交互影响的元素组列表
+      type: Array,
+      default: () => [],
+    },
+    subGroupAffectedPropList: { // 受到子交互影响的元素组列表
       type: Array,
       default: () => [],
     },

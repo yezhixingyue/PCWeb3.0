@@ -134,7 +134,7 @@ export default {
       }
       // // console.log(this.repath);
       // this.$router.push(`${this.repath}`);
-      const { source, id } = this.$route.query;
+      const { source, id, redirect } = this.$route.query;
       if (source && source === 'home') {
         window.location.href = homeUrl;
         return;
@@ -142,7 +142,13 @@ export default {
       // console.log('domain', domain);
       const host = window.location.hostname;
       if (host.includes(domain)) {
-        const path = id ? `/placeOrder?id=${id}` : '/placeOrder';
+        let path = '/placeOrder';
+        if (id) {
+          path = `/placeOrder?id=${id}`;
+        } else if (redirect) {
+          path = redirect;
+        }
+        // const path = id ? `/placeOrder?id=${id}` : '/placeOrder';
         this.$router.push(path);
       } else {
         // 登录域名不匹配，请使用正确域名登录
