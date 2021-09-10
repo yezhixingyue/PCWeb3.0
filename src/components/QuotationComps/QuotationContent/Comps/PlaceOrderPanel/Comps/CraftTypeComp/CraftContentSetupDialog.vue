@@ -35,7 +35,7 @@
           />
         </el-form-item>
         <el-form-item
-          v-for="it in GroupList"
+          v-for="(it, i) in GroupList"
           :key="it.ID"
           :label="it.Name && !it.IsNameHidden ? `${it.Name}：` : ''"
           :prop="it.ID"
@@ -49,10 +49,11 @@
             :errorIndex='errorIndex'
             :showTop='it.Name && !it.IsNameHidden'
             :value="craftForm[it.ID].Value"
-            :AffectedPropList='it.AffectedPropList'
-            :subGroupAffectedPropList='getSubControlList(it)'
+            :AffectedPropList='AffectedPropLists[i]'
+            :subGroupAffectedPropList='subGroupAffectedPropLists[i]'
             @input="handleGroupChange($event, it)"
             @changeValidate='onChangeValidate(it.ID)'
+            @triggerInteraction='getSubGroupAffectedPropLists'
           />
         </el-form-item>
       </el-form>
@@ -120,9 +121,7 @@ export default {
       return this.Craft?.ElementList?.filter(it => !it.HiddenToCustomer) || [];
     },
     GroupList() {
-      const list = this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer)
-        .map(it => ({ ...it, AffectedPropList: this.getGroupAffectedPropList(it) }))
-        .filter(it => this.getClearedHiddenItemData(it));
+      const list = this.Craft?.GroupList?.filter(it => !it.HiddenToCustomer).filter((it, i) => this.getClearedHiddenItemData(it, i));
       return list || [];
     },
     craftForm() {
@@ -159,6 +158,8 @@ export default {
       showMain: false,
       errorElementID: '',
       errorIndex: '',
+      AffectedPropLists: [],
+      subGroupAffectedPropLists: [],
     };
   },
   methods: {
@@ -187,6 +188,8 @@ export default {
         this.localSetupData = JSON.parse(JSON.stringify(this.setupData));
       }
       this.showMain = true;
+      this.getAffectedPropList();
+      this.getSubGroupAffectedPropLists();
     },
     onClosed() {
       this.showMain = false;
@@ -234,9 +237,9 @@ export default {
           }
         }
         if (Type === 'Group') {
-          const target = this.GroupList.find(it => it.ID === ID);
-          if (target) {
-            const res = checkElementGroup(Value, target, target.AffectedPropList);
+          const index = this.GroupList.findIndex(it => it.ID === ID);
+          if (index >= 0) {
+            const res = checkElementGroup(Value, this.GroupList[index], this.AffectedPropLists[index], this.subGroupAffectedPropLists[index]); // 此处需要修改为合并后的
             if (res && typeof res === 'object' && res.msg) {
               this.errorElementID = res.ElementID;
               this.errorIndex = res.index;
@@ -262,7 +265,7 @@ export default {
       return this.GroupAffectedPropList.filter(it => it.Property?.Group?.ID === group.ID);
     },
     getClearedHiddenItemData(it) {
-      const { AffectedPropList } = it;
+      const AffectedPropList = this.getGroupAffectedPropList(it);
       const _AffectedPropList = AffectedPropList.filter((_it) => _it.Property && !_it.Property.Element && _it.Property.Group);
       if (_AffectedPropList.length === 1) {
         return _AffectedPropList[0].Operator !== 22;
@@ -271,14 +274,20 @@ export default {
     },
     onTriggerInteractionClick() { // 工艺index统一处理
     },
-    getSubControlList(it) {
-      const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
-      if (t && t.SubControlList) {
-        const _list = t.List.map(_it => ({ CraftList: [{ GroupList: [{ GroupID: t.GroupID, List: [_it] }], CraftID: this.Craft.ID }] }))
-          .map(_it => getPropertiesAffectedByInteraction(_it, this.curProductInfo2Quotation, t.SubControlList));
-        return _list;
-      }
-      return [];
+    getAffectedPropList() { // 获取工艺元素组交互数据 -----  此处需要修改为合并后的全部交互数据
+      this.AffectedPropLists = this.GroupList.map(it => this.getGroupAffectedPropList(it));
+    },
+    getSubGroupAffectedPropLists() { // 获取工艺元素组子交互数据
+      this.getAffectedPropList();
+      this.subGroupAffectedPropLists = this.GroupList.map(it => {
+        const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
+        if (t && t.SubControlList) {
+          const _list = t.List.map(_it => ({ CraftList: [{ GroupList: [{ GroupID: t.GroupID, List: [_it] }], CraftID: this.Craft.ID }] }))
+            .map(_it => getPropertiesAffectedByInteraction(_it, this.curProductInfo2Quotation, t.SubControlList));
+          return _list;
+        }
+        return [];
+      });
     },
   },
 };

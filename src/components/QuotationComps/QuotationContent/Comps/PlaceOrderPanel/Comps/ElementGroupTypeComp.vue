@@ -20,7 +20,7 @@
           :isDisabled='disabled'
           @input="onItemValueChange(index, it, $event)"
           @interaction="onTriggerInteractionClick"
-          :AffectedPropList='getChildUseAffectedPropList(it)'
+          :AffectedPropList='getChildUseAffectedPropList(it, index)'
           :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
         />
         <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!(List.length === minLength && List.length === maxLength)" v-show="!disabled">
@@ -46,6 +46,7 @@
 
 <script>
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
+import { getCombineAffectedPropList } from '@/store/Quotation/EffectiveControlList';
 import ElementTypeComp from './ElementTypeComp';
 
 export default {
@@ -112,8 +113,14 @@ export default {
       return this.AffectedPropList.filter((it) => it.Property && !it.Property.Element && it.Property.Group);
     },
     ChildUseAffectedPropList() {
-      if (this.disabled || this.AffectedPropList.length === 0) return [];
-      return this.AffectedPropList.filter((it) => it.Property && it.Property.Element && it.Property.Group);
+      return this.List.map((group, i) => {
+        if (this.disabled) return [];
+        if (this.AffectedPropList.length === 0 && !Array.isArray(this.subGroupAffectedPropList) && !this.subGroupAffectedPropList[i]) return [];
+        const _AffectedPropList = this.AffectedPropList || [];
+        const _subGroupAffectedPropList = this.subGroupAffectedPropList[i] || [];
+        const combineList = getCombineAffectedPropList(_AffectedPropList, _subGroupAffectedPropList); // 合并交互与子交互
+        return combineList.filter((it) => it.Property && it.Property.Element && it.Property.Group);
+      });
     },
   },
   data() {
@@ -145,8 +152,8 @@ export default {
       const t = this.List[index].List.find(_it => _it.ElementID === it.ID);
       return t ? t.CustomerInputValues : {};
     },
-    getChildUseAffectedPropList(it) {
-      return this.ChildUseAffectedPropList.filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
+    getChildUseAffectedPropList(it, index) {
+      return this.ChildUseAffectedPropList[index].filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
     },
     onTriggerInteractionClick() { // 触发交互
       this.$nextTick(() => {

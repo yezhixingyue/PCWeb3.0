@@ -2,6 +2,7 @@
 /* eslint-disable object-curly-newline */
 
 import { getNumberValueList, getValueIsOrNotNumber } from '@/assets/js/utils/utils';
+import { getCombineAffectedPropList, getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
 import InterAction from '@/store/Quotation/Interaction';
 
 /**
@@ -159,7 +160,8 @@ const getStrArrIsRepeat = arr => { // 判断字符串组成的数组是否有重
   return Object.keys(obj).length < arr.length;
 };
 
-export const checkElementGroup = (valueList, prop, AffectedPropList) => {
+export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAffectedPropList = []) => {
+  // console.log(valueList, prop, AffectedPropList, subGroupAffectedPropList);
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
     if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
@@ -168,10 +170,14 @@ export const checkElementGroup = (valueList, prop, AffectedPropList) => {
     const CustomerCanUseElementList = prop.ElementList.filter(it => !it.HiddenToCustomer);
     for (let i = 0; i < valueList.length; i += 1) {
       const itemValues = valueList[i]; // 单行所有元素组成的值列表
+      const _AffectedPropList = AffectedPropList || [];
+      const _subGroupAffectedPropList = subGroupAffectedPropList[i] || [];
+      const combineList = getCombineAffectedPropList(_AffectedPropList, _subGroupAffectedPropList); // 合并交互与子交互
       for (let index = 0; index < itemValues.List.length; index += 1) {
         const { ElementID, CustomerInputValues } = itemValues.List[index];
         const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
-        const ElementAffectedPropList = AffectedPropList.filter((_it) => _it.Property && _it.Property.Element && _it.Property.Element.ID === _Element.ID);
+        const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element && _it.Property.Element.ID === _Element.ID);
+        // console.log(ElementAffectedPropList);
         const msg = checkElement(CustomerInputValues, _Element, ElementAffectedPropList);
         if (msg) return { msg, ElementID, index: i };
       }
@@ -229,7 +235,7 @@ export const checkSizeGroup = (value, prop, AffectedPropList) => {
   return '';
 };
 
-export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedPropList) => {
+export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedPropList, CraftAffectedPropList, curProductInfo2Quotation) => {
   // 1. 找到应禁用或必选的工艺本身， 如果已被禁用则从列表中去除然后进行后面判断，如果是必选而没有选中则报错处理
   const diabledCraftIDs = InterAction.getDisabledCraftIDList(AffectedPropList);
   const _value = value.filter(_it => !diabledCraftIDs.includes(_it.CraftID));
@@ -310,9 +316,16 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
             const _groupAffectedPropList = AffectedPropList
               .filter(_it => _it.Property.Craft && _it.Property.Craft.ID === craftDataItem.ID
                  && _it.Property.Group && _it.Property.Group.ID === groupDataItem.ID);
-            const errMsg = checkElementGroup(groupValItem.List || [], groupDataItem, _groupAffectedPropList);
+            // 4.1 子交互
+            let _subGroupAffectedPropList = [];
+            if (groupValItem.SubControlList) {
+              _subGroupAffectedPropList = groupValItem.List
+                .map(_item => ({ CraftList: [{ GroupList: [{ GroupID: groupValItem.GroupID, List: [_item] }], CraftID: craftValItem.CraftID }] }))
+                .map(_item => getPropertiesAffectedByInteraction(_item, curProductInfo2Quotation, groupValItem.SubControlList));
+            }
+            const errMsg = checkElementGroup(groupValItem.List || [], groupDataItem, _groupAffectedPropList, _subGroupAffectedPropList);
             // 5. 对工艺设置参数进行校验并返回结果
-            if (errMsg.msg) return `[ ${craftDataItem.Name} ] 工艺里面，${errMsg.msg}`;
+            if (errMsg.msg) return `[ ${craftDataItem.Name} ] 工艺中，${errMsg.msg}`;
           }
         }
       }

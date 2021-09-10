@@ -28,6 +28,7 @@
         :submitData="submitData"
         :PartAffectedPropList='PartAffectedPropList'
         @changeValidate='handleChangeValidate'
+        @partInteraction='getPartAffectedPropList'
       />
     </el-form>
   </section>
@@ -66,22 +67,25 @@ export default {
       'ProductDisplayPropertyTypeList',
       'curProductInfo2Quotation',
     ]),
-    PartAffectedPropList() {
-      const SubControlList = this.submitData?.SubControlList || [];
-      const res = getPropertiesAffectedByInteraction(this.submitData, this.curProductInfo2Quotation, SubControlList);
-      return res;
-    },
   },
   data() {
     return {
       ruleForm: {},
       rules: {},
+      PartAffectedPropList: [],
     };
   },
   methods: {
     handleChangeValidate(key) {
       this.$refs.ruleForm.validateField(key);
     },
+    getPartAffectedPropList() {
+      const SubControlList = this.submitData?.SubControlList || [];
+      this.PartAffectedPropList = getPropertiesAffectedByInteraction(this.submitData, this.curProductInfo2Quotation, SubControlList);
+    },
+  },
+  mounted() {
+    this.getPartAffectedPropList();
   },
 };
 </script>

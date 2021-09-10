@@ -39,7 +39,7 @@ import {
   checkElement, checkElementGroup, checkSizeGroup, checkCraft,
 } from '@/store/Quotation/Checker';
 import InterAction from '@/store/Quotation/Interaction';
-import { getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
+import { getPropertiesAffectedByInteraction, getCombineAffectedPropList } from '@/store/Quotation/EffectiveControlList';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
@@ -192,19 +192,6 @@ export default {
       if (this.target.GroupInfo) return this.target.GroupInfo.Name || 'propName';
       return 'propName';
     },
-    subGroupAffectedPropList() { // 元素组子交互
-      if (this.isNormalGroup && Array.isArray(this.submitData.ChildSubControlList)) {
-        const list = this.submitData.ChildSubControlList.filter(it => !it.CraftID && it.GroupID === this.target.ID);
-        // return list;
-        const t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
-        if (t) {
-          const _list = t.List.map(it => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
-            .map(it => getPropertiesAffectedByInteraction(it, this.curProductInfo2Quotation, list));
-          return _list;
-        }
-      }
-      return [];
-    },
     CraftAffectedPropList() { // 工艺子交互
       if (this.curTypeName === '工艺') {
         const list = this.submitData.ChildSubControlList.filter(it => it.CraftID && this.target.List.includes(it.CraftID));
@@ -216,8 +203,9 @@ export default {
       // this.PartAffectedPropList // 部件子交互生效属性控制信息列表    合并1 -- 部件子交互
       // this.subGroupAffectedPropList  合并2 -- 元素组子交互  ------------- 不能在此处合并 或可使用数组形式？
       // this.CraftAffectedPropList  合并3 -- 工艺子交互
-      if (!Array.isArray(this.PropertiesAffectedByInteraction) || this.PropertiesAffectedByInteraction.length === 0) return [];
-      return this.PropertiesAffectedByInteraction.filter(({ Property }) => {
+      const CombineAffectedByInteraction = getCombineAffectedPropList(this.PropertiesAffectedByInteraction, this.PartAffectedPropList);
+      if (!Array.isArray(CombineAffectedByInteraction) || CombineAffectedByInteraction.length === 0) return [];
+      return CombineAffectedByInteraction.filter(({ Property }) => {
         const isSamePart = (!this.PartID && !Property.Part) || (this.PartID && Property.Part && Property.Part.ID === this.PartID);
         if (!isSamePart) return false;
         const isSameTarget = this.getIsSameTarget(Property);
@@ -244,6 +232,7 @@ export default {
     return {
       errorElementID: '',
       errorIndex: '',
+      subGroupAffectedPropList: [],
     };
   },
   methods: {
@@ -262,7 +251,7 @@ export default {
         }
       }
       if (this.curTypeName === '元素组' && this.isNormalGroup) {
-        const res = checkElementGroup(this.itemValue, this.target, this.localAffectedPropList);
+        const res = checkElementGroup(this.itemValue, this.target, this.localAffectedPropList, this.subGroupAffectedPropList);
         if (res && typeof res === 'object' && res.msg) {
           this.errorElementID = res.ElementID;
           this.errorIndex = res.index;
@@ -279,7 +268,8 @@ export default {
         }
       }
       if (this.curTypeName === '工艺') { // 工艺
-        const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList, this.localAffectedPropList);
+        const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList,
+          this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
         if (res && typeof res === 'string') {
           callback(new Error(res));
           return;
@@ -308,9 +298,31 @@ export default {
       }
       return false;
     },
+    getSubGroupAffectedPropList() { // 元素组子交互
+      if (this.isNormalGroup && Array.isArray(this.submitData.ChildSubControlList)) {
+        const list = this.submitData.ChildSubControlList.filter(it => !it.CraftID && it.GroupID === this.target.ID);
+        // return list;
+        const t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
+        if (t) {
+          const _list = t.List.map(it => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
+            .map(it => getPropertiesAffectedByInteraction(it, this.curProductInfo2Quotation, list));
+          this.subGroupAffectedPropList = _list;
+          return;
+        }
+      }
+      this.subGroupAffectedPropList = [];
+    },
     onTriggerInteractionClick() {
       this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
+      this.$emit('partInteraction');
+      this.getSubGroupAffectedPropList();
+      this.$nextTick(() => {
+        this.onChangeValidate();
+      });
     },
+  },
+  mounted() {
+    this.getSubGroupAffectedPropList();
   },
 };
 </script>

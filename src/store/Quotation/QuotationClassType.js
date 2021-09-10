@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define */
 import massage from '@/assets/js/utils/message';
 import store from '@/store';
-import { getPropertiesAffectedByInteraction } from './EffectiveControlList';
+import { getPropertiesAffectedByInteraction, getCombineAffectedPropList } from './EffectiveControlList';
 import InterAction from './Interaction';
 
 // eslint-disable-next-line no-unused-vars
@@ -306,14 +306,20 @@ export default class QuotationClassType {
       if (!ElementList || !Array.isArray(ElementList)) return [];
       return ElementList.map(it => (disabledElementIDs.includes(it.ElementID) ? null : getSingleElementClearValue(it))).filter(it => it);
     };
-    const getGroupListValueFilter = (GroupList, GroupAffectedPropList = []) => {
+    const getGroupListValueFilter = (GroupList, GroupAffectedPropList = [], isCraft) => {
       if (!GroupList || !Array.isArray(GroupList)) return [];
       const disabledGroupIDs = InterAction.getDisabledOrHiddenedGroupIDList(GroupAffectedPropList);
+      if (isCraft) console.log(isCraft, GroupList, GroupAffectedPropList); // ----------------- 此处转换工艺子交互时出现有问题 待查看
       return GroupList.map(Group => {
         if (!Array.isArray(Group.List) || Group.List.length === 0) return null;
-        const List = Group.List.map(item => {
+        if (Group.GroupID && disabledGroupIDs.includes(Group.GroupID)) return null;
+        const List = Group.List.map((item) => {
           if (disabledGroupIDs.includes(item.GroupID)) return null;
-          const groupItemAffectedPropList = GroupAffectedPropList.filter(it => it.Property.Group.ID === item.GroupID);
+          const subGroupAffectedPropList = getPropertiesAffectedByInteraction(
+            { GroupList: [{ GroupID: Group.GroupID, List: [item] }] }, curProductInfo2Quotation, Group.SubControlList || [],
+          );
+          const InterActionData = getCombineAffectedPropList(GroupAffectedPropList, subGroupAffectedPropList);
+          const groupItemAffectedPropList = InterActionData.filter(it => it.Property.Group.ID === item.GroupID);
           const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
           const itemList = getElementListValueFilter(item.List, disabledElementIDs);
           if (itemList.length === 0) return null;
@@ -339,7 +345,7 @@ export default class QuotationClassType {
         return {
           ...Craft,
           ElementList: getElementListValueFilter(Craft.ElementList, disabledElementIDs),
-          GroupList: getGroupListValueFilter(Craft.GroupList, GroupAffectedPropList),
+          GroupList: getGroupListValueFilter(Craft.GroupList, GroupAffectedPropList, true),
         };
       }).filter(it => it);
     };
@@ -347,11 +353,13 @@ export default class QuotationClassType {
     const getClearPartEmptyValues = (Part, PartID) => {
       if (!Part || Object.prototype.toString.call(Part) !== '[object Object]') return Part;
       // 找出作用与当前部件的交互列表数据
-      let InterActionData = [];
+      let _InterActionData = [];
       if (Array.isArray(PropertiesAffectedByInteraction) && PropertiesAffectedByInteraction.length > 0) {
-        InterActionData = PropertiesAffectedByInteraction
+        _InterActionData = PropertiesAffectedByInteraction
           .filter(it => (!it.Property.Part && !PartID) || (it.Property.Part && it.Property.Part.ID === PartID));
       }
+      const PartAffectedPropList = getPropertiesAffectedByInteraction(Part, curProductInfo2Quotation, Part.SubControlList || []);
+      const InterActionData = getCombineAffectedPropList(_InterActionData, PartAffectedPropList);
       const _Part = Part;
       if (Array.isArray(_Part.ElementList)) {
         const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(InterActionData);

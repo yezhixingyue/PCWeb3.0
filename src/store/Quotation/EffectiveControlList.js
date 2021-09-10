@@ -342,42 +342,47 @@ export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation,
   return list;
 };
 
-export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyList) => {
-  if (!imperfectProp || !PropertyList || !Array.isArray(PropertyList) || PropertyList.length === 0) return null;
-  const t = PropertyList.find(it => {
-    const { Product, Part, Craft, Material, Group, Element, FixedType, Type, TableData, Cost, Constraint, Formula } = it;
-    if (!((!Product && Product === imperfectProp.Product) || (Product && imperfectProp.Product && Product.ID === imperfectProp.Product.ID))) return false;
-    if (!((!Part && Part === imperfectProp.Part) || (Part && imperfectProp.Part && Part.ID === imperfectProp.Part.ID))) return false;
-    if (!((!Craft && Craft === imperfectProp.Craft) || (Craft && imperfectProp.Craft && Craft.ID === imperfectProp.Craft.ID))) return false;
-    if (!((!Material && Material === imperfectProp.Material) || (Material && imperfectProp.Material && Material.ID === imperfectProp.Material.ID))) return false;
-    if (!((!Group && Group === imperfectProp.Group) || (Group && imperfectProp.Group && Group.ID === imperfectProp.Group.ID))) return false;
-    if (!((!Element && Element === imperfectProp.Element) || (Element && imperfectProp.Element && Element.ID === imperfectProp.Element.ID))) return false;
-    if (!((!TableData && TableData === imperfectProp.TableData) || (TableData && imperfectProp.TableData && TableData.ID === imperfectProp.TableData.ID))) return false;
-    if (!((!Cost && Cost === imperfectProp.Cost) || (Cost && imperfectProp.Cost && Cost.ID === imperfectProp.Cost.ID))) return false;
-    if (!((!Constraint && Constraint === imperfectProp.Constraint) || (Constraint && imperfectProp.Constraint && Constraint.ID === imperfectProp.Constraint.ID))) return false;
-    if (!((!Formula && Formula === imperfectProp.Formula) || (Formula && imperfectProp.Formula && Formula.ID === imperfectProp.Formula.ID))) return false;
-    if (FixedType !== imperfectProp.FixedType) return false;
-    if (Type !== imperfectProp.Type) return false;
+export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyList, Operator) => {
+  if (!imperfectProp || !PropertyList || !Array.isArray(PropertyList) || PropertyList.length === 0) return false;
+  const i = PropertyList.findIndex(it => {
+    const { Product, Part, Craft, Material, Group, Element, FixedType, Type, TableData, Cost, Constraint, Formula } = it.Property;
+    if (!((!Product && Product === imperfectProp.Property.Product) || (Product && imperfectProp.Property.Product && Product.ID === imperfectProp.Property.Product.ID))) return false;
+    if (!((!Part && Part === imperfectProp.Property.Part) || (Part && imperfectProp.Property.Part && Part.ID === imperfectProp.Property.Part.ID))) return false;
+    if (!((!Craft && Craft === imperfectProp.Property.Craft) || (Craft && imperfectProp.Property.Craft && Craft.ID === imperfectProp.Property.Craft.ID))) return false;
+    if (!((!Material && Material === imperfectProp.Property.Material) || (Material && imperfectProp.Property.Material && Material.ID === imperfectProp.Property.Material.ID))) return false;
+    if (!((!Group && Group === imperfectProp.Property.Group) || (Group && imperfectProp.Property.Group && Group.ID === imperfectProp.Property.Group.ID))) return false;
+    if (!((!Element && Element === imperfectProp.Property.Element) || (Element && imperfectProp.Property.Element && Element.ID === imperfectProp.Property.Element.ID))) return false;
+    if (!((!TableData && TableData === imperfectProp.Property.TableData) || (TableData && imperfectProp.Property.TableData && TableData.ID === imperfectProp.Property.TableData.ID))) return false;
+    if (!((!Cost && Cost === imperfectProp.Property.Cost) || (Cost && imperfectProp.Property.Cost && Cost.ID === imperfectProp.Property.Cost.ID))) return false;
+    if (!((!Constraint && Constraint === imperfectProp.Property.Constraint) || (Constraint && imperfectProp.Property.Constraint && Constraint.ID === imperfectProp.Property.Constraint.ID))) return false;
+    if (!((!Formula && Formula === imperfectProp.Property.Formula) || (Formula && imperfectProp.Property.Formula && Formula.ID === imperfectProp.Property.Formula.ID))) return false;
+    if (FixedType !== imperfectProp.Property.FixedType) return false;
+    if (Type !== imperfectProp.Property.Type) return false;
     return true;
   });
-  if (t) {
-    if (t.FixedType === 255) { // 常量
-      const { DefaultValue } = imperfectProp;
-      return { ...t, DefaultValue };
-    }
-    if (t.Type === 9) {
-      const { CraftOptionList } = imperfectProp;
-      if (CraftOptionList && t.CraftOptionList) {
-        const list = t.CraftOptionList.map(it => {
-          const _t = CraftOptionList.find(_it => _it.ID === it.ID && JSON.stringify(_it.Part) === JSON.stringify(it.Part));
-          return _t || it;
-        });
-        return { ...t, CraftOptionList: list };
+  if (i > -1) {
+    const t = PropertyList[i];
+    if ((t.Property.FixedType || t.Property.FixedType === 0) && t.OptionList.length > 0) {
+      // 找出差异与新增部分
+      const list1 = t.OptionList;
+      const list2 = imperfectProp.OptionList;
+      const newList = list2.filter(_it => !list1.includes(_it));
+      if (newList.length === 0) return true;
+      if (Operator === t.Operator) { // 都为隐藏或禁用
+        return {
+          index: i,
+          item: { ...t, OptionList: [...t.OptionList, ...newList] },
+        };
       }
+      // 为不同的限制方式
+      return {
+        index: -1,
+        item: { ...imperfectProp, OptionList: newList },
+      };
     }
-    return t;
+    return true;
   }
-  return null;
+  return false;
 };
 
 /**
@@ -393,15 +398,32 @@ export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo
   EffectiveControlList.forEach(({ List }) => {
     if (Array.isArray(List)) {
       List.forEach(it => {
-        const _list = arr.map(_it => _it.Property);
-        const t = getPerfectPropertyByImperfectProperty(it.Property, _list);
+        // const _list = arr.map(_it => _it.Property);
+        const t = getPerfectPropertyByImperfectProperty(it, arr, it.Operator);
         if (!t) arr.push(it);
+        else if (Object.prototype.toString.call(t) === '[object Object]') {
+          const { index, item } = t;
+          if (index === -1) arr.push(item);
+          else arr.splice(index, 1, item);
+        }
       });
     }
   });
   return arr;
 };
 
-export const combineAffectedPropList = (AffectedPropList, PartAffectedPropList, CraftAffectedPropList, GroupAffectedPropList) => {
-  console.log('合并 交互 与 子交互', AffectedPropList, PartAffectedPropList, CraftAffectedPropList, GroupAffectedPropList);
+export const getCombineAffectedPropList = (AffectedPropList, PartAffectedPropList) => {
+  const List = [...AffectedPropList, ...PartAffectedPropList];
+  const arr = [];
+  List.forEach(it => {
+    // const _list = arr.map(_it => _it.Property);
+    const t = getPerfectPropertyByImperfectProperty(it, arr, it.Operator);
+    if (!t) arr.push(it);
+    else if (Object.prototype.toString.call(t) === '[object Object]') {
+      const { index, item } = t;
+      if (index === -1) arr.push(item);
+      else arr.splice(index, 1, item);
+    }
+  });
+  return arr;
 };
