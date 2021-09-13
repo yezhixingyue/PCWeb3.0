@@ -127,6 +127,17 @@ export default {
         this.$emit('change', _defaultVal);
       }
     },
+    handleAllowChange(bool) {
+      if (!bool && this.value) {
+        const t = this.localOptions.find(it => it.ID === this.value);
+        if (!t) {
+          const t2 = this.localOptions.find(it => it.IsChecked); // 找到默认值
+          let _defaultVal = '';
+          if (t2 && !this.DisabledOptionList.includes(t2.ID) && !this.HiddenOptionList.includes(t2.ID)) _defaultVal = t2.ID;
+          this.$emit('change', _defaultVal);
+        }
+      }
+    },
   },
   watch: {
     DisabledOptionList: {
@@ -138,6 +149,12 @@ export default {
     HiddenOptionList: {
       handler(val) {
         this.handleInterAction(val);
+      },
+      immediate: true,
+    },
+    Allow: {
+      handler(val) {
+        this.handleAllowChange(val);
       },
       immediate: true,
     },

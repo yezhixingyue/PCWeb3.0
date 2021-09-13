@@ -193,7 +193,7 @@ import { productJumpUrl } from '@/assets/js/setup';
 import ComputedResultComp from './Comps/ComputedResultComp.vue';
 // import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
 import ConsigneeAddressSetpComp from '../PlaceOrderComps/ConsigneeAddressSetpComp/index.vue';
-import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp.vue';
+import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp/index.vue';
 import SwiperClassifyComp from './Comps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
 import PlaceOrderPanel from './Comps/PlaceOrderPanel/index.vue';
@@ -448,7 +448,6 @@ export default {
       this.couponCode2Add = '';
       this.messageBox.successSingle({
         title: '激活成功',
-        // successFunc: () => this.handleChange([1], true),
         successFunc: () => {
           this.couponList.push(res.data.Data);
         },
@@ -459,10 +458,8 @@ export default {
         !this.selectedCoupon
         || this.selectedCoupon.CouponCode !== item.CouponCode
       ) {
-        // this.selectedCoupon = item;
         this.$store.commit('Quotation/setSelectedCoupon', item);
       } else {
-        // this.selectedCoupon = null;
         this.$store.commit('Quotation/setSelectedCoupon', null);
       }
     },

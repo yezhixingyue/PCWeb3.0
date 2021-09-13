@@ -213,7 +213,6 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       break;
   }
 
-  // if (temp) console.log('temp----- ', temp);
   return temp;
 };
 
@@ -368,7 +367,7 @@ export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyLis
       const list2 = imperfectProp.OptionList;
       const newList = list2.filter(_it => !list1.includes(_it));
       if (newList.length === 0) return true;
-      if (Operator === t.Operator) { // 都为隐藏或禁用
+      if (Operator === t.Operator) { // 都为隐藏或禁用 +++ 后添加一种新的关系类型：必选
         return {
           index: i,
           item: { ...t, OptionList: [...t.OptionList, ...newList] },

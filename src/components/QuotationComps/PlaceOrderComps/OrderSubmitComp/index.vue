@@ -14,14 +14,22 @@
            show-word-limit
            placeholder="1.请填写文件中“具有明显特征”的名称；2.此名称不作为最终制作要求，请正确点选制作要求；"></el-input>
         </li>
+        <li class="design-document">
+          <DesignDocumentPopoverComp />
+        </li>
         <li class="upload-box">
           <UploadComp4BreakPoint ref='UploadComp4BreakPoint' :validateFunc='getProductPriceLocal'
             :shouldUpload='!isSpotGoods'
             :msgTitle='title' @fillFileContent='fillFileContent'
             :successFunc="successFunc" @saveFile2Store='saveFile2Store' />
         </li>
+        <li>
+          <UploadItem />
+        </li>
+        <li>
+          <UploadItem />
+        </li>
       </ul>
-      <!-- <p v-if="isSpotGoods" class="is-cyan is-font-12">当前产品为现货产品，不用上传文件，可直接下单</p> -->
       <div class="submit-btn-wrap">
         <el-button class="button-title-pink" @click="onSave2TheCar">
           <i class="iconfont icon-jiarugouwuche" ></i>加入购物车</el-button>
@@ -36,12 +44,16 @@
 <script>
 import { mapState } from 'vuex';
 import UploadComp4BreakPoint from '@/components/common/UploadComp/UploadComp4BreakPoint.vue';
-import ComputedResultComp from '../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
+import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
+import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
+import UploadItem from './UploadItem.vue';
 
 export default {
   components: {
     UploadComp4BreakPoint,
     ComputedResultComp,
+    DesignDocumentPopoverComp,
+    UploadItem,
   },
   props: {
     isSpotGoods: {
@@ -82,10 +94,6 @@ export default {
   },
   methods: {
     successFunc({ compiledName, FileSize }) {
-      // // console.log('successFunc ---- submit comp -- this.shouldUpload', this.isSpotGoods);
-      // if (this.isSpotGoods) { // 现货 不需上传
-      //   return;
-      // }
       if (this.type === 'placeOrder') {
         const callBack = () => {
           this.$store.commit('Quotation/setCurPayInfo2Code', null);
@@ -93,8 +101,6 @@ export default {
         };
         this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName, fileContent: this.fileContent, callBack });
       } else if (this.type === 'saveCar') {
-        // console.log('saveCar', FileSize);
-        // eslint-disable-next-line max-len
         this.$store.dispatch('Quotation/getQuotationSave2Car', { compiledName, fileContent: this.fileContent, FileSize });
       }
     },
@@ -144,10 +150,10 @@ export default {
     margin-top: 22px;
     > ul {
       border-bottom: 1px solid #eee;
-      // padding-bottom: 8px;
       > li {
         margin-bottom: 30px;
         &.file-content-box {
+          margin-bottom: 8px;
           > .el-input {
             width: 700px;
             > input {
@@ -166,6 +172,9 @@ export default {
         }
         &.upload-box {
           text-align: right;
+        }
+        &.design-document {
+          padding-left: 78px;
         }
       }
     }
@@ -198,7 +207,6 @@ export default {
       }
     }
     > .submit-btn-wrap {
-      // text-align: right;
       padding-bottom: 80px;
       margin-top: 60px;
       position: relative;

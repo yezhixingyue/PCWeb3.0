@@ -299,7 +299,7 @@ export default {
       return false;
     },
     getSubGroupAffectedPropList() { // 元素组子交互
-      if (this.isNormalGroup && Array.isArray(this.submitData.ChildSubControlList)) {
+      if (this.isNormalGroup && Array.isArray(this.submitData.ChildSubControlList) && Array.isArray(this.submitData.GroupList)) {
         const list = this.submitData.ChildSubControlList.filter(it => !it.CraftID && it.GroupID === this.target.ID);
         // return list;
         const t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);

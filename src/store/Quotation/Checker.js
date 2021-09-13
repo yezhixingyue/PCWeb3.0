@@ -91,6 +91,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
     if (prop.Type === 2) { // 选项元素，判断是否有值在禁用或隐藏列表中
       const disabledList = InterAction.getDisabledOptionList(AffectedPropList);
       const hiddenList = InterAction.getHiddenedOptionList(AffectedPropList);
+      const requiredList = InterAction.getRequirededOptionList(AffectedPropList);
       const arr = [...disabledList, ...hiddenList];
       if (arr.length > 0) {
         // console.log(arr, values, values.length);
@@ -99,6 +100,17 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
         if (t) {
           const target = prop.OptionAttribute?.OptionList?.find(_it => _it.ID === t);
           if (target) return `${showPropName ? prop.Name : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
+        }
+      }
+      if (requiredList.length > 0) {
+        const valueIDs = values.map(it => it.ID).filter(it => it);
+        const t2 = requiredList.filter(it => !valueIDs.includes(it));
+        if (t2.length > 0) {
+          const target = t2.map(it => prop.OptionAttribute?.OptionList?.find(_it => _it.ID === it)).filter(it => it);
+          if (target.length > 0) {
+            const text = target.map(it => `[ ${it.Name} ]`).join('、');
+            return `${showPropName ? prop.Name : ''}选项中 ${text} 为必选项`;
+          }
         }
       }
     }

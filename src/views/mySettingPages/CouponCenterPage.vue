@@ -2,7 +2,7 @@
   <section class="mp-pc-my-setting-pages-coupon-center-page-wrap">
     <header>
       <span class="blue-v-line is-bold is-black">领券中心</span>
-      <span class="is-font-12">（ 共检测出 <i class="is-pink is-font-16">{{couponCount}}</i> 张优惠券 ）</span>
+      <!-- <span class="is-font-12">（ 共检测出 <i class="is-pink is-font-16">{{couponCount}}</i> 张优惠券 ）</span> -->
     </header>
     <ul class="content" v-if="couponList.length > 0">
       <li class="coupon-item"
@@ -40,7 +40,8 @@
       </li>
     </ul>
     <div class="has-none-wrap" v-else>
-      <span>暂无优惠券</span>
+      <img src="@/assets/images/coupon-null.png" alt="">
+      <p>当前暂无优惠券</p>
     </div>
     <footer>
       <Count
@@ -273,6 +274,9 @@ export default {
     padding-top: 140px;
     padding-right: 80px;
     line-height: 16px;
+    > p {
+      padding-top: 10px;
+    }
   }
   > footer {
     margin-bottom: 50px;

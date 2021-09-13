@@ -244,7 +244,7 @@ import ProductCountComp from './NewPcComps/ProductCountComp.vue';
 import ComputedResultComp from './NewPcComps/ComputedResultComp.vue';
 // import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
 import ConsigneeAddressSetpComp from '../PlaceOrderComps/ConsigneeAddressSetpComp/index.vue';
-import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp.vue';
+import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp/index.vue';
 import SwiperClassifyComp from './NewPcComps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
 

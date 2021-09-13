@@ -1,6 +1,5 @@
 <template>
   <div class="mp-phone-upload-comp-break-point-type-wrap out-btn" @click.stop="onInputClick">
-    <!-- <span class="is-pink" @click="clearFile">清除文件</span> -->
     <div class="self-comp" v-if="isUploadRightNow" @click.stop="onInputClick"
       :class="{hide: showLoading || showProgress, disabled: onlyShow}"
      >
@@ -17,12 +16,10 @@
       {{showTitle}}
     </div>
     <div v-else class="el-comp">
-      <!-- <span class="gray">印刷文件：</span> -->
       <el-upload
         class="upload-box"
         ref="upload"
         action=''
-        :on-preview="handlePreview"
         :on-remove="handleRemove"
         :file-list="fileList"
         :class="fileList.length > 0 ? '' : 'empty' "
@@ -32,68 +29,10 @@
         :on-change='handleElChange'
         drag
         :auto-upload="false">
-        <!-- <input
-        type="file"
-          :multiple='multiple'
-          :accept="accept"
-          @change="onChange"
-          @click.stop="onInputClick"
-          class="upload-inp"
-          ref="uploadInp"
-          :disabled='onlyShow'
-        /> -->
         <el-button slot="trigger" size="small" type="primary">{{showTitle}}</el-button>
         <div class="upload-tips">
-          <el-popover
-            placement="top-start"
-            width="564"
-            offset='151'
-            trigger="hover">
-            <section class="mp-file-upload-tips-popover-wrap">
-              <header><i></i>文档设计标准</header>
-              <ul>
-                <li>
-                  <p>1．软件版本</p>
-                  <span>CDR文件推荐使用X4（如有高版本文件建议转PDF或JPG进行上传）</span>
-                </li>
-                <li>
-                  <p>2．字体与转曲</p>
-                  <span>文档需提前进行转曲（栅格化）</span>
-                </li>
-                <li>
-                  <p>3．尺寸出血与边距</p>
-                  <span>下单尺寸要与文件成品尺寸保持一致；</span>
-                  <span>重要图文信息距边距3mm及以上，出血勿携带裁切脚线</span>
-                </li>
-                <li>
-                  <p>4．分辨率</p>
-                  <span>按照印刷最小分辨率要求不小于300dpi</span>
-                </li>
-                <li>
-                  <p>5．特殊效果</p>
-                  <span>特殊效果建议转位图处理</span>
-                </li>
-                <li>
-                  <p>6．最小字号及极细线</p>
-                  <span>印刷最小字号为5pt，烫金最小字号为7pt；</span>
-                  <span>印刷线条最细为0.076mm，烫金最细线条为0.2mm</span>
-                </li>
-                <li>
-                  <p>7．颜色设置</p>
-                  <span>印刷文档要求颜色模式为CMYK；</span>
-                  <span>四色黑字及四色黑二维码请转成单黑；</span>
-                  <span>大面积实地四色黑（C100 M100 Y100 K100）建议使用C30 K100替代</span>
-                </li>
-              </ul>
-            </section>
-            <span slot="reference"
-             style="margin:4px 0; margin-right: 10px;color:#428dfa; cursor: pointer;
-             display:inline-block;height:22px; line-height: 22px">注意事项</span>
-          </el-popover>
           <span>( 请上传cdr, jpg, jpeg, tiff, tif, rar, zip, pdf等格式的设计文件，JPG文件多面请打压缩包上传 )</span>
         </div>
-        <!-- <el-button  size="small" type="success" @click="submitUpload">上传到服务器</el-button> -->
-        <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
       </el-upload>
     </div>
     <transition name="el-fade-in">
@@ -102,11 +41,6 @@
         @click="e => {e.stopPropagation(); return false;}"
         v-show="showLoading || showProgress || showReadMsg"
        >
-      <!-- <div
-            class="loading-box"
-            @click="e => {e.stopPropagation(); return false;}"
-            v-if="1"
-        > -->
           <div v-if="showLoading">
             <i class="el-icon-loading"></i>
             <p>文件正在上传中...</p>
@@ -207,12 +141,10 @@ export default { // 上传图片按钮
       fileName: '',
       files: null,
       fileList: [],
-      // eventFileList: [], //
     };
   },
   computed: {
     showTitle() {
-      // if (!this.upLoadTitle || !this.isUploadRightNow) return this.title;
       if (!this.upLoadTitle) return this.title;
       return this.upLoadTitle;
     },
@@ -235,7 +167,6 @@ export default { // 上传图片按钮
       }
     },
     upLoadSingleFile(file) {
-      // console.log('upLoadSingleFile');
       if (!file && this.shouldUpload) return;
       if (!this.shouldUpload) {
         this.successFunc({});
@@ -245,7 +176,6 @@ export default { // 上传图片按钮
       this.showReadMsg = true;
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
-      // // console.log(file, 12345);
       reader.onerror = () => {
         this.messageBox.failSingleError({ title: '文件解析错误！', msg: '请检查文件并重新上传' });
         this.upLoadTitle = '文件读取失败';
@@ -266,8 +196,6 @@ export default { // 上传图片按钮
         }
         this.showReadMsg = false;
         this.upLoadTitle = '';
-        // this.setReplenishFileUniqueName(`${sha1(reader.result)}.${ext}`);
-        // this.setReplenishFile(file);
         const onUploadProgressFunc = progress => {
           // eslint-disable-next-line no-restricted-globals
           if (!isNaN(progress)) this.percentage = progress;
@@ -290,23 +218,13 @@ export default { // 上传图片按钮
         }
       };
     },
-    // clearFile() {
-    //   // console.log(this.$refs.uploadInp.value)
-    // },
     submitUpload() {
       this.$refs.upload.submit();
     },
     handleRemove(file, fileList) {
-      // // console.log(file, fileList);
       this.fileList = fileList;
     },
-    handlePreview(file) {
-      if (file) {
-        // // console.log(file);
-      }
-    },
     handleElChange(file, fileList) {
-      // // console.log(file, fileList);
       this.fileList = fileList;
       this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
     },
@@ -318,18 +236,12 @@ export default { // 上传图片按钮
       });
     },
     exceed(fileList) {
-      // // console.log(this.fileList, fileList, arr);
       const file = fileList[0];
       this.fileList[0].raw = file;
       this.fileList[0].name = file.name;
       this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
-      // this.fileList = fileList;
-      // massage.failSingleError({ title: '已上传订单文件', msg: '如需更换，请删除订单文件后重新上传' });
     },
     async handleElUpload() {
-      // // console.log('handleElUpload');
-      // const oInpFile = document.querySelector('.upload-box .el-upload__input');
-      // // console.log(oInpFile.files, 'shouldUpload upload comp', this.shouldUpload);
       if (!this.shouldUpload) { // 如果不需要上传文件
         const msg = await this.validateFunc();
         if (typeof msg === 'string') {
@@ -350,10 +262,6 @@ export default { // 上传图片按钮
         return;
       }
       if (msg === true) {
-        // this.$emit('handleMapPosition', () => {
-        //   const file = this.fileList[0].raw;
-        //   this.upLoadSingleFile(file);
-        // });
         const file = this.fileList[0].raw;
         this.upLoadSingleFile(file);
       }
@@ -379,14 +287,7 @@ export default { // 上传图片按钮
         return;
       }
       if (msg === true) {
-        // this.$emit('handleMapPosition', () => {
-        //   const file = this.fileList[0].raw;
-        //   // this.upLoadSingleFile(file);
-        //   this.$emit('saveFile2Store', file);
-        //   this.successFunc({ compiledName: '', initialName: this.fileName });
-        // });
         const file = this.fileList[0].raw;
-        // this.upLoadSingleFile(file);
         this.$emit('saveFile2Store', file);
         this.successFunc({ compiledName: '', initialName: this.fileName });
       }
@@ -425,8 +326,6 @@ export default { // 上传图片按钮
     outline: none;
     font-size: 12px;
     border-radius: 2px;
-    // margin-right: 15px;
-    // margin-top: 25px;
     user-select: none;
     display: inline-block;
     position: relative !important;
@@ -568,22 +467,6 @@ export default { // 上传图片按钮
           max-width: 620px;
         }
         position: relative;
-        // &::before {
-        //   content: '请选择订单文件 ( 请上传cdr, jpg, jpeg, tiff, tif, rar, zip, pdf等格式的设计文件，JPG文件多面请打压缩包上传 )';
-        //   display: inline-block;
-        //   line-height: 35px;
-        //   color: #989898;
-        //   font-size: 12px;
-        //   // display: block;
-        //   position: absolute;
-
-        //   left: -6px;
-        //   // top: -30px;
-        //   width: 0;
-        //   top: -12px;
-        //   opacity: 0;
-        //   // display: block;
-        // }
       }
       > .upload-tips {
         position: absolute;
@@ -603,15 +486,6 @@ export default { // 上传图片按钮
       overflow: hidden;
       height: 35px;
       &.empty {
-        // > .el-upload-list {
-        //   width: 600px;
-        //   &::before {
-        //     top: -12px;
-        //     opacity: 1;
-        //     width: 55em;
-        //     animation: afterAnimate 0.4s;
-        //   }
-        // }
         > .upload-tips {
           opacity: 1;
           animation: afterAnimate 0.4s;

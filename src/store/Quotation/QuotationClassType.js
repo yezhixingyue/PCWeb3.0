@@ -306,22 +306,28 @@ export default class QuotationClassType {
       if (!ElementList || !Array.isArray(ElementList)) return [];
       return ElementList.map(it => (disabledElementIDs.includes(it.ElementID) ? null : getSingleElementClearValue(it))).filter(it => it);
     };
-    const getGroupListValueFilter = (GroupList, GroupAffectedPropList = [], isCraft) => {
+    const getGroupListValueFilter = (GroupList, GroupAffectedPropList = [], CraftID) => {
       if (!GroupList || !Array.isArray(GroupList)) return [];
       const disabledGroupIDs = InterAction.getDisabledOrHiddenedGroupIDList(GroupAffectedPropList);
-      if (isCraft) console.log(isCraft, GroupList, GroupAffectedPropList); // ----------------- 此处转换工艺子交互时出现有问题 待查看
       return GroupList.map(Group => {
         if (!Array.isArray(Group.List) || Group.List.length === 0) return null;
         if (Group.GroupID && disabledGroupIDs.includes(Group.GroupID)) return null;
         const List = Group.List.map((item) => {
           if (disabledGroupIDs.includes(item.GroupID)) return null;
-          const subGroupAffectedPropList = getPropertiesAffectedByInteraction(
-            { GroupList: [{ GroupID: Group.GroupID, List: [item] }] }, curProductInfo2Quotation, Group.SubControlList || [],
-          );
-          const InterActionData = getCombineAffectedPropList(GroupAffectedPropList, subGroupAffectedPropList);
-          const groupItemAffectedPropList = InterActionData.filter(it => it.Property.Group.ID === item.GroupID);
+          let subGroupAffectedPropList = [];
+          if (CraftID) {
+            subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选工艺子交互中元素组，得到受子交互影响的属性列表
+              { CraftList: [{ GroupList: [{ GroupID: Group.GroupID, List: [item] }], CraftID }] }, curProductInfo2Quotation, Group.SubControlList || [],
+            );
+          } else {
+            subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选普通元素组子交互，得到受子交互影响的属性列表
+              { GroupList: [{ GroupID: Group.GroupID, List: [item] }] }, curProductInfo2Quotation, Group.SubControlList || [],
+            );
+          }
+          const InterActionData = getCombineAffectedPropList(GroupAffectedPropList, subGroupAffectedPropList); // 合并交互与子交互
+          const groupItemAffectedPropList = InterActionData.filter(it => it.Property.Group.ID === Group.GroupID); // 筛选出当前元素组生效列表
           const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
-          const itemList = getElementListValueFilter(item.List, disabledElementIDs);
+          const itemList = getElementListValueFilter(item.List, disabledElementIDs); // 对其所属元素进行筛选处理
           if (itemList.length === 0) return null;
           return {
             ...item,
@@ -345,7 +351,7 @@ export default class QuotationClassType {
         return {
           ...Craft,
           ElementList: getElementListValueFilter(Craft.ElementList, disabledElementIDs),
-          GroupList: getGroupListValueFilter(Craft.GroupList, GroupAffectedPropList, true),
+          GroupList: getGroupListValueFilter(Craft.GroupList, GroupAffectedPropList, Craft.CraftID),
         };
       }).filter(it => it);
     };

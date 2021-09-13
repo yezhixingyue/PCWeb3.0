@@ -16,7 +16,7 @@
      v-if="Property.Type === 2"
      v-model.lazy="PropValue"
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
-     :Allow='Property.OptionAttribute.AllowCustomer'
+     :Allow='Property.OptionAttribute.AllowCustomer && !disabledDefine'
      :isMultiple='!Property.OptionAttribute.IsRadio'
      :IsRequired='Property.OptionAttribute.IsRequired'
      :isDisabled='isDisabled || disabled'
@@ -124,6 +124,9 @@ export default {
     },
     HiddenOptionList() { // 隐藏的选项
       return InterAction.getHiddenedOptionList(this.AffectedPropList);
+    },
+    disabledDefine() {
+      return this.DisabledOptionList.includes('00000000-0000-0000-0000-000000000000');
     },
   },
   data() {

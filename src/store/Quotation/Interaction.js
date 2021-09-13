@@ -37,6 +37,14 @@ export default class InterAction {
     return [];
   }
 
+  static getRequirededOptionList(AffectedPropList) { // 获取必选的选项列表
+    if (AffectedPropList.length > 0) {
+      const t = AffectedPropList.find(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0);
+      if (t && t.Operator === 23) return t.OptionList;
+    }
+    return [];
+  }
+
   static getDisabledCraftIDList(AffectedPropList) {
     if (!Array.isArray(AffectedPropList)) return [];
     return AffectedPropList.filter(it => it.Property && it.Property.Craft && !it.Property.Element && !it.Property.Group && it.Operator === 21)
