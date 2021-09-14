@@ -140,7 +140,9 @@ const api = {
   getExpressValidList(data) { // POST /Api/Express/ValidList 查询可用物料列表
     return instance.post('/Api/Express/ValidList', data, { closeLoading: true });
   },
-
+  getFileTypeList() { // /Api/FileType/List 获取文件对应列表
+    return instance.get('/Api/FileType/List');
+  },
   /* 图片与文件上传api
    ----------------------------------------------------------------------------------- */
   uploadImage(data) { // 图片上传  POST /Api/Upload/Image

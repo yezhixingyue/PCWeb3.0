@@ -105,6 +105,10 @@ export default {
     /** 受到交互影响的属性列表数据
     ---------------------------------------- */
     PropertiesAffectedByInteraction: [],
+    /** 当前产品正在生效的 需要上传的文件列表
+    ---------------------------------------- */
+    FileList: [],
+    FileTypeList: [],
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -212,6 +216,8 @@ export default {
       state.initPageText = '';
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
+      state.FileList = QuotationClassType.getFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation)
+        .map(it => ({ ...it, File: { ...it.File, File: null }, display: true, key: Math.random().toString(36).slice(-10) }));
     },
     /* 清除选中产品详细信息
     -------------------------------*/
@@ -947,10 +953,15 @@ export default {
       }
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
+      state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
     },
     setPropertiesAffectedByInteraction(state) { // 获取受交互影响属性列表
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
+      state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
+    },
+    setFileTypeList(state, list) {
+      state.FileTypeList = list;
     },
   },
   actions: {
@@ -994,16 +1005,25 @@ export default {
       }
       return res.data.Data;
     },
+    /* 获取文件对应列表
+    -------------------------------*/
+    async getFileTypeList({ state, commit }) {
+      if (state.FileTypeList.length > 0) return;
+      const resp = await api.getFileTypeList().catch(() => {});
+      if (resp && resp.data.Status === 1000) {
+        commit('setFileTypeList', resp.data.Data);
+      }
+    },
     /* 获取产品报价信息
     -------------------------------*/
-    async getProductPrice({ state, commit, dispatch }) {
+    async getProductPrice({ state, commit }) {
       // console.log(curSelectStatus);
       const productData = state.obj2GetProductPrice.ProductParams;
       commit('setCurSelectStatus', '报价');
       // if (QuotationClassType.check(productData) === false) return; // 校验 后面填写
       const _data = {};
-      commit('setWatchTarget2DelCraft');
-      await dispatch('delay', 10);
+      // commit('setWatchTarget2DelCraft');
+      // await dispatch('delay', 10);
       // _data.ProductParams = QuotationClassType.filter( // 数据转换与筛选 后面补充
       //   QuotationClassType.transform(productData),
       // );
@@ -1037,7 +1057,7 @@ export default {
     },
     /* 下单 - 预下单
     -------------------------------*/
-    async getOrderPreCreate({ state, commit, dispatch, rootState }, { compiledName, fileContent, callBack }) {
+    async getOrderPreCreate({ state, commit, rootState }, { compiledName, fileContent, callBack }) {
       // 配置组合生成请求对象
       const _requestObj = { List: [], OrderType: 2, PayInFull: false };
       const _itemObj = {};
@@ -1057,12 +1077,13 @@ export default {
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
 
       const productData = state.obj2GetProductPrice.ProductParams;
-      if (QuotationClassType.check(productData) === false) return;
-      commit('setWatchTarget2DelCraft');
-      await dispatch('delay', 10);
-      const ProductParams = QuotationClassType.filter(
-        QuotationClassType.transform(productData),
-      );
+      // if (QuotationClassType.check(productData) === false) return;
+      // commit('setWatchTarget2DelCraft');
+      // await dispatch('delay', 10);
+      // const ProductParams = QuotationClassType.filter(
+      //   QuotationClassType.transform(productData),
+      // );
+      const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
 
@@ -1117,12 +1138,13 @@ export default {
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
 
       const productData = state.obj2GetProductPrice.ProductParams;
-      if (QuotationClassType.check(productData) === false) return;
-      commit('setWatchTarget2DelCraft');
-      await dispatch('delay', 10);
-      const ProductParams = QuotationClassType.filter(
-        QuotationClassType.transform(productData),
-      );
+      // if (QuotationClassType.check(productData) === false) return;
+      // commit('setWatchTarget2DelCraft');
+      // await dispatch('delay', 10);
+      // const ProductParams = QuotationClassType.filter(
+      //   QuotationClassType.transform(productData),
+      // );
+      const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
       const res = await api.getQuotationSave(_itemObj);

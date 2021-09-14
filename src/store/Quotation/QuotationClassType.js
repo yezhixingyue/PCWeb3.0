@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define */
 import massage from '@/assets/js/utils/message';
 import store from '@/store';
-import { getPropertiesAffectedByInteraction, getCombineAffectedPropList } from './EffectiveControlList';
+import { getPropertiesAffectedByInteraction, getCombineAffectedPropList, getFileListInEffect } from './EffectiveControlList';
 import InterAction from './Interaction';
 
 // eslint-disable-next-line no-unused-vars
@@ -402,6 +402,42 @@ export default class QuotationClassType {
 
   static getPropertiesAffectedByInteraction(ProductParams, curProductInfo2Quotation) { // 获取到当前受到交互影响的需要处理的属性列表
     return getPropertiesAffectedByInteraction(ProductParams, curProductInfo2Quotation);
+  }
+
+  static getFileListInEffect(ProductParams, curProductInfo2Quotation) {
+    if (!ProductParams || !curProductInfo2Quotation) return [];
+    const { FileList } = curProductInfo2Quotation;
+    if (!Array.isArray(FileList) || FileList.length === 0) return [];
+    const list = getFileListInEffect(ProductParams, curProductInfo2Quotation, FileList);
+    return list.sort((p, n) => p.File.ShowIndex - n.File.ShowIndex);
+  }
+
+  static setFileListInEffect(ProductParams, curProductInfo2Quotation, FileList) { // 设置当前产品上传文件列表
+    const _list = this.getFileListInEffect(ProductParams, curProductInfo2Quotation);
+    const nextIDs = _list.map(it => it.File.ID);
+    const _FileList = FileList.filter(it => nextIDs.includes(it.File.ID));
+    _FileList.forEach(it => {
+      const _it = it;
+      if (!nextIDs.includes(it.File.ID)) _it.display = false;
+      else {
+        _it.display = true;
+        const t = _list.find(a => a.File.ID === it.File.ID);
+        if (t) _it.IsRequired = t.IsRequired;
+      }
+    });
+    const prevIDs = _FileList.map(it => it.File.ID);
+    _list.forEach(it => {
+      if (!prevIDs.includes(it.File.ID)) {
+        const index = _FileList.findIndex((_it) => it.File.ShowIndex < _it.File.ShowIndex);
+        const item = { ...it, File: { ...it.File, File: null }, display: true, key: Math.random().toString(36).slice(-10) };
+        if (index > -1) {
+          _FileList.splice(index, 0, item);
+        } else {
+          _FileList.push(item); // 此处需要受排序影响 -- 已设置
+        }
+      }
+    });
+    return _FileList;
   }
 }
 

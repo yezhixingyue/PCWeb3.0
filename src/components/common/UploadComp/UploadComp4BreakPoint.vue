@@ -252,16 +252,16 @@ export default { // 上传图片按钮
         return;
       }
       await this.delay(0);
-      if (this.fileList.length === 0) {
-        massage.failSingleError({ title: `${this.msgTitle}失败`, msg: '请选择订单文件!', failFunc: this.failFunc });
-        return;
-      }
       const msg = await this.validateFunc();
       if (typeof msg === 'string') {
         massage.failSingleError({ title: `${this.msgTitle}失败`, msg });
         return;
       }
       if (msg === true) {
+        if (this.fileList.length === 0) {
+          massage.failSingleError({ title: `${this.msgTitle}失败`, msg: '请选择订单文件!', failFunc: this.failFunc });
+          return;
+        }
         const file = this.fileList[0].raw;
         this.upLoadSingleFile(file);
       }
@@ -277,16 +277,16 @@ export default { // 上传图片按钮
         return;
       }
       await this.delay(0);
-      if (this.fileList.length === 0) {
-        massage.failSingleError({ title: `${this.msgTitle}失败`, msg: '请选择订单文件!', failFunc: this.failFunc });
-        return;
-      }
       const msg = await this.validateFunc();
       if (typeof msg === 'string') {
         massage.failSingleError({ title: `${this.msgTitle}失败`, msg });
         return;
       }
       if (msg === true) {
+        if (this.fileList.length === 0) {
+          massage.failSingleError({ title: `${this.msgTitle}失败`, msg: '请选择订单文件!', failFunc: this.failFunc });
+          return;
+        }
         const file = this.fileList[0].raw;
         this.$emit('saveFile2Store', file);
         this.successFunc({ compiledName: '', initialName: this.fileName });

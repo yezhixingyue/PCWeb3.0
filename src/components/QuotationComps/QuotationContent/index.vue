@@ -172,6 +172,7 @@
       <OrderSubmitComp
         :asyncInputchecker='asyncInputchecker'
         :isSpotGoods="placeData.IsSpotGoods"
+        :getCheckResult='getCheckResult'
       />
     </section>
     <AsideIntroComp
@@ -370,7 +371,7 @@ export default {
     ]),
     ...mapActions('Quotation', ['getProductPrice']),
     async getCheckResult() {
-      const bool1 = await this.$refs.oProductPanel.$refs.ruleForm.validate().catch(() => {});
+      const bool1 = await this.$refs.oProductPanel.$refs.ruleForm.validate().catch((e) => { console.log(e); });
       let partResults = [];
       if (this.$refs.oPartPanels) {
         partResults = await Promise.all(this.$refs.oPartPanels.map(oPart => oPart.onSubmitCheck()));

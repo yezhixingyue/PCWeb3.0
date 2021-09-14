@@ -426,3 +426,31 @@ export const getCombineAffectedPropList = (AffectedPropList, PartAffectedPropLis
   });
   return arr;
 };
+
+export const getFileListInEffect = (ProductParams, curProductInfo2Quotation, FileList) => {
+  if (!Array.isArray(FileList) || FileList.length === 0) return [];
+  const _list = JSON.parse(JSON.stringify(FileList));
+  const list = _list.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation))
+    .sort((f, s) => f.Priority - s.Priority).filter(it => it.FileList && it.FileList.length > 0); // 按照优先级进行排序
+  if (list.length > 0) {
+    const allFiles = list.map(it => it.FileList).reduce((prev, next) => [...prev, ...next], []);
+    const FileListInEffect = [];
+    if (allFiles.length > 0) {
+      let hasPrintFile = false; // 是否已有印刷文件，如果有则不再添加印刷文件
+      allFiles.forEach(it => {
+        const { IsPrintFile } = it.File;
+        if ((IsPrintFile && hasPrintFile)) return;
+        const t = FileListInEffect.find(_it => _it.File.ID === it.File.ID);
+        if (!t) {
+          FileListInEffect.push(it);
+          if (IsPrintFile) hasPrintFile = true;
+        } else if (!t.IsRequired && it.IsRequired) {
+          const _t = t;
+          _t.IsRequired = true;
+        }
+      });
+    }
+    return FileListInEffect;
+  }
+  return [];
+};

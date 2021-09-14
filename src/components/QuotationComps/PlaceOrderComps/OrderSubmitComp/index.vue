@@ -23,12 +23,12 @@
             :msgTitle='title' @fillFileContent='fillFileContent'
             :successFunc="successFunc" @saveFile2Store='saveFile2Store' />
         </li>
-        <li>
-          <UploadItem />
+        <li v-for="it in FileList" :key="it.key" v-show="it.display">
+          <UploadItem :required='it.IsRequired' :FileInfo='it.File' />
         </li>
-        <li>
+        <!-- <li>
           <UploadItem />
-        </li>
+        </li> -->
       </ul>
       <div class="submit-btn-wrap">
         <el-button class="button-title-pink" @click="onSave2TheCar">
@@ -64,9 +64,13 @@ export default {
       type: Function,
       default: () => {},
     },
+    getCheckResult: {
+      type: Function,
+      default: () => {},
+    },
   },
   computed: {
-    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder']),
+    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList']),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -125,6 +129,21 @@ export default {
       this.fileContent = name;
     },
     async getProductPriceLocal() { // 校验函数  用来判断是否可以进行下单
+      const bool = await this.getCheckResult();
+      if (!bool) {
+        const scrollHandler = () => {
+          const app = document.getElementById('app');
+          if (app) {
+            this.utils.animateScroll(app.scrollTop, 0, num => {
+              app.scrollTop = num;
+            });
+          }
+        };
+        this.messageBox.failSingleError({
+          title: `${this.title}失败`, msg: '产品参数设置有问题，请检查', successFunc: scrollHandler, failFunc: scrollHandler,
+        });
+        return false;
+      }
       if (!this.fileContent && !this.isSpotGoods) return '请输入文件内容';
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
       const asyncInputchecker = await this.asyncInputchecker();
@@ -140,6 +159,9 @@ export default {
     saveFile2Store(file) {
       this.$store.commit('Quotation/setOrderFile4PreCreateData', file);
     },
+  },
+  mounted() {
+    this.$store.dispatch('Quotation/getFileTypeList');
   },
 };
 </script>

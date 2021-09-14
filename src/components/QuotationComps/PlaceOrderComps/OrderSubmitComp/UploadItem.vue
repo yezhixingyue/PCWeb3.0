@@ -1,37 +1,83 @@
 <template>
   <el-upload
+    v-if="FileInfo"
     class="mp-pc-order-submit-upload-item-comp-wrap"
-    :class="fileList.length === 0 ? 'em' : ''"
+    :class="{em: fileList.length === 0, single: fileList.length === 1}"
     drag
     :auto-upload="false"
     :on-remove="handleRemove"
     :file-list="fileList"
+    :on-change='onFileChange'
+    :on-exceed='handleExceed'
     action=""
-    multiple>
+    :accept='accept'
+    :limit="!multiple ? 1 : undefined"
+    :multiple='multiple'>
     <div class="header">
       <i>+</i>
-      <span class="title">添加印刷文件</span>
+      <span class="title">添加{{FileInfo.Name}}<i v-if="required" class="is-pink is-font-12">（必传）</i></span>
       <span class="tips">
-        （<em> 只能上传jpg/png文件，且不超过500kb </em>）
+        <i>（</i>
+        <em> {{FileInfo.Remark}} </em>
+        <i>）</i>
       </span>
     </div>
   </el-upload>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
+  props: {
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    FileInfo: {
+      type: Object,
+      default: null,
+    },
+  },
   data() {
     return {
       fileList: [],
     };
   },
+  computed: {
+    ...mapState('Quotation', ['FileTypeList']),
+    multiple() {
+      if (this.FileInfo) return this.FileInfo.AllowMultiple;
+      return false;
+    },
+    accept() {
+      if (this.FileInfo) {
+        return this.FileInfo.TypeList.map(({ ID }) => {
+          const t = this.FileTypeList.find(_it => _it.ID === ID);
+          if (t) {
+            return t.Name.split('/').map(it => `.${it}`).join(',');
+          }
+          return null;
+        }).filter(it => it).join(',');
+      }
+      return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z';
+    },
+  },
   methods: {
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      this.fileList = fileList;
     },
-    // this.$refs.upload.submit();
-    // accept  文件类型
-    // limit 最大数量限制
+    onFileChange(file, fileList) {
+      console.log(file, 'change');
+      this.fileList = fileList;
+    },
+    handleExceed(fileList) {
+      console.log(this.fileList, fileList, 'exceed');
+      const file = fileList[0];
+      this.fileList[0].raw = file;
+      this.fileList[0].name = file.name;
+      this.fileList[0].size = file.size;
+    },
   },
 };
 </script>
@@ -52,6 +98,11 @@ export default {
         text-align: left;
         height: 55px;
         line-height: 54px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
         > i {
           display: inline-block;
           width: 20px;
@@ -63,17 +114,31 @@ export default {
           text-align: center;
           font-size: 17px;
           font-weight: 100;
-          margin-right: 8px;
+          margin-right: 10px;
           margin-left: 22px;
+          flex: none;
+          position: relative;
+          top: -1px;
         }
         > span {
           &.title {
             color: #428dfa;
             margin-right: 4px;
+            flex: none;
           }
           &.tips {
             color: #999;
             font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            display: flex;
+            > em {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              flex: 1 1 auto;
+              padding: 0 1px;
+            }
           }
         }
         &:active {
@@ -101,6 +166,8 @@ export default {
       margin-top: 0;
       display: inline-block;
       width: 415px;
+      box-sizing: border-box;
+      padding-left: 10px;
       > a.el-upload-list__item-name {
         font-size: 12px;
         color: #aaa;
@@ -111,8 +178,33 @@ export default {
     }
   }
   &.em {
+    border-color: rgba($color: #000000, $alpha: 0);
     > ul.el-upload-list {
       padding: 0;
+    }
+    > .el-upload {
+      .el-upload-dragger {
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+        border-color: #eee;
+      }
+    }
+  }
+  &.single, &.em {
+    > ul.el-upload-list > li {
+      max-width: 830px;
+      width: auto;
+    }
+    > .el-upload {
+      .el-upload-dragger {
+        &:hover {
+          background-color: rgba(32, 159, 255, 0.06);
+          border-color: #428dfa;
+        }
+        &.is-dragover {
+          border-color: #428dfa;
+        }
+      }
     }
   }
 }
