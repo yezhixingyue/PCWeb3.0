@@ -29,12 +29,22 @@ function failSingle({ msg, successFunc, failFunc }) {
 function failSingleError({
   title = '出错啦 ！', msg, successFunc, failFunc, beforeClose,
 }) {
-  // // console.log(title);
+  let message = msg;
+  let dangerouslyUseHTMLString = false;
+  if (Array.isArray(msg)) {
+    // eslint-disable-next-line prefer-destructuring
+    if (msg.length === 1) message = msg[0];
+    if (msg.length > 1) {
+      dangerouslyUseHTMLString = true;
+      message = `<ul>${msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`)}</ul>`.replaceAll(',', '');
+    }
+  }
   MessageBox({
     showClose: true,
-    message: msg,
-    type: 'fail ',
+    message,
+    type: 'fail',
     confirmButtonText: '确定',
+    dangerouslyUseHTMLString,
     title,
     beforeClose: (action, instance, done) => {
       if (beforeClose) beforeClose();

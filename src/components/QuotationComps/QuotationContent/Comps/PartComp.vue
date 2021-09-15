@@ -83,15 +83,21 @@ export default {
       const item = { ..._item, key: Math.random().toString(36).slice(-10) };
       this.$store.commit('Quotation/setObj2GetProductPriceProductParamsPartChange', [this.PartData.PartID, i, item]);
     },
-    async onSubmitCheck() {
-      if (this.$refs.oPartPanelArray) {
-        const resultList = await Promise.all(this.$refs.oPartPanelArray.map(it => it.$refs.ruleForm.validate().catch(() => {})));
-        const len1 = resultList.length;
-        const len2 = resultList.filter(_it => _it).length;
-        return len1 === len2;
-      }
-      return true;
-      // return this.$refs.oPartPanelArray.$refs.ruleForm.validate();
+    transformErrorObj(obj) {
+      return Object.values(obj).map(it => `[ 部件${this.PartName} - ${it[0].field} ] 中，${it[0].message}`);
+    },
+    async onSubmitCheck() { // 部件提交校验
+      const checkItem = (ruleForm) => new Promise((resolve) => {
+        ruleForm.validate((bool, obj) => {
+          resolve(bool || this.transformErrorObj(obj));
+        });
+      });
+      let resultList = await Promise.all(this.$refs.oPartPanelArray.map(async it => {
+        const res = await checkItem(it.$refs.ruleForm);
+        return res;
+      }));
+      resultList = resultList.filter(it => it !== true).reduce((prev, next) => [...prev, ...next], []);
+      return resultList.length === 0 ? true : resultList;
     },
   },
 };

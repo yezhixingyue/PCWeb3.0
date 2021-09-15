@@ -100,6 +100,7 @@ export default {
       { Name: '物料', ID: 3 },
       { Name: '工艺', ID: 4 },
       { Name: '工厂', ID: 5 },
+      { Name: '尺寸组', ID: 6 },
     ],
     isOrderRestore: false,
     /** 受到交互影响的属性列表数据
@@ -217,7 +218,7 @@ export default {
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
       state.FileList = QuotationClassType.getFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation)
-        .map(it => ({ ...it, File: { ...it.File, File: null }, display: true, key: Math.random().toString(36).slice(-10) }));
+        .map(it => QuotationClassType.getCreateFileItem(it));
     },
     /* 清除选中产品详细信息
     -------------------------------*/
@@ -963,6 +964,12 @@ export default {
     setFileTypeList(state, list) {
       state.FileTypeList = list;
     },
+    setItemFlieList(state, [list, id]) {
+      const t = state.FileList.find(({ File }) => File.ID === id);
+      if (t) {
+        t.File.FileList = list;
+      }
+    },
   },
   actions: {
     /* 产品分类相关 getProductClassify getProductLists
@@ -1036,6 +1043,7 @@ export default {
       let key = true;
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
       // if (!key) return;
+      // if (res.data.Status === 500 && res.data.Message) return res.data.Message;
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;
       // eslint-disable-next-line consistent-return
       if (res.data.Status !== 1000) return res.data.Message;

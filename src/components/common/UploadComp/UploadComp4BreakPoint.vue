@@ -507,43 +507,4 @@ export default { // 上传图片按钮
     }
   }
 }
-.mp-file-upload-tips-popover-wrap {
-  margin: 0 2px;
-  > header {
-    font-size: 16px;
-    padding-left: 10px;
-    height: 32px;
-    border-bottom: 1px solid #eee;
-    padding-top: 3px;
-    padding-bottom: 1px;
-    > i {
-      width: 19px;
-      height: 18px;
-      vertical-align: text-bottom;
-      display: inline-block;
-      margin-right: 10px;
-      background: url('../../../assets/images/upload-tip.png') no-repeat center center/100% 100%;
-    }
-  }
-  > ul {
-    padding-top: 17px;
-    padding-left: 10px;
-    padding-bottom: 20px;
-    > li {
-      > p {
-        font-size: 12px;
-        color: #585858;
-        padding: 5px 0;
-        line-height: 14px;
-      }
-      > span {
-        display: block;
-        color: #888;
-        font-size: 12px;
-        line-height: 14px;
-        padding: 5px 0;
-      }
-    }
-  }
-}
 </style>

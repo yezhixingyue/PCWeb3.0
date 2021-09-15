@@ -42,7 +42,7 @@
     <span
       slot="reference"
       style="
-        margin: 4px 0;
+        margin: 0;
         margin-right: 10px;
         color: #428dfa;
         cursor: pointer;

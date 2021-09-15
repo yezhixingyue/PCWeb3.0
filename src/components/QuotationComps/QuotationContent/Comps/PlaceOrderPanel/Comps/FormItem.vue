@@ -15,7 +15,7 @@
      :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList' :subGroupAffectedPropList='subGroupAffectedPropList'
      @triggerInteraction='onTriggerInteractionClick' />
      <!-- 尺寸 -->
-    <SizeGroupComp v-if="curTypeName==='元素组' && !target.ElementList && target.SizeList" :AffectedPropList='localAffectedPropList'
+    <SizeGroupComp v-if="curTypeName==='尺寸组'" :AffectedPropList='localAffectedPropList'
      :Property='target' v-model="itemValue" :errorElementID='errorElementID' @triggerInteraction='onTriggerInteractionClick' />
      <!-- 物料 -->
     <MaterialTypeComp v-if="curTypeName==='物料'" @triggerInteraction='onTriggerInteractionClick'
@@ -96,9 +96,11 @@ export default {
           case '元素':
             targetProp = this.placeData.ElementList.find(it => it.ID === this.itemData.Property.ID);
             break;
-          case '元素组': // 元素组  也可能为尺寸
+          case '元素组':
             targetProp = this.placeData.GroupList.find(it => it.ID === this.itemData.Property.ID);
-            if (!targetProp && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property.ID) targetProp = this.placeData.SizeGroup;
+            break;
+          case '尺寸组':
+            targetProp = this.placeData.SizeGroup;
             break;
           case '物料':
             targetProp = this.placeData.MaterialList || [];
@@ -153,7 +155,11 @@ export default {
                 t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
                 if (t) value = t.List;
               }
-              if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property?.ID) value = this.submitData.Size;
+              // if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property?.ID) value = this.submitData.Size;
+              break;
+            case '尺寸组':
+              console.log(this.placeData.SizeGroup);
+              value = this.submitData.Size;
               break;
             case '物料':
               value = this.submitData.MaterialID || '';
@@ -172,8 +178,8 @@ export default {
       },
       set(val) {
         // console.log('formItem itemValue 触发改变', val);
-        let type = this.curTypeName;
-        if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
+        const type = this.curTypeName;
+        // if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);
         if (this.curTypeName === '工艺') {
           this.$emit('changeValidate', this.placeData.CraftGroupList.map(it => it.Name));
@@ -217,7 +223,7 @@ export default {
         if (this.curTypeName === '元素') { // 是否元素隐藏
           return InterAction.getIsHiddenOrNot(this.localAffectedPropList);
         }
-        if (this.curTypeName === '元素组') { // 是否元素组和尺寸组隐藏
+        if (this.curTypeName === '元素组' || this.curTypeName === '尺寸组') { // 是否元素组和尺寸组隐藏
           const _AffectedPropList = this.localAffectedPropList
             .filter((_it) => _it.Property && !_it.Property.Element && _it.Property.Group && !_it.Property.FixedType && _it.Property.FixedType !== 0);
           if (_AffectedPropList.length === 1) {
@@ -259,7 +265,7 @@ export default {
           return;
         }
       }
-      if (this.curTypeName === '元素组' && !this.isNormalGroup) { // 尺寸组
+      if (this.curTypeName === '尺寸组') { // 尺寸组
         const res = checkSizeGroup(this.itemValue, this.target, this.localAffectedPropList);
         if (res && typeof res === 'object' && res.msg) {
           this.errorElementID = res.ElementID;
@@ -293,7 +299,7 @@ export default {
       if (this.curTypeName === '物料' && Property.Type === 5) {
         return true;
       }
-      if (this.curTypeName === '元素组' && !this.target.ElementList && this.target.SizeList && Property.Type === 6) {
+      if (this.curTypeName === '尺寸组' && !this.target.ElementList && this.target.SizeList && Property.Type === 6) {
         return true;
       }
       return false;

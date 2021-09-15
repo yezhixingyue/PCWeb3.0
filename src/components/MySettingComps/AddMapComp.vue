@@ -6,6 +6,7 @@
     width="1000px"
     v-dialogDrag
     destroy-on-close
+    :close-on-click-modal='false'
     :before-close='handleBeforeDiaClose'
     custom-class="set-craft-dia mp-pc-address-map-comp-wrap"
    >

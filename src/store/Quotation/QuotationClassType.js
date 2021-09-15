@@ -132,13 +132,16 @@ export default class QuotationClassType {
             case '元素组':
               target = getTargetGroup(item, PartData.SizeGroup, PartData.GroupList);
               if (target) {
-                // 判断是否尺寸组
-                const [Prop, isSize] = target;
-                if (isSize) temp.Size = getSizeSubmitData(Prop); // 尺寸组
-                else {
-                  if (!temp.GroupList) temp.GroupList = [];
-                  temp.GroupList.push(this.getGroupItemSubmitData(Prop, false, otherSubControlList)); // 元素组
-                }
+                const [Prop] = target;
+                if (!temp.GroupList) temp.GroupList = [];
+                temp.GroupList.push(this.getGroupItemSubmitData(Prop, false, otherSubControlList)); // 元素组
+              }
+              break;
+            case '尺寸组':
+              target = getTargetGroup(item, PartData.SizeGroup, PartData.GroupList);
+              if (target) {
+                const [Prop] = target;
+                temp.Size = getSizeSubmitData(Prop); // 尺寸组
               }
               break;
             case '物料':
@@ -412,6 +415,15 @@ export default class QuotationClassType {
     return list.sort((p, n) => p.File.ShowIndex - n.File.ShowIndex);
   }
 
+  static getCreateFileItem(item) { // 创建生成一个文件项目
+    return {
+      ...item,
+      File: { ...item.File, FileList: [] },
+      display: true,
+      key: Math.random().toString(36).slice(-10),
+    };
+  }
+
   static setFileListInEffect(ProductParams, curProductInfo2Quotation, FileList) { // 设置当前产品上传文件列表
     const _list = this.getFileListInEffect(ProductParams, curProductInfo2Quotation);
     const nextIDs = _list.map(it => it.File.ID);
@@ -429,7 +441,7 @@ export default class QuotationClassType {
     _list.forEach(it => {
       if (!prevIDs.includes(it.File.ID)) {
         const index = _FileList.findIndex((_it) => it.File.ShowIndex < _it.File.ShowIndex);
-        const item = { ...it, File: { ...it.File, File: null }, display: true, key: Math.random().toString(36).slice(-10) };
+        const item = this.getCreateFileItem(it);
         if (index > -1) {
           _FileList.splice(index, 0, item);
         } else {

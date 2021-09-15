@@ -370,21 +370,41 @@ export default {
       'setProductParamsCraftList',
     ]),
     ...mapActions('Quotation', ['getProductPrice']),
+    transformErrorObj(obj) {
+      return Object.values(obj).map(it => `[ 产品 - ${it[0].field} ] 中，${it[0].message}`);
+    },
     async getCheckResult() {
-      const bool1 = await this.$refs.oProductPanel.$refs.ruleForm.validate().catch((e) => { console.log(e); });
-      let partResults = [];
-      if (this.$refs.oPartPanels) {
-        partResults = await Promise.all(this.$refs.oPartPanels.map(oPart => oPart.onSubmitCheck()));
-      }
-      const list = [bool1 || false, ...partResults];
-      const failLen = list.filter(it => !it).length;
-      return failLen === 0;
+      return new Promise((resolve) => {
+        this.$refs.oProductPanel.$refs.ruleForm.validate(async (bool, obj) => {
+          const arr = [];
+          arr.push(bool || this.transformErrorObj(obj));
+          if (this.$refs.oPartPanels) {
+            const partCheckList = await Promise.all(this.$refs.oPartPanels.map(oPart => oPart.onSubmitCheck()));
+            arr.push(...partCheckList);
+          }
+          const list = arr.filter(it => it !== true).reduce((prev, next) => [...prev, ...next], []);
+          resolve(list.length === 0 ? true : list);
+        });
+      });
     },
     async go2GetProductPrice() { // 计算价格
       // 校验
-      const bool = await this.getCheckResult();
+      const res = await this.getCheckResult();
       // 如果验证通过 执行算价
-      if (bool) this.getProductPriceLocal();
+      if (res === true) this.getProductPriceLocal();
+      else {
+        const scrollHandler = () => {
+          const app = document.getElementById('app');
+          if (app) {
+            this.utils.animateScroll(app.scrollTop, 0, num => {
+              app.scrollTop = num;
+            });
+          }
+        };
+        this.messageBox.failSingleError({
+          title: '价格计算失败', msg: res, successFunc: scrollHandler, failFunc: scrollHandler,
+        });
+      }
     },
     async getProductPriceLocal() {
       this.priceGetErrMsg = '';
