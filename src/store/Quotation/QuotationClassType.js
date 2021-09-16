@@ -430,11 +430,14 @@ export default class QuotationClassType {
     const _FileList = FileList.filter(it => nextIDs.includes(it.File.ID));
     _FileList.forEach(it => {
       const _it = it;
-      if (!nextIDs.includes(it.File.ID)) _it.display = false;
+      if (!nextIDs.includes(it.File.ID)) _it.display = false; // 已被上面筛选掉，此种情况不会再出现
       else {
         _it.display = true;
         const t = _list.find(a => a.File.ID === it.File.ID);
-        if (t) _it.IsRequired = t.IsRequired;
+        if (t) {
+          _it.IsRequired = t.IsRequired;
+          _it.MaxSize = t.MaxSize;
+        }
       }
     });
     const prevIDs = _FileList.map(it => it.File.ID);

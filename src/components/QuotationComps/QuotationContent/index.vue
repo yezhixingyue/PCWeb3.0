@@ -395,10 +395,12 @@ export default {
       else {
         const scrollHandler = () => {
           const app = document.getElementById('app');
-          if (app) {
-            this.utils.animateScroll(app.scrollTop, 0, num => {
-              app.scrollTop = num;
-            });
+          if (app && app.scrollTop > 280) {
+            // this.utils.animateScroll(app.scrollTop, 0, num => {
+            //   app.scrollTop = num;
+            // });
+            const backDom = document.getElementsByClassName('el-backtop')[0];
+            if (backDom) backDom.click();
           }
         };
         this.messageBox.failSingleError({

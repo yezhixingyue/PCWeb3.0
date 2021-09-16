@@ -4,8 +4,8 @@
     <el-upload
       :class="{ em: fileList.length === 0, single: fileList.length === 1, 'mp-upload': 1 }"
       drag
-      :auto-upload="false"
       :on-remove="handleRemove"
+      :auto-upload='false'
       :file-list="fileList"
       :on-change="onFileChange"
       :on-exceed="handleExceed"
@@ -13,21 +13,16 @@
       :accept="accept"
       :limit="!multiple ? 1 : 1000"
       :multiple="multiple"
+      :http-request="handleHttpRequest"
+      ref="upload"
     >
       <div class="header">
         <i>+</i>
-        <span class="title"
-          >添加{{ FileInfo.Name
-          }}<i v-if="required || multiple" class="is-pink is-font-12"
-            >（
-            <template v-if="required">必传</template>
-            <template v-if="required && multiple">、</template>
-            <template v-if="multiple">可上传多个</template>
-            ）</i
-          ></span
-        >
+        <span class="title">添加{{ FileInfo.Name}}</span>
         <span class="tips">
           <i>（</i>
+          <template v-if="required">必传，</template>
+          <template v-if="multiple">可上传多个，</template>
           <em :title="FileInfo.Remark.length > 40 ? FileInfo.Remark : ''">
             {{ FileInfo.Remark }}
           </em>
@@ -51,11 +46,15 @@ export default {
       type: Object,
       default: null,
     },
+    maxSize: {
+      type: Number,
+      default: 1024,
+    },
   },
   data() {
     return {
       // fileList: [],
-      maxSize: 50,
+      // maxSize: 50,
     };
   },
   computed: {
@@ -104,6 +103,10 @@ export default {
     },
     onFileChange(file, fileList) {
       this.fileList = fileList;
+      if (fileList.length > 0) {
+        console.log([{ ...fileList[0], status: 'error' }, ...fileList.slice(1)]);
+        this.fileList = [{ ...fileList[0], status: 'error' }, ...fileList.slice(1)];
+      }
       if (this.FileInfo.IsPrintFile) this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
     },
     handleExceed(fileList) { // limit超出触发事件 -- 仅单选时生效
@@ -124,7 +127,7 @@ export default {
     },
     itemValidator(rule, value, callback) { // 校验
       if (this.fileList.length === 0 && this.required) {
-        callback(new Error(`[ ${this.FileInfo.Name} ] 为必传文件`));
+        callback(new Error(this.FileInfo.FailTips || `[ ${this.FileInfo.Name} ] 为必传文件`));
         return;
       }
       if (this.fileList.length > 0) {
@@ -135,6 +138,15 @@ export default {
         }
       }
       callback();
+    },
+    handleHttpRequest(...arr) {
+      console.log('handleHttpRequest', arr);
+      return 'error';
+    },
+    submit() {
+      console.log('submit item', this.$refs.upload);
+      this.$refs.upload.submit();
+      this.$refs.upload.httpRequest();
     },
   },
 };
@@ -283,24 +295,5 @@ export default {
   .el-form-item__error {
     padding-left: 6px;
   }
-  // &.is-error {
-    // .mp-upload {
-      // border-color: #ff3769;
-      // &:hover {
-      //   border-color: #eee;
-      // }
-      // &.em {
-      //   border-color: rgba($color: #000000, $alpha: 0);
-        // > .el-upload {
-        //   .el-upload-dragger {
-        //     border-color: #ff3769;
-        //     &:hover {
-        //       border-color: #428dfa;
-        //     }
-        //   }
-        // }
-      // }
-    // }
-  // }
 }
 </style>

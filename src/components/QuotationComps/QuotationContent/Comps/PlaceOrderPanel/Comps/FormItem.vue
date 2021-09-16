@@ -158,7 +158,6 @@ export default {
               // if (!t && this.placeData.SizeGroup.GroupInfo.ID === this.itemData.Property?.ID) value = this.submitData.Size;
               break;
             case '尺寸组':
-              console.log(this.placeData.SizeGroup);
               value = this.submitData.Size;
               break;
             case '物料':
@@ -180,7 +179,8 @@ export default {
         // console.log('formItem itemValue 触发改变', val);
         const type = this.curTypeName;
         // if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
-        this.$store.commit('Quotation/setObj2GetProductPriceProductParams', [this.PartID, this.PartIndex, type, this.itemData.Property.ID, val]);
+        this.$store.commit('Quotation/setObj2GetProductPriceProductParams',
+          [this.PartID, this.PartIndex, type, this.itemData.Property ? this.itemData.Property.ID : '', val]);
         if (this.curTypeName === '工艺') {
           this.$emit('changeValidate', this.placeData.CraftGroupList.map(it => it.Name));
         }

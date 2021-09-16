@@ -5,7 +5,9 @@
       :key="it.key"
       v-show="it.display"
       :required="it.IsRequired"
+      :maxSize='it.MaxSize'
       :FileInfo="it.File"
+      ref="UploadItem"
       @validateField="handleValidateField"
       @fillFileContent='fillFileContent'
     />
@@ -41,6 +43,19 @@ export default {
     },
     fillFileContent(e) {
       this.$emit('fillFileContent', e);
+    },
+    submitAll() {
+      if (this.$refs.UploadItem.length > 0) {
+        this.$refs.UploadItem.map(it => it.submit());
+      }
+    },
+  },
+  watch: {
+    FileList(newVal, oldVal) {
+      console.log(newVal, oldVal);
+      this.$nextTick(() => {
+        this.validate();
+      });
     },
   },
 };

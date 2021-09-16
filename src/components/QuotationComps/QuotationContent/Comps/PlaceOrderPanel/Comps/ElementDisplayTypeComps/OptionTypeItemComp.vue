@@ -77,7 +77,7 @@ export default {
       get() {
         return this.value;
       },
-      set(val) {
+      set(val) { // 单选传字符串  多选传数值
         this.$emit('change', val);
       },
     },
@@ -118,17 +118,24 @@ export default {
     onSelectChange(e) {
       this.$emit('blur', e);
     },
-    handleInterAction(list) {
+    handleInterAction(list) { // 处理选项列表变动时
       if (!Array.isArray(list) || list.length === 0) return;
-      if (list.includes(this.value)) {
-        const t = this.localOptions.find(it => it.IsChecked); // 找到默认值
-        let _defaultVal = '';
-        if (t && !list.includes(t.ID)) _defaultVal = t.ID;
-        this.$emit('change', _defaultVal);
+      // 应分2种情况： 单选时 | 多选时
+      if (!this.isMultiple) { // 单选
+        if (list.includes(this.value)) {
+          const t = this.localOptions.find(it => it.IsChecked); // 找到默认值
+          let _defaultVal = '';
+          if (t && !list.includes(t.ID)) _defaultVal = t.ID;
+          this.$emit('change', _defaultVal);
+        }
+      } else if (Array.isArray(this.value) && this.value.length > 0) { // 多选
+        let _val = this.value.filter(it => !list.includes(it));
+        if (_val.length === 0) _val = this.localOptions.filter(it => it.IsChecked && !list.includes(it.ID)).map(it => it.ID);
+        this.$emit('change', _val);
       }
     },
-    handleAllowChange(bool) {
-      if (!bool && this.value) {
+    handleAllowChange(bool) { // 主要用于在动态切换为不允许自定义时，清除掉原来已设置的自定义的内容，仅为下拉框且为单选的情况下才会出现该情况
+      if (!bool && this.value && !this.isMultiple && !this.isRadio) { // 不支持多选且为下拉框时才执行 多选不支持自定义
         const t = this.localOptions.find(it => it.ID === this.value);
         if (!t) {
           const t2 = this.localOptions.find(it => it.IsChecked); // 找到默认值

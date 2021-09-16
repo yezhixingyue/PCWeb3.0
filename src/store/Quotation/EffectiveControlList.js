@@ -439,14 +439,20 @@ export const getFileListInEffect = (ProductParams, curProductInfo2Quotation, Fil
       let hasPrintFile = false; // 是否已有印刷文件，如果有则不再添加印刷文件
       allFiles.forEach(it => {
         const { IsPrintFile } = it.File;
-        if ((IsPrintFile && hasPrintFile)) return;
+        // if ((IsPrintFile && hasPrintFile)) return;
         const t = FileListInEffect.find(_it => _it.File.ID === it.File.ID);
-        if (!t) {
+        if (!t && !(IsPrintFile && hasPrintFile)) {
           FileListInEffect.push(it);
           if (IsPrintFile) hasPrintFile = true;
-        } else if (!t.IsRequired && it.IsRequired) {
-          const _t = t;
-          _t.IsRequired = true;
+        } else {
+          if (!t.IsRequired && it.IsRequired) {
+            const _t = t;
+            _t.IsRequired = true;
+          }
+          if (t.MaxSize < it.MaxSize) {
+            const _t = t;
+            _t.MaxSize = it.MaxSize;
+          }
         }
       });
     }

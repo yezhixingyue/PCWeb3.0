@@ -1066,12 +1066,15 @@ export default {
     /* 下单 - 预下单
     -------------------------------*/
     async getOrderPreCreate({ state, commit, rootState }, { compiledName, fileContent, callBack }) {
-      // 配置组合生成请求对象
+      // 1. 配置组合生成请求对象
       const _requestObj = { List: [], OrderType: 2, PayInFull: false };
       const _itemObj = {};
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
+      // 2. 编译文件名称 --- 此处需要修改
       if (compiledName) _itemObj.FilePath = compiledName;
+      // 3. 补充平台单号
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
+      // 4. 填充收货地址与配送方式
       _itemObj.Address = {};
       _itemObj.Address.Express = state.addressInfo4PlaceOrder.Address.Express;
       if (state.addressInfo4PlaceOrder.Address.AddressID) {
@@ -1079,25 +1082,26 @@ export default {
       } else {
         _itemObj.Address.Address = state.addressInfo4PlaceOrder.Address.Address;
       }
+      // 5. 填充文件内容
       _itemObj.Content = fileContent;
+      // 6. 记录文件内容与当前接口请求类型
       commit('setCurFileContent', fileContent);
       commit('setCurSelectStatus', '下单');
+      // 7. 填充优惠券信息
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
 
+      // 8. 填充面板信息
       const productData = state.obj2GetProductPrice.ProductParams;
-      // if (QuotationClassType.check(productData) === false) return;
-      // commit('setWatchTarget2DelCraft');
-      // await dispatch('delay', 10);
-      // const ProductParams = QuotationClassType.filter(
-      //   QuotationClassType.transform(productData),
-      // );
       const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
 
+      // 9. 最终完成提交信息
       _requestObj.List.push(_itemObj);
-      const res = await api.getOrderPreCreate(_requestObj);
-      if (res.data.Status === 1000) {
+
+      // 10. 接口提交
+      const res = await api.getOrderPreCreate(_requestObj).catch(() => {});
+      if (res && res.data.Status === 1000) {
         commit('setCurReqObj4PreCreate', _itemObj);
         commit('setPreCreateData', res.data.Data);
         const _b = rootState.common.customerBalance;
@@ -1146,19 +1150,12 @@ export default {
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
 
       const productData = state.obj2GetProductPrice.ProductParams;
-      // if (QuotationClassType.check(productData) === false) return;
-      // commit('setWatchTarget2DelCraft');
-      // await dispatch('delay', 10);
-      // const ProductParams = QuotationClassType.filter(
-      //   QuotationClassType.transform(productData),
-      // );
       const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
-      const res = await api.getQuotationSave(_itemObj);
-      // // console.log(res);
+      const res = await api.getQuotationSave(_itemObj).catch(() => {});
 
-      if (res.data.Status === 1000) {
+      if (res && res.data.Status === 1000) {
         massage.successSingle({ title: '添加成功!' });
         const _obj = JSON.parse(JSON.stringify(state.curProductInfo2Quotation));
         commit('setCurProductInfo2Quotation', null);

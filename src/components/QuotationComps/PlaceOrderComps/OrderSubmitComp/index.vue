@@ -97,7 +97,6 @@ export default {
     isSpotGoods() {
       if (!Array.isArray(this.FileList) || this.FileList.length === 0) return true;
       const t = this.FileList.find(it => it.File && it.File.IsPrintFile);
-      console.log(this.FileList, t);
       return !t;
     },
   },
@@ -111,11 +110,11 @@ export default {
   methods: {
     successFunc({ compiledName, FileSize }) {
       if (this.type === 'placeOrder') {
-        const callBack = () => {
-          this.$store.commit('Quotation/setCurPayInfo2Code', null);
-          this.$router.push('/OrderPreCreate');
-        };
-        this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName, fileContent: this.fileContent, callBack });
+        // const callBack = () => {
+        //   this.$store.commit('Quotation/setCurPayInfo2Code', null);
+        //   this.$router.push('/OrderPreCreate');
+        // };
+        // this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName, fileContent: this.fileContent, callBack });
       } else if (this.type === 'saveCar') {
         this.$store.dispatch('Quotation/getQuotationSave2Car', { compiledName, fileContent: this.fileContent, FileSize });
       }
@@ -125,8 +124,11 @@ export default {
       this.type = 'placeOrder';
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
-      console.log('执行下单');
-      // await this.$refs.UploadComp4BreakPoint.saveFile2Store();
+      const callBack = () => {
+        this.$store.commit('Quotation/setCurPayInfo2Code', null);
+        this.$router.push('/OrderPreCreate');
+      };
+      this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent: this.fileContent, callBack });
     },
     async onSave2TheCar(evt) { // 加入购物车
       let { target } = evt;
@@ -140,7 +142,7 @@ export default {
       this.type = 'saveCar';
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
-      console.log('执行加购');
+      this.$refs.FileForm.submitAll();
       // await this.$refs.UploadComp4BreakPoint.handleElUpload();
     },
     fillFileContent(name) {
@@ -166,18 +168,20 @@ export default {
     },
     async FileChecker() { // 获取文件校验结果信息
       const [bool, obj] = await this.$refs.FileForm.validate();
-      return bool ? '' : Object.values(obj).map(it => it[0].message).reverse().join('、');
+      return bool ? '' : Object.values(obj).map(it => it[0].message).reverse();
     },
     async OrderPanelChecker() { // 下单面板校验及返回页面顶部处理
       const bool = await this.getCheckResult();
       if (bool !== true) {
         const scrollHandler = () => {
-          const app = document.getElementById('app');
-          if (app) {
-            this.utils.animateScroll(app.scrollTop, 0, num => {
-              app.scrollTop = num;
-            });
-          }
+          // const app = document.getElementById('app');
+          // if (app) {
+          //   this.utils.animateScroll(app.scrollTop, 0, num => {
+          //     app.scrollTop = num;
+          //   });
+          // }
+          const backDom = document.getElementsByClassName('el-backtop')[0];
+          if (backDom) backDom.click();
         };
         this.messageBox.failSingleError({
           title: `${this.title}失败`, msg: bool, successFunc: scrollHandler, failFunc: scrollHandler,
@@ -224,7 +228,7 @@ export default {
         this.FileContentChecker(), // 文件内容
         this.FileChecker(), // 文件上传
       ]);
-      list = list.filter(it => it); // 错误信息列表
+      list = list.filter(it => it).map(it => (Array.isArray(it) ? it : [it])).filter(it => it.length > 0).reduce((a, b) => [...a, ...b], []); // 错误信息列表
       if (list.length > 0 && bool) {
         this.messageBox.failSingleError({ title: `${this.title}失败`, msg: list });
         return false;

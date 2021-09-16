@@ -190,6 +190,7 @@ export default {
       this.showMain = true;
       this.getAffectedPropList();
       this.getSubGroupAffectedPropLists();
+      console.log(this.localSetupData.ElementList && this.localSetupData.ElementList[1]?.CustomerInputValues);
     },
     onClosed() {
       this.showMain = false;
@@ -205,6 +206,7 @@ export default {
       return t ? t.List : [];
     },
     handleElementChange(CustomerInputValues, el) {
+      console.log(el, CustomerInputValues);
       const t = this.localSetupData.ElementList.find(
         (it) => it.ElementID === el.ID,
       );

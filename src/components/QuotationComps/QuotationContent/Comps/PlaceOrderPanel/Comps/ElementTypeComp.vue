@@ -109,6 +109,7 @@ export default {
           this.$emit('input', [temp]);
         } else if (this.Property.OptionAttribute && !this.Property.OptionAttribute.IsRadio) {
           // 多选  此时不允许自定义
+          console.log(val, Array.isArray(val) && val.map(ID => ({ ID })));
           this.$emit('input', Array.isArray(val) ? val.map(ID => ({ ID })) : []);
         }
       },
@@ -135,23 +136,23 @@ export default {
     };
   },
   methods: {
-    handleDefaultValueInit() {
-      if (this.Property.Type === 2 && this.Property.OptionAttribute) { // 选项值 单选 | 多选
-        const ValueList = this.Property.OptionAttribute.OptionList?.filter(it => it.IsChecked).map(it => ({ ID: it.ID })) || [];
-        this.$emit('input', ValueList);
-      }
-      if (this.Property.Type === 1 && this.Property.NumbericAttribute) { // 数字值
-        let Value = this.Property.NumbericAttribute.CheckedValue;
-        if (!Value && Value !== 0) Value = '';
-        const ValueList = [{ Value: `${Value}` }];
-        this.$emit('input', ValueList);
-      }
-      if (this.Property.Type === 3 && this.Property.SwitchAttribute) { // 开关
-        const Value = this.Property.SwitchAttribute.DefaultOpen ? this.Property.SwitchAttribute.OpenValue : this.Property.SwitchAttribute.CloseValue;
-        const ValueList = [{ Value: `${Value}` }];
-        this.$emit('input', ValueList);
-      }
-    },
+    // handleDefaultValueInit() {
+    //   if (this.Property.Type === 2 && this.Property.OptionAttribute) { // 选项值 单选 | 多选
+    //     const ValueList = this.Property.OptionAttribute.OptionList?.filter(it => it.IsChecked).map(it => ({ ID: it.ID })) || [];
+    //     this.$emit('input', ValueList);
+    //   }
+    //   if (this.Property.Type === 1 && this.Property.NumbericAttribute) { // 数字值
+    //     let Value = this.Property.NumbericAttribute.CheckedValue;
+    //     if (!Value && Value !== 0) Value = '';
+    //     const ValueList = [{ Value: `${Value}` }];
+    //     this.$emit('input', ValueList);
+    //   }
+    //   if (this.Property.Type === 3 && this.Property.SwitchAttribute) { // 开关
+    //     const Value = this.Property.SwitchAttribute.DefaultOpen ? this.Property.SwitchAttribute.OpenValue : this.Property.SwitchAttribute.CloseValue;
+    //     const ValueList = [{ Value: `${Value}` }];
+    //     this.$emit('input', ValueList);
+    //   }
+    // },
     onFocus() {
       this.$emit('focus');
     },
