@@ -35,6 +35,8 @@
 
 <script>
 import { mapState } from 'vuex';
+import FileTypeClass from '@/assets/js/ClassType/FileTypeClass';
+import UploadFileByBreakPoint from '@/assets/js/upload/UploadFileByBreakPoint';
 
 export default {
   props: {
@@ -53,8 +55,9 @@ export default {
   },
   data() {
     return {
-      // fileList: [],
+      fileList: [],
       // maxSize: 50,
+      isExecuting: false, // 去除重复操作是否正在执行
     };
   },
   computed: {
@@ -79,35 +82,33 @@ export default {
       }
       return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z';
     },
-    fileList: {
-      get() {
-        if (this.FileInfo) {
-          return this.FileInfo.FileList;
-        }
-        return [];
-      },
-      set(val) {
-        this.$nextTick(() => {
-          this.$store.commit('Quotation/setItemFlieList', [
-            val,
-            this.FileInfo.ID,
-          ]);
-          this.$emit('validateField', `${this.FileInfo.ID}`);
-        });
-      },
-    },
+    // fileList: {
+    //   get() {
+    //     if (this.FileInfo) {
+    //       return this.FileInfo.FileList;
+    //     }
+    //     return [];
+    //   },
+    //   set(val) {
+    //     this.$nextTick(() => {
+    //       this.$store.commit('Quotation/setItemFlieList', [
+    //         val,
+    //         this.FileInfo.ID,
+    //       ]);
+    //       this.$emit('validateField', `${this.FileInfo.ID}`);
+    //     });
+    //   },
+    // },
   },
   methods: {
     handleRemove(file, fileList) {
       this.fileList = fileList;
     },
     onFileChange(file, fileList) {
+      // console.log('onFileChange', file, fileList);
+      // if (file.status !== 'ready') return; // 不是添加则返回
       this.fileList = fileList;
-      if (fileList.length > 0) {
-        console.log([{ ...fileList[0], status: 'error' }, ...fileList.slice(1)]);
-        this.fileList = [{ ...fileList[0], status: 'error' }, ...fileList.slice(1)];
-      }
-      if (this.FileInfo.IsPrintFile) this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
+      if (this.FileInfo.IsPrintFile && file.status === 'ready') this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
     },
     handleExceed(fileList) { // limit超出触发事件 -- 仅单选时生效
       if (!this.multiple) {
@@ -139,14 +140,87 @@ export default {
       }
       callback();
     },
-    handleHttpRequest(...arr) {
-      console.log('handleHttpRequest', arr);
-      return 'error';
+    async handleHttpRequest(data) {
+      const {
+        file, onError, onProgress, onSuccess,
+      } = data;
+
+      onProgress({ percent: 0 }); //   进度条起始
+
+      // 1. 解析文件名称
+      let err;
+      const name = await FileTypeClass.getUniqueFileName(file).catch((error) => {
+        err = error;
+      });
+      if (err) { // 解析失败
+        //  -----------------  此处应执行 onError 方法
+        return;
+      }
+      onProgress({ percent: 10 }); //  进度条跳至10%
+
+      // 2. 获取到文件及唯一文件名称后，开始执行上传
+      console.log('唯一名称：', name, UploadFileByBreakPoint);
+
+      console.log('handleHttpRequest, file文件：', file, onError);
+      let n = 10;
+      const timer = setInterval(() => {
+        if (n < 100) {
+          onProgress({ percent: n });
+          n += 10;
+        } else {
+          if (Math.random() > 0.5) onSuccess('上传成功');
+          else onError();
+          clearInterval(timer);
+        }
+      }, 1000);
     },
     submit() {
-      console.log('submit item', this.$refs.upload);
       this.$refs.upload.submit();
-      this.$refs.upload.httpRequest();
+    },
+  },
+  watch: {
+    fileList(newVal, oldVal) { // 去重及筛选格式不符合的文件
+      this.$emit('validateField', `${this.FileInfo.ID}`); // 发生变动时进行重新校验
+      // 去重
+      if (newVal.length < oldVal.length) return;
+      const arr = [];
+      this.fileList.forEach(_file => {
+        const i = arr.findIndex(_it => _it.size === _file.size && _it.name === _file.name && _it.raw.type === _file.raw.type);
+        if (i === -1) arr.push(_file);
+      });
+      let isRepeat = false;
+      let isNotMatch = false;
+      if (this.fileList.length > arr.length) isRepeat = true;
+
+      // 去除格式不符合文件
+      const list = arr.filter(_file => {
+        const extname = this.utils.extname(_file.name);
+        return this.accept.includes(extname);
+      });
+      if (list.length < arr.length) isNotMatch = true;
+
+      // 汇总
+      if (isRepeat || isNotMatch) {
+        let message;
+        let title;
+        if (isRepeat) {
+          message = '已去除重复文件';
+          title = '文件重复';
+        }
+        if (isNotMatch) {
+          message = '已去除格式不符合文件';
+          title = '文件格式不符';
+        }
+        if (isRepeat && isNotMatch) {
+          message = '已去除重复及格式不符合文件';
+          title = '部分文件重复且格式不符';
+        }
+        this.$notify.error({
+          title,
+          message,
+        });
+        this.fileList = list;
+      }
     },
   },
 };
@@ -245,7 +319,8 @@ export default {
       > li {
         margin-top: 0;
         display: inline-block;
-        width: 415px;
+        width: 405px;
+        margin-right: 10px;
         box-sizing: border-box;
         padding-left: 10px;
         line-height: 24px;
@@ -277,6 +352,7 @@ export default {
     &.em {
       > ul.el-upload-list > li {
         max-width: 830px;
+        min-width: 405px;
         width: auto;
       }
       > .el-upload {

@@ -55,15 +55,18 @@ export default {
         }).join(' ');
         return _Name;
       };
+      const _showLenList = this.MaterialList.map(it => it.Type).map(it => it.UnionShowList.length);
+      const showRootClass = [...new Set(_showLenList)].length > 1;
       this.MaterialList.filter(it => !this.hiddenMatarialList.includes(it.ID)).forEach(lv1 => {
         const { Type, ID } = lv1;
         const { UnionShowList, Name, ElementList } = Type;
         // 1. 寻找已有相同分类
-        let t1 = list.find(it => it.ID === Type.ID);
+        let t1 = list.find(it => it.ID === (showRootClass ? Type.ID : 'Type'));
         // let t1 = list.find(it => it.ID === 'Type');
         if (!t1) { // 2.如果没有则添加
           const temp = {
-            ID: Type.ID,
+            // ID: Type.ID,
+            ID: showRootClass ? Type.ID : 'Type',
             // ID: 'Type',
             Name,
             children: [],
@@ -71,7 +74,8 @@ export default {
           list.push(temp);
         }
         // 3. 重新寻找一遍 此时肯定会找着
-        t1 = list.find(it => it.ID === Type.ID);
+        t1 = list.find(it => it.ID === (showRootClass ? Type.ID : 'Type'));
+        // t1 = list.find(it => it.ID === Type.ID);
         // t1 = list.find(it => it.ID === 'Type');
         if (t1) {
           if (UnionShowList.length === 0) {
