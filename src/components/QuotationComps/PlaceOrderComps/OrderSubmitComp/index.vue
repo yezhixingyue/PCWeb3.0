@@ -141,9 +141,9 @@ export default {
       this.title = '添加';
       this.type = 'saveCar';
       const result = await this.handleSummaryChecker(); // 总校验是否通过
+      console.log(result, this.$refs.FileForm);
       if (!result) return;
-      this.$refs.FileForm.submitAll();
-      // await this.$refs.UploadComp4BreakPoint.handleElUpload();
+      this.$refs.FileForm.submitAll(); // 执行文件上传
     },
     fillFileContent(name) {
       this.fileContent = name;

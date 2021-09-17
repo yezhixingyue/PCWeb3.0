@@ -19,7 +19,7 @@
      :Property='target' v-model="itemValue" :errorElementID='errorElementID' @triggerInteraction='onTriggerInteractionClick' />
      <!-- 物料 -->
     <MaterialTypeComp v-if="curTypeName==='物料'" @triggerInteraction='onTriggerInteractionClick'
-     :AffectedPropList='localAffectedPropList' :MaterialList='target.filter(it => !it.HiddenToCustomer)' v-model="itemValue"/>
+     :AffectedPropList='localAffectedPropList' :MaterialList='target' v-model="itemValue"/>
     <!-- 工艺 -->
     <CraftTypeComp
      v-if="curTypeName==='工艺'"
@@ -109,7 +109,7 @@ export default {
             targetProp = this.placeData.CraftGroupList.find(it => it.ID === this.itemData.Property.ID);
             break;
           case '工厂': // 工厂隐藏
-            targetProp = this.placeData.FactoryList;
+            // targetProp = this.placeData.FactoryList;
             break;
           default:
             break;

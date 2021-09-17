@@ -340,8 +340,8 @@ export default {
     },
     isSetupError() { // 是否有配置上的错误
       if (!this.placeData) return true;
-      if (!Array.isArray(this.placeData.FactoryList)) return true;
-      if (this.placeData.FactoryList.length === 0) return true;
+      // if (!Array.isArray(this.placeData.FactoryList)) return true;
+      // if (this.placeData.FactoryList.length === 0) return true;
       // if (!this.placeData.FactoryList || this.placeDate.FactoryList.length === 0) return true; // 暂时只判断工厂， 其它后面补充
       return false;
     },

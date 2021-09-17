@@ -36,7 +36,6 @@
 <script>
 import { mapState } from 'vuex';
 import FileTypeClass from '@/assets/js/ClassType/FileTypeClass';
-import UploadFileByBreakPoint from '@/assets/js/upload/UploadFileByBreakPoint';
 
 export default {
   props: {
@@ -153,28 +152,32 @@ export default {
         err = error;
       });
       if (err) { // 解析失败
-        //  -----------------  此处应执行 onError 方法
+        this.$notify.error({
+          title: `${file.name}上传失败`,
+          message: err,
+        });
+        onError(new Error(err));
         return;
       }
-      onProgress({ percent: 10 }); //  进度条跳至10%
 
       // 2. 获取到文件及唯一文件名称后，开始执行上传
-      console.log('唯一名称：', name, UploadFileByBreakPoint);
+      const onUploadProgressFunc = progress => {
+        if (this.utils.getValueIsOrNotNumber(progress)) onProgress({ percent: progress });
+      };
 
-      console.log('handleHttpRequest, file文件：', file, onError);
-      let n = 10;
-      const timer = setInterval(() => {
-        if (n < 100) {
-          onProgress({ percent: n });
-          n += 10;
-        } else {
-          if (Math.random() > 0.5) onSuccess('上传成功');
-          else onError();
-          clearInterval(timer);
-        }
-      }, 1000);
+      const key = await FileTypeClass.UploadFileByBreakPoint(file, name, onUploadProgressFunc, 100);
+      if (key) { // 上传成功
+        onSuccess();
+      } else { // 上传失败
+        this.$notify.error({
+          title: `${file.name}上传失败`,
+          message: '抱歉，文件上传失败，请重试!',
+        });
+        onError(new Error('文件上传失败'));
+      }
     },
     submit() {
+      // this.result
       this.$refs.upload.submit();
     },
   },

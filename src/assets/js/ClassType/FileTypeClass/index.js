@@ -1,4 +1,5 @@
-import { extname } from '../utils/utils';
+import UploadFileByBreakPoint from './UploadFileByBreakPoint';
+import { extname } from '../../utils/utils';
 
 const sha1 = require('js-sha1');
 
@@ -27,5 +28,9 @@ export default class FileTypeClass {
         resolve(_name);
       };
     });
+  }
+
+  static UploadFileByBreakPoint(file, name, onUploadProgressFunc, finalPercentage) {
+    return UploadFileByBreakPoint(file, name, onUploadProgressFunc, finalPercentage);
   }
 }

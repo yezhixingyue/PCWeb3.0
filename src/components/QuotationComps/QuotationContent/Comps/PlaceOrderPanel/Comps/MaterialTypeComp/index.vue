@@ -1,5 +1,5 @@
 <template>
-  <section v-if="MaterialList.length > 0">
+  <section v-if="_MaterialList.length > 0">
     <MaterialSingleSelector :list='showList' v-model="selectedMaterial" hiddenOption />
   </section>
 </template>
@@ -43,6 +43,22 @@ export default {
       }
       return [];
     },
+    _MaterialList() {
+      const list = [];
+      this.MaterialList.forEach(it => {
+        const _list = it.MaterialList.map(m => ({
+          ...m,
+          Type: {
+            ID: it.ID,
+            Name: it.Name,
+            ElementList: m.ElementList,
+            UnionShowList: it.UnionShowList,
+          },
+        }));
+        list.push(..._list);
+      });
+      return list;
+    },
     showList() {
       const list = [];
       // const showLabel = true; // 是否显示属性名称，如 克重、颜色等
@@ -55,9 +71,9 @@ export default {
         }).join(' ');
         return _Name;
       };
-      const _showLenList = this.MaterialList.map(it => it.Type).map(it => it.UnionShowList.length);
+      const _showLenList = this.MaterialList.map(it => it.UnionShowList.length);
       const showRootClass = [...new Set(_showLenList)].length > 1;
-      this.MaterialList.filter(it => !this.hiddenMatarialList.includes(it.ID)).forEach(lv1 => {
+      this._MaterialList.filter(it => !this.hiddenMatarialList.includes(it.ID)).forEach(lv1 => {
         const { Type, ID } = lv1;
         const { UnionShowList, Name, ElementList } = Type;
         // 1. 寻找已有相同分类
@@ -149,7 +165,7 @@ export default {
       if (!Array.isArray(list) || list.length === 0) return;
       if (list.includes(this.value)) {
         let t = this.curMaterialList.find(it => it.disabled && it.ID !== this.value && !list.includes(it.ID));
-        if (!t) t = this.MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !list.includes(it.ID));
+        if (!t) t = this._MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !list.includes(it.ID));
         this.selectedMaterial = t ? t.ID : '';
       }
     },

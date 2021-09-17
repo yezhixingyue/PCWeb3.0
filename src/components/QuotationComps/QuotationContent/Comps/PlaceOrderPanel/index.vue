@@ -3,17 +3,16 @@
     v-if="placeData"
     class="mp-place-order-page-place-order-panel-comp-container"
   >
-    <div
+    <!-- <div
       class="setting-error is-pink"
       v-if="!PartID && (!placeData.FactoryList || placeData.FactoryList.length === 0)"
     >
       <i class="el-icon-warning"></i>
       <span>当前产品未设置工厂，请到产品管理中设置工厂 ！</span>
-    </div>
+    </div> -->
     <el-form
       :model="ruleForm"
       ref="ruleForm"
-      v-else
       label-width="100px"
       class="place-order-ruleForm"
       size="mini"

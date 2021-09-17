@@ -44,15 +44,20 @@ export default {
     fillFileContent(e) {
       this.$emit('fillFileContent', e);
     },
-    submitAll() {
-      if (this.$refs.UploadItem.length > 0) {
-        this.$refs.UploadItem.map(it => it.submit());
+    async submitAll() {
+      if (this.$refs.UploadItem && this.$refs.UploadItem.length > 0) {
+        let uploadErr = false;
+        const result = await Promise.all(this.$refs.UploadItem.map(it => it.submit())).catch(() => {
+          uploadErr = true;
+        });
+        if (uploadErr) return false;
+        console.log(result);
       }
+      return true;
     },
   },
   watch: {
-    FileList(newVal, oldVal) {
-      console.log(newVal, oldVal);
+    FileList() {
       this.$nextTick(() => {
         this.validate();
       });

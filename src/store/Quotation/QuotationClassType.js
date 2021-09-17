@@ -146,8 +146,14 @@ export default class QuotationClassType {
               break;
             case '物料':
               // 此处获取该部件物料列表数据(筛选过后)，如果长度为0 则不生成下面数据 -- 已在上面筛选判断
-              target = PartData.MaterialList.filter(it => !it.HiddenToCustomer);
-              if (target.length > 0) temp.MaterialID = target[0].ID;
+              // target = PartData.MaterialList.filter(it => !it.HiddenToCustomer);
+              if (Array.isArray(PartData.MaterialList) && PartData.MaterialList.length > 0) {
+                target = PartData.MaterialList.find(_it => Array.isArray(_it.MaterialList) && _it.MaterialList.length > 0);
+                if (target) {
+                  temp.MaterialID = target.MaterialList[0].ID;
+                }
+              }
+              // if (target.length > 0) temp.MaterialID = target[0].ID;
               break;
             case '工艺':
               if (isCraftInited) return;

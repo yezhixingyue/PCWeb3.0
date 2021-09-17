@@ -62,7 +62,7 @@
 
 <script>
 
-import UploadFileByBreakPoint from '@/assets/js/upload/UploadFileByBreakPoint';
+import UploadFileByBreakPoint from '@/assets/js/ClassType/FileTypeClass/UploadFileByBreakPoint';
 import massage from '@/assets/js/utils/message';
 
 const sha1 = require('js-sha1');
