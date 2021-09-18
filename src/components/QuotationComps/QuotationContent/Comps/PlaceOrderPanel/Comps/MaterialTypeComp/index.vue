@@ -46,7 +46,7 @@ export default {
     _MaterialList() {
       const list = [];
       this.MaterialList.forEach(it => {
-        const _list = it.MaterialList.map(m => ({
+        const _list = it.List.map(m => ({
           ...m,
           Type: {
             ID: it.ID,

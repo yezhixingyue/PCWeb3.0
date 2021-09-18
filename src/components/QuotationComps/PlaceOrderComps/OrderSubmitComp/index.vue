@@ -13,6 +13,7 @@
               prop="fileContent"
               :rules="[
                 { required: true, message: '请输入文件内容'},
+                { max: 130, message: '文件内容不能超过130个字'},
               ]"
             >
               <el-input
@@ -26,12 +27,6 @@
         <li class="design-document">
           <DesignDocumentPopoverComp />
         </li>
-        <!-- <li class="upload-box">
-          <UploadComp4BreakPoint ref='UploadComp4BreakPoint' :validateFunc='getProductPriceLocal'
-            :shouldUpload='!isSpotGoods'
-            :msgTitle='title' @fillFileContent='fillFileContent'
-            :successFunc="successFunc" @saveFile2Store='saveFile2Store' />
-        </li> -->
         <li class="file-list-box">
           <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' />
         </li>
@@ -43,29 +38,26 @@
         <ComputedResultComp
           :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
       </div>
+      <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' :requestObj='requestObj' :FileCount='FileCount' />
     </div>
   </section>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-// import UploadComp4BreakPoint from '@/components/common/UploadComp/UploadComp4BreakPoint.vue';
 import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
 import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
 import FileListForm from './FileListForm';
+import SubmitConfirmDialog from './SubmitConfirmDialog/index.vue';
 
 export default {
   components: {
-    // UploadComp4BreakPoint,
     ComputedResultComp,
     DesignDocumentPopoverComp,
     FileListForm,
+    SubmitConfirmDialog,
   },
   props: {
-    // isSpotGoods: { // 改成内部使用 -- 根据是否有印刷文件来确定 3.0不再有该内容
-    //   type: Boolean,
-    //   default: false,
-    // },
     asyncInputchecker: {
       type: Function,
       default: () => {},
@@ -104,31 +96,27 @@ export default {
     return {
       fileContent: '',
       title: '', // 用于弹窗标题显示   下单 | 添加购物车   后面自动添加失败2字
-      type: '',
+      visible: false,
+      OrderPreData: null,
+      requestObj: null,
+      FileCount: 0,
     };
   },
   methods: {
-    successFunc({ compiledName, FileSize }) {
-      if (this.type === 'placeOrder') {
-        // const callBack = () => {
-        //   this.$store.commit('Quotation/setCurPayInfo2Code', null);
-        //   this.$router.push('/OrderPreCreate');
-        // };
-        // this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName, fileContent: this.fileContent, callBack });
-      } else if (this.type === 'saveCar') {
-        this.$store.dispatch('Quotation/getQuotationSave2Car', { compiledName, fileContent: this.fileContent, FileSize });
-      }
-    },
     async onSubmitOrder() { // 直接下单
       this.title = '下单';
-      this.type = 'placeOrder';
+      this.OrderPreData = null;
+      this.requestObj = null;
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
-      const callBack = () => {
-        this.$store.commit('Quotation/setCurPayInfo2Code', null);
-        this.$router.push('/OrderPreCreate');
-      };
-      this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent: this.fileContent, callBack });
+      const resp = await this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent: this.fileContent });
+      if (resp) {
+        const [PreCreateData, requestObj] = resp;
+        this.OrderPreData = PreCreateData;
+        this.requestObj = requestObj;
+        this.FileCount = this.getFileCount();
+        this.visible = true;
+      }
     },
     async onSave2TheCar(evt) { // 加入购物车
       let { target } = evt;
@@ -139,11 +127,41 @@ export default {
       }
       target.blur();
       this.title = '添加';
-      this.type = 'saveCar';
       const result = await this.handleSummaryChecker(); // 总校验是否通过
-      console.log(result, this.$refs.FileForm);
       if (!result) return;
-      this.$refs.FileForm.submitAll(); // 执行文件上传
+      const FileList = await this.handleFileUpload();
+      if (!FileList) return;
+      // 下面执行加购提交操作
+      this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack: this.scrollToTop });
+    },
+    scrollToTop() {
+      this.$nextTick(() => {
+        const backDom = document.getElementsByClassName('el-backtop')[0];
+        if (backDom) backDom.click();
+      });
+    },
+    // ----------------------------- 处理文件上传，生成文件上传对象
+    async handleFileUpload() {
+      // 1. 判断当前产品是否可以无文件提交 FileList
+      let FileList;
+      if (this.FileList.length === 0) { // 无文件上传，可以直接提交
+        FileList = [];
+      } else {
+        // 2. 判断当前文件是否必须上传 --- 在提交方法中完成：当不必须上传且未传文件时，直接返回true
+        const _FileList = await this.$refs.FileForm.submitAll(); // 执行文件上传 ------------- bool处还应返回文件解析名称 --- 然后生成文件上传格式对象，加入到提交对象中 -- 后面完成
+        if (Array.isArray(_FileList)) { // 文件上传通过，可以提交
+          // 生成提交对象并返回
+          FileList = _FileList;
+        }
+      }
+      return FileList;
+    },
+    getFileCount() {
+      let count = 0;
+      if (this.FileList.length > 0) {
+        count = this.$refs.FileForm.getFileCount();
+      }
+      return count;
     },
     fillFileContent(name) {
       this.fileContent = name;
@@ -173,18 +191,8 @@ export default {
     async OrderPanelChecker() { // 下单面板校验及返回页面顶部处理
       const bool = await this.getCheckResult();
       if (bool !== true) {
-        const scrollHandler = () => {
-          // const app = document.getElementById('app');
-          // if (app) {
-          //   this.utils.animateScroll(app.scrollTop, 0, num => {
-          //     app.scrollTop = num;
-          //   });
-          // }
-          const backDom = document.getElementsByClassName('el-backtop')[0];
-          if (backDom) backDom.click();
-        };
         this.messageBox.failSingleError({
-          title: `${this.title}失败`, msg: bool, successFunc: scrollHandler, failFunc: scrollHandler,
+          title: `${this.title}失败`, msg: bool, successFunc: this.scrollToTop, failFunc: this.scrollToTop,
         });
         return false;
       }
@@ -192,7 +200,10 @@ export default {
     },
     async FileContentChecker() {
       const res = await this.$refs.contentValidateForm.validate().catch(() => {});
-      if (!res && !this.isSpotGoods) return '[ 文件内容 ] 中，请输入文件内容';
+      if (!res && !this.isSpotGoods) {
+        if (!this.fileContent) return '[ 文件内容 ] 中，请输入文件内容';
+        if (this.fileContent && this.fileContent.length > 130) return '[ 文件内容 ] 字数不能超过130个字';
+      }
       return '';
     },
     AddressInfoChecker() {

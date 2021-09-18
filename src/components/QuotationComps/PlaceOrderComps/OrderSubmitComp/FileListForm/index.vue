@@ -51,9 +51,18 @@ export default {
           uploadErr = true;
         });
         if (uploadErr) return false;
-        console.log(result);
+        const t = result.find(it => !it);
+        if (t) return false;
+        return result;
       }
-      return true;
+      return [];
+    },
+    getFileCount() {
+      if (this.$refs.UploadItem && this.$refs.UploadItem.length > 0) {
+        const nums = this.$refs.UploadItem.map(it => it.fileList.length);
+        return nums.reduce((a, b) => a + b, 0);
+      }
+      return 0;
     },
   },
   watch: {

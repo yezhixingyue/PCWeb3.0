@@ -5,6 +5,7 @@ import store from '../store';
 import messageBox from '../assets/js/utils/message';
 import Cookie from '../assets/js/Cookie';
 import { useCookie, baseUrl } from '../assets/js/setup';
+import { delay } from '../assets/js/utils/utils';
 
 let loadingInstance;
 let closeTip = false;
@@ -51,7 +52,7 @@ axios.interceptors.request.use(
       // // console.log(url);
       if (url === '/Api/Quotation/Save' || url === '/Api/Order/Create') {
         _color = 'rgba(0, 0, 0, 0.7)';
-        _text = '上传完成，正在提交...';
+        _text = '文件上传完成，正在提交...';
         _customClass = 'mp-general-loading-box';
       }
       if (url === '/Api/Customer/CouponList') _text = '优惠券信息获取中...';
@@ -81,7 +82,7 @@ axios.interceptors.request.use(
 );
 
 axios.interceptors.response.use(
-  (response) => {
+  async (response) => {
     if (loadingInstance) loadingInstance.close();
     // eslint-disable-next-line max-len
     const _list2NotNeed2Toast = ['/Api/Order/Create', '/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
@@ -145,6 +146,9 @@ axios.interceptors.response.use(
 
       _obj.title = _msg;
       messageBox.failSingleError(_obj);
+    }
+    if (_url === '/Api/Quotation/Save' || _url === '/Api/Order/Create') {
+      await delay(300);
     }
     return response;
   },

@@ -1024,16 +1024,9 @@ export default {
     /* 获取产品报价信息
     -------------------------------*/
     async getProductPrice({ state, commit }) {
-      // console.log(curSelectStatus);
       const productData = state.obj2GetProductPrice.ProductParams;
       commit('setCurSelectStatus', '报价');
-      // if (QuotationClassType.check(productData) === false) return; // 校验 后面填写
       const _data = {};
-      // commit('setWatchTarget2DelCraft');
-      // await dispatch('delay', 10);
-      // _data.ProductParams = QuotationClassType.filter( // 数据转换与筛选 后面补充
-      //   QuotationClassType.transform(productData),
-      // );
       _data.ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
       commit('setProductQuotationResult', null);
       commit('setProductQuotationDetail', null);
@@ -1042,18 +1035,13 @@ export default {
       }
       let key = true;
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
-      // if (!key) return;
-      // if (res.data.Status === 500 && res.data.Message) return res.data.Message;
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;
-      // eslint-disable-next-line consistent-return
       if (res.data.Status !== 1000) return res.data.Message;
       if (!res.data.Data || !res.data.Data.HavePrice) {
-        // eslint-disable-next-line consistent-return
         return '暂无报价，请联系客服获取报价信息!';
       } // 可能为null 当需要客服咨询报价
       commit('setProductQuotationResult', res.data.Data);
       commit('setProductQuotationDetail', productData);
-      // eslint-disable-next-line consistent-return
       return true;
     },
     delay(storeObj, duration) {
@@ -1101,14 +1089,21 @@ export default {
 
       // 10. 接口提交
       const res = await api.getOrderPreCreate(_requestObj).catch(() => {});
-      if (res && res.data.Status === 1000) {
+
+      // 11. 提交成功后的处理函数
+      const successHandler = (PreCreateData, requestObj) => {
         commit('setCurReqObj4PreCreate', _itemObj);
-        commit('setPreCreateData', res.data.Data);
+        commit('setPreCreateData', PreCreateData);
         const _b = rootState.common.customerBalance;
-        const { FundBalance } = res.data.Data;
+        const { FundBalance } = PreCreateData;
         if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
-        callBack();
-      } else if ([9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
+        if (callBack) callBack();
+        return [PreCreateData, requestObj];
+      };
+      if (res && res.data.Status === 1000) {
+        return successHandler(res.data.Data, _requestObj);
+      }
+      if (res && [9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
         massage.warnCancelBox({
           title: res.data.Message,
           msg: '是否 [ 取消使用优惠券 ] 然后下单',
@@ -1116,14 +1111,8 @@ export default {
             delete _requestObj.List[0].Coupon;
             commit('setSelectedCoupon', null);
             const resp = await api.getOrderPreCreate(_requestObj);
-
             if (resp.data.Status === 1000) {
-              commit('setCurReqObj4PreCreate', _itemObj);
-              commit('setPreCreateData', resp.data.Data);
-              const _b = rootState.common.customerBalance;
-              const { FundBalance } = resp.data.Data;
-              if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
-              callBack();
+              return successHandler(resp.data.Data, _requestObj);
             }
           },
         });
@@ -1131,12 +1120,11 @@ export default {
     },
     /* 下单 - 保存购物车
     -------------------------------*/
-    async getQuotationSave2Car({ state, commit, dispatch }, { compiledName, fileContent, FileSize }) {
+    async getQuotationSave2Car({ state, commit, dispatch }, { FileList, fileContent, callBack }) {
       const _itemObj = {};
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
-      _itemObj.FilePath = compiledName;
+      if (FileList) _itemObj.FileList = FileList;
       _itemObj.FileHaveUpload = true;
-      if (FileSize) _itemObj.FileSize = FileSize;
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
       _itemObj.Address = {};
       _itemObj.Address.Express = state.addressInfo4PlaceOrder.Address.Express;
@@ -1144,7 +1132,6 @@ export default {
         _itemObj.Address.AddressID = state.addressInfo4PlaceOrder.Address.AddressID;
       } else {
         _itemObj.Address.Address = state.addressInfo4PlaceOrder.Address.Address;
-        // if (!state.addressInfo4PlaceOrder.Address.Address.Latitude) alert('未定位')
       }
       _itemObj.Content = fileContent;
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
@@ -1155,30 +1142,35 @@ export default {
       _itemObj.ProductParams = ProductParams;
       const res = await api.getQuotationSave(_itemObj).catch(() => {});
 
-      if (res && res.data.Status === 1000) {
-        massage.successSingle({ title: '添加成功!' });
+      const handleSuccess = async () => { // 处理成功后的函数
+        massage.successSingle({ title: '添加成功!', successFunc: callBack });
         const _obj = JSON.parse(JSON.stringify(state.curProductInfo2Quotation));
         commit('setCurProductInfo2Quotation', null);
         commit('setSelectedCoupon', null);
         await dispatch('delay', 10);
         commit('setCurProductInfo2Quotation', _obj);
-      } else if ([9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
+      };
+
+      const handleError = () => { // 失败处理函数 暂未使用 -- 交由统一错误方式处理
+        // massage.failSingleError({ title: '添加购物车失败!', msg: response && response.data.Message ? response.data.Message : '服务器响应失败' });
+      };
+
+      if (res && res.data.Status === 1000) {
+        handleSuccess();
+      } else if (res && [9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
         massage.warnCancelBox({
           title: '未达到优惠券使用金额',
           msg: '是否 [ 取消使用优惠券 ] 然后加入购物车',
           successFunc: async () => {
             commit('setSelectedCoupon', null);
             delete _itemObj.Coupon;
-            const resp = await api.getQuotationSave(_itemObj);
-            if (resp.data.Status === 1000) {
-              massage.successSingle({ title: '添加成功!' });
-              const _obj = JSON.parse(JSON.stringify(state.curProductInfo2Quotation));
-              commit('setCurProductInfo2Quotation', null);
-              await dispatch('delay', 10);
-              commit('setCurProductInfo2Quotation', _obj);
-            }
+            const resp = await api.getQuotationSave(_itemObj).catch(() => {});
+            if (resp && resp.data.Status === 1000) handleSuccess();
+            else handleError(resp);
           },
         });
+      } else {
+        handleError(res);
       }
     },
     /* 最终下单

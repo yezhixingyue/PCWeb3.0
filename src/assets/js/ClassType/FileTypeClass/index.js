@@ -14,7 +14,7 @@ export default class FileTypeClass {
    * @param {*} file
    * @return {*}
    */
-  static getUniqueFileName(file) {
+  static getUniqueFileName(file, TypeID) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
@@ -24,7 +24,8 @@ export default class FileTypeClass {
       reader.onloadend = async () => {
         if (!(reader.result)) return;
         const ext = extname(file.name);
-        const _name = `${sha1(reader.result)}.${ext}`; // 文件名称, 文件唯一标识
+        let _name = `${sha1(reader.result)}.${ext}`; // 文件名称, 文件唯一标识
+        if (TypeID || TypeID === 0) _name = `${TypeID}_${_name}`;
         resolve(_name);
       };
     });

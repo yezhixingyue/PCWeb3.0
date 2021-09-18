@@ -22,6 +22,7 @@
         <span class="tips">
           <i>（</i>
           <template v-if="required">必传，</template>
+          <template v-else>非必传，</template>
           <template v-if="multiple">可上传多个，</template>
           <em :title="FileInfo.Remark.length > 40 ? FileInfo.Remark : ''">
             {{ FileInfo.Remark }}
@@ -56,7 +57,8 @@ export default {
     return {
       fileList: [],
       // maxSize: 50,
-      isExecuting: false, // 去除重复操作是否正在执行
+      timer: null, // 上传定时器，获取状态使用
+      uploadResultList: [],
     };
   },
   computed: {
@@ -148,7 +150,7 @@ export default {
 
       // 1. 解析文件名称
       let err;
-      const name = await FileTypeClass.getUniqueFileName(file).catch((error) => {
+      const name = await FileTypeClass.getUniqueFileName(file, this.FileInfo.ID).catch((error) => {
         err = error;
       });
       if (err) { // 解析失败
@@ -168,6 +170,12 @@ export default {
       const key = await FileTypeClass.UploadFileByBreakPoint(file, name, onUploadProgressFunc, 100);
       if (key) { // 上传成功
         onSuccess();
+        this.uploadResultList.push({ // 添加对象，包含：文件大小FileSize、文件解析名称FilePath、文件名称FileName
+          FileSize: file.size,
+          FilePath: name,
+          FileName: file.name,
+          uid: file.uid,
+        });
       } else { // 上传失败
         this.$notify.error({
           title: `${file.name}上传失败`,
@@ -176,14 +184,46 @@ export default {
         onError(new Error('文件上传失败'));
       }
     },
-    submit() {
-      // this.result
-      this.$refs.upload.submit();
+    submit() { // 提交 判断是否有文件需要上传（非必传文件时），如果没有则直接返回结果
+      return new Promise((resolve) => {
+        if (this.fileList.length === 0) {
+          const temp = {
+            ID: this.FileInfo.ID,
+            List: [],
+          };
+          resolve(temp);
+          return;
+        }
+        this.$refs.upload.submit();
+        this.timer = setInterval(() => {
+          const list = this.fileList.map(it => it.status);
+          const t = list.find(it => it === 'uploading');
+          if (!t) {
+            clearInterval(this.timer);
+            this.timer = null;
+            const failItem = list.find(it => it === 'fail');
+            if (failItem) { // 如果存在上传失败的 -- 待测
+              resolve(false);
+            } else {
+              const temp = {
+                ID: this.FileInfo.ID,
+                List: [...this.uploadResultList],
+              };
+              resolve(temp);
+            }
+          }
+        }, 1000);
+      });
     },
   },
   watch: {
     fileList(newVal, oldVal) { // 去重及筛选格式不符合的文件
       this.$emit('validateField', `${this.FileInfo.ID}`); // 发生变动时进行重新校验
+      // uploadResultList 跟随其一起变动
+      if (this.uploadResultList.length > 0) {
+        const list = newVal.filter(it => it.status === 'success').map(it => it.uid);
+        this.uploadResultList = this.uploadResultList.filter(it => list.includes(it.uid));
+      }
       // 去重
       if (newVal.length < oldVal.length) return;
       const arr = [];
@@ -225,6 +265,10 @@ export default {
         this.fileList = list;
       }
     },
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
+    this.timer = null;
   },
 };
 </script>

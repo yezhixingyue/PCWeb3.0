@@ -95,7 +95,7 @@ export default class QuotationClassType {
           const TypeName = t.Name;
           switch (TypeName) {
             case '物料':
-              if (!PartData.MaterialList || PartData.MaterialList.filter(it => !it.HiddenToCustomer).length === 0) {
+              if (!PartData.TypeList || PartData.TypeList.length === 0) {
                 bool = false;
               }
               break;
@@ -147,10 +147,10 @@ export default class QuotationClassType {
             case '物料':
               // 此处获取该部件物料列表数据(筛选过后)，如果长度为0 则不生成下面数据 -- 已在上面筛选判断
               // target = PartData.MaterialList.filter(it => !it.HiddenToCustomer);
-              if (Array.isArray(PartData.MaterialList) && PartData.MaterialList.length > 0) {
-                target = PartData.MaterialList.find(_it => Array.isArray(_it.MaterialList) && _it.MaterialList.length > 0);
+              if (Array.isArray(PartData.TypeList) && PartData.TypeList.length > 0) {
+                target = PartData.TypeList.find(_it => Array.isArray(_it.List) && _it.List.length > 0);
                 if (target) {
-                  temp.MaterialID = target.MaterialList[0].ID;
+                  temp.MaterialID = target.List[0].ID;
                 }
               }
               // if (target.length > 0) temp.MaterialID = target[0].ID;

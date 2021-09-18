@@ -103,7 +103,7 @@ export default {
             targetProp = this.placeData.SizeGroup;
             break;
           case '物料':
-            targetProp = this.placeData.MaterialList || [];
+            targetProp = this.placeData.TypeList || [];
             break;
           case '工艺':
             targetProp = this.placeData.CraftGroupList.find(it => it.ID === this.itemData.Property.ID);
