@@ -190,7 +190,6 @@ export default {
       this.showMain = true;
       this.getAffectedPropList();
       this.getSubGroupAffectedPropLists();
-      console.log(this.localSetupData.ElementList && this.localSetupData.ElementList[1]?.CustomerInputValues);
     },
     onClosed() {
       this.showMain = false;

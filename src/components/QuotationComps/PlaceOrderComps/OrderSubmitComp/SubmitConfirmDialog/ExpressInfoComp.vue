@@ -3,7 +3,7 @@
     <template #img>
       <img src="@/assets/images/express-info.png" alt="">
     </template>
-    <ul>
+    <ul class="display-box">
       <li>
         <span class="label">配送方式：</span>
         <div class="text">{{ExpressName}}</div>

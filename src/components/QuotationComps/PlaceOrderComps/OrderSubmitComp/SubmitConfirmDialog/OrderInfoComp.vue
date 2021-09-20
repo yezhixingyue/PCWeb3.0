@@ -3,7 +3,7 @@
     <template #img>
       <img src="@/assets/images/order-info.png" alt="">
     </template>
-    <ul>
+    <ul class="display-box">
       <li>
         <span class="label">平台单号：</span>
         <div class="text">{{orderInfo.OutPlateNo || '无'}}</div>

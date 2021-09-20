@@ -59,20 +59,6 @@ export function getDateFormat2Date(date) {
   return date ? date.split('T')[0] : '';
 }
 
-// export function MP(ak) {
-//   return new Promise(((resolve, reject) => {
-//     window.onload = () => {
-//       resolve(window.BMap);
-//     };
-//     if (!window.BMap) {
-//       const script = document.createElement('script');
-//       script.type = 'text/javascript';
-//       script.src = `http://api.map.baidu.com/api?v=1.4.15&ak=${ak}&callback=init`;
-//       script.onerror = reject;
-//       document.head.appendChild(script);
-//     }
-//   }));
-// }
 /**
  * @description: 把数字组成的数组字符串拆分开为数组
  * @param {*} valueList
@@ -123,6 +109,17 @@ export const isLessThen = (a, b) => {
   return false;
 };
 
+/**
+   * @description: 转换十以内的阿拉伯数字为中文数字
+   * @param {*}
+   * @return {*}
+   */
+export const transformNumToChindNum = (num) => {
+  const str = '一二三四五六七八九十';
+  if (getValueIsOrNotNumber(num, true) && num < str.length && num >= 0) return str[num];
+  return num;
+};
+
 export default {
   isEqual,
   isGreatThen,
@@ -136,4 +133,5 @@ export default {
   getDateFormat2Date,
   getNumberValueList,
   getValueIsOrNotNumber,
+  transformNumToChindNum,
 };

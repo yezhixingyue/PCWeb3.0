@@ -133,8 +133,9 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
       if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
         // 项数不符合
         if (MinValue === MaxValue) return `${showPropName ? prop.Name : ''}必须选择${MinValue}项`;
-        if (MaxValue === -1) return `${showPropName ? prop.Name : ''}至少选择${MinValue}项`;
-        return `${showPropName ? prop.Name : ''}至少选择${MinValue}至${MaxValue}项`;
+        if (MaxValue === -1 || len < MinValue) return `${showPropName ? prop.Name : ''}至少选择${MinValue}项`;
+        if (len > MaxValue) return `${showPropName ? prop.Name : ''}最多选择${MaxValue}项`;
+        return `${showPropName ? prop.Name : ''}应选择${MinValue}至${MaxValue}项`;
       }
     }
   }

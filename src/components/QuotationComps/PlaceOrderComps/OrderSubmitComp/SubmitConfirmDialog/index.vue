@@ -5,6 +5,7 @@
     custom-class="mp-place-order-panel-comp-order-submit-comfirm-dialog-comp-wrap"
     v-dialogDrag
     @open="onOpen"
+    top="10vh"
     @closed="onClosed"
   >
     <header slot="title">
@@ -12,14 +13,39 @@
     </header>
     <main>
       <div class="left">
-        <ProductInfoComp :ProductParams='ProductParams' :curProductInfo2Quotation='curProductInfo2Quotation' />
+        <ProductInfoComp
+          v-if="ProductParams"
+          :ProductParams="ProductParams"
+          :curProductInfo2Quotation="curProductInfo2Quotation"
+          :OrderPreData="OrderPreData"
+        />
       </div>
       <div class="right">
-        <ExpressInfoComp :Address='Address' :ExpressList='ExpressList' />
-        <OrderInfoComp :orderInfo='orderInfo' />
+        <ExpressInfoComp :Address="Address" :ExpressList="ExpressList" />
+        <OrderInfoComp :orderInfo="orderInfo" />
       </div>
     </main>
     <footer>
+      <ul v-if="OrderPreData">
+        <li>
+          <span class="label">在线支付：</span>
+          <span class="content is-bold is-pink">{{onLineAmount}}<i class="is-font-12">元</i></span>
+        </li>
+        <li>
+          <span class="label">货到付款：</span>
+          <span class="content is-pink">{{PayOnDelivery}}<i class="is-font-12">元</i></span>
+        </li>
+        <li>
+          <span class="label">当前可用余额：</span>
+          <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
+        </li>
+        <li>
+          <template v-if="MinimumCost < ProductPrice">
+            <span class="label">支付方式：</span>
+            <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
+          </template>
+        </li>
+      </ul>
       <span class="blue-span" @click="localVisible = false">取消</span>
       <el-button type="primary" @click="onSubmit">确认提交</el-button>
     </footer>
@@ -28,7 +54,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import ProductInfoComp from './ProductInfoComp.vue';
+import ProductInfoComp from './ProductInfoComp/index.vue';
 import OrderInfoComp from './OrderInfoComp.vue';
 import ExpressInfoComp from './ExpressInfoComp';
 
@@ -68,10 +94,16 @@ export default {
       },
     },
     orderInfo() {
-      if (this.OrderPreData && this.requestObj && this.requestObj.List && this.requestObj.List.length > 0) {
+      if (
+        this.OrderPreData
+        && this.requestObj
+        && this.requestObj.List
+        && this.requestObj.List.length > 0
+      ) {
         const { Content, OutPlate } = this.requestObj.List[0];
         let ProducePeriod = null;
-        if (this.OrderPreData
+        if (
+          this.OrderPreData
           && Array.isArray(this.OrderPreData.PackageList)
           && this.OrderPreData.PackageList.length > 0
           && this.OrderPreData.PackageList[0].OrderList
@@ -91,26 +123,52 @@ export default {
       return null;
     },
     Address() {
-      if (this.OrderPreData
-       && Array.isArray(this.OrderPreData.PackageList)
-       && this.OrderPreData.PackageList.length > 0
-       && this.OrderPreData.PackageList[0].Address
-       && this.OrderPreData.PackageList[0].Address.Address
+      if (
+        this.OrderPreData
+        && Array.isArray(this.OrderPreData.PackageList)
+        && this.OrderPreData.PackageList.length > 0
+        && this.OrderPreData.PackageList[0].Address
+        && this.OrderPreData.PackageList[0].Address.Address
       ) {
         return this.OrderPreData.PackageList[0].Address;
       }
       return null;
     },
     ProductParams() {
-      if (this.requestObj && this.requestObj.List && this.requestObj.List.length > 0) {
+      if (!this.localVisible) return null;
+      if (
+        this.requestObj
+        && this.requestObj.List
+        && this.requestObj.List.length > 0
+      ) {
         const { ProductParams } = this.requestObj.List[0];
         if (ProductParams) return ProductParams;
       }
       return {};
     },
+    MinimumCost() {
+      return this.OrderPreData ? this.OrderPreData.MinimumCost : '';
+    },
+    ProductPrice() {
+      return this.OrderPreData ? this.OrderPreData.ProductPrice : '';
+    },
+    onLineAmount() {
+      if (!this.PayInFull) return this.MinimumCost;
+      return this.ProductPrice;
+    },
+    PayOnDelivery() {
+      if ((this.ProductPrice || this.ProductPrice === 0) && (this.onLineAmount || this.onLineAmount === 0)) {
+        return this.ProductPrice - this.onLineAmount;
+      }
+      return '';
+    },
+    FundBalance() {
+      return this.OrderPreData ? this.OrderPreData.FundBalance : '';
+    },
   },
   data() {
     return {
+      PayInFull: false,
     };
   },
   methods: {
@@ -180,7 +238,7 @@ export default {
           }
           .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap {
             .panel-content {
-              > ul {
+              ul.display-box {
                 padding-top: 8px;
                 > li {
                   width: 100%;
@@ -199,14 +257,39 @@ export default {
                   }
                 }
               }
+              > ul.content {
+                height: 365px;
+                overflow-y: auto;
+              }
+              > div.footer {
+                height: 75px;
+              }
             }
           }
         }
       }
       > footer {
         text-align: right;
-        margin-top: 58px;
+        margin-top: 20px;
         padding-right: 10px;
+        > ul {
+          padding-right: 2px;
+          padding-bottom: 12px;
+          > li {
+            padding: 4px 0;
+            line-height: 18px;
+            > .content {
+              width: 120px;
+              display: inline-block;
+              &.is-bold {
+                font-size: 18px;
+              }
+            }
+            > .label {
+              color: #888;
+            }
+          }
+        }
         > button {
           height: 35px;
           width: 120px;

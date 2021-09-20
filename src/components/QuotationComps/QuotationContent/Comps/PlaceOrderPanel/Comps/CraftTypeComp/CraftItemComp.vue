@@ -23,6 +23,7 @@
 <script>
 import ShowProductBtn from '@/components/QuotationComps/SMComps/ShowProductBtn.vue';
 import InterAction from '@/store/Quotation/Interaction';
+import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
 import CraftContentSetupDialog from './CraftContentSetupDialog.vue';
 
 export default {
@@ -78,7 +79,12 @@ export default {
     },
     craftTitle() {
       const list = this.ChildUseAffectedPropList;
-      return this.getCraftContentName(list, this.disabled);
+      const titleObj = ShowProductDetail.getCraftContentName(this.value, this.Craft, list, this.disabled);
+      if (titleObj) {
+        const { Name, Content } = titleObj;
+        return Content ? `${Name} ${Content}` : Name;
+      }
+      return '';
     },
     OwnUseAffectedPropList() {
       // 工艺自身交互限制  可能为必选或者禁用 目前该数组最多只有一个
@@ -114,133 +120,6 @@ export default {
     },
     handleEditClick() {
       this.visible = true;
-    },
-    getElementValueText(CustomerInputValues, Element, AffectedPropList) {
-      const _AffectedPropList = AffectedPropList.filter(it => it.Property.Element);
-      if (_AffectedPropList && _AffectedPropList.length > 0) {
-        const list = _AffectedPropList.filter(it => it.Property.Element.ID === Element.ID);
-        if (list.length > 0) {
-          if (InterAction.getDisabledOrNot(list) || InterAction.getIsHiddenOrNot(list)) return '';
-        }
-      }
-      const { IsNameHidden } = Element;
-      const EleName = IsNameHidden ? '' : Element.Name;
-      if (!CustomerInputValues || CustomerInputValues.length === 0 || !Element) return '';
-      if (CustomerInputValues.length === 1) {
-        const [{ ID, Name, Value }] = CustomerInputValues;
-        if (Element.Type === 3) {
-          // 开关
-          if (
-            Element.SwitchAttribute
-            && `${Element.SwitchAttribute.OpenValue}` === Value
-          ) return Element.SwitchAttribute.Words || Element.Name;
-        }
-        if (Element.Type === 1 && Value) {
-          // 数值
-          return `${EleName}${EleName ? '：' : ''}${Value}${Element.Unit}`;
-        }
-        if (
-          Element.Type === 2
-          && Element.OptionAttribute
-          && Element.OptionAttribute.IsRadio
-          && Element.OptionAttribute.OptionList
-        ) {
-          if (ID) {
-            const t = Element.OptionAttribute.OptionList.find(
-              (_it) => _it.ID === ID,
-            );
-            if (t) return `${EleName}${EleName ? '：' : ''}${t.Name}`;
-          }
-          if (Name) return `${EleName}${EleName ? '：' : ''}${Name}`;
-        }
-      }
-      if (
-        Element.Type === 2
-        && Element.OptionAttribute
-        && !Element.OptionAttribute.IsRadio
-        && Element.OptionAttribute.OptionList
-      ) {
-        const ids = CustomerInputValues.map((it) => it.ID).filter((it) => it);
-        if (ids.length > 0) {
-          const names = ids
-            .map((id) => Element.OptionAttribute.OptionList.find((it) => it.ID === id))
-            .filter((it) => it)
-            .map((it) => it.Name);
-          return names.join('，');
-        }
-      }
-      return '';
-    },
-    getGroupValueText(List, Group, AffectedPropList) {
-      if (AffectedPropList.length > 0) {
-        const t = AffectedPropList.find(it => !it.Property.Element && it.Property.Group && it.Property.Group.ID === Group.ID && [21, 22].includes(it.Operator));
-        if (t) return '';
-      }
-      if (List.length > 1) {
-        return `${Group.Name}${List.length}处`;
-      }
-      if (List.length === 1) {
-        const item = List[0];
-        const arr = [];
-        item.List.forEach(({ ElementID, CustomerInputValues }) => {
-          const t = Group.ElementList.find((_it) => _it.ID === ElementID);
-          if (t) {
-            const _SingleAffectedPropList = AffectedPropList.filter(_it => _it.Property
-             && _it.Property.Group && _it.Property.Group.ID === Group.ID && _it.Property.Element);
-            const text = this.getElementValueText(CustomerInputValues, t, _SingleAffectedPropList);
-            if (text) arr.push(text);
-          }
-        });
-        if (arr.length > 0) {
-          return `${Group.IsNameHidden ? '' : Group.Name} [ ${arr.join(
-            '；',
-          )} ]`;
-        }
-      }
-      return '';
-    },
-    getCraftContentName(ChildUseAffectedPropList, disabled) {
-      if (!this.Craft) return '工艺';
-      if (!this.value || disabled) return this.Craft.ShowName;
-      const { ElementList, GroupList } = this.value;
-      if (
-        (!Array.isArray(ElementList) || ElementList.length === 0)
-        && (!Array.isArray(GroupList) || GroupList.length === 0)
-      ) return this.Craft.ShowName;
-      let ElContent = [];
-      let GroupContent = [];
-      const hasElementList = Array.isArray(ElementList) && ElementList.length > 0;
-      const hasGroupList = Array.isArray(GroupList) && GroupList.length > 0;
-      if (hasElementList) {
-        ElementList.forEach((it) => {
-          const t = this.filteredElementShowList.find(
-            (_it) => _it.ID === it.ElementID,
-          );
-          if (t) {
-            const text = this.getElementValueText(it.CustomerInputValues, t, ChildUseAffectedPropList);
-            if (text) ElContent.push(text);
-          }
-        });
-        ElContent = ElContent.filter(it => it);
-      }
-      if (hasGroupList) {
-        GroupList.forEach((it) => {
-          const t = this.filteredGroupShowList.find(
-            (_it) => _it.ID === it.GroupID,
-          );
-          if (t) {
-            const text = this.getGroupValueText(it.List, t, ChildUseAffectedPropList);
-            if (text) GroupContent.push(text);
-          }
-        });
-        GroupContent = GroupContent.filter(it => it);
-      }
-      if (ElContent.length > 0 || GroupContent.length > 0) {
-        return `${this.Craft.ShowName} ${ElContent.join(
-          ' ',
-        )} ${GroupContent.join('')}`;
-      }
-      return this.Craft.ShowName;
     },
     handleElementAffectedListChange(ElementAffectedList, ElementValList, ElementList) {
       const _ElementList = ElementValList.map(it => {
