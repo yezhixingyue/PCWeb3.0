@@ -40,7 +40,7 @@
           <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
         </li>
         <li>
-          <template v-if="MinimumCost < ProductPrice">
+          <template v-if="MinimumCost < FullPayout">
             <span class="label">支付方式：</span>
             <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
           </template>
@@ -147,18 +147,21 @@ export default {
       return {};
     },
     MinimumCost() {
-      return this.OrderPreData ? this.OrderPreData.MinimumCost : '';
+      return this.OrderPreData ? +(this.OrderPreData.MinimumCost.toFixed(2)) : '';
+    },
+    FullPayout() {
+      return this.OrderPreData ? +(this.OrderPreData.FullPayout.toFixed(2)) : '';
     },
     ProductPrice() {
       return this.OrderPreData ? this.OrderPreData.ProductPrice : '';
     },
     onLineAmount() {
       if (!this.PayInFull) return this.MinimumCost;
-      return this.ProductPrice;
+      return this.FullPayout;
     },
     PayOnDelivery() {
       if ((this.ProductPrice || this.ProductPrice === 0) && (this.onLineAmount || this.onLineAmount === 0)) {
-        return this.ProductPrice - this.onLineAmount;
+        return +((this.ProductPrice - this.onLineAmount).toFixed(2));
       }
       return '';
     },
@@ -180,7 +183,7 @@ export default {
       console.log('onClosed 还原部分状态');
     },
     onSubmit() {
-      console.log('onSubmit');
+      this.$emit('submit', { ...this.requestObj, PayInFull: this.PayInFull });
     },
   },
 };
@@ -277,9 +280,9 @@ export default {
           padding-bottom: 12px;
           > li {
             padding: 4px 0;
-            line-height: 18px;
+            line-height: 20px;
             > .content {
-              width: 120px;
+              min-width: 120px;
               display: inline-block;
               &.is-bold {
                 font-size: 18px;

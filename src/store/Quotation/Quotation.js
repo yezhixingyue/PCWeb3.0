@@ -110,6 +110,7 @@ export default {
     ---------------------------------------- */
     FileList: [],
     FileTypeList: [],
+    isUploading: false,
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -843,19 +844,19 @@ export default {
       state.selectedCoupon = null;
       state.isFullPayoutDisabled = false;
 
-      const _keepingData = localStorage.getItem('isOrderDataKeeping');
-      // console.log(_keepingData);
-      if (!(_keepingData && _keepingData === 'true')) {
-        state.curProductID = '';
-        state.curProductClass = null;
-        state.curProductName = '';
-        state.curProductInfo2Quotation = null;
-        state.obj2GetProductPrice = {
-          ProductParams: {},
-        };
-        state.initPageText = '下单成功';
-        state.curProduct = null;
-      }
+      // const _keepingData = localStorage.getItem('isOrderDataKeeping');
+      // // console.log(_keepingData);
+      // if (!(_keepingData && _keepingData === 'true')) {
+      //   state.curProductID = '';
+      //   state.curProductClass = null;
+      //   state.curProductName = '';
+      //   state.curProductInfo2Quotation = null;
+      //   state.obj2GetProductPrice = {
+      //     ProductParams: {},
+      //   };
+      //   state.initPageText = '下单成功';
+      //   state.curProduct = null;
+      // }
     },
     /* 下单成功后的状态清理
     -------------------------------*/
@@ -963,6 +964,9 @@ export default {
     },
     setFileTypeList(state, list) {
       state.FileTypeList = list;
+    },
+    setIsUploading(state, bool) {
+      state.isUploading = bool;
     },
     setItemFlieList(state, [list, id]) {
       const t = state.FileList.find(({ File }) => File.ID === id);
@@ -1180,21 +1184,17 @@ export default {
       const res = await api.getPayResult(state.curPayInfo2Code.PayCode);
       if (res.data.Status === 1000) cb(res.data.Data);
     },
-    async placeOrderFromPreCreate({ state, commit, rootState }, { FilePath, PayInFull, cb, isSpotGoods = false, FileSize }) {
-      const _obj = { OrderType: 2, PayInFull, List: [] };
+    async placeOrderFromPreCreate({ commit, rootState }, { temp, cb, isFormOrder }) {
+      const _obj = { ...temp };
       let item;
-      if (FilePath || isSpotGoods) {
-        item = { ...state.curReqObj4PreCreate, FilePath };
-        if (FileSize) item.FileSize = FileSize;
-        _obj.List.push(item);
-      } else {
+      if (!isFormOrder) {
         item = [...rootState.shoppingCar.curShoppingCarDataBeforeFirstPlace];
         _obj.List = item;
       }
 
-      const res = await api.CreateOrderFromPreCreate(_obj);
-      if (res.data.Status !== 1000) {
-        throw new Error(res.data.Message);
+      const res = await api.CreateOrderFromPreCreate(_obj).catch(() => {});
+      if (!res || res.data.Status !== 1000) {
+        throw new Error(res && res.data.Message ? res.data.Message : '服务器未响应');
       }
       if (res.data.Data) {
         const _b = rootState.common.customerBalance;
@@ -1210,7 +1210,7 @@ export default {
         massage.successSingle({
           title: '下单成功!',
           successFunc: () => {
-            if (FilePath || (!FilePath && isSpotGoods)) commit('setPaySuccessOrderDataStatus');
+            if (isFormOrder) commit('setPaySuccessOrderDataStatus');
             if (cb) cb(); // 清除购物车中一些数据 然后跳转购物车列表页面 该方法目前只在购物车提交时使用
             commit('setIsShow2PayDialog', false);
           },

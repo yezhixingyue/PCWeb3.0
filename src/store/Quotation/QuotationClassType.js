@@ -477,10 +477,10 @@ const getSizeSubmitData = (Prop) => { // 获取尺寸组提交数据
   let isCustomize = false;
   const List = [];
   const {
-    AllowCustomerCustomize, IsCheckedCustomerCustomize, GroupInfo, SizeList,
+    AllowCustomer, IsCheckedCustomerCustomize, GroupInfo, SizeList,
   } = Prop;
   if (Array.isArray(SizeList) && SizeList.filter(it => !it.HiddenToCustomer).length > 0) ID = SizeList.filter(it => !it.HiddenToCustomer)[0].ID;
-  if (AllowCustomerCustomize && (IsCheckedCustomerCustomize || SizeList.filter(_it => !_it.HiddenToCustomer).length === 0)) {
+  if (AllowCustomer && (IsCheckedCustomerCustomize || SizeList.filter(_it => !_it.HiddenToCustomer).length === 0)) {
     isCustomize = true;
   }
   if (Array.isArray(GroupInfo?.ElementList)) {

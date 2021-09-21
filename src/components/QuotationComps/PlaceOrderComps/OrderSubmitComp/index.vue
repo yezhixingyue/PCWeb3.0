@@ -7,7 +7,8 @@
     <div class="content">
       <ul v-show="!isSpotGoods">
         <li class="file-content-box">
-           <el-form :model="{ fileContent: fileContent }" ref="contentValidateForm" label-width="86px"  size="mini" hide-required-asterisk>
+           <el-form :model="{ fileContent: fileContent }" ref="contentValidateForm" label-width="86px"
+            size="mini" hide-required-asterisk :disabled='isUploading'>
             <el-form-item
               label="文件内容："
               prop="fileContent"
@@ -25,29 +26,36 @@
           </el-form>
         </li>
         <li class="design-document">
-          <DesignDocumentPopoverComp />
+          <DesignDocumentPopoverComp :disabled='isUploading' />
         </li>
         <li class="file-list-box">
-          <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' />
+          <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' :disabled='isUploading' />
         </li>
       </ul>
       <div class="submit-btn-wrap">
-        <el-button class="button-title-pink" @click="onSave2TheCar">
-          <i class="iconfont icon-jiarugouwuche" ></i>加入购物车</el-button>
-        <el-button type="danger" @click="onSubmitOrder">直接下单</el-button>
+        <el-button class="button-title-pink" @click="onSave2TheCar" :loading="isUploading && uploadType === 'car'"
+         :disabled="isUploading && uploadType === 'create'">
+          <template v-if="!(isUploading && uploadType === 'car')"><i class="iconfont icon-jiarugouwuche" ></i>加入购物车</template>
+          <span v-else class="l">文件上传中...</span>
+        </el-button>
+        <el-button type="danger" @click="onSubmitOrder" :loading="isUploading && uploadType === 'create'"
+         :disabled="isUploading && uploadType === 'car'">{{submitText}}</el-button>
         <ComputedResultComp
           :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
       </div>
-      <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' :requestObj='requestObj' :FileCount='FileCount' />
+      <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' :requestObj='requestObj' :FileCount='FileCount' @submit="handleSubmit" />
+      <Dialog2Pay :needClear='false' />
     </div>
   </section>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import { Loading } from 'element-ui';
+import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
 import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
 import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
-import FileListForm from './FileListForm';
+import FileListForm from './FileListForm/index.vue';
 import SubmitConfirmDialog from './SubmitConfirmDialog/index.vue';
 
 export default {
@@ -56,6 +64,7 @@ export default {
     DesignDocumentPopoverComp,
     FileListForm,
     SubmitConfirmDialog,
+    Dialog2Pay,
   },
   props: {
     asyncInputchecker: {
@@ -68,7 +77,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList']),
+    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading']),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -100,6 +109,9 @@ export default {
       OrderPreData: null,
       requestObj: null,
       FileCount: 0,
+      submitText: '直接下单',
+      loadingInstance: null,
+      uploadType: '',
     };
   },
   methods: {
@@ -129,10 +141,15 @@ export default {
       this.title = '添加';
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
+      this.uploadType = 'car';
       const FileList = await this.handleFileUpload();
       if (!FileList) return;
       // 下面执行加购提交操作
-      this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack: this.scrollToTop });
+      const callBack = () => {
+        this.fileContent = '';
+        this.scrollToTop();
+      };
+      this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
     },
     scrollToTop() {
       this.$nextTick(() => {
@@ -148,7 +165,15 @@ export default {
         FileList = [];
       } else {
         // 2. 判断当前文件是否必须上传 --- 在提交方法中完成：当不必须上传且未传文件时，直接返回true
+        this.$store.commit('Quotation/setIsUploading', true);
+        this.loadingInstance = Loading.service({
+          lock: true,
+          spinner: '123',
+          background: 'rgba(255, 255, 255, 0)',
+        });
         const _FileList = await this.$refs.FileForm.submitAll(); // 执行文件上传 ------------- bool处还应返回文件解析名称 --- 然后生成文件上传格式对象，加入到提交对象中 -- 后面完成
+        this.$store.commit('Quotation/setIsUploading', false);
+        this.loadingInstance.close();
         if (Array.isArray(_FileList)) { // 文件上传通过，可以提交
           // 生成提交对象并返回
           FileList = _FileList;
@@ -247,6 +272,34 @@ export default {
       if (!bool) return false;
       return true;
     },
+    async handleSubmit(data) { // 创建订单
+      // 关闭弹窗
+      this.visible = false;
+      // 上传文件
+      this.submitText = '文件上传中...';
+      this.uploadType = 'create';
+      const FileList = await this.handleFileUpload();
+      this.submitText = '直接下单';
+      if (!FileList) return;
+      // 完成后 提交
+      // 打开支付弹窗
+      this.$store.commit('Quotation/setIsShow2PayDialog', true);
+      const cb = () => {
+        this.$store.dispatch('common/getCustomerFundBalance');
+        this.scrollToTop();
+      };
+      const temp = { ...data, List: [{ ...data.List[0], FileList }] };
+      if (!temp.List[0].Content) delete temp.List[0].Content;
+      const _obj = { temp, cb, isFormOrder: true }; // isFormOrder 区分来自下单 或 购物车
+      await this.$store.dispatch('Quotation/placeOrderFromPreCreate', _obj).catch((...args) => {
+        const error = args[0];
+        this.messageBox.handleLoadingError({
+          title: '下单失败',
+          error,
+          successFunc: () => this.$store.commit('Quotation/setIsShow2PayDialog', false),
+        });
+      });
+    },
   },
   mounted() {
     this.$store.dispatch('Quotation/getFileTypeList');
@@ -301,6 +354,10 @@ export default {
           padding-bottom: 10px;
           padding-top: 5px;
         }
+        .info-text {
+          padding-bottom: 10px;
+          font-size: 13px;
+        }
       }
     }
     > .price-wrap {
@@ -351,6 +408,19 @@ export default {
         & + button {
           margin-left: 40px;
         }
+        .el-icon-loading {
+          font-size: 17px;
+        }
+        .l {
+          font-size: 14px;
+          vertical-align: bottom;
+        }
+        &.el-button.is-loading {
+          &:before {
+            background-color: rgba(0,0,0,0);
+          }
+          font-size: 14px;
+        }
       }
       > div {
        position: absolute;
@@ -358,10 +428,6 @@ export default {
        left: 360px;
       }
     }
-    // > p {
-    //   position: relative;
-    //   top: 5px;
-    // }
   }
 }
 

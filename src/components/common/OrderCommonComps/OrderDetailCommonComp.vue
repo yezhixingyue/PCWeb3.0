@@ -170,8 +170,15 @@ export default {
         return `${FirstLevelName}-${SecondLevelName}-${ProductName}`;
       }
       if (!this.orderDetail.ProductParams || !this.orderDetail.ProductParams.Attributes) return '';
-      const { FirstLevelName, SecondLevelName, Name } = this.orderDetail.ProductParams.Attributes;
-      return `${FirstLevelName}-${SecondLevelName}-${Name}`;
+      const { DisplayName, ClassList } = this.orderDetail.ProductParams.Attributes;
+      if (ClassList.length > 0) {
+        const t = ClassList.find(it => it.Type === 2);
+        if (t) {
+          const ClassifyName = t.FirstLevel?.Name || '';
+          if (ClassifyName) return `${ClassifyName} - ${DisplayName}`;
+        }
+      }
+      return DisplayName;
     },
     ProductNum() {
       if (!this.orderDetail) return '';

@@ -29,7 +29,7 @@
         </el-table-column>
         <el-table-column label="优惠券" show-overflow-tooltip width="65">
           <template slot-scope="scope"
-            >{{ scope.row.Funds.CouponAmount > 0 ? '-' + scope.row.Funds.CouponAmount : 0 }}元</template>
+            >{{ scope.row.Funds.CouponAmount > 0 ? '-' +scope.row.Funds.CouponAmount.toFixed(2) : 0 }}元</template>
         </el-table-column>
         <el-table-column label="成交价" width="65" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Funds.FinalPrice }}元</template>
@@ -142,48 +142,24 @@ export default {
     },
     getName({ ProductParams }) {
       const { Attributes } = ProductParams;
-      const { Name, SecondLevelName } = Attributes;
-      return `${SecondLevelName}-${Name}`;
+      const { DisplayName, ClassList } = Attributes;
+      if (ClassList.length > 0) {
+        const t = ClassList.find(it => it.Type === 2);
+        if (t) {
+          const ClassifyName = t.FirstLevel?.Name || '';
+          if (ClassifyName) return `${ClassifyName}-${DisplayName}`;
+        }
+      }
+      return DisplayName;
     },
     getSize({ ProductParams }) {
-      const { PartList } = ProductParams;
-      const _sizeArr = [];
-      if (PartList[0].PartList[0].Attributes.SizeName) return PartList[0].PartList[0].Attributes.SizeName;
-      PartList.forEach(item => {
-        const { SizePropertyList } = item.PartList[0];
-        let _str = '';
-        const _sizeList = [];
-        const _unitList = [];
-        SizePropertyList.forEach(it => {
-          _sizeList.push(it.ShowValue);
-          _unitList.push(it.ShowUnit);
-        });
-        const _obj = {};
-        _unitList.forEach(it => {
-          if (!_obj[it]) _obj[it] = 0;
-          else _obj[it] += 1;
-        });
-        if (Object.keys(_obj).length === 1) {
-          _str = _sizeList.join('×') + _unitList[0];
-        } else {
-          const _arr = [];
-          _sizeList.forEach((it, i) => {
-            const _temp = it + _unitList[i];
-            _arr.push(_temp);
-          });
-          _str = _arr.join('×');
-        }
-        const len = _sizeArr.length;
-        if (len > 0 && _sizeArr[len - 1] === _str) return;
-        _sizeArr.push(_str);
-      });
-
-      return _sizeArr.join('、');
+      const { Size } = ProductParams;
+      return Size && Size.DisplayName ? Size.DisplayName : '';
     },
-    getNumber({ Attributes, ProductAmount, KindCount }) {
-      const { Unit } = Attributes;
-      let _str = '';
-      if (KindCount > 1) _str = `${KindCount}款`;
+    getNumber({ Attributes }) {
+      const { Unit, ProductAmount, KindCount } = Attributes;
+      const _str = `(${KindCount}款)`;
+      // if (KindCount > 1) _str = `（共${KindCount}款）`;
       return `${ProductAmount}${Unit}${_str}`;
     },
     getCraftFromItem(First, arr) {
@@ -272,6 +248,7 @@ export default {
       if (res) this.$router.push('/shopping/submit');
     },
     handleDel(item) {
+      console.log(item);
       if (!item && this.multipleSelection.length === 0) {
         this.$message.error('请选择订单');
         return;
@@ -282,9 +259,10 @@ export default {
       if (item) {
         if (!item.ProductParams || !item.ProductParams.Attributes) return;
         const _nameInfo = item.ProductParams.Attributes;
-        const { SecondLevelName, Name } = _nameInfo;
-        if (!SecondLevelName || !Name) return;
-        msg = `订单产品：[ ${SecondLevelName} - ${Name} ]`;
+        const { ClassList, DisplayName } = _nameInfo;
+        if (!ClassList || !DisplayName) return;
+        const t = ClassList.find(it => it.Type === 2);
+        msg = `订单产品：[ ${t && t.FirstLevel.Name ? (`${t.FirstLevel.Name} - `) : ''}${DisplayName} ]`;
       } else {
         if (!this.multipleSelection) return;
         msg = `[ 共有 ${this.multipleSelection.length} 条订单被选中 ]`;

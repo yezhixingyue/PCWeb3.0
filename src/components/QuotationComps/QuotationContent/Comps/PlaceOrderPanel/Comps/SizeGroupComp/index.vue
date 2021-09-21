@@ -3,7 +3,7 @@
     <CanFreeCreateSelectComp
       v-show="
         !isCustomize &&
-        (CustomerSizeList.length > 0 || !Property.AllowCustomerCustomize)
+        (CustomerSizeList.length > 0 || !Property.AllowCustomer)
       "
       v-model="ID"
       :options="CustomerSizeList"
@@ -23,7 +23,7 @@
     <el-checkbox
       v-model="isCustomize"
       v-if="
-        Property.AllowCustomerCustomize &&
+        Property.AllowCustomer &&
         Property.SizeList.length > 0
       "
       >自定义</el-checkbox

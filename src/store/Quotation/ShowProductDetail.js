@@ -178,7 +178,6 @@ const getUniqueSizeUnit = (SizeList, SizeElementList) => {
   const list1 = SizeList.map(it => it.ElementID);
   const list2 = SizeElementList.filter(it => list1.includes(it.ID));
   const unitList = list2.map(it => it.Unit || '');
-  console.log(unitList, [...new Set(unitList)]);
   if ([...new Set(unitList)].length === 1) {
     return {
       Unit: unitList[0],
@@ -296,7 +295,7 @@ export default class ProductDetailTypeShowClass {
                 ))
                 .filter(_it => _it && _it.Label && _it.Content)
                 .map(({ Content }) => `${Content}`).join(' x ');
-              if (target) arr.push({ type: 'Size', Label: originPartData.SizeGroup.GroupInfo.Name, Content: target.concat(Unit) });
+              if (target) arr.push({ type: 'Size', Label: originPartData.SizeGroup.GroupInfo.Name, Content: target ? target.concat(Unit) : target });
             }
             break;
           case '物料':

@@ -13,7 +13,7 @@
         ref="oInInp"
         @keyup.enter.native="submitForm"
         v-model="IdentifyForm.Value"
-        :disabled='OutPlateNoLoading'
+        :disabled='OutPlateNoLoading || disabled'
         clearable
         placeholder="请输入淘宝/京东/拼多多平台单号，或者详细地址。然后点击“自动识别”按钮"
       ></el-input>
@@ -26,7 +26,8 @@
         :disabled="
           OutPlateNoLoading ||
           !IdentifyForm.Value ||
-          OutPlateNo === IdentifyForm.Value
+          OutPlateNo === IdentifyForm.Value ||
+          disabled
         "
       >
         <template v-if="!OutPlateNoLoading && !(OutPlateNo && OutPlateNo === IdentifyForm.Value)">自动识别</template>
@@ -38,7 +39,7 @@
   <div v-else>
     <el-input
       ref="oOutInp"
-      :disabled='OutPlateNoLoading'
+      :disabled='OutPlateNoLoading || disabled'
       @keyup.enter.native="submitForm"
       placeholder="输入平台单号或临时地址进行解析"
       v-model="IdentifyForm.Value"
@@ -50,7 +51,8 @@
       :disabled="
         OutPlateNoLoading ||
         (!IdentifyForm.Value && !OutPlateNo) ||
-        OutPlateNo === IdentifyForm.Value
+        OutPlateNo === IdentifyForm.Value ||
+        disabled
       "
       >
       <template v-if="OutPlateNoLoading">
@@ -71,6 +73,10 @@ export default {
     type: {
       type: String,
       default: '',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

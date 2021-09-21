@@ -49,7 +49,7 @@ export default {
   }
   &.disabled {
     // color: $--color-text-light;
-    background-color: #eee;
+    background-color: #f5f5f5;
     // pointer-events: none;
     cursor: not-allowed;
     color: #a2a2a2 !important;

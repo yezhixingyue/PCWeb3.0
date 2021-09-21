@@ -980,5 +980,9 @@ export default {
       }
     }
   }
+  .el-input.is-disabled .el-input__inner {
+    background-color: #f8f8f8;
+    border-color: #eee;
+  }
 }
 </style>

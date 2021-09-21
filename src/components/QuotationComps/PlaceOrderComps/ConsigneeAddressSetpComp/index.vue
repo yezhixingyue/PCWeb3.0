@@ -53,7 +53,7 @@
           <!-- 配送方式 -->
           <div class="express-box">
             <span class="title">配送：</span>
-            <el-radio-group v-model="Express.First" @change="onRadioChange">
+            <el-radio-group v-model="Express.First" @change="onRadioChange" :disabled='isUploading'>
               <el-radio
                 :label="1"
                 :disabled="!ExpressTypeDisabled.canMpzj"
@@ -102,6 +102,7 @@
           <IdentifyFormItem
             ref="oIdentifyFormItemOut"
             :OutPlateNo="OutPlateNo"
+            :disabled='isUploading'
             @OutPlateNoResolved="onOutPlateNoResolved"
             @DetailedAddress="onDetailedAddressChange"
           />
@@ -195,7 +196,7 @@ export default {
   },
   computed: {
     ...mapState('common', ['ExpressList', 'customerInfo']),
-    ...mapState('Quotation', ['curProductID', 'addressInfo4PlaceOrder']),
+    ...mapState('Quotation', ['curProductID', 'addressInfo4PlaceOrder', 'isUploading']),
     secondExpressList() {
       if (this.ExpressList.length === 0) return [];
       return this.ExpressList.find((it) => it.Type === 3).List;

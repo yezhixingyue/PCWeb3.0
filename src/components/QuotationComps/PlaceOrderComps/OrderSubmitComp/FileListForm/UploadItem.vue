@@ -1,6 +1,6 @@
 <template>
   <el-form-item v-if="FileInfo" :rules="[{ validator: itemValidator, trigger: 'change' }]" :prop="`${FileInfo.ID}`"
-      class="mp-pc-order-submit-upload-item-comp-wrap">
+      class="mp-pc-order-submit-upload-item-comp-wrap" :class="{disabled: disabled}">
     <el-upload
       :class="{ em: fileList.length === 0, single: fileList.length === 1, 'mp-upload': 1 }"
       drag
@@ -13,6 +13,7 @@
       :accept="accept"
       :limit="!multiple ? 1 : 1000"
       :multiple="multiple"
+      :disabled='disabled'
       :http-request="handleHttpRequest"
       ref="upload"
     >
@@ -52,6 +53,10 @@ export default {
       type: Number,
       default: 1024,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -83,31 +88,12 @@ export default {
       }
       return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z';
     },
-    // fileList: {
-    //   get() {
-    //     if (this.FileInfo) {
-    //       return this.FileInfo.FileList;
-    //     }
-    //     return [];
-    //   },
-    //   set(val) {
-    //     this.$nextTick(() => {
-    //       this.$store.commit('Quotation/setItemFlieList', [
-    //         val,
-    //         this.FileInfo.ID,
-    //       ]);
-    //       this.$emit('validateField', `${this.FileInfo.ID}`);
-    //     });
-    //   },
-    // },
   },
   methods: {
     handleRemove(file, fileList) {
       this.fileList = fileList;
     },
     onFileChange(file, fileList) {
-      // console.log('onFileChange', file, fileList);
-      // if (file.status !== 'ready') return; // 不是添加则返回
       this.fileList = fileList;
       if (this.FileInfo.IsPrintFile && file.status === 'ready') this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
     },
@@ -146,7 +132,7 @@ export default {
         file, onError, onProgress, onSuccess,
       } = data;
 
-      onProgress({ percent: 0 }); //   进度条起始
+      onProgress({ percent: 1 }); //   进度条起始
 
       // 1. 解析文件名称
       let err;
@@ -161,10 +147,11 @@ export default {
         onError(new Error(err));
         return;
       }
+      onProgress({ percent: 2 }); //   进度条起始
 
       // 2. 获取到文件及唯一文件名称后，开始执行上传
       const onUploadProgressFunc = progress => {
-        if (this.utils.getValueIsOrNotNumber(progress)) onProgress({ percent: progress });
+        if (this.utils.getValueIsOrNotNumber(progress)) onProgress({ percent: progress >= 2 ? progress : 2 });
       };
 
       const key = await FileTypeClass.UploadFileByBreakPoint(file, name, onUploadProgressFunc, 100);
@@ -291,6 +278,7 @@ export default {
         height: 55px;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
+        transition: border-color 0.08s;
         .header {
           text-align: left;
           height: 55px;
@@ -380,6 +368,9 @@ export default {
             font-size: 14px;
           }
         }
+        .el-progress__text {
+          color: #428dfa;
+        }
       }
     }
     &.em {
@@ -417,6 +408,19 @@ export default {
   }
   .el-form-item__error {
     padding-left: 6px;
+  }
+  &.disabled .mp-upload {
+    > .el-upload {
+      .el-upload-dragger {
+        border-color: rgba($color: #000000, $alpha: 0) !important;
+        background-color: #f8f8f8 !important;
+      }
+    }
+    &.em {
+      > .el-upload .el-upload-dragger {
+        border-color: #eee !important;
+      }
+    }
   }
 }
 </style>

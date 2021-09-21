@@ -22,7 +22,7 @@
                   <p>¥ {{curShoppingCarDetailData.Funds.OriginalPrice}}</p>
                   <p :class="curShoppingCarDetailData.Funds.CouponAmount
                      && curShoppingCarDetailData.Funds.CouponAmount > 0 ? 'is-pink' : ''">
-                    <template v-show='curShoppingCarDetailData.Funds.CouponAmount'
+                    <template v-if='curShoppingCarDetailData.Funds.CouponAmount'
                       >{{(curShoppingCarDetailData.Funds.CouponAmount
                         ? '-¥ ' + curShoppingCarDetailData.Funds.CouponAmount : '¥ ' + 0)}}</template>
                   </p>
@@ -58,13 +58,28 @@ export default {
   computed: {
     ...mapState('shoppingCar', ['curShoppingCarDetailData']),
     info4OrderSummary() {
+      const {
+        OutPlate, Address, Content, ProducePeriod, Weight, FileList,
+      } = this.curShoppingCarDetailData;
+      let FilePath = '';
+      FileList.forEach(FileType => {
+        const { Name, List } = FileType;
+        if (List) {
+          const _text = List.map(it => it.FileName).join('、');
+          // const _text = List.map(it => (it.FileName.length > 15 ? `${it.FileName.slice(0, 12)}...` : it.FileName)).join('、');
+          if (_text) {
+            if (FilePath) FilePath += '；';
+            FilePath += `${Name}：${_text}`;
+          }
+        }
+      });
       return {
-        OutPlate: this.curShoppingCarDetailData.OutPlate ? this.curShoppingCarDetailData.OutPlate.Second : '',
-        Address: this.curShoppingCarDetailData.Address,
-        Content: this.curShoppingCarDetailData.Content,
-        FilePath: this.curShoppingCarDetailData.FilePath,
-        ProducePeriod: this.curShoppingCarDetailData.ProducePeriod,
-        Weight: this.curShoppingCarDetailData.Weight,
+        OutPlate: OutPlate ? OutPlate.Second : '',
+        Address,
+        Content,
+        FilePath,
+        ProducePeriod,
+        Weight,
       };
     },
   },

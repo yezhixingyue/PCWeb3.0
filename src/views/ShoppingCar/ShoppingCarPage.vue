@@ -21,9 +21,13 @@ export default {
   computed: {
     ...mapState('shoppingCar', ['shoppingDataNumber', 'shoppingDataList']),
   },
-  mounted() {
-    this.$store.dispatch('shoppingCar/getQuotationList');
-    this.$store.dispatch('common/getExpressList');
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      if (from.name !== 'shoppingCarDetail') {
+        vm.$store.dispatch('shoppingCar/getQuotationList');
+        vm.$store.dispatch('common/getExpressList');
+      }
+    });
   },
 };
 </script>

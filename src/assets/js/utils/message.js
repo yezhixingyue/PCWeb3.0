@@ -36,7 +36,8 @@ function failSingleError({
     if (msg.length === 1) message = msg[0];
     if (msg.length > 1) {
       dangerouslyUseHTMLString = true;
-      message = `<ul>${msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`)}</ul>`.replaceAll(',', '');
+      const text = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
+      message = `<ul>${text}</ul>`;
     }
   }
   MessageBox({

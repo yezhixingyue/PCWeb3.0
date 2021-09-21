@@ -7,6 +7,7 @@
       :required="it.IsRequired"
       :maxSize='it.MaxSize'
       :FileInfo="it.File"
+      :disabled='disabled'
       ref="UploadItem"
       @validateField="handleValidateField"
       @fillFileContent='fillFileContent'
@@ -22,6 +23,10 @@ export default {
     FileList: {
       type: Array,
       default: () => [],
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
