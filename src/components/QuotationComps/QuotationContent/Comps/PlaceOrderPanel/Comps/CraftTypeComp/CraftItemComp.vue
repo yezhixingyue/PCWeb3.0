@@ -13,8 +13,11 @@
       :visible.sync="visible"
       :Craft="Craft"
       :setupData="value"
+      :PartID='PartID'
+      :PartIndex='PartIndex'
       :AffectedPropList="ChildUseAffectedPropList"
       :ChildSubControlList='ChildSubControlList'
+      :PartAffectedPropList='PartAffectedPropList'
       @submit="handleDialogSubmit"
     />
   </li>
@@ -44,6 +47,18 @@ export default {
     ChildSubControlList: { // 子交互列表
       type: Array,
       default: () => [],
+    },
+    PartID: {
+      type: String,
+      default: '',
+    },
+    PartIndex: {
+      type: Number,
+      default: 0,
+    },
+    PartAffectedPropList: { // 部件子交互生效属性控制信息列表
+      type: Array,
+      default: null,
     },
   },
   components: {

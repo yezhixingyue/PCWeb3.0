@@ -24,7 +24,7 @@
           <div :style="wStyles[0]" class="is-twelve">{{getProductName(item)}}</div>
           <div :style="wStyles[1]">{{getProductCount(item.OrderID)}}</div>
           <div :style="wStyles[2]">{{item.OriginalPrice}}元</div>
-          <div :style="wStyles[3]">{{ getCoupon(item.OrderID)}}</div>
+          <div :style="wStyles[3]">{{item.CouponAmount}}元</div>
           <div :style="wStyles[4]">{{item.FinalPrice}}元</div> <!-- 成交价 -->
           <div :style="wStyles[5]">{{item.DepositAmount}}元</div> <!-- 定金 -->
           <div :style="wStyles[6]" class="is-font-12 is-pink">{{item.ProducePeriod | getPayTime}}
@@ -96,17 +96,9 @@ export default {
       if (!this.curShoppingCarDataBeforeFirstPlace) return '';
       const _t = this.curShoppingCarDataBeforeFirstPlace.find(it => it.OrderID === OrderID);
       if (!_t) return '';
-      const { ProductAmount, KindCount, Attributes } = _t.ProductParams;
-      const { Unit } = Attributes;
-      return `${ProductAmount}${Unit}${KindCount}款`;
-    },
-    getCoupon(OrderID) {
-      if (!this.curShoppingCarDataBeforeFirstPlace) return '';
-      const _t = this.curShoppingCarDataBeforeFirstPlace.find(it => it.OrderID === OrderID);
-      if (!_t) return '';
-      const { CouponAmount } = _t.Funds;
-      if (CouponAmount > 0) return `-${CouponAmount}元`;
-      return '0元';
+      const { Attributes } = _t.ProductParams;
+      const { Unit, ProductAmount, KindCount } = Attributes;
+      return `${ProductAmount}${Unit}(${KindCount}款)`;
     },
     getContent(OrderID) {
       if (!this.curShoppingCarDataBeforeFirstPlace) return '';

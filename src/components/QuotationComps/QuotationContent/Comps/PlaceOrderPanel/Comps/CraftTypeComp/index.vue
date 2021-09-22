@@ -7,9 +7,12 @@
       v-for="it in localCraftList"
       :key="it.ID"
       :Craft="it"
+      :PartID='PartID'
+      :PartIndex='PartIndex'
       :value="getCraftValue(it)"
       :AffectedPropList='getCraftAffectedPropList(it.ID)'
       :ChildSubControlList='ChildSubControlList'
+      :PartAffectedPropList='PartAffectedPropList'
       @change="onCraftItemChange($event, it)"
     />
   </ul>
@@ -41,6 +44,18 @@ export default {
     ChildSubControlList: { // 子交互列表
       type: Array,
       default: () => [],
+    },
+    PartID: {
+      type: String,
+      default: '',
+    },
+    PartIndex: {
+      type: Number,
+      default: 0,
+    },
+    PartAffectedPropList: { // 部件子交互生效属性控制信息列表
+      type: Array,
+      default: null,
     },
   },
   components: {

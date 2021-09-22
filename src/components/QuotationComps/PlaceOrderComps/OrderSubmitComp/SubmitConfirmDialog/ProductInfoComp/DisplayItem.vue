@@ -1,10 +1,10 @@
 <template>
-  <ul class="display-box">
+  <ul class="display-box mp-order-detail-item-comp-wrap" :class="{border: showBorder}">
     <li>
       <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称':'部件'}}：</span>
-      <div class="text is-font-14 is-bold">{{ShowData.Name}}</div>
+      <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}</div>
     </li>
-    <li v-for="item in localContentList" :key="item.Label + item.Content">
+    <li v-for="(item) in localContentList" :key="item.Label + item.Content">
       <span class="label">{{item.Label}}：</span>
       <div class="text">
         <span v-if="typeof item.Content === 'string'">{{item.Content}}</span>
@@ -33,6 +33,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    showBorder: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     localContentList() {
@@ -45,4 +49,50 @@ export default {
 };
 </script>
 <style lang='scss'>
+.mp-order-detail-item-comp-wrap {
+  > li {
+    width: 100%;
+    margin-top: 8px;
+    line-height: 22px;
+    > span.label {
+      color: #888;
+      float: left;
+      margin-right: 2px;
+      &.part {
+        position: relative;
+        padding-left: 13px;
+        &::before {
+          content: '';
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          background: #F4A307;
+          border-radius: 50%;
+          left: 0;
+          top: 8px;
+        }
+      }
+    }
+    > div.text {
+      color: #585858;
+      font-size: 12px;
+      overflow: hidden;
+      min-height: 22px;
+    }
+  }
+  &.border {
+    margin-top: 20px;
+    padding-top: 10px;
+    position: relative;
+    &::before {
+      content: '';
+      width: 280px;
+      position: absolute;
+      height: 1px;
+      border-top: 1px dashed #eee;
+      top: 0;
+      left: 0;
+    }
+  }
+}
 </style>

@@ -29,6 +29,9 @@
      :AffectedPropList='localAffectedPropList'
      :CraftConditionList='placeData.CraftConditionList || []'
      :ChildSubControlList='submitData.ChildSubControlList'
+     :PartID='PartID'
+     :PartIndex='PartIndex'
+     :PartAffectedPropList='PartAffectedPropList'
      @triggerInteraction='onTriggerInteractionClick' />
   </el-form-item>
 </template>

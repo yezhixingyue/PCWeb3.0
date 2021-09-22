@@ -185,19 +185,20 @@ export default {
       }
     },
     getCraft({ CraftList, PartList }) {
-      const _arr = [];
-
-      const { First } = CraftList;
-      this.getCraftFromItem(First, _arr);
-      if (PartList.length > 0) {
-        PartList.forEach(part => {
-          part.PartList.forEach(subPart => {
-            const partFirst = subPart.CraftList.First;
-            this.getCraftFromItem(partFirst, _arr);
+      const arr = [];
+      CraftList.forEach(it => {
+        if (it.Attributes) arr.push(it.Attributes.DisplayName);
+      });
+      if (Array.isArray(PartList) && PartList.length > 0) {
+        PartList.forEach(_it => {
+          _it.List.forEach(_it2 => {
+            _it2.CraftList.forEach(_it3 => {
+              if (_it3.Attributes) arr.push(_it3.Attributes.DisplayName);
+            });
           });
         });
       }
-      return _arr.join('，');
+      return [...new Set(arr.filter(it => it))].join('，');
     },
     getExpress({ First, Second }) {
       if (First === 1 && Second === 1) return '名片之家';

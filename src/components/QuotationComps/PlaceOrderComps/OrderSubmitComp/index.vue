@@ -44,7 +44,7 @@
           :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
       </div>
       <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' :requestObj='requestObj' :FileCount='FileCount' @submit="handleSubmit" />
-      <Dialog2Pay :needClear='false' />
+      <Dialog2Pay :needClear='true' />
     </div>
   </section>
 </template>

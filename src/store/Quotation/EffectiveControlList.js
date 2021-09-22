@@ -235,6 +235,9 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
       if (!Array.isArray(value)) { // 目前只比对不可多次出现目标
         return ValueList.map(it => it.Value).includes(value);
       }
+      if (Array.isArray(value) && value.length === 1) { // 目前只比对不可多次出现目标
+        return ValueList.map(it => it.Value).includes(value[0]);
+      }
     }
     return false;
   };
@@ -335,7 +338,6 @@ export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation,
     if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
     InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
   }
-
   const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation, isSubControl))
     .sort((f, s) => f.Priority - s.Priority); // 按照优先级进行排序
   return list;

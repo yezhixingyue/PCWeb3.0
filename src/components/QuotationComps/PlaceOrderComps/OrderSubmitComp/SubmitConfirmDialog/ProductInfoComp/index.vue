@@ -4,8 +4,8 @@
       <img src="@/assets/images/product-info.png" alt="">
     </template>
     <ul class="content mp-scroll-wrap">
-      <li v-for="item in DetailDisplayDataList" :key="item.Name">
-        <DisplayItem :ShowData='item' />
+      <li v-for="(item, i) in DetailDisplayDataList" :key="item.Name">
+        <DisplayItem :ShowData='item' :showBorder='i > 0' />
       </li>
     </ul>
     <div class="footer price-box">

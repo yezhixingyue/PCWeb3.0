@@ -70,7 +70,7 @@ import { mapState } from 'vuex';
 import { checkElement, checkElementGroup } from '@/store/Quotation/Checker';
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import InterAction from '@/store/Quotation/Interaction';
-import { getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
+import { getPropertiesAffectedByInteraction, getCombineAffectedPropList } from '@/store/Quotation/EffectiveControlList';
 import ElementTypeComp from '../ElementTypeComp.vue';
 import ElementGroupTypeComp from '../ElementGroupTypeComp.vue';
 
@@ -97,13 +97,25 @@ export default {
       type: Array,
       default: () => [],
     },
+    PartID: {
+      type: String,
+      default: '',
+    },
+    PartIndex: {
+      type: Number,
+      default: 0,
+    },
+    PartAffectedPropList: { // 部件子交互生效属性控制信息列表
+      type: Array,
+      default: null,
+    },
   },
   components: {
     ElementTypeComp,
     ElementGroupTypeComp,
   },
   computed: {
-    ...mapState('Quotation', ['curProductInfo2Quotation']),
+    ...mapState('Quotation', ['curProductInfo2Quotation', 'obj2GetProductPrice']),
     localVisible: {
       get() {
         return this.visible;
@@ -144,12 +156,12 @@ export default {
       return temp;
     },
     ElementAffectedPropList() {
-      if (this.AffectedPropList.length === 0) return [];
-      return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Element && !it.Property.Group);
+      if (this.localAffectedPropList.length === 0) return [];
+      return this.localAffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Element && !it.Property.Group);
     },
     GroupAffectedPropList() {
-      if (this.AffectedPropList.length === 0) return [];
-      return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Group);
+      if (this.localAffectedPropList.length === 0) return [];
+      return this.localAffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Group);
     },
   },
   data() {
@@ -160,15 +172,15 @@ export default {
       errorIndex: '',
       AffectedPropLists: [],
       subGroupAffectedPropLists: [],
+      localAffectedPropList: [], // 弹窗内使用本地交互列表，以实现实时响应数据
     };
   },
   methods: {
     onSubmit() {
       this.$refs.craftForm.validate((bool) => {
         if (bool) {
-          const ElementList = InterAction.setElementListClear4Craft(this.localSetupData.ElementList, this.ElementAffectedPropList);
-          const GroupList = InterAction.setElementGroupListClear4Craft(this.localSetupData.GroupList, this.GroupAffectedPropList);
-          this.$emit('submit', { ...this.localSetupData, ElementList, GroupList });
+          const obj = this.generateSubmitSetupData();
+          this.$emit('submit', obj);
           this.onTriggerInteractionClick();
         }
       });
@@ -181,6 +193,11 @@ export default {
         );
       }
     },
+    generateSubmitSetupData() {
+      const ElementList = InterAction.setElementListClear4Craft(this.localSetupData.ElementList, this.ElementAffectedPropList);
+      const GroupList = InterAction.setElementGroupListClear4Craft(this.localSetupData.GroupList, this.GroupAffectedPropList);
+      return { ...this.localSetupData, ElementList, GroupList };
+    },
     onOpen() {
       if (!this.setupData) this.generateInitSetupData();
       else {
@@ -188,7 +205,7 @@ export default {
         this.localSetupData = JSON.parse(JSON.stringify(this.setupData));
       }
       this.showMain = true;
-      this.getAffectedPropList();
+      // this.getAffectedPropList();
       this.getSubGroupAffectedPropLists();
     },
     onClosed() {
@@ -205,7 +222,6 @@ export default {
       return t ? t.List : [];
     },
     handleElementChange(CustomerInputValues, el) {
-      console.log(el, CustomerInputValues);
       const t = this.localSetupData.ElementList.find(
         (it) => it.ElementID === el.ID,
       );
@@ -279,6 +295,7 @@ export default {
       this.AffectedPropLists = this.GroupList.map(it => this.getGroupAffectedPropList(it));
     },
     getSubGroupAffectedPropLists() { // 获取工艺元素组子交互数据
+      this.getLocalAffectedPropList();
       this.getAffectedPropList();
       this.subGroupAffectedPropLists = this.GroupList.map(it => {
         const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
@@ -289,6 +306,38 @@ export default {
         }
         return [];
       });
+    },
+    getLocalAffectedPropList() {
+      // 替换对象
+      const obj = this.generateSubmitSetupData();
+      const temp = JSON.parse(JSON.stringify(this.obj2GetProductPrice.ProductParams));
+      let target;
+      if (!this.PartID) {
+        if (!temp.CraftList) temp.CraftList = [];
+        target = temp.CraftList;
+      } else {
+        target = temp.PartList.find(it => it.PartID === this.PartID);
+        if (target && target.List && target.List[this.PartIndex]) {
+          if (!target.List[this.PartIndex].CraftList) target.List[this.PartIndex].CraftList = [];
+          target = target.List[this.PartIndex].CraftList;
+        }
+      }
+      if (!target) return;
+      const i = target.findIndex(it => it.CraftID === obj.CraftID);
+      if (i > -1) target.splice(i, 1, obj);
+      else target.push(obj);
+      const list = QuotationClassType.getPropertiesAffectedByInteraction(temp, this.curProductInfo2Quotation)
+        .filter(it => it && it.Property && it.Property.Craft && it.Property.Craft.ID === this.Craft.ID && (it.Property.Element || it.Property.Group));
+      const _PartAffectedPropList = this.PartAffectedPropList
+        .filter(it => it && it.Property && it.Property.Craft && it.Property.Craft.ID === this.Craft.ID && (it.Property.Element || it.Property.Group));
+      const CombineAffectedByInteraction = getCombineAffectedPropList(list, _PartAffectedPropList);
+      if (Array.isArray(CombineAffectedByInteraction)) {
+        this.localAffectedPropList = CombineAffectedByInteraction.filter(({ Property }) => {
+          const isSamePart = (!this.PartID && !Property.Part) || (this.PartID && Property.Part && Property.Part.ID === this.PartID);
+          if (!isSamePart) return false;
+          return true;
+        });
+      }
     },
   },
 };

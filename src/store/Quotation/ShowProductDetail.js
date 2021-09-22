@@ -187,6 +187,124 @@ const getUniqueSizeUnit = (SizeList, SizeElementList) => {
   return { isUnique: false, Unit: '' };
 };
 
+// ------------------------------------------- ↑ 上面为通过下单数据获取到产品详细信息
+
+// ------------------------------------------- ↓ 下面为通过详情数据获取到产品详细信息
+const getElementValueContentFromDetail = (target, giveUpUnit) => {
+  let Content = '';
+  if (Array.isArray(target.CustomerInputValues) && target.CustomerInputValues.length > 0) {
+    if (target.CustomerInputValues.length > 1) {
+      Content = target.CustomerInputValues.map(it => it.Name).join('、');
+    } else {
+      Content = target.CustomerInputValues[0].Name;
+      if (target.Attributes.Unit && !giveUpUnit) Content += target.Attributes.Unit;
+    }
+  }
+  const Label = target.Attributes.Name;
+  return { Label, Content };
+};
+
+const getDisplayContentByElementFromDetailData = (ElementList, item, giveUpUnit) => {
+  if (item && item.Property && Array.isArray(ElementList) && ElementList.length > 0) {
+    const target = ElementList.find(it => it.ElementID === item.Property.ID);
+    if (target) {
+      const { Label, Content } = getElementValueContentFromDetail(target, giveUpUnit);
+      if (Label && Content) {
+        return { Label, Content };
+      }
+    }
+  }
+  return null;
+};
+
+const getDisplayContentByGroupFromDetailData = (GroupList, item) => {
+  if (Array.isArray(GroupList) && GroupList.length > 0 && item) {
+    const target = GroupList.find(it => it.GroupID === item.Property.ID);
+    if (target && target.List.length > 0) {
+      let _list = [];
+      target.List.forEach(valList => {
+        const groupItemContent = valList.List
+          .map(_it => {
+            const t = getDisplayContentByElementFromDetailData(valList.List, { Property: { ID: _it.ElementID } });
+            return t;
+          })
+          .filter(_it => _it && _it.Label && _it.Content)
+          .map(({ Label, Content }) => `${Label}：${Content}`);
+        if (groupItemContent) _list.push(groupItemContent);
+      });
+      if (_list.length > 0) {
+        _list = _list.map((Content, i) => {
+          const Label = _list.length > 1 ? `${target.Attributes.Name}-${i + 1}` : target.Attributes.Name;
+          return { Label, Content };
+        });
+        return _list;
+      }
+    }
+  }
+  return null;
+};
+
+const getCraftItemContentNameFromDetailData = (Craft) => {
+  if (!Craft) return { Name: '工艺' };
+  const { ElementList, GroupList } = Craft;
+  if (
+    (!Array.isArray(ElementList) || ElementList.length === 0)
+      && (!Array.isArray(GroupList) || GroupList.length === 0)
+  ) return { Name: Craft.Attributes.DisplayName };
+  const ElContent = [];
+  const GroupContent = [];
+  const hasElementList = Array.isArray(ElementList) && ElementList.length > 0;
+  const hasGroupList = Array.isArray(GroupList) && GroupList.length > 0;
+  const hiddenGroupName = !hasElementList && hasGroupList && GroupList.length === 1;
+  if (hasElementList) {
+    ElementList.forEach((it) => {
+      const _data = getElementValueContentFromDetail(it);
+      if (_data) {
+        const { Label, Content } = _data;
+        if (Label && Content) ElContent.push(`${Label}：${Content}`);
+      }
+    });
+  }
+  if (hasGroupList) {
+    GroupList.forEach((it) => {
+      if (it.List.length === 0) return;
+      if (it.List.length > 1) {
+        GroupContent.push(`${hiddenGroupName ? '' : it.Attributes.Name}${it.List.length}处`);
+        return;
+      }
+      const _data = getDisplayContentByGroupFromDetailData(GroupList, { Property: { ID: it.GroupID } });
+      if (_data.length > 0) {
+        const [{ Label, Content }] = _data;
+        if (Label && Content) {
+          if (hiddenGroupName) GroupContent.push(`${Content.join('，')}`);
+          else GroupContent.push(`${Label}：[ ${Content.join('，')} ]`);
+        }
+      }
+    });
+  }
+  if (ElContent.length > 0 || GroupContent.length > 0) {
+    const temp = {
+      Name: Craft.Attributes.DisplayName,
+      Content: `${ElContent.join('，')}${ElContent.length > 0 ? '；' : ''}${GroupContent.join('，')}`,
+    };
+    return temp;
+  }
+  return { Name: Craft.Attributes.DisplayName };
+};
+
+const getDisplayContentByCraftFromDetailData = (CraftList, item) => {
+  if (item && Array.isArray(CraftList) && item.Property && item.Property.ID) {
+    const list = CraftList.filter(it => it.Attributes?.DisplayGroup?.ID === item.Property.ID);
+    if (list.length > 0) {
+      const CraftGroupLabel = list[0].Attributes.DisplayGroup.Name || '工艺';
+      const temp = { Label: CraftGroupLabel, Content: [] };
+      temp.Content = list.map(it => getCraftItemContentNameFromDetailData(it)).filter(it => it);
+      return temp;
+    }
+  }
+  return null;
+};
+
 /**
  * @description: 用产品详情展示的类
  * @param {*}
@@ -330,7 +448,6 @@ export default class ProductDetailTypeShowClass {
    * @return {*}
    */
   static getProductDetailShowDataList(ProductParams, curProductInfo2Quotation) {
-    console.log('类：ProductDetailTypeShowClass - getProductDetailShowDataList', ProductParams, curProductInfo2Quotation);
     const rootContent = this.getDisplayContentFromPartData(ProductParams, curProductInfo2Quotation);
     const root = {
       Name: curProductInfo2Quotation.ShowName,
@@ -353,7 +470,60 @@ export default class ProductDetailTypeShowClass {
         });
       }
     });
-    console.log(list);
     return list;
+  }
+
+  /**
+   * @description: 购物车列表获取订单详情列表展示数据
+   * @param {*} partData
+   * @param {*} originPartData
+   * @return {*}
+   */
+  static getDisplayContentFromPartDataByDetailData(DisplayList, ProductParams) {
+    if (!ProductParams || !DisplayList) return [];
+    const arr = [];
+    const { ProductDisplayPropertyTypeList } = store.state.Quotation;
+    if (Array.isArray(DisplayList) && DisplayList.length > 0) {
+      DisplayList.forEach(itemData => {
+        const t = ProductDisplayPropertyTypeList.find(it => it.ID === itemData.Type);
+        if (!t) return;
+        let target;
+        switch (t.Name) {
+          case '元素':
+            target = getDisplayContentByElementFromDetailData(ProductParams.ElementList, itemData);
+            if (target && target.Label && target.Content) {
+              arr.push({ type: 'ElementList', Label: target.Label, Content: target.Content });
+            }
+            break;
+          case '元素组':
+            target = getDisplayContentByGroupFromDetailData(ProductParams.GroupList, itemData);
+            if (Array.isArray(target)) {
+              arr.push(...target.map(it => ({ type: 'GroupList', Label: it.Label, Content: it.Content })));
+            }
+            break;
+          case '尺寸组':
+            if (ProductParams.Size?.SizeGroup?.GroupInfo?.Name && ProductParams.Size.DisplayName) {
+              arr.push({ type: 'Size', Label: ProductParams.Size.SizeGroup.GroupInfo.Name, Content: ProductParams.Size.DisplayName });
+            }
+            break;
+          case '物料':
+            if (ProductParams.Attributes?.MaterialName) {
+              arr.push({ type: 'MaterialID', Label: ProductParams.Attributes.MaterialTipsName || '物料', Content: ProductParams.Attributes.MaterialName });
+            }
+            break;
+          case '工艺':
+            target = getDisplayContentByCraftFromDetailData(ProductParams.CraftList, itemData);
+            if (target) {
+              arr.push({ type: 'CraftList', Label: target.Label, Content: target.Content });
+            }
+            break;
+          case '工厂': // 工厂隐藏 不考虑
+            break;
+          default:
+            break;
+        }
+      });
+    }
+    return arr;
   }
 }
