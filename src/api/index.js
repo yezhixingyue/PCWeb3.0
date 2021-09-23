@@ -233,8 +233,8 @@ const api = {
 
   /* 未付款订单部分 api
    ----------------------------------------------------------------------------------- */
-  getUnpayList() { // 获取未付款单列表
-    return instance.post('/Api/Customer/OrderList', { FieldType: 3, NotPaidList: true });
+  getUnpayList() { // 获取未付款单列表 POST /Api/PaymentOrder/List
+    return instance.post('/Api/PaymentOrder/List', { Status: 1 });
   },
   getUnpayOrderCancle({ OrderID, closeTip }) { // 未付款单取消 - 和订单取消同一个接口
     // return instance.delete(`/Api/Order/Cancle?orderID=${OrderID}`);

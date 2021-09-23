@@ -8,10 +8,8 @@
       :auto-upload='false'
       :file-list="fileList"
       :on-change="onFileChange"
-      :on-exceed="handleExceed"
       action=""
       :accept="accept"
-      :limit="!multiple ? 1 : 1000"
       :multiple="multiple"
       :disabled='disabled'
       :http-request="handleHttpRequest"
@@ -94,24 +92,12 @@ export default {
       this.fileList = fileList;
     },
     onFileChange(file, fileList) {
-      this.fileList = fileList;
-      if (this.FileInfo.IsPrintFile && file.status === 'ready') this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
-    },
-    handleExceed(fileList) { // limit超出触发事件 -- 仅单选时生效
       if (!this.multiple) {
-        // 不是多选时才替换
-        const file = fileList[0];
-        const temp = [
-          {
-            ...this.fileList[0],
-            raw: file,
-            name: file.name,
-            size: file.size,
-          },
-        ];
-        this.fileList = temp;
-        if (this.FileInfo.IsPrintFile) this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
+        this.fileList = [fileList[fileList.length - 1]];
+      } else {
+        this.fileList = fileList;
       }
+      if (this.FileInfo.IsPrintFile && file.status === 'ready') this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
     },
     itemValidator(rule, value, callback) { // 校验
       if (this.fileList.length === 0 && this.required) {

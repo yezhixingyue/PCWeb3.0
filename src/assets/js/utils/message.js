@@ -37,7 +37,7 @@ function failSingleError({
     if (msg.length > 1) {
       dangerouslyUseHTMLString = true;
       const text = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
-      message = `<ul>${text}</ul>`;
+      message = `<ul style='display: inline-block'>${text}</ul>`;
     }
   }
   MessageBox({
@@ -67,11 +67,23 @@ function failSingleError({
 function warnSingleError({
   msg, successFunc, failFunc, title = '注意', text = '确定',
 }) {
+  let message = msg;
+  let dangerouslyUseHTMLString = false;
+  if (Array.isArray(msg)) {
+    // eslint-disable-next-line prefer-destructuring
+    if (msg.length === 1) message = msg[0];
+    if (msg.length > 1) {
+      dangerouslyUseHTMLString = true;
+      const content = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
+      message = `<ul style='display: inline-block'>${content}</ul>`;
+    }
+  }
   MessageBox({
     showClose: true,
-    message: msg,
+    message,
     type: 'warning',
     confirmButtonText: text,
+    dangerouslyUseHTMLString,
     title,
     customClass: 'mp-order-del-pop-reverse-warn',
   }).then(() => successFunc && successFunc()).catch(() => failFunc && failFunc());
@@ -88,11 +100,23 @@ function warnSingleError({
 function warnCancelBox({
   title = '确定取消此订单吗 ?', msg, successFunc, failFunc, confirmButtonText = '确定', cancelButtonText = '取消',
 }) {
+  let message = msg;
+  let dangerouslyUseHTMLString = false;
+  if (Array.isArray(msg)) {
+    // eslint-disable-next-line prefer-destructuring
+    if (msg.length === 1) message = msg[0];
+    if (msg.length > 1) {
+      dangerouslyUseHTMLString = true;
+      const content = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
+      message = `<ul style='display: inline-block'>${content}</ul>`;
+    }
+  }
   MessageBox({
     showClose: true,
-    message: msg,
+    message,
     type: 'success ',
     confirmButtonText,
+    dangerouslyUseHTMLString,
     title,
     customClass: 'mp-order-del-pop-reverse-warn',
     showCancelButton: true,

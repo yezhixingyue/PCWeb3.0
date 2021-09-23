@@ -18,8 +18,15 @@
             alt
            />
           <div v-if="!showImg" class="payImg-loading-box">
-            <i class="el-icon-loading"></i>
-            <i>正在加载中</i>
+            <template v-if="!getImageCodeFail">
+              <i class="el-icon-loading is-font-18"></i>
+              <span>正在加载中</span>
+            </template>
+            <template v-else>
+              <i class="el-icon-warning-outline is-font-18"></i>
+              <span>二维码获取失败，<i class="blue-span is-font-12" @click="onFetchCodeAgainClick">重新获取</i></span>
+              <span>或到未付款订单中查看及支付</span>
+            </template>
           </div>
         </div>
         <p>
@@ -104,12 +111,13 @@ export default {
       showImg: false,
       timer: null,
       count: 0,
+      getImageCodeFail: false,
     };
   },
   computed: {
     ...mapState('Quotation', ['isShow2PayDialog', 'curPayInfo2Code']),
     imgSrc() {
-      if (!this.curPayInfo2Code || !this.curPayInfo2Code.PayWay || !this.curPayInfo2Code.PayWay.AllinPay) return '';
+      if (!this.curPayInfo2Code || !this.curPayInfo2Code.PayWay || !this.curPayInfo2Code.PayWay.AllinPay || this.getImageCodeFail) return '';
       return this.curPayInfo2Code.PayWay.AllinPay;
     },
     listener4GetPayStatus() { // 监听数据变化以启动支付状态轮询
@@ -127,6 +135,7 @@ export default {
       this.setIsShow2PayDialog(false);
       clearTimeout(this.timer);
       this.timer = null;
+      this.getImageCodeFail = false;
     },
     onLoad() {
       // 图片下载完成
@@ -135,11 +144,18 @@ export default {
     },
     onError(e) {
       // 图片下载出错
-      if (e.type === 'error' && this.isShow2PayDialog) {
-        const msg = this.$route.name === 'unpayOrderSubmit' ? '[ 获取二维码失败，请刷新重试 ]' : '[ 抱歉，获取二维码失败，订单已生成，请到未付款单中查看及支付 ]';
+      if (e.type === 'error' && this.isShow2PayDialog && this.imgSrc) {
+        // const msg = this.$route.name === 'unpayOrderSubmit' ? '[ 获取二维码失败，请刷新重试 ]' : '[ 抱歉，获取二维码失败，订单已生成，请到未付款单中查看及支付 ]';
+        const msg = '[ 支付二维码获取失败 ]';
         this.messageBox.failSingleError({
           msg,
           title: '图片获取失败',
+          successFunc: () => {
+            this.getImageCodeFail = true;
+          },
+          failFunc: () => {
+            this.getImageCodeFail = true;
+          },
         });
       }
     },
@@ -179,6 +195,9 @@ export default {
       // 转换数字格式
       if (!num && num !== 0) return '';
       return num.toFixed(count);
+    },
+    onFetchCodeAgainClick() {
+      this.getImageCodeFail = false;
     },
   },
   watch: {
@@ -240,7 +259,7 @@ export default {
             object-fit: cover;
           }
           .payImg-loading-box {
-            line-height: 36px;
+            line-height: 20px;
             color: #aaa;
             white-space: normal;
             margin: 20px;
@@ -255,7 +274,12 @@ export default {
             background-color: rgb(238, 238, 238);
             border-radius: 5px;
             i:first-of-type {
-              font-size: 15px;
+              font-size: 18px;
+              margin-bottom: 5px;
+            }
+            > span {
+              text-align: center;
+              padding: 0 20px;
             }
           }
         }
@@ -308,9 +332,8 @@ export default {
         }
       }
     }
-    .hasTimeout,
-    .payImg-loading-box {
-      line-height: 36px;
+    .hasTimeout {
+      line-height: 20px;
       color: #aaa;
       white-space: normal;
       margin: 20px;
@@ -323,7 +346,7 @@ export default {
       background-color: rgb(238, 238, 238);
       border-radius: 5px;
       i:first-of-type {
-        font-size: 15px;
+        font-size: 18px;
       }
     }
   }

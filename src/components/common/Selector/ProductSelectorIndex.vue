@@ -115,9 +115,12 @@ export default {
     },
     productThirdList() {
       const _arr = this.productNames.filter(it => {
-        const { First, Second } = it.ProductClass;
-        return First === this.first && Second === this.second;
-      });
+        const t = it.ClassifyList.find(_it => _it.Type === 2);
+        if (t) {
+          return t.FirstLevel.ID === this.first && t.SecondLevel.ID === this.second;
+        }
+        return false;
+      }).filter(it => it).map(it => ({ ProductID: it.ID, ProductName: it.ShowName }));
       return [{ ProductID: '', ProductName: '不限' }, ..._arr];
     },
   },

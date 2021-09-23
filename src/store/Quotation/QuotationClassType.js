@@ -338,6 +338,8 @@ export default class QuotationClassType {
           const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
           const itemList = getElementListValueFilter(item.List, disabledElementIDs); // 对其所属元素进行筛选处理
           if (itemList.length === 0) return null;
+          // const _itemList = itemList.filter(_it => _it.CustomerInputValues && _it.CustomerInputValues.length > 0);
+          // if (_itemList.length === 0) return null;
           return {
             ...item,
             List: itemList,

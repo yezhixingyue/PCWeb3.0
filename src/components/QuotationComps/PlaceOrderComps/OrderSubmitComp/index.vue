@@ -123,11 +123,15 @@ export default {
       if (!result) return;
       const resp = await this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent: this.fileContent });
       if (resp) {
-        const [PreCreateData, requestObj] = resp;
-        this.OrderPreData = PreCreateData;
-        this.requestObj = requestObj;
-        this.FileCount = this.getFileCount();
-        this.visible = true;
+        if (Array.isArray(resp)) {
+          const [PreCreateData, requestObj] = resp;
+          this.OrderPreData = PreCreateData;
+          this.requestObj = requestObj;
+          this.FileCount = this.getFileCount();
+          this.visible = true;
+        } else {
+          console.log('页面提示返回数据', resp);
+        }
       }
     },
     async onSave2TheCar(evt) { // 加入购物车
@@ -149,7 +153,8 @@ export default {
         this.fileContent = '';
         this.scrollToTop();
       };
-      this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
+      const resp = await this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
+      console.log('加入购物车返回内容', resp);
     },
     scrollToTop() {
       this.$nextTick(() => {

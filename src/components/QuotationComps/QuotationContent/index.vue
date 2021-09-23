@@ -71,6 +71,7 @@
                   >
                     使用优惠券<i class="el-icon-arrow-down el-icon--right"></i>
                   </el-button>
+                  <TipsBox />
                 </template>
                 <section class="coupon-wrap">
                   <header>
@@ -199,6 +200,7 @@ import SwiperClassifyComp from './Comps/SwiperClassifyComp.vue';
 import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
 import PlaceOrderPanel from './Comps/PlaceOrderPanel/index.vue';
 import PartComp from './Comps/PartComp.vue';
+import TipsBox from './Comps/TipsBox.vue';
 
 export default {
   props: ['placeData'],
@@ -211,6 +213,7 @@ export default {
     PlaceOrderPanel,
     PartComp,
     ConsigneeAddressSetpComp,
+    TipsBox,
   },
   computed: {
     // eslint-disable-next-line max-len
@@ -411,7 +414,7 @@ export default {
     async getProductPriceLocal() {
       this.priceGetErrMsg = '';
       this.isGettingPrice = true;
-      const msg = await this.getProductPrice('报价');
+      const msg = await this.getProductPrice();
       this.isGettingPrice = false;
       if (msg === true) {
         // this.$router.push('/offerResult');
@@ -419,6 +422,11 @@ export default {
         // this.$message.singleError('报价失败', msg, null);
         this.priceGetErrMsg = msg;
         // this.messageBox.failSingleError({ title: '报价失败', msg });
+      } else if (typeof msg === 'object') {
+        console.log('算价风险 msg', msg);
+        if (msg.DisplayMode === 2) {
+          this.messageBox.warnSingleError({ title: '温馨提示', msg: msg.Message });
+        }
       }
     },
     handleChange(list, bool) {
@@ -740,14 +748,15 @@ export default {
                   clear: both;
                 }
                 > .el-collapse-item__header {
-                  text-align: right;
+                  text-align: left;
                   // justify-content: flex-end;
                   display: inline-block;
                   border: none;
                   float: left;
                   cursor: unset;
                   margin-bottom: 10px;
-                  height: 66px;
+                  height: auto;
+                  min-height: 66px;
                   line-height: 66px;
                   > span {
                     display: inline;

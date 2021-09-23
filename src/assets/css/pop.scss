@@ -253,6 +253,9 @@
 // 订单列表删除弹框样式，样式中确定和取消按键反向相反  且为 warn 类型       类名：mp-order-del-pop-reverse-warn
 .el-message-box.mp-order-del-pop-reverse-warn {
     @include reverse-warn;
+    .el-message-box__content{
+      padding-top: 20px;
+    }
 }
 // MessageBox({
 //     showClose: true,

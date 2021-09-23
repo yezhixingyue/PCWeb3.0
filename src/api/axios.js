@@ -101,7 +101,7 @@ axios.interceptors.response.use(
 
     const _url = response.config.url.split('?')[0];
 
-    const _statusList2NotNeed2Toast = [1000, 9062];
+    const _statusList2NotNeed2Toast = [1000, 9062, 6225];
     // 包含以上的状态码 或 以上的请求路径  不会弹窗报错  其余以外都会报错出来
     // eslint-disable-next-line max-len
     const oneCondition4NotNeedToast = !([9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(response.data.Status) && ['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url));

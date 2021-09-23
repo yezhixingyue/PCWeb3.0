@@ -1040,6 +1040,7 @@ export default {
       let key = true;
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;
+      if (res.data.Status === 6225) return res.data;
       if (res.data.Status !== 1000) return res.data.Message;
       if (!res.data.Data || !res.data.Data.HavePrice) {
         return '暂无报价，请联系客服获取报价信息!';
@@ -1108,18 +1109,45 @@ export default {
         return successHandler(res.data.Data, _requestObj);
       }
       if (res && [9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
-        massage.warnCancelBox({
-          title: res.data.Message,
-          msg: '是否 [ 取消使用优惠券 ] 然后下单',
-          successFunc: async () => {
-            delete _requestObj.List[0].Coupon;
-            commit('setSelectedCoupon', null);
-            const resp = await api.getOrderPreCreate(_requestObj);
-            if (resp.data.Status === 1000) {
-              return successHandler(resp.data.Data, _requestObj);
-            }
-          },
+        return new Promise((resolve) => {
+          massage.warnCancelBox({
+            title: res.data.Message,
+            msg: '是否 [ 取消使用优惠券 ] 然后下单',
+            successFunc: async () => {
+              delete _requestObj.List[0].Coupon;
+              commit('setSelectedCoupon', null);
+              const resp = await api.getOrderPreCreate(_requestObj);
+              if (resp.data.Status === 1000) {
+                resolve(successHandler(resp.data.Data, _requestObj));
+              }
+            },
+            failFunc: () => {
+              resolve(null);
+            },
+          });
         });
+      }
+      if (res && res.data.Status === 6225) {
+        if (res.data.DisplayMode !== 3) {
+          return new Promise((resolve) => {
+            massage.warnCancelBox({
+              title: '存在风险，是否继续下单?',
+              msg: res.data.Message,
+              confirmButtonText: '继续下单',
+              successFunc: async () => {
+                _requestObj.List[0].ProductParams.IsIgnoreRisk = true;
+                const resp = await api.getOrderPreCreate(_requestObj);
+                if (resp.data.Status === 1000) {
+                  resolve(successHandler(resp.data.Data, _requestObj));
+                }
+              },
+              failFunc: () => {
+                resolve(null);
+              },
+            });
+          });
+        }
+        return res.data;
       }
     },
     /* 下单 - 保存购物车
@@ -1173,6 +1201,22 @@ export default {
             else handleError(resp);
           },
         });
+      } else if (res && res.data.Status === 6225) {
+        if (res.data.DisplayMode !== 3) {
+          massage.warnCancelBox({
+            title: '存在风险，是否继续加入购物车?',
+            msg: res.data.Message,
+            confirmButtonText: '继续加入',
+            successFunc: async () => {
+              _itemObj.ProductParams.IsIgnoreRisk = true;
+              const resp = await api.getQuotationSave(_itemObj).catch(() => {});
+              if (resp && resp.data.Status === 1000) handleSuccess();
+              else handleError(resp);
+            },
+          });
+        } else {
+          return res.data;
+        }
       } else {
         handleError(res);
       }

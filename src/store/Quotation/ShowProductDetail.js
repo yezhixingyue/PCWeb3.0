@@ -8,7 +8,7 @@ import { transformNumToChindNum } from '../../assets/js/utils/utils';
  * @return {*}
  */
 const getElementValueContent = (CustomerInputValues, origin, giveUpUnit) => {
-  if (CustomerInputValues && origin) {
+  if (CustomerInputValues && origin && Array.isArray(CustomerInputValues) && CustomerInputValues.length > 0) {
     // ---------------------------- 获取到选项元素展示结果内容
     if (origin.Type === 2 && origin.OptionAttribute) {
       if (!origin.OptionAttribute.IsRadio) { // 多选选项元素，此时value为ID组成的数组
