@@ -217,7 +217,12 @@ export default {
     },
     getStatus(item) {
       if (!item.FileErrorMessage) {
-        if (item.FileHaveUpload) return { text: '文件已上传', warn: false, success: false };
+        let text = '无订单文件';
+        if (Array.isArray(item.FileList)) {
+          const t = item.FileList.find(it => it.List && it.List.length > 0);
+          if (t) text = '文件已上传';
+        }
+        if (item.FileHaveUpload) return { text, warn: false, success: false };
         return { text: '文件未上传', warn: true, success: false };
       }
       let warn = false;

@@ -9,6 +9,7 @@
       :file-list="fileList"
       :on-change="onFileChange"
       action=""
+      :limit="1000"
       :accept="accept"
       :multiple="multiple"
       :disabled='disabled'
@@ -20,7 +21,7 @@
         <span class="title">添加{{ FileInfo.Name}}</span>
         <span class="tips">
           <i>（</i>
-          <template v-if="required">必传，</template>
+          <template v-if="required"><i class="is-pink">必传，</i></template>
           <template v-else>非必传，</template>
           <template v-if="multiple">可上传多个，</template>
           <em :title="FileInfo.Remark.length > 40 ? FileInfo.Remark : ''">

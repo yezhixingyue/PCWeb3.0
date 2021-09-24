@@ -73,7 +73,8 @@ export default {
   watch: {
     FileList() {
       this.$nextTick(() => {
-        this.validate();
+        // this.validate();
+        this.$refs.ruleForm.clearValidate();
       });
     },
   },

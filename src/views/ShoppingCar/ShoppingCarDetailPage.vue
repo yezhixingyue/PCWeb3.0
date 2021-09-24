@@ -22,8 +22,7 @@
                   <p>¥ {{curShoppingCarDetailData.Funds.OriginalPrice}}</p>
                   <p :class="curShoppingCarDetailData.Funds.CouponAmount
                      && curShoppingCarDetailData.Funds.CouponAmount > 0 ? 'is-pink' : ''">
-                    <template v-if='curShoppingCarDetailData.Funds.CouponAmount'
-                      >{{(curShoppingCarDetailData.Funds.CouponAmount
+                    <template>{{(curShoppingCarDetailData.Funds.CouponAmount
                         ? '-¥ ' + curShoppingCarDetailData.Funds.CouponAmount : '¥ ' + 0)}}</template>
                   </p>
                   <p class="final-price is-pink">¥ <i class="is-font-18 is-bold"
@@ -69,7 +68,7 @@ export default {
           // const _text = List.map(it => (it.FileName.length > 15 ? `${it.FileName.slice(0, 12)}...` : it.FileName)).join('、');
           if (_text) {
             if (FilePath) FilePath += '；';
-            FilePath += `${Name}：${_text}`;
+            FilePath += `${Name ? `${Name}：` : ''}${_text}`;
           }
         }
       });

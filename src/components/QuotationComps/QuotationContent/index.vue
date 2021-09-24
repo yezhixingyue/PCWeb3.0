@@ -399,9 +399,6 @@ export default {
         const scrollHandler = () => {
           const app = document.getElementById('app');
           if (app && app.scrollTop > 280) {
-            // this.utils.animateScroll(app.scrollTop, 0, num => {
-            //   app.scrollTop = num;
-            // });
             const backDom = document.getElementsByClassName('el-backtop')[0];
             if (backDom) backDom.click();
           }
@@ -414,18 +411,21 @@ export default {
     async getProductPriceLocal() {
       this.priceGetErrMsg = '';
       this.isGettingPrice = true;
+      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
       const msg = await this.getProductPrice();
       this.isGettingPrice = false;
       if (msg === true) {
         // this.$router.push('/offerResult');
       } else if (typeof msg === 'string') {
-        // this.$message.singleError('报价失败', msg, null);
         this.priceGetErrMsg = msg;
-        // this.messageBox.failSingleError({ title: '报价失败', msg });
       } else if (typeof msg === 'object') {
-        console.log('算价风险 msg', msg);
+        // 此时应显示报价信息，执行报价信息显示操作（存放数据）
+        this.$store.commit('Quotation/setProductQuotationResult', msg.Data);
+        this.$store.commit('Quotation/setProductQuotationDetail', this.obj2GetProductPrice.ProductParams);
         if (msg.DisplayMode === 2) {
-          this.messageBox.warnSingleError({ title: '温馨提示', msg: msg.Message });
+          this.messageBox.warnSingleError({ title: '温馨提示', msg: msg.Message.split('#') });
+        } else if (msg.DisplayMode === 3) {
+          this.$store.commit('Quotation/setRiskWarningTips', { origin: 'price', tips: msg.Message });
         }
       }
     },
@@ -559,6 +559,7 @@ export default {
     },
     curProductID() {
       this.priceGetErrMsg = '';
+      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
     },
   },
 };

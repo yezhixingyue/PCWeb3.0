@@ -1,12 +1,12 @@
 <template>
   <section class="mp-pc-place-order-upload-and-submit-comp-wrap">
     <header class="bg-gray"></header>
-    <div class="comp-title float" v-show="!isSpotGoods">
+    <div class="comp-title float" v-show="!(isSpotGoods && FileList.length === 0)">
       <span class="left is-bold">印刷内容</span>
     </div>
     <div class="content">
-      <ul v-show="!isSpotGoods">
-        <li class="file-content-box">
+      <ul >
+        <li class="file-content-box" v-show="!isSpotGoods">
            <el-form :model="{ fileContent: fileContent }" ref="contentValidateForm" label-width="86px"
             size="mini" hide-required-asterisk :disabled='isUploading'>
             <el-form-item
@@ -25,7 +25,7 @@
             </el-form-item>
           </el-form>
         </li>
-        <li class="design-document">
+        <li class="design-document" v-show="!isSpotGoods">
           <DesignDocumentPopoverComp :disabled='isUploading' />
         </li>
         <li class="file-list-box">
@@ -43,6 +43,9 @@
         <ComputedResultComp
           :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
       </div>
+      <div class="tips-box-wrap">
+        <TipsBox />
+      </div>
       <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' :requestObj='requestObj' :FileCount='FileCount' @submit="handleSubmit" />
       <Dialog2Pay :needClear='true' />
     </div>
@@ -53,6 +56,7 @@
 import { mapState } from 'vuex';
 import { Loading } from 'element-ui';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
+import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
 import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
 import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
 import FileListForm from './FileListForm/index.vue';
@@ -65,6 +69,7 @@ export default {
     FileListForm,
     SubmitConfirmDialog,
     Dialog2Pay,
+    TipsBox,
   },
   props: {
     asyncInputchecker: {
@@ -77,7 +82,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading']),
+    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading', 'curProductID']),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -151,13 +156,15 @@ export default {
       // 下面执行加购提交操作
       const callBack = () => {
         this.fileContent = '';
+        this.$refs.contentValidateForm.resetFields();
         this.scrollToTop();
       };
-      const resp = await this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
-      console.log('加入购物车返回内容', resp);
+      await this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
+      // console.log('加入购物车返回内容', resp);
     },
     scrollToTop() {
       this.$nextTick(() => {
+        this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
         const backDom = document.getElementsByClassName('el-backtop')[0];
         if (backDom) backDom.click();
       });
@@ -275,6 +282,7 @@ export default {
         return false;
       }
       if (!bool) return false;
+      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
       return true;
     },
     async handleSubmit(data) { // 创建订单
@@ -308,6 +316,12 @@ export default {
   },
   mounted() {
     this.$store.dispatch('Quotation/getFileTypeList');
+  },
+  watch: {
+    curProductID() {
+      this.fileContent = '';
+      this.$refs.contentValidateForm.resetFields();
+    },
   },
 };
 </script>
@@ -394,7 +408,6 @@ export default {
       }
     }
     > .submit-btn-wrap {
-      padding-bottom: 80px;
       margin-top: 60px;
       position: relative;
       > button {
@@ -432,6 +445,10 @@ export default {
        top: 0;
        left: 360px;
       }
+    }
+    > .tips-box-wrap {
+      padding-top: 22px;
+      padding-bottom: 80px;
     }
   }
 }

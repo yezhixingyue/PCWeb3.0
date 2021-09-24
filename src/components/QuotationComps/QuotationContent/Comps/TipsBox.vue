@@ -1,14 +1,23 @@
 <template>
-  <div class="mp-quotation-content-tips-box-comp-wrap">
-    <ul>
-      <li class="icon"><i class="el-icon-warning"></i> 注：</li>
-      <li>产品数量大于30时，颜色会出现偏差</li>
+  <div class="mp-quotation-content-tips-box-comp-wrap" @click.stop="">
+    <ul v-show="localTipsArr">
+      <li class="icon"><i class="el-icon-warning"></i> 温馨提示：</li>
+      <li v-for="it in localTipsArr" :key="it">{{it}}</li>
     </ul>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
+  computed: {
+    ...mapState('Quotation', ['RiskWarningTipsObj']),
+    localTipsArr() {
+      if (!this.RiskWarningTipsObj.tips) return '';
+      return this.RiskWarningTipsObj.tips.split('#');
+    },
+  },
 };
 </script>
 <style lang='scss'>
@@ -22,12 +31,12 @@ export default {
     padding-bottom: 3px;
     line-height: 24px;
     > li {
-      padding-left: 60px;
+      padding-left: 96px;
       font-size: 12px;
       color: #F4A307;
       &.icon {
         position: absolute;
-        left: -52px;
+        left: -88px;
         padding-top: 0px;
         i {
           font-size: 15px;

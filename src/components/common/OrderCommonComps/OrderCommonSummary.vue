@@ -44,11 +44,13 @@
           <el-tooltip
             class="item"
             effect="dark"
+            v-if="info4OrderSummary.FilePath"
             :content="info4OrderSummary.FilePath"
             placement="top-start"
           >
             <span>{{info4OrderSummary.FilePath}}</span>
           </el-tooltip>
+          <span class="item" v-else>无订单文件</span>
         </p>
         <p>
           <span class="title">文件内容：</span>
@@ -172,6 +174,14 @@ export default {
       padding-top: 14px;
       > p {
         height: 32px;
+        width: 434px;
+        .el-tooltip {
+          max-width: 374px;
+          display: inline-block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          vertical-align: top;
+        }
       }
     }
   }

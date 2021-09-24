@@ -250,6 +250,7 @@ export const checkSizeGroup = (value, prop, AffectedPropList) => {
 
 export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedPropList, CraftAffectedPropList, curProductInfo2Quotation) => {
   // 1. 找到应禁用或必选的工艺本身， 如果已被禁用则从列表中去除然后进行后面判断，如果是必选而没有选中则报错处理
+  const _CraftList = CraftList.filter(it => !it.HiddenToCustomer);
   const diabledCraftIDs = InterAction.getDisabledCraftIDList(AffectedPropList);
   const _value = value.filter(_it => !diabledCraftIDs.includes(_it.CraftID));
   const requiredCraftIDs = InterAction.getRequiredCraftIDList(AffectedPropList);
@@ -257,12 +258,12 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
     const selectedCraftIDs = _value.map(it => it.CraftID);
     const t = requiredCraftIDs.find(it => !selectedCraftIDs.includes(it));
     if (t) {
-      const targetCraft = CraftList.find(it => it.ID === t);
+      const targetCraft = _CraftList.find(it => it.ID === t);
       if (targetCraft) return `[ ${targetCraft.ShowName} ] 工艺必选`;
     }
   }
   // 判断是否有必选的单选工艺组，判断其是否已有选择，如果无则报错
-  if (prop && Array.isArray(prop.List) && Array.isArray(CraftConditionList) && prop.List.length > 0 && Array.isArray(CraftList) && CraftList.length > 0) {
+  if (prop && Array.isArray(prop.List) && Array.isArray(CraftConditionList) && prop.List.length > 0 && Array.isArray(_CraftList) && _CraftList.length > 0) {
     const requiredList = CraftConditionList.filter(it => it.IsRequired);
     if (requiredList.length > 0) {
       for (let i = 0; i < requiredList.length; i += 1) {
@@ -283,7 +284,7 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
               }
             }
             if (!target) {
-              const craftNames = List.map(_craftID => CraftList.find(_it => _it.ID === _craftID))
+              const craftNames = List.map(_craftID => _CraftList.find(_it => _it.ID === _craftID))
                 .filter(_it => _it && !_it.HiddenToCustomer).map(_it => _it.ShowName);
               if (craftNames.length === 1) return `${craftNames[0]}为必选工艺`;
               return `${craftNames.join('、')}至少选择一种`;
@@ -294,13 +295,13 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
     }
   }
   // 参数发生变动，请重新设置某某工艺参数 ---- 对工艺参数进行校验及报错
-  if (prop && Array.isArray(prop.List) && prop.List.length > 0 && Array.isArray(CraftList) && CraftList.length > 0 && _value.length > 0) {
+  if (prop && Array.isArray(prop.List) && prop.List.length > 0 && Array.isArray(_CraftList) && _CraftList.length > 0 && _value.length > 0) {
     // 1. 找出当前正在校验的工艺分组列表条目
     const list = _value.filter(it => prop.List.includes(it.CraftID));
     for (let i = 0; i < list.length; i += 1) {
       const craftValItem = list[i];
       // 2. 找到该工艺对应的参数数据
-      const craftDataItem = CraftList.find(it => it.ID === craftValItem.CraftID);
+      const craftDataItem = _CraftList.find(it => it.ID === craftValItem.CraftID);
       // 3. 筛选出带参数的工艺进行校验
       if (Array.isArray(craftDataItem.ElementList) && craftDataItem.ElementList.length > 0) {
         // 工艺上带有元素
@@ -333,7 +334,7 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
             let _subGroupAffectedPropList = [];
             if (groupValItem.SubControlList) {
               _subGroupAffectedPropList = groupValItem.List
-                .map(_item => ({ CraftList: [{ GroupList: [{ GroupID: groupValItem.GroupID, List: [_item] }], CraftID: craftValItem.CraftID }] }))
+                .map(_item => ({ _CraftList: [{ GroupList: [{ GroupID: groupValItem.GroupID, List: [_item] }], CraftID: craftValItem.CraftID }] }))
                 .map(_item => getPropertiesAffectedByInteraction(_item, curProductInfo2Quotation, groupValItem.SubControlList));
             }
             const errMsg = checkElementGroup(groupValItem.List || [], groupDataItem, _groupAffectedPropList, _subGroupAffectedPropList);

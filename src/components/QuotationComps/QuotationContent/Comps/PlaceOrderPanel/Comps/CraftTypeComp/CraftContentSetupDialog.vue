@@ -11,7 +11,7 @@
       <i class="iconfont icon-shezhi is-primary-blue"></i>
       <span>{{ dialogTitle }}</span>
     </header>
-    <main v-if="localSetupData && showMain">
+    <main v-if="localSetupData && showMain" class="mp-scroll-wrap">
       <el-form
         :model="craftForm"
         ref="craftForm"
@@ -358,11 +358,14 @@ export default {
     }
     > .el-dialog__body {
       margin-left: 20px;
-      margin-right: 35px;
+      margin-right: 15px;
       padding-bottom: 25px;
       margin-left: 15px\0;
       margin-right: 15px\0;
       > main {
+        max-height: 420px;
+        overflow-y: auto;
+        padding-right: 20px;
         .mp-place-order-content-element-type-show-item-comp-wrap {
           > label {
             width: unset;

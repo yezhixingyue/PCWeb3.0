@@ -111,6 +111,7 @@ export default {
     FileList: [],
     FileTypeList: [],
     isUploading: false,
+    RiskWarningTipsObj: { origin: '', tips: '' },
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -955,9 +956,11 @@ export default {
       }
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
+      state.RiskWarningTipsObj = { origin: '', tips: '' };
       state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
     },
     setPropertiesAffectedByInteraction(state) { // 获取受交互影响属性列表
+      state.RiskWarningTipsObj = { origin: '', tips: '' };
       const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       state.PropertiesAffectedByInteraction = list;
       state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
@@ -967,6 +970,9 @@ export default {
     },
     setIsUploading(state, bool) {
       state.isUploading = bool;
+    },
+    setRiskWarningTips(state, { origin, tips }) { // origin：price | car | place
+      state.RiskWarningTipsObj = { origin, tips };
     },
     setItemFlieList(state, [list, id]) {
       const t = state.FileList.find(({ File }) => File.ID === id);
@@ -1132,7 +1138,7 @@ export default {
           return new Promise((resolve) => {
             massage.warnCancelBox({
               title: '存在风险，是否继续下单?',
-              msg: res.data.Message,
+              msg: res.data.Message.split('#'),
               confirmButtonText: '继续下单',
               successFunc: async () => {
                 _requestObj.List[0].ProductParams.IsIgnoreRisk = true;
@@ -1147,6 +1153,7 @@ export default {
             });
           });
         }
+        commit('setRiskWarningTips', { origin: 'place', tips: res.data.Message });
         return res.data;
       }
     },
@@ -1205,7 +1212,7 @@ export default {
         if (res.data.DisplayMode !== 3) {
           massage.warnCancelBox({
             title: '存在风险，是否继续加入购物车?',
-            msg: res.data.Message,
+            msg: res.data.Message.split('#'),
             confirmButtonText: '继续加入',
             successFunc: async () => {
               _itemObj.ProductParams.IsIgnoreRisk = true;
@@ -1215,6 +1222,7 @@ export default {
             },
           });
         } else {
+          commit('setRiskWarningTips', { origin: 'car', tips: res.data.Message });
           return res.data;
         }
       } else {

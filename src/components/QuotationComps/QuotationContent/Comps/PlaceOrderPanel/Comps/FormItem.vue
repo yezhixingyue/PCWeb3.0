@@ -110,6 +110,16 @@ export default {
             break;
           case '工艺':
             targetProp = this.placeData.CraftGroupList.find(it => it.ID === this.itemData.Property.ID);
+            if (targetProp) targetProp = JSON.parse(JSON.stringify(targetProp));
+            if (targetProp && targetProp.List && targetProp.List.length > 0) {
+              targetProp.List = targetProp.List
+                .map(it => this.placeData.CraftList.find(_it => _it.ID === it))
+                .filter(it => it && !it.HiddenToCustomer)
+                .map(it => it.ID);
+              if (targetProp.List.length === 0) targetProp = null;
+            } else {
+              targetProp = null;
+            }
             break;
           case '工厂': // 工厂隐藏
             // targetProp = this.placeData.FactoryList;
@@ -277,6 +287,7 @@ export default {
         }
       }
       if (this.curTypeName === '工艺') { // 工艺
+        console.log(this.placeData.CraftList);
         const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList,
           this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
         if (res && typeof res === 'string') {

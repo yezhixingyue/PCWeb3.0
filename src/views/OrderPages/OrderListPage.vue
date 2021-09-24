@@ -39,9 +39,9 @@
         </li>
       </ul>
     </section>
-    <section class="content-wrap" v-if="computedOrderlist.length > 0 || OrderListNumber > 0">
+    <section class="content-wrap" v-if="OrderList.length > 0 || OrderListNumber > 0">
       <section class="content">
-        <Table4OrderList :orderData='computedOrderlist' />
+        <Table4OrderList :orderData='OrderList' />
         <footer>
           <Count
             :watchPage='condition4OrderList.Page'
@@ -97,9 +97,7 @@ import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorC
 import Count from '@/components/common/Count.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
 import Table4OrderList from '@/components/OrderListComps/Table4OrderList.vue';
-import {
-  mapState, mapGetters, mapMutations, mapActions,
-} from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 import CommonClassType from '../../store/CommonClassType';
 
 export default {
@@ -121,7 +119,6 @@ export default {
   computed: {
     ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
     ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount']),
-    ...mapGetters('order', ['computedOrderlist']),
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },
@@ -188,7 +185,7 @@ export default {
     },
   },
   watch: {
-    computedOrderlist() {
+    OrderList() {
       this.$nextTick(() => {
         this.oApp.scrollTop = 0;
         this.handleScroll(this.oApp);

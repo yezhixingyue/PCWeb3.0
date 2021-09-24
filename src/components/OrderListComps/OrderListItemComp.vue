@@ -4,11 +4,11 @@
         <div class="product-item-header-left">
           <span class="product-item-header-amount-box gray is-font-14">产品金额：<i class="is-pink"
             >{{totalOriginalPrice}}元</i></span>
+          <span class="freight-box" v-if="OutPlatNo"> <i class="gray">平台单号：</i><em class="is-font-12">{{OutPlatNo}}</em></span>
           <span class="freight-box"> <i class="gray">运费：</i>{{totalFreight}}元</span>
           <span class="add-detail">
-            <i class="express-box">{{data[0].Express}}</i>
-            <i class="gray">配送地址：</i>{{getAddress(data[0].Package.Address.Address).First}}
-            <!-- <i class="gray"> {{getAddress(data.Address.Address).Second}}</i> -->
+            <i class="express-box">{{data.Address.ExpressText}}</i>
+            <i class="gray">配送地址：</i>{{localAddressDetail}}
           </span>
         </div>
         <div class="product-item-header-right" @click="handleCollapse">
@@ -19,61 +19,61 @@
         <li
           class="product-item-content has-transition"
           v-show="isActive"
-          v-for="(item, i) in data"
+          v-for="(item, i) in data.OrderList"
           :class="i === data.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID"
         >
           <div :style="wStyles[0]" class="is-twelve">{{item.OrderID}}</div>
-          <div :style="wStyles[1]">
+          <!-- <div :style="wStyles[1]">
             <el-tooltip popper-class="table-item" :enterable='false'
               :content="item.OutPlate" placement="top-start">
               <span>{{item.OutPlate}}</span>
             </el-tooltip>
-          </div>
-          <div :style="wStyles[2]">
+          </div> -->
+          <div :style="wStyles[1]">
             <el-tooltip popper-class="table-item" :enterable='false'
               :content="item.ProductName" placement="top-start">
               <span>{{item.ProductName}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[3]">
+          <div :style="wStyles[2]">
             <el-tooltip popper-class="table-item" :enterable='false'
               :content="getSize(item.SizeList)" placement="top-start">
               <span>{{getSize(item.SizeList)}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[4]">
+          <div :style="wStyles[3]">
             <el-tooltip popper-class="table-item" :enterable='false'
               :content="getCraft(item.CraftList)" placement="top-start">
               <span>{{getCraft(item.CraftList)}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[5]">
+          <div :style="wStyles[4]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.ProductAmount + item.Unit + item.KindCount + '款'" placement="top-start">
-              <span>{{item.ProductAmount + item.Unit + item.KindCount + '款'}}</span>
+              :content="item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'" placement="top-start">
+              <span>{{item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[6]" class="is-font-12 gray">
+          <div :style="wStyles[5]" class="is-font-12 gray">
             <el-tooltip popper-class="table-item" :enterable='false'
               :content="item.Content" placement="top-start">
-              <span>{{item.Content}}</span>
+              <span>{{item.Content || '无'}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[7]" class="is-twelve">
+          <div :style="wStyles[6]" class="is-twelve">
             <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-          <div :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
-          <div :style="wStyles[9]">{{item.Funds.HavePaid}}元</div>
-          <div :style="wStyles[10]">{{item.Funds.Unpaid}}元</div>
-          <div :style="wStyles[11]">{{item.Funds.Refund}}元</div>
-          <div :style="wStyles[12]" :class="{
+          <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
+          <div :style="wStyles[8]">{{item.Funds.HavePaid}}元</div>
+          <div :style="wStyles[9]">{{item.Funds.Unpaid}}元</div>
+          <div :style="wStyles[10]">{{item.Funds.Refund}}元</div>
+          <div :style="wStyles[11]" :class="{
             'is-font-13': 1,
             'yellow-color': 1,
             'is-gray': [254, 255, 35].includes(item.Status),
             'is-success': item.Status === 200,
           }">{{item.Status | formatStatus}}</div>
-          <div :style="wStyles[13]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
-          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap">
+          <div :style="wStyles[12]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
+          <div :style="wStyles[13]" class="is-font-12 gray btn-wrap">
             <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
             <span class="span-title-blue" @click="goToFeedback(item)"
               v-if="item.AllowAfterSales">售后</span>
@@ -104,8 +104,8 @@ export default {
      * 需要渲染的数据信息
      */
     data: {
-      type: Array,
-      default: () => ([]),
+      type: Object,
+      default: () => ({}),
     },
     /**
      * 是否需要禁用复选框
@@ -131,17 +131,19 @@ export default {
       return Object.values(this.widthObj).map((item) => `width: ${item}px`);
     },
     totalOriginalPrice() {
-      let _amount = 0;
-      // eslint-disable-next-line no-return-assign
-      this.data.forEach(it => (_amount += it.Funds.FinalPrice));
-      return +(_amount.toFixed(2));
+      return +(this.data.ProductPrice.toFixed(2));
     },
     totalFreight() {
-      let _freight = 0;
-      // eslint-disable-next-line no-return-assign
-      // this.data.forEach(it => (_freight += it.Funds.Freight));
-      if (this.data[0] && this.data[0].Package) _freight = this.data[0].Package.Freight;
-      return +(_freight.toFixed(2));
+      return +(this.data.Freight.toFixed(2));
+    },
+    OutPlatNo() {
+      return this.data.OutPlat && this.data.OutPlat.Second ? this.data.OutPlat.Second : '';
+    },
+    localAddressDetail() {
+      if (!this.data || !this.data.Address || !this.data.Address.Address) return '';
+      const { RegionalName, CityName, CountyName } = this.data.Address.Address.ExpressArea;
+      const AddressDetail = this.data.Address.Address.AddressDetail || '';
+      return `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
     },
   },
   data() {
@@ -154,6 +156,7 @@ export default {
       this.isActive = !this.isActive;
     },
     getSize(SizeList) {
+      if (!SizeList) return '未知尺寸';
       const _list = [];
       SizeList.forEach(it => {
         _list.push(it.Name.replace('毫米', 'mm'));
@@ -166,6 +169,7 @@ export default {
       return Object.keys(_obj).join('、');
     },
     getCraft(CraftList) {
+      if (!CraftList) return '无';
       const _list = [];
       CraftList.forEach(it => {
         _list.push(it.Name.replace('毫米', 'mm'));
@@ -181,7 +185,7 @@ export default {
       return _obj;
     },
     goToDetailPage(data) {
-      this.$store.commit('order/setCurOrderDetailData', data);
+      this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlat, Address: this.data.Address });
       this.$router.push('/order/detail');
     },
     goToFeedback(item) {
@@ -258,11 +262,11 @@ export default {
           }
         }
         &.freight-box {
-          margin-right: 50px;
+          margin-right: 40px;
           font-size: 14px;
         }
         &.add-detail {
-          max-width: 800px;
+          max-width: 550px;
         }
         > i.express-box {
           margin-right: 32px;
@@ -333,6 +337,12 @@ export default {
       display: inline-block\0;
       &.yellow-color {
         color: #f4a307;
+      }
+      .el-tooltip {
+        max-width: 100%;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       // &.btn-wrap {
       //   // > .span-title-blue {

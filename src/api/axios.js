@@ -52,7 +52,11 @@ axios.interceptors.request.use(
       // // console.log(url);
       if (url === '/Api/Quotation/Save' || url === '/Api/Order/Create') {
         _color = 'rgba(0, 0, 0, 0.7)';
-        _text = '文件上传完成，正在提交...';
+        _text = '文件上传成功，正在提交...';
+        if (Array.isArray(config.data?.FileList)) {
+          const t = config.data.FileList.find(it => it.List && it.List.length > 0);
+          if (!t) _text = '正在提交...';
+        }
         _customClass = 'mp-general-loading-box';
       }
       if (url === '/Api/Customer/CouponList') _text = '优惠券信息获取中...';

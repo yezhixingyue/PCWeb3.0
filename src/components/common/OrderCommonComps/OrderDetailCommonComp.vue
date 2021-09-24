@@ -35,14 +35,14 @@ export default {
     DisplayItem,
   },
   computed: {
+    localDetailData() {
+      if (this.pageName === 'orderDetail') return this.curOrderData;
+      return this.orderDetail;
+    },
     PartList() {
-      if (!this.orderDetail) return [];
-      if (this.pageName === 'orderDetail') {
-        if (this.curOrderData) return this.curOrderData.ProductParams.PartList;
-        return [];
-      }
-      if (!this.orderDetail.ProductParams) return [];
-      return this.orderDetail.ProductParams.PartList;
+      if (!this.localDetailData) return [];
+      if (!this.localDetailData.ProductParams) return [];
+      return this.localDetailData.ProductParams.PartList;
     },
     PartShowDataList() {
       const arr = [];
@@ -63,14 +63,18 @@ export default {
       return arr;
     },
     ProductShowData() {
-      if (this.orderDetail?.ProductParams?.Attributes?.DisplayOrderList && this.orderDetail.ProductParams.Attributes.DisplayOrderList.length > 0) {
+      if (this.localDetailData?.ProductParams?.Attributes?.DisplayOrderList && this.localDetailData.ProductParams.Attributes.DisplayOrderList.length > 0) {
         return {
-          Name: this.orderDetail.ProductParams.Attributes.DisplayName,
-          ContentList: this.getPartShowList(this.orderDetail.ProductParams.Attributes.DisplayOrderList, this.orderDetail.ProductParams),
+          Name: this.localDetailData.ProductParams.Attributes.DisplayName,
+          ContentList: this.getPartShowList(this.localDetailData.ProductParams.Attributes.DisplayOrderList, this.localDetailData.ProductParams),
           Type: 'product',
         };
       }
-      return null;
+      return {
+        Name: this.localDetailData?.ProductParams?.Attributes?.DisplayName || '产品名称',
+        ContentList: [],
+        Type: 'product',
+      };
     },
   },
   data() {
@@ -88,15 +92,17 @@ export default {
     this.pageName = this.$route.name;
     if (this.pageName === 'unpayOrderDetail') this.pageName = 'orderDetail';
     if (this.pageName !== 'orderDetail') return;
-    const res = await this.api.getOrderDetail(this.orderDetail.OrderID);
-    this.$emit('setDetailDataCompleted', true);
-    if (res.data.Status === 1000) {
+    const res = await this.api.getOrderDetail(this.orderDetail.OrderID).catch(() => {});
+    if (res && res.data.Status === 1000) {
       this.curOrderData = res.data.Data;
       this.$store.commit('order/updateOrderDetailData', res.data.Data);
       if (this.$route.name === 'unpayOrderDetail') {
         this.$store.commit('unpayList/updateCurUnpayListDetailData', res.data.Data);
       }
     }
+    this.$nextTick(() => {
+      this.$emit('setDetailDataCompleted', true);
+    });
   },
 };
 </script>

@@ -40,23 +40,23 @@ export default {
   getters: {
     /** 合包后的订单列表信息
     ---------------------------------------- */
-    computedOrderlist(state) {
-      const _list = state.OrderList;
-      if (_list.length === 0) return [];
-      const _obj = {};
-      _list.forEach((it, i) => {
-        let _PackageID;
-        if (it.Package) {
-          _PackageID = it.Package.ID;
-        } else {
-          _PackageID = `unPackageOrder${i}`;
-        }
-        if (!_obj[_PackageID]) _obj[_PackageID] = [];
-        _obj[_PackageID].push(it);
-      });
-      const list = Object.values(_obj);
-      return list;
-    },
+    // computedOrderlist(state) {
+    //   const _list = state.OrderList;
+    //   if (_list.length === 0) return [];
+    //   const _obj = {};
+    //   _list.forEach((it, i) => {
+    //     let _PackageID;
+    //     if (it.Package) {
+    //       _PackageID = it.Package.ID;
+    //     } else {
+    //       _PackageID = `unPackageOrder${i}`;
+    //     }
+    //     if (!_obj[_PackageID]) _obj[_PackageID] = [];
+    //     _obj[_PackageID].push(it);
+    //   });
+    //   const list = Object.values(_obj);
+    //   return list;
+    // },
   },
   mutations: {
     /** 设置订单列表数据

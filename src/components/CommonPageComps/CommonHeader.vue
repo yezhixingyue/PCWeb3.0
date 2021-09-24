@@ -112,6 +112,12 @@
             </el-dropdown-menu>
           </el-dropdown>
         </div>
+        <div v-else-if="!isloading" class="customer-error-box">
+          <p class="is-gray">
+            <i class="el-icon-warning-outline"></i>
+            用户信息错误，<span class="blue-span" @click="onErrorLoginCLick">请重新登录</span>
+          </p>
+        </div>
       </div>
     </footer>
     <el-drawer
@@ -277,6 +283,12 @@ export default {
           break;
       }
       if (this.$route.path !== _path) this.$router.push(_path);
+    },
+    onErrorLoginCLick() {
+      sessionStorage.removeItem('token');
+      localStorage.removeItem('token');
+      Cookie.removeCookie('token');
+      this.$router.replace('/login');
     },
   },
   watch: {
@@ -656,6 +668,23 @@ export default {
               color: #428dfa;
               background-color:  rgba(66, 141, 250, 0.1);
             }
+          }
+        }
+      }
+      > .customer-error-box {
+        float: right;
+        color: #888;
+        line-height: 65px;
+        max-width: 470px;
+        text-align: right;
+        white-space: nowrap;
+        > p {
+          padding-right: 20px;
+          font-size: 12px;
+          > i {
+            position: relative;
+            top: 1px;
+            font-size: 15px;
           }
         }
       }

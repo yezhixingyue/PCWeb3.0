@@ -85,21 +85,21 @@ export default {
     ...mapState('order', ['curOrderDetailData']),
     info4OrderSummary() {
       const {
-        OutPlate, Content, OrderID, CreateTime, Express, Status, Package, ProducePeriod, PayTime, Weight,
+        OutPlate, Content, OrderID, CreateTime, Status, ProducePeriod, PayTime, Weight, Address,
       } = this.curOrderDetailData;
       // console.log(Weight, 'Weight');
       const {
         AddressDetail, ExpressArea, Consignee, Mobile,
-      } = Package.Address.Address;
+      } = Address.Address;
       const { RegionalName, CountyName, CityName } = ExpressArea;
-      const Address = `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
+      const AddressShowDetail = `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
       return {
         OutPlate,
-        Address,
+        Address: AddressShowDetail,
         Content,
         OrderID,
         CreateTime,
-        Express,
+        Express: Address.ExpressText,
         Consignee,
         Mobile,
         Status,
