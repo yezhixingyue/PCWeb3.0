@@ -189,6 +189,9 @@ export default {
         }, 1000);
       });
     },
+    clearFiles() {
+      this.$refs.upload.clearFiles();
+    },
   },
   watch: {
     fileList(newVal, oldVal) { // 去重及筛选格式不符合的文件

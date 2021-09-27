@@ -287,7 +287,6 @@ export default {
         }
       }
       if (this.curTypeName === '工艺') { // 工艺
-        console.log(this.placeData.CraftList);
         const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList,
           this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
         if (res && typeof res === 'string') {
@@ -348,6 +347,7 @@ export default {
 </script>
 <style lang='scss'>
 .mp-place-order-panel-form-item-comp-wrap {
+  // overflow: hidden;
   > label {
     white-space: nowrap;
   }
@@ -376,6 +376,10 @@ export default {
     .el-form-item__error {
       margin-left: 6px;
       white-space: nowrap;
+      max-width: 740px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
   &.isNormalGroup > label {

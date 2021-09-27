@@ -5,7 +5,7 @@
     </header>
     <ul class="content">
       <li>
-        <OrderDetailHeader :info4OrderSummary='info4OrderSummary' />
+        <OrderDetailHeader  v-if="info4OrderSummary" :info4OrderSummary='info4OrderSummary' />
       </li>
       <li>
         <OrderDetailCommonComp :orderDetail='curUnpayListDetailData'>
@@ -22,7 +22,7 @@
                   <p>¥ {{curUnpayListDetailData.Funds.OriginalPrice}}</p>
                   <p :class="curUnpayListDetailData.Funds.CouponAmount
                      && curUnpayListDetailData.Funds.CouponAmount > 0 ? 'is-pink' : ''">
-                    <template v-show='curUnpayListDetailData.Funds.CouponAmount'>
+                    <template>
                       <template
                        v-if="curUnpayListDetailData.Funds.CouponAmount && curUnpayListDetailData.Funds.CouponAmount > 0"
                        >-</template>¥
@@ -61,25 +61,29 @@ export default {
   computed: {
     ...mapState('unpayList', ['curUnpayListDetailData']),
     info4OrderSummary() {
+      if (!this.curUnpayListDetailData) return null;
+      console.log(this.curUnpayListDetailData);
       const {
-        OutPlate, Content, OrderID, CreateTime, Express, Status, Package, ProducePeriod, Weight,
+        OutPlate, Content, OrderID, CreateTime, Status, ProducePeriod, PayTime, Weight, Address,
       } = this.curUnpayListDetailData;
+      console.log(Weight, 'Weight');
       const {
         AddressDetail, ExpressArea, Consignee, Mobile,
-      } = Package.Address.Address;
+      } = Address.Address;
       const { RegionalName, CountyName, CityName } = ExpressArea;
-      const Address = `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
+      const AddressShowDetail = `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
       return {
         OutPlate,
-        Address,
-        Content,
+        Address: AddressShowDetail,
+        Content: Content || '无',
         OrderID,
         CreateTime,
-        Express,
+        Express: Address.ExpressText,
         Consignee,
         Mobile,
         Status,
         ProducePeriod,
+        PayTime,
         Weight,
       };
     },

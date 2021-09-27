@@ -109,7 +109,6 @@ export default {
           this.$emit('input', [temp]);
         } else if (this.Property.OptionAttribute && !this.Property.OptionAttribute.IsRadio) {
           // 多选  此时不允许自定义
-          console.log(val, Array.isArray(val) && val.map(ID => ({ ID })));
           this.$emit('input', Array.isArray(val) ? val.map(ID => ({ ID })) : []);
         }
       },

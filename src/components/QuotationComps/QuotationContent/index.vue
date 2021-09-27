@@ -174,6 +174,7 @@
         :asyncInputchecker='asyncInputchecker'
         :isSpotGoods="placeData.IsSpotGoods"
         :getCheckResult='getCheckResult'
+        @clearAdd='clearAdd'
       />
     </section>
     <AsideIntroComp
@@ -517,6 +518,10 @@ export default {
     async asyncInputchecker() {
       const resp = await this.$refs.oConsigneeAddressSetpComp.inputChecker();
       return resp;
+    },
+    clearAdd() {
+      console.log('clearAdd');
+      this.$refs.oConsigneeAddressSetpComp.initCurAddIndex();
     },
   },
   mounted() {

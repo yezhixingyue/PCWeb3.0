@@ -5,6 +5,9 @@
         v-for="(item,i) in titleList" :key="item + '-' + i"
         :onWidthChange='(newWidth) => onWidthChange(newWidth, widthKeyList[i])'
         :width='widthValueList[i]' :title="item"
+        :isCheck='i === 0 && isCheck ? true : false'
+        v-model="checked"
+        :indeterminate='indeterminate'
        />
     </header>
     <main :class="isScrollStyle? 'mp-scroll-wrap': '' " :style="minWidth">
@@ -50,6 +53,18 @@ export default {
       type: Boolean,
       default: true,
     },
+    isCheck: {
+      type: Boolean,
+      default: false,
+    },
+    indeterminate: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     minWidth() {
@@ -64,6 +79,14 @@ export default {
     widthValueList() {
       if (!this.widthObj) return [];
       return Object.values(this.widthObj);
+    },
+    checked: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit('input', val);
+      },
     },
   },
   mounted() {

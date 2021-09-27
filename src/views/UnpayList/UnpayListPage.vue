@@ -1,7 +1,7 @@
 <template>
   <article class="mp-pc-unpay-list-page-wrap">
     <section v-if="unpayDataList.length > 0 || unpayDataNumber > 0">
-      <UnpayListTable />
+      <NewUnpayListTable />
     </section>
     <div class="show-empty-bg" v-else>
       <img src="../../assets/images/order-empty.png" alt="">
@@ -12,17 +12,35 @@
 
 <script>
 import { mapState } from 'vuex';
-import UnpayListTable from '@/components/UnpayListComps/UnpayListTable.vue';
+// import UnpayListTable from '@/components/UnpayListComps/UnpayListTable.vue';
+import NewUnpayListTable from '@/components/UnpayListComps/NewUnpayListTable/index.vue';
 
 export default {
   components: {
-    UnpayListTable,
+    NewUnpayListTable,
   },
   computed: {
     ...mapState('unpayList', ['unpayDataList', 'unpayDataNumber']),
   },
-  mounted() {
-    this.$store.dispatch('unpayList/getUnpayList');
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      if (from.name !== 'unpayOrderDetail') {
+        vm.$store.dispatch('unpayList/getUnpayList');
+      } else {
+        const oApp = document.getElementById('app');
+        oApp.scrollTop = to.meta.y;
+      }
+    });
+  },
+  beforeRouteLeave(to, from, next) {
+    const oApp = document.getElementById('app');
+    const self = from;
+    if (to.name === 'unpayOrderDetail') {
+      self.meta.y = oApp.scrollTop;
+    } else {
+      self.meta.y = 0;
+    }
+    next();
   },
 };
 </script>

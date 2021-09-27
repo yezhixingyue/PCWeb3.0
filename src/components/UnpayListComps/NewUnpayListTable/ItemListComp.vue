@@ -1,33 +1,33 @@
 <template>
-    <div class="mp-pc-order-list-page-table-item-comp-wrap">
+    <div class="mp-pc-new-unpay-list-page-table-item-comp-wrap">
       <div class="product-item-header">
         <div class="product-item-header-left">
-          <span class="product-item-header-amount-box gray is-font-14">产品金额：<i class="is-pink"
-            >{{totalOriginalPrice}}元</i></span>
-          <span class="freight-box" v-if="OutPlatNo"> <i class="gray">平台单号：</i><em class="is-font-12">{{OutPlatNo}}</em></span>
+          <el-checkbox v-model="checked">
+            <span class="product-item-header-amount-box gray is-font-14">付款单号：<i>{{this.data.PayCode}}</i></span>
+          </el-checkbox>
+          <span class="freight-box"> <i class="gray">产品金额：</i><em class="is-pink">{{totalOriginalPrice}}元</em></span>
           <span class="freight-box"> <i class="gray">运费：</i>{{totalFreight}}元</span>
-          <span class="add-detail">
-            <i class="express-box">{{data.Address.ExpressText}}</i>
-            <i class="gray">配送地址：</i>{{localAddressDetail}}
-          </span>
+          <span class="freight-box"> <i class="gray">重量：</i>{{this.data._Weight}}kg</span>
         </div>
         <div class="product-item-header-right" @click="handleCollapse">
-          <div :class="isActive ? 'active' : ''"></div>
+          <span class="span-title-blue">付款</span>
+          <span class="span-title-blue">取消</span>
+          <div :class="isActive ? 'active arrow' : 'arrow'"></div>
         </div>
       </div>
       <TransitionGroupCollapse4ShopCar tag="ul" class="mp-group-collapse-for-shop"> <!-- 子列表部分 -->
         <li
           class="product-item-content has-transition"
           v-show="isActive"
-          v-for="(item, i) in data.OrderList"
+          v-for="(item, i) in data._OrderList"
           :class="i === data.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID"
         >
-          <div :style="wStyles[0]" class="is-twelve">{{item.OrderID}}</div>
-          <div :style="wStyles[1]">
+          <div :style="wStyles[0]"></div>
+          <div :style="'width:' + (widthObj.w2 + 20) + 'px' + ';text-align:left;margin-left:-20px;'">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.ProductName" placement="top-start">
-              <span>{{item.ProductName}}</span>
+              :content="item._FullName" placement="top-start">
+              <span>{{item._FullName}}</span>
             </el-tooltip>
           </div>
           <div :style="wStyles[2]">
@@ -38,44 +38,39 @@
           </div>
           <div :style="wStyles[3]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="getCraft(item.CraftList)" placement="top-start">
-              <span>{{getCraft(item.CraftList)}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[4]">
-            <el-tooltip popper-class="table-item" :enterable='false'
               :content="item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'" placement="top-start">
               <span>{{item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[5]" class="is-font-12 gray">
+          <div :style="wStyles[4]">
+            <el-tooltip popper-class="table-item" :enterable='false'
+              :content="getCraft(item.CraftList)" placement="top-start">
+              <span>{{getCraft(item.CraftList)}}</span>
+            </el-tooltip>
+          </div>
+          <div :style="wStyles[5]">{{item.Funds.OriginalPrice}}元</div>
+          <div :style="wStyles[6]" class="is-twelve">
+            <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
+          <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
+          <div :style="wStyles[8]">{{item.Funds.Deposit}}元</div>
+          <div :style="wStyles[9]" class="is-font-12 gray">
             <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
               :content="item.Content" placement="top-start">
               <span>{{item.Content}}</span>
             </el-tooltip>
             <span v-else>无</span>
           </div>
-          <div :style="wStyles[6]" class="is-twelve">
-            <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-          <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
-          <div :style="wStyles[8]">{{item.Funds.HavePaid}}元</div>
-          <div :style="wStyles[9]">{{item.Funds.Unpaid}}元</div>
-          <div :style="wStyles[10]">{{item.Funds.Refund}}元</div>
-          <div :style="wStyles[11]" :class="{
+          <div :style="wStyles[10]">{{item.Address.Address.Consignee}}</div>
+          <div :style="wStyles[11]">{{item.Address.Address.Mobile}}</div>
+          <div :style="wStyles[12]">{{item.Address.ExpressText}}</div>
+          <div :style="wStyles[13]" :class="{
             'is-font-13': 1,
             'yellow-color': 1,
             'is-gray': [254, 255, 35].includes(item.Status),
             'is-success': item.Status === 200,
           }">{{item.Status | formatStatus}}</div>
-          <div :style="wStyles[12]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
-          <div :style="wStyles[13]" class="is-font-12 gray btn-wrap">
-            <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
-            <span class="span-title-blue" @click="goToFeedback(item)"
-              v-if="item.AllowAfterSales">售后</span>
-            <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>售后</span>
-            <span class="span-title-pink" @click="handleOrderCancel(item)"
-              v-if="[20, 30, 35, 40].includes(item.Status)">取消</span>
-            <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>取消</span>
+          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap">
+            <span class="span-title-blue" @click="goToDetailPage(item)">详情</span>
           </div>
         </li>
       </TransitionGroupCollapse4ShopCar>
@@ -115,6 +110,10 @@ export default {
     CustomerNo: {
       type: String,
     },
+    value: {
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     // Test,
@@ -140,6 +139,15 @@ export default {
       const AddressDetail = this.data.Address.Address.AddressDetail || '';
       return `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
     },
+    checked: {
+      get() {
+        return this.value.includes(this.data.PayCode);
+      },
+      set(val) {
+        const list = val ? [...this.value, this.data.PayCode] : this.value.filter(it => it !== this.data.PayCode);
+        this.$emit('input', list);
+      },
+    },
   },
   data() {
     return {
@@ -151,7 +159,7 @@ export default {
       this.isActive = !this.isActive;
     },
     getSize(SizeList) {
-      if (!SizeList) return '未知尺寸';
+      if (!SizeList) return '无';
       const _list = [];
       SizeList.forEach(it => {
         _list.push(it.Name.replace('毫米', 'mm'));
@@ -180,16 +188,12 @@ export default {
       return _obj;
     },
     goToDetailPage(data) {
-      this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlat, Address: this.data.Address });
-      this.$router.push('/order/detail');
-    },
-    goToFeedback(item) {
-      const { OrderID, Content } = item;
-      this.$router.push({ name: 'feedback', params: { id: OrderID, desc: Content, type: 'add' } });
+      this.$store.commit('unpayList/setCurUnpayListDetailData', { ...data, Weight: this.data._Weight });
+      this.$router.push('/unpay/detail');
     },
     handleOrderCancel({ OrderID }) {
       this.messageBox.warnCancelBox({
-        title: '确定取消该订单吗?',
+        title: '确定取消该付款单吗?',
         msg: `订单号：[ ${OrderID} ]`,
         successFunc: () => {
           this.cancelOrder(OrderID);
@@ -213,13 +217,9 @@ export default {
 </script>
 
 <style lang='scss'>
-.mp-pc-order-list-page-table-item-comp-wrap {
+.mp-pc-new-unpay-list-page-table-item-comp-wrap {
   margin-top: 20px;
-  // margin-bottom: 20px;
   font-size: 12px;
-  // border-top: 1px solid #eee;
-  // border-bottom: 1px solid #eee;
-  // border-bottom: none;
   box-sizing: border-box;
 
   .product-item-header {
@@ -228,11 +228,10 @@ export default {
     justify-content: space-between;
     border-top: 1px solid rgba($color: #000000, $alpha: 0);
     border-bottom: 1px solid #eee;
-    // width: 1150px;
     .product-item-header-left {
       height: 36px;
       line-height: 36px;
-      padding-left: 30px;
+      padding-left: 12px;
       display: flex;
       overflow: hidden;
       width: calc(100% - 32px);
@@ -249,7 +248,7 @@ export default {
           font-size: 14px;
         }
         &.product-item-header-amount-box {
-          margin-right: 25px;
+          margin-right: 35px;
           > i {
             display: inline-block;
             min-width: 60px;
@@ -260,32 +259,32 @@ export default {
           margin-right: 40px;
           font-size: 14px;
         }
-        &.add-detail {
-          max-width: 550px;
-        }
-        > i.express-box {
-          margin-right: 32px;
+      }
+      .el-checkbox {
+        margin-right: 35px;
+        .el-checkbox__label {
+          padding-left: 20px;
         }
       }
     }
     .product-item-header-right {
       height: 29px;
-      width: 25px;
+      width: 125px;
       margin-right: 22px;
       position: relative;
       flex: none;
       display: inline-block\0;
       cursor: pointer;
-      > div {
+      user-select: none;
+      > div.arrow {
         height: 12px;
         width: 7px;
         position: absolute;
         top: 50%;
-        left: 50%;
+        right: 10px;
         transition: 0.3s !important;
         transform: translate(-50%, -50%) rotate(0deg);
-        background: url("../../assets/images/right-arrow.png") center
-          no-repeat;
+        background: url("../../../assets/images/right-arrow.png") center no-repeat;
         background-size: 100% 100%;
         &.active {
           transform: translate(-50%, -50%) rotate(-90deg);
@@ -302,13 +301,11 @@ export default {
   }
   .product-item-content {
     height: 70px;
-    // padding: 13px 0;
     box-sizing: border-box;
     vertical-align: middle;
     white-space: nowrap;
     display: flex;
     border-bottom: none;
-    // border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
     &:hover > div {
       background-color: #ebf7ff;
@@ -319,7 +316,6 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       text-align: center;
-      // padding: 20px 0;
       padding-right: 6px;
       box-sizing: border-box;
       flex: none;
@@ -339,11 +335,6 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      // &.btn-wrap {
-      //   // > .span-title-blue {
-      //   //   // margin-right: 6px;
-      //   // }
-      // }
     }
   }
 }

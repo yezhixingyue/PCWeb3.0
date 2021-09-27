@@ -47,7 +47,7 @@
         <TipsBox />
       </div>
       <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' :requestObj='requestObj' :FileCount='FileCount' @submit="handleSubmit" />
-      <Dialog2Pay :needClear='true' />
+      <Dialog2Pay @close='handleCodeDialogClose' />
     </div>
   </section>
 </template>
@@ -312,6 +312,25 @@ export default {
           successFunc: () => this.$store.commit('Quotation/setIsShow2PayDialog', false),
         });
       });
+    },
+    handleSuccessFunc() {
+      this.fileContent = '';
+      this.$refs.contentValidateForm.resetFields();
+      this.$refs.FileForm.clearAllFile();
+      this.$emit('clearAdd');
+      this.scrollToTop();
+    },
+    handleCodeDialogClose(isPaid) {
+      if (!isPaid) {
+        this.messageBox.warnSingleError({
+          title: '订单已生成',
+          msg: '尚未完成支付，请到未付款单中查看',
+          successFunc: this.handleSuccessFunc,
+          failFunc: this.handleSuccessFunc,
+        });
+      } else {
+        this.handleSuccessFunc();
+      }
     },
   },
   mounted() {

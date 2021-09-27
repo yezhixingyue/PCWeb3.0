@@ -109,13 +109,16 @@ export default {
       _temp.ProducePeriod = data.ProducePeriod;
       state.curOrderDetailData = _temp;
     },
-    handleCancelOrder(state, OrderID) {
-      const _t = state.OrderList.find(it => it.OrderID === OrderID);
-      _t.Funds.Refund = _t.Funds.HavePaid;
-      // _t.Funds.HavePaid = 0;
-      _t.Funds.Unpaid = 0;
-      _t.Status = 254;
-      // state.OrderList = state.OrderList.filter(it => it.OrderID !== OrderID);
+    handleCancelOrder(state, [OrderID, ID]) {
+      const _t = state.OrderList.find(it => it.ID === ID);
+      if (_t) {
+        const t = _t.OrderList.find(it => it.OrderID === OrderID);
+        if (t) {
+          t.Funds.Refund = t.Funds.HavePaid;
+          t.Funds.Unpaid = 0;
+          t.Status = 254;
+        }
+      }
     },
     /** 是否重新获取当前订单列表数据 (从详情返回不需要)
     ---------------------------------------- */

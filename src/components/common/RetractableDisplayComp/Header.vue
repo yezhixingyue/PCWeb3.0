@@ -3,7 +3,8 @@
     @mousedown="onMousedown"
     ref="moveDiv"
   >
-    {{title}}
+    <el-checkbox v-model="checked" v-if="isCheck" :indeterminate="indeterminate">{{title}}</el-checkbox>
+    <template v-else>{{title}}</template>
   </div>
 </template>
 
@@ -33,10 +34,30 @@ export default {
       type: String,
       default: '',
     },
+    indeterminate: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: Boolean,
+      default: false,
+    },
+    isCheck: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     widthStyle() {
       return `width: ${this.width}px`;
+    },
+    checked: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit('input', val);
+      },
     },
   },
   data() {
@@ -131,6 +152,13 @@ export default {
     right: 6px;
     top: 50%;
     transform: translateY(-50%);
+  }
+  .el-checkbox {
+    padding-left: 4px;
+  }
+  .el-checkbox__label {
+    padding-left: 6px;
+    color: #39588a;
   }
 }
 </style>

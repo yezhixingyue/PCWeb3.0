@@ -94,7 +94,6 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
       const requiredList = InterAction.getRequirededOptionList(AffectedPropList);
       const arr = [...disabledList, ...hiddenList];
       if (arr.length > 0) {
-        // console.log(arr, values, values.length);
         const valueIDs = values.map(it => it.ID).filter(it => it);
         const t = arr.find(it => valueIDs.includes(it));
         if (t) {
@@ -174,7 +173,6 @@ const getStrArrIsRepeat = arr => { // 判断字符串组成的数组是否有重
 };
 
 export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAffectedPropList = []) => {
-  // console.log(valueList, prop, AffectedPropList, subGroupAffectedPropList);
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
     if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
@@ -190,7 +188,6 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
         const { ElementID, CustomerInputValues } = itemValues.List[index];
         const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
         const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element && _it.Property.Element.ID === _Element.ID);
-        // console.log(ElementAffectedPropList);
         const msg = checkElement(CustomerInputValues, _Element, ElementAffectedPropList);
         if (msg) return { msg, ElementID, index: i };
       }
@@ -204,7 +201,12 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
             let _val = getElementValue(t.CustomerInputValues);
             const isNumber = getValueIsOrNotNumber(_val);
             if (isNumber) _val = +_val;
-            return _val ? JSON.stringify(_val) : _val;
+            if (!_val) return _val;
+            if (Array.isArray(_val) && Element.Type === 2 && Element.OptionAttribute?.OptionList?.length > 0) {
+              const list = Element.OptionAttribute.OptionList.filter(_it => _val.includes(_it.ID)).map(_it => _it.ID);
+              return JSON.stringify(list);
+            }
+            return JSON.stringify(_val);
           }
           return '';
         }).filter(it => it !== '');

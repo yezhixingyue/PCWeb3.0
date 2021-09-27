@@ -352,7 +352,7 @@ export default class ProductDetailTypeShowClass {
     if (ElContent.length > 0 || GroupContent.length > 0) {
       const temp = {
         Name: Craft.ShowName,
-        Content: `${ElContent.join(' ')} ${GroupContent.join('')}`,
+        Content: `${ElContent.join(' ')} ${GroupContent.join(' ')}`,
       };
       // return `${Craft.ShowName} ${ElContent.join(' ')} ${GroupContent.join('')}`;
       return temp;

@@ -37,9 +37,11 @@
       <li class="file-box gray is-font-12">
         <p class="ProducePeriod" v-if="[254, 255].indexOf(info4OrderSummary.Status) === -1">
           <span>工期时间：</span>
-          <span :class="!afterPay ? 'is-pink' : ''">
+          <span :class="!afterPay && info4OrderSummary.ProducePeriod ? 'is-pink' : ''">
             <template v-if="!afterPay">{{info4OrderSummary.ProducePeriod | getPayTime}}</template>
-            {{info4OrderSummary.ProducePeriod | getDoneTime(true)}}</span>
+            {{info4OrderSummary.ProducePeriod | getDoneTime(true)}}
+            <template v-if="!info4OrderSummary.ProducePeriod">无</template>
+          </span>
         </p>
         <p>
           <span>下单时间：</span>

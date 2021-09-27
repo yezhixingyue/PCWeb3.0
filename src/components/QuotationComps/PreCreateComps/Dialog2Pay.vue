@@ -5,6 +5,8 @@
     custom-class="dialog-to-pay-box"
     center
     :before-close="handleClose"
+    :close-on-click-modal='false'
+    :close-on-press-escape='false'
     v-dialogDrag
   >
     <section v-if="curPayInfo2Code">
@@ -128,7 +130,7 @@ export default {
     ...mapActions('Quotation', ['getPayResult']),
     // eslint-disable-next-line max-len
     ...mapMutations('Quotation', ['setIsShow2PayDialog', 'setCurPayInfo2Code', 'setPaySuccessOrderDataStatus']),
-    handleClose() {
+    handleClose(isPaid = false) {
       // 关闭前清除img元素src地址
       if (this.needClear) this.showImg = false;
       if (this.needClear) this.setCurPayInfo2Code(null);
@@ -136,6 +138,7 @@ export default {
       clearTimeout(this.timer);
       this.timer = null;
       this.getImageCodeFail = false;
+      this.$emit('close', isPaid === true);
     },
     onLoad() {
       // 图片下载完成
@@ -171,7 +174,7 @@ export default {
       }
       this.$store.dispatch('common/getCustomerFundBalance');
       this.setCurPayInfo2Code(null);
-      this.handleClose();
+      this.handleClose(true);
     },
     async getPayStatus() {
       // 轮询付款状态

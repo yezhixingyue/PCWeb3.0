@@ -69,6 +69,13 @@ export default {
       }
       return 0;
     },
+    clearAllFile() {
+      if (this.$refs.UploadItem && this.$refs.UploadItem.length > 0) {
+        this.$refs.UploadItem.forEach(it => {
+          it.clearFiles();
+        });
+      }
+    },
   },
   watch: {
     FileList() {
