@@ -1236,8 +1236,8 @@ export default {
       const res = await api.getPayResult(state.curPayInfo2Code.PayCode);
       if (res.data.Status === 1000) cb(res.data.Data);
     },
-    async placeOrderFromPreCreate({ commit, rootState }, { temp, cb, isFormOrder }) {
-      const _obj = { ...temp };
+    async placeOrderFromPreCreate({ commit, rootState }, { temp, cb, isFormOrder, PayInFull, submitSuccessFunc }) {
+      const _obj = temp ? { ...temp } : { OrderType: 2, PayInFull, List: [] };
       let item;
       if (!isFormOrder) {
         item = [...rootState.shoppingCar.curShoppingCarDataBeforeFirstPlace];
@@ -1248,6 +1248,7 @@ export default {
       if (!res || res.data.Status !== 1000) {
         throw new Error(res && res.data.Message ? res.data.Message : '服务器未响应');
       }
+      if (submitSuccessFunc) submitSuccessFunc();
       if (res.data.Data) {
         const _b = rootState.common.customerBalance;
         const { FundBalance } = res.data.Data;

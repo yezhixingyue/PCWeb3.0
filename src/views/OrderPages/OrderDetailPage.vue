@@ -49,6 +49,11 @@
                   <p>¥ {{curOrderDetailData.Funds.Refund}}</p>
               </div>
             </div>
+            <p class="r-btn-wrap">
+              <span class="span-title-blue" @click="onReturnClick">
+                <i class="iconfont icon-left-double-arrow"></i> 返回列表
+              </span>
+            </p>
           </div>
         </OrderDetailCommonComp>
       </li>
@@ -87,7 +92,6 @@ export default {
       const {
         OutPlate, Content, OrderID, CreateTime, Status, ProducePeriod, PayTime, Weight, Address,
       } = this.curOrderDetailData;
-      // console.log(Weight, 'Weight');
       const {
         AddressDetail, ExpressArea, Consignee, Mobile,
       } = Address.Address;
@@ -96,7 +100,7 @@ export default {
       return {
         OutPlate,
         Address: AddressShowDetail,
-        Content,
+        Content: Content || '无',
         OrderID,
         CreateTime,
         Express: Address.ExpressText,
@@ -130,17 +134,14 @@ export default {
     setProgressDataCompleted(bool) {
       this.progressDataCompleted = bool;
       if (bool) this.handleGetDataSuccess();
-      // // console.log(this.$refs.AsideIndexComp);
     },
     setPackDataCompleted(bool) {
       this.packDataCompleted = bool;
       if (bool) this.handleGetDataSuccess();
-      // // console.log(this.$refs.AsideIndexComp);
     },
     setDetailDataCompleted(bool) {
       this.detailDataCompleted = bool;
       if (bool) this.handleGetDataSuccess();
-      // // console.log(this.$refs.AsideIndexComp);
     },
   },
   mounted() {
@@ -171,7 +172,6 @@ export default {
       border-radius: 5px;
       &:hover {
         background-color: rgb(230, 230, 230);
-        // box-shadow: 0 0px 1px 1px rgba(38, 188, 249, 0.2);
       }
       &:active {
         background-color: rgb(208, 208, 208);
@@ -231,6 +231,10 @@ export default {
             right: -30px;
             top: 195px;
           }
+        }
+        > .r-btn-wrap {
+          padding-top: 30px;
+          padding-left: 100px;
         }
       }
       .btn-wrap {

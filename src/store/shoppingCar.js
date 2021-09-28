@@ -28,9 +28,11 @@ export default {
   mutations: {
     /** 设置购物车信息列表
     ---------------------------------------- */
+    // eslint-disable-next-line no-unused-vars
     setShoppingDataList(state, { Data, DataNumber }) {
       state.shoppingDataList = Data.filter(it => it.FileHaveUpload);
-      state.shoppingDataNumber = DataNumber;
+      const list = Data.filter(it => !it.FileHaveUpload);
+      state.shoppingDataNumber = DataNumber - list.length;
     },
     /** 设置当前购物车订单详情
     ---------------------------------------- */
@@ -53,7 +55,6 @@ export default {
       const allIDList = allList.map(it => it.OrderID);
       const failIDList = failList ? failList.map(it => it.OrderID) : [];
       state.shoppingDataList.forEach(it => {
-        // FileErrorMessage
         const item = it;
         if (allIDList.includes(it.OrderID) && !failIDList.includes(it.OrderID)) item.FileErrorMessage = '已删除';
         if (allIDList.includes(it.OrderID) && failIDList.includes(it.OrderID)) {
@@ -65,7 +66,11 @@ export default {
       const _list = state.shoppingDataList;
       state.shoppingDataList = _list.filter(it => it.FileErrorMessage !== '已删除');
       state.shoppingDataNumber = state.shoppingDataList.length;
-      // if (failList.length === 0)
+    },
+    setShoppingDataStatusAfterSubmit(state, list) {
+      const submitedIDs = list.map(it => it.OrderID);
+      state.shoppingDataList = state.shoppingDataList.filter(it => !submitedIDs.includes(it.OrderID));
+      state.shoppingDataNumber = state.shoppingDataList.length;
     },
     /** 清理购物车订单列表，清除已上传订单
     ---------------------------------------- */

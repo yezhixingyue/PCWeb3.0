@@ -180,16 +180,16 @@ const routes = [
             },
             component: () => import('../views/UnpayList/UnpayOrderDetailPage.vue'),
           },
-          {
-            path: '/unpay/submit',
-            name: 'unpayOrderSubmit',
-            meta: {
-              requiresAuth: true,
-              y: 0,
-              title: '订单支付 - 郑州名片之家电子商务有限公司',
-            },
-            component: () => import('../views/UnpayList/UnpayOrderSubmitPage.vue'),
-          },
+          // {
+          //   path: '/unpay/submit',
+          //   name: 'unpayOrderSubmit',
+          //   meta: {
+          //     requiresAuth: true,
+          //     y: 0,
+          //     title: '订单支付 - 郑州名片之家电子商务有限公司',
+          //   },
+          //   component: () => import('../views/UnpayList/UnpayOrderSubmitPage.vue'),
+          // },
         ],
       },
       {

@@ -5,7 +5,7 @@
       <li class="left">
         <p class="first">
           <span class="title">平台单号：</span>
-          <span>{{info4OrderSummary.OutPlate}}</span>
+          <span>{{info4OrderSummary.OutPlate || '无'}}</span>
         </p>
         <p>
           <span class="title">收件人：</span>
@@ -60,7 +60,7 @@
             :content="info4OrderSummary.Content"
             placement="top-start"
           >
-            <span>{{info4OrderSummary.Content}}</span>
+            <span>{{info4OrderSummary.Content || '无'}}</span>
           </el-tooltip>
         </p>
       </li>

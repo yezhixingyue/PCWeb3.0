@@ -22,6 +22,10 @@ export default {
   computed: {
     ...mapState('unpayList', ['unpayDataList', 'unpayDataNumber']),
   },
+  data() {
+    return {
+    };
+  },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       if (from.name !== 'unpayOrderDetail') {

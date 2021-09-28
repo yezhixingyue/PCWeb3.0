@@ -2,17 +2,17 @@
     <div class="mp-pc-new-unpay-list-page-table-item-comp-wrap">
       <div class="product-item-header">
         <div class="product-item-header-left">
-          <el-checkbox v-model="checked">
+          <el-checkbox v-model="checked" :disabled='this.data.isCanceled || this.data.isPaid'>
             <span class="product-item-header-amount-box gray is-font-14">付款单号：<i>{{this.data.PayCode}}</i></span>
           </el-checkbox>
           <span class="freight-box"> <i class="gray">产品金额：</i><em class="is-pink">{{totalOriginalPrice}}元</em></span>
           <span class="freight-box"> <i class="gray">运费：</i>{{totalFreight}}元</span>
           <span class="freight-box"> <i class="gray">重量：</i>{{this.data._Weight}}kg</span>
         </div>
-        <div class="product-item-header-right" @click="handleCollapse">
-          <span class="span-title-blue">付款</span>
-          <span class="span-title-blue">取消</span>
-          <div :class="isActive ? 'active arrow' : 'arrow'"></div>
+        <div class="product-item-header-right" >
+          <span class="span-title-blue" @click="handlePayClick" :class="{disabled: this.data.isCanceled || this.data.isPaid}">付款</span>
+          <span class="span-title-blue" @click="handleOrderCancel" :class="{disabled: this.data.isCanceled || this.data.isPaid}">取消</span>
+          <div :class="isActive ? 'active arrow' : 'arrow'" @click="handleCollapse"></div>
         </div>
       </div>
       <TransitionGroupCollapse4ShopCar tag="ul" class="mp-group-collapse-for-shop"> <!-- 子列表部分 -->
@@ -74,12 +74,14 @@
           </div>
         </li>
       </TransitionGroupCollapse4ShopCar>
+      <CancelDialogBox :visible.sync='cancelVisivle' v-model="cancelObj" @submit="submitCancelOrder" />
     </div>
 </template>
 
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
 import { mapState } from 'vuex';
+import CancelDialogBox from './CancelDialogBox.vue';
 
 export default {
   props: {
@@ -116,8 +118,8 @@ export default {
     },
   },
   components: {
-    // Test,
     TransitionGroupCollapse4ShopCar,
+    CancelDialogBox,
   },
   computed: {
     ...mapState('shoppingCar', ['curShoppingCarDataBeforeFirstPlace']),
@@ -152,6 +154,8 @@ export default {
   data() {
     return {
       isActive: true,
+      cancelVisivle: false,
+      cancelObj: null,
     };
   },
   methods: {
@@ -177,7 +181,7 @@ export default {
       CraftList.forEach(it => {
         _list.push(it.Name.replace('毫米', 'mm'));
       });
-      return _list.join('、');
+      return _list.join('、') || '无';
     },
     // eslint-disable-next-line object-curly-newline
     getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {
@@ -191,26 +195,42 @@ export default {
       this.$store.commit('unpayList/setCurUnpayListDetailData', { ...data, Weight: this.data._Weight });
       this.$router.push('/unpay/detail');
     },
-    handleOrderCancel({ OrderID }) {
-      this.messageBox.warnCancelBox({
-        title: '确定取消该付款单吗?',
-        msg: `订单号：[ ${OrderID} ]`,
-        successFunc: () => {
-          this.cancelOrder(OrderID);
-        },
-      });
+    handleOrderCancel() {
+      if (!this.data || this.data.isCanceled || this.data.isPaid) return;
+      this.cancelObj = {
+        PayCode: this.data.PayCode,
+        isAddPrepare: true,
+      };
+      this.cancelVisivle = true;
     },
-    async cancelOrder(OrderID) {
-      const res = await this.api.getOrderCancle(OrderID);
+    async submitCancelOrder() {
+      const res = await this.api.getUnpayOrderCancle(this.cancelObj);
       if (res.data.Status === 1000) {
         this.messageBox.successSingle({
           title: '取消成功',
           successFunc: () => {
-            this.$store.commit('order/handleCancelOrder', [OrderID, this.data.ID]);
+            this.$store.commit('unpayList/setMultipleOrderDataStatus', { allList: [this.data.PayCode] });
             this.$store.dispatch('common/getCustomerFundBalance');
           },
         });
       }
+    },
+    handlePayClick() {
+      if (!this.data || this.data.isCanceled || this.data.isPaid) return;
+      const {
+        FullPayout, PayOnlineAmount, PayOnDelivery, BalanceAmount, PayQRCode, PayCode,
+      } = this.data;
+      this.$store.commit('Quotation/setCurPayInfo2Code', {
+        Amount: PayOnlineAmount,
+        BalanceAmount,
+        PayOnDelivery,
+        TotalAmount: FullPayout,
+        PayCode,
+        PayWay: {
+          AllinPay: PayQRCode,
+        },
+      });
+      this.$store.commit('Quotation/setIsShow2PayDialog', true);
     },
   },
 };
@@ -231,7 +251,7 @@ export default {
     .product-item-header-left {
       height: 36px;
       line-height: 36px;
-      padding-left: 12px;
+      padding-left: 14px;
       display: flex;
       overflow: hidden;
       width: calc(100% - 32px);
@@ -269,26 +289,32 @@ export default {
     }
     .product-item-header-right {
       height: 29px;
-      width: 125px;
-      margin-right: 22px;
+      width: 118px;
+      margin-right: 12px;
       position: relative;
       flex: none;
       display: inline-block\0;
       cursor: pointer;
       user-select: none;
       > div.arrow {
-        height: 12px;
-        width: 7px;
+        height: 32px;
+        width: 30px;
         position: absolute;
-        top: 50%;
-        right: 10px;
+        top: calc(50% + 3px);
+        right: -12px;
         transition: 0.3s !important;
         transform: translate(-50%, -50%) rotate(0deg);
         background: url("../../../assets/images/right-arrow.png") center no-repeat;
-        background-size: 100% 100%;
+        background-size: 7px 10px;
         &.active {
           transform: translate(-50%, -50%) rotate(-90deg);
         }
+      }
+      > span {
+        display: inline-block;
+        line-height: 32px;
+        font-size: 14px;
+        margin-left: 4px;
       }
     }
     &::before {
@@ -334,6 +360,10 @@ export default {
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+      &.btn-wrap {
+        padding-right: 16px;
+        font-size: 14px !important;
       }
     }
   }

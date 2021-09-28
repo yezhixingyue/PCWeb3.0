@@ -26,7 +26,7 @@ const getElementValueContent = (CustomerInputValues, origin, giveUpUnit) => {
     if (origin.Type === 1) { // 数字类型
       const [{ Value }] = CustomerInputValues;
       const { Unit } = origin;
-      if (Value || Value === 0) return Unit && !giveUpUnit ? `${+Value}${Unit}` : `${+Value}`;
+      if (Value || Value === 0) return Unit && !giveUpUnit ? `${+Value}${Unit || ''}` : `${+Value}`;
     }
     if (origin.Type === 3 && origin.SwitchAttribute) { // 开关类型
       const [{ Value }] = CustomerInputValues;
@@ -502,8 +502,9 @@ export default class ProductDetailTypeShowClass {
             }
             break;
           case '尺寸组':
-            if (ProductParams.Size?.SizeGroup?.GroupInfo?.Name && ProductParams.Size.DisplayName) {
-              arr.push({ type: 'Size', Label: ProductParams.Size.SizeGroup.GroupInfo.Name, Content: ProductParams.Size.DisplayName });
+            if (ProductParams.Size.DisplayName) {
+              const Label = ProductParams.Size?.SizeGroup?.GroupInfo?.Name || '尺寸';
+              arr.push({ type: 'Size', Label, Content: ProductParams.Size.DisplayName });
             }
             break;
           case '物料':

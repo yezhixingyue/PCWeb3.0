@@ -29,7 +29,7 @@ export default {
     /** 设置未付款单信息列表
     ---------------------------------------- */
     setUnpayDataList(state, { Data, DataNumber }) {
-      state.unpayDataList = Data;
+      state.unpayDataList = Data.map(it => ({ ...it, isCanceled: false, isPaid: false }));
       state.unpayDataNumber = DataNumber;
     },
     /** 设置当前未付款单订单详情
@@ -59,27 +59,44 @@ export default {
     },
     /** 支付成功后 设置对应订单状态
     ---------------------------------------- */
-    setOrderStatusAfterPaid(state) {
-      if (!state.curUnpayListDataBeforeFirstPlace) return;
-      state.curUnpayListDataBeforeFirstPlace.forEach(it => {
-        const _t = state.unpayDataList.find(item => item.OrderID === it.OrderID);
-        if (_t) _t.Status = 200;
-      });
-      state.curUnpayListDataBeforeFirstPlace = null;
+    setOrderStatusAfterPaid(state, PayCode) {
+      const t = state.unpayDataList.find(it => it.PayCode === PayCode);
+      if (t) {
+        t.isPaid = true;
+        t.PackageList.forEach(({ OrderList }) => {
+          OrderList.forEach(order => {
+            const _order = order;
+            _order.Status = 200;
+          });
+        });
+      }
     },
     /** 删除订单后，设置订单状态
     ---------------------------------------- */
     setMultipleOrderDataStatus(state, { allList, failList }) {
-      const allIDList = allList.map(it => it.OrderID);
-      const failIDList = failList ? failList.map(it => it.OrderID) : [];
+      // const allIDList = allList.map(it => it.PayCode);
+      const failIDList = failList ? failList.map(it => it.PayCode) : [];
       state.unpayDataList.forEach(it => {
         // FileErrorMessage
         const item = it;
-        if (allIDList.includes(it.OrderID) && !failIDList.includes(it.OrderID)) item.Status = 254;
-        if (allIDList.includes(it.OrderID) && failIDList.includes(it.OrderID)) {
-          item.Status = '取消失败';
-          const _t = failList.find(sub => sub.OrderID === item.OrderID);
-          if (_t) item.Status = _t.Message;
+        if (allList.includes(it.PayCode) && !failIDList.includes(it.PayCode)) {
+          item.PackageList.forEach(({ OrderList }) => {
+            OrderList.forEach(order => {
+              const _order = order;
+              _order.Status = 254;
+            });
+          });
+          item.isCanceled = true;
+        }
+        if (allList.includes(it.PayCode) && failIDList.includes(it.PayCode)) {
+          item.PackageList.forEach(({ OrderList }) => {
+            OrderList.forEach(order => {
+              const _order = order;
+              _order.Status = '取消失败';
+              const _t = failList.find(_it => _it.PayCode === it.PayCode);
+              if (_t) _order.Status = _t.Message;
+            });
+          });
         }
       });
       // const _list = state.unpayDataList;
@@ -91,7 +108,7 @@ export default {
     ---------------------------------------- */
     clearUnpayDataList(state) {
       const _list = state.unpayDataList;
-      state.unpayDataList = _list.filter(it => it.Status === 10);
+      state.unpayDataList = _list.filter(it => !it.isCanceled && !it.isPaid);
       state.unpayDataNumber = state.unpayDataList.length;
     },
     /* 注销及登录状态清理
@@ -108,8 +125,8 @@ export default {
     /** 获取未付款单信息列表
     ---------------------------------------- */
     async getUnpayList({ commit }) {
-      const res = await api.getUnpayList();
-      if (res.data.Status === 1000) {
+      const res = await api.getUnpayList().catch(() => {});
+      if (res && res.data.Status === 1000) {
         commit('setUnpayDataList', res.data);
       }
     },
@@ -132,14 +149,14 @@ export default {
     },
     /** 删除未付款单订单
     ---------------------------------------- */
-    async getOrderCancle({ commit }, list) {
-      if (list.length === 0) Message.error('请选择订单');
+    async getOrderCancle({ commit }, [list, isAddPrepare]) {
+      if (list.length === 0) Message.error('请选择付款单');
 
-      const _list = list.map(it => ({ OrderID: it.OrderID, closeTip: true }));
+      const _list = list.map(it => ({ PayCode: it, closeTip: true, isAddPrepare }));
 
       const res = await asyncNonCurrentFunc(api.getUnpayOrderCancle, _list);
 
-      const _res = res.map((it, i) => ({ ...it, OrderID: _list[i].OrderID })); // 非并发方式处理批量取消，获取总结果
+      const _res = res.map((it, i) => ({ ...it, PayCode: _list[i] })); // 非并发方式处理批量取消，获取总结果
 
       const hasWrongList = _res.filter(it => it.data.Status !== 1000);
 
@@ -150,7 +167,7 @@ export default {
       }
 
       const _errTextList = hasWrongList.map(it => ({
-        OrderID: it.OrderID,
+        PayCode: it.PayCode,
         Status: it.data.Status,
         Message: it.data.Message,
       }));
@@ -159,7 +176,7 @@ export default {
       const _failLen = _errTextList.length;
       const _successLen = list.length - _failLen;
       massage.failSingleError({
-        title: '部分订单取消失败!',
+        title: '部分付款单取消失败!',
         msg: `${_successLen} 条成功， ${_failLen} 条失败，具体请查看列表订单状态`,
       }); // 弹窗提示出错订单
       return true;

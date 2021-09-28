@@ -3,7 +3,7 @@
     @mousedown="onMousedown"
     ref="moveDiv"
   >
-    <el-checkbox v-model="checked" v-if="isCheck" :indeterminate="indeterminate">{{title}}</el-checkbox>
+    <el-checkbox v-model="checked" v-if="isCheck" :indeterminate="indeterminate" :disabled='checkDisabled'>{{title}}</el-checkbox>
     <template v-else>{{title}}</template>
   </div>
 </template>
@@ -43,6 +43,10 @@ export default {
       default: false,
     },
     isCheck: {
+      type: Boolean,
+      default: false,
+    },
+    checkDisabled: {
       type: Boolean,
       default: false,
     },

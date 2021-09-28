@@ -167,7 +167,7 @@ export default {
       if (this.pageType === 'placeOrderPage') this.setPaySuccessOrderDataStatus();
       else if (this.pageType === 'shoppingCarPage' || this.pageType === 'unpayPage') {
         if (this.pageType === 'shoppingCarPage') this.$router.push('/shopping/car');
-        else if (this.pageType === 'unpayPage') this.$router.push('/unpay/list');
+        else if (this.pageType === 'unpayPage') this.$store.commit('unpayList/setOrderStatusAfterPaid', this.curPayInfo2Code.PayCode);
         this.$store.commit('shoppingCar/setCurShoppingCarDetailData', null);
         this.$store.commit('shoppingCar/setCurShoppingCarDataBeforeFirstPlace', null);
         this.$store.commit('shoppingCar/setCurShoppingCarData4FirstPlace', null);

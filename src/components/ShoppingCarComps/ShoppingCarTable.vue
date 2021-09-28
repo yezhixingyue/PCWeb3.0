@@ -37,7 +37,9 @@
         <el-table-column label="定金" width="65" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Funds.Deposit }}元</template>
         </el-table-column>
-        <el-table-column prop="Content" label="文件内容" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="Content" label="文件内容" show-overflow-tooltip>
+          <template slot-scope="scope">{{scope.row.Content || '无'}}</template>
+        </el-table-column>
         <el-table-column prop="Address.Address.Consignee" label="收货人" width="60" show-overflow-tooltip>
         </el-table-column>
         <el-table-column prop="Address.Address.Mobile" label="收货人手机" width="90" show-overflow-tooltip>
@@ -160,7 +162,7 @@ export default {
       const { Unit, ProductAmount, KindCount } = Attributes;
       const _str = `(${KindCount}款)`;
       // if (KindCount > 1) _str = `（共${KindCount}款）`;
-      return `${ProductAmount}${Unit}${_str}`;
+      return `${ProductAmount}${Unit || ''}${_str}`;
     },
     getCraftFromItem(First, arr) {
       if (First && First.length > 0) {

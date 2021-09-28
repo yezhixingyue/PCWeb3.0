@@ -169,7 +169,7 @@ export default {
       CraftList.forEach(it => {
         _list.push(it.Name.replace('毫米', 'mm'));
       });
-      return _list.join('、');
+      return _list.join('、') || '无';
     },
     // eslint-disable-next-line object-curly-newline
     getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {

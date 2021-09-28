@@ -7,6 +7,7 @@
         :width='widthValueList[i]' :title="item"
         :isCheck='i === 0 && isCheck ? true : false'
         v-model="checked"
+        :checkDisabled='checkDisabled'
         :indeterminate='indeterminate'
        />
     </header>
@@ -62,6 +63,10 @@ export default {
       default: false,
     },
     value: {
+      type: Boolean,
+      default: false,
+    },
+    checkDisabled: {
       type: Boolean,
       default: false,
     },

@@ -236,9 +236,8 @@ const api = {
   getUnpayList() { // 获取未付款单列表 POST /Api/Customer/UnpaidList
     return instance.post('/Api/Customer/UnpaidList', {});
   },
-  getUnpayOrderCancle({ OrderID, closeTip }) { // 未付款单取消 - 和订单取消同一个接口
-    // return instance.delete(`/Api/Order/Cancle?orderID=${OrderID}`);
-    return instance.delete(`/Api/Order/Cancle?orderID=${OrderID}`, { closeTip });
+  getUnpayOrderCancle({ PayCode, isAddPrepare, closeTip }) { // 未付款单取消
+    return instance.put(`/Api/PaymentOrder/Cancle?PayCode=${PayCode}&isAddPrepare=${isAddPrepare}`, { closeTip });
   },
   getOrderPrePay(data) { // POST /Api/Order/PrePay  直接下单 - 预下单
     const { closeTip } = data;

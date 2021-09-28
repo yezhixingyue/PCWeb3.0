@@ -39,7 +39,7 @@
           <p class="btn-wrap">
             <span class="span-title-blue" @click="onReturnClick">
               <i class="iconfont icon-left-double-arrow"></i> 返回列表</span>
-            <el-button type="danger" @click="handleSubmit">支付</el-button>
+            <!-- <el-button type="danger" @click="handleSubmit">支付</el-button> -->
           </p>
         </OrderDetailCommonComp>
       </li>
@@ -62,11 +62,9 @@ export default {
     ...mapState('unpayList', ['curUnpayListDetailData']),
     info4OrderSummary() {
       if (!this.curUnpayListDetailData) return null;
-      console.log(this.curUnpayListDetailData);
       const {
         OutPlate, Content, OrderID, CreateTime, Status, ProducePeriod, PayTime, Weight, Address,
       } = this.curUnpayListDetailData;
-      console.log(Weight, 'Weight');
       const {
         AddressDetail, ExpressArea, Consignee, Mobile,
       } = Address.Address;
@@ -178,6 +176,8 @@ export default {
       padding-left: 40px;
       padding-top: 64px;
       padding-bottom: 25px;
+      text-align: right;
+      padding-right: 30px;
       > span {
         > i {
           transform: rotate(-90deg);

@@ -89,7 +89,7 @@ export default {
       return `${FirstLevelName}-${SecondLevelName}-${ProductName}`;
     },
     getProductCount({ ProductAmount, Unit, KindCount }) {
-      return `${ProductAmount}${Unit}${KindCount}款`;
+      return `${ProductAmount}${Unit || ''}${KindCount}款`;
     },
     // eslint-disable-next-line object-curly-newline
     getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {

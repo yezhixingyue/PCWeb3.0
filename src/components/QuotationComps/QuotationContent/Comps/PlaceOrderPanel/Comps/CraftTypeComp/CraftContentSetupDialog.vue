@@ -364,7 +364,7 @@ export default {
       margin-right: 15px\0;
       > main {
         max-height: 420px;
-        overflow-y: auto;
+        overflow-y: scroll;
         padding-right: 20px;
         .mp-place-order-content-element-type-show-item-comp-wrap {
           > label {

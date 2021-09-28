@@ -5,7 +5,7 @@
     custom-class="mp-place-order-panel-comp-order-submit-comfirm-dialog-comp-wrap"
     v-dialogDrag
     @open="onOpen"
-    top="10vh"
+    top="9vh"
     @closed="onClosed"
   >
     <header slot="title">
@@ -273,13 +273,13 @@ export default {
       }
       > footer {
         text-align: right;
-        margin-top: 20px;
+        margin-top: 13px;
         padding-right: 10px;
         > ul {
           padding-right: 2px;
           padding-bottom: 12px;
           > li {
-            padding: 4px 0;
+            padding: 5px 0;
             line-height: 20px;
             > .content {
               min-width: 120px;

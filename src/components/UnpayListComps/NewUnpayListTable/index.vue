@@ -7,6 +7,7 @@
       :onWidthChange="onWidthChange"
       :titleList="titleList"
       isCheck
+      :checkDisabled='canSelectList.length === 0'
       v-model="checkedAll"
       :indeterminate="isIndeterminate"
     >
@@ -26,7 +27,7 @@
     <footer class="is-font-14">
       <div class="float">
         <div class="left">
-          <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll"
+          <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll" :disabled='canSelectList.length === 0'
             >全选</el-checkbox
           >
           <span class="gray"
@@ -37,7 +38,7 @@
           <span class="span-title-blue" @click="handleClearList"
             >清除已付款已取消订单</span
           >
-          <span class="span-title-pink" @click="handleDel(null)"
+          <span class="span-title-pink" @click="onCancelMulClick"
             >取消选中订单</span
           >
           <!-- <el-button type="primary" @click="handleSelectedSubmit"
@@ -50,7 +51,7 @@
       <footer class="is-font-14 floating" v-show="isFootFixed">
         <div class="float">
           <div class="left">
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll"
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll" :disabled='canSelectList.length === 0'
               >全选</el-checkbox
             >
             <span class="gray"
@@ -62,7 +63,7 @@
             <span class="span-title-blue" @click="handleClearList"
               >清除已付款已取消订单</span
             >
-            <span class="span-title-pink" @click="handleDel(null)"
+            <span class="span-title-pink" @click="onCancelMulClick"
               >取消选中订单</span
             >
             <!-- <el-button type="primary" @click="handleSelectedSubmit"
@@ -72,18 +73,24 @@
         </div>
       </footer>
     </transition>
+    <CancelDialogBox :visible.sync='cancelVisivle' v-model="cancelObj" @submit="submitCancelOrder" />
+    <Dialog2Pay pageType='unpayPage' />
   </section>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import RetractableDisplayComp from '@/components/common/RetractableDisplayComp/Index.vue';
+import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
 import ItemListComp from './ItemListComp.vue';
+import CancelDialogBox from './CancelDialogBox.vue';
 
 export default {
   components: {
     ItemListComp,
+    CancelDialogBox,
     RetractableDisplayComp,
+    Dialog2Pay,
   },
   data() {
     return {
@@ -124,6 +131,8 @@ export default {
       multipleSelection: [],
       h: 0,
       isFootFixed: false,
+      cancelVisivle: false,
+      isAddPrepare: true,
     };
   },
   computed: {
@@ -136,16 +145,20 @@ export default {
         + this.ScrollInfo.offsetHeight
       );
     },
+    canSelectList() {
+      if (!this.unpayDataList) return [];
+      return this.unpayDataList.filter(it => !it.isCanceled && !it.isPaid);
+    },
     checkedAll: {
       get() {
         return (
-          this.multipleSelection.length === this.unpayDataNumber
+          this.multipleSelection.length === this.canSelectList.length
           && this.multipleSelection.length > 0
         );
       },
       set(newVal) {
         if (newVal) {
-          this.multipleSelection = this.unpayDataList.map(it => it.PayCode);
+          this.multipleSelection = this.canSelectList.map(it => it.PayCode);
         } else {
           this.multipleSelection = [];
         }
@@ -153,7 +166,7 @@ export default {
     },
     isIndeterminate() {
       return (
-        this.multipleSelection.length < this.unpayDataNumber
+        this.multipleSelection.length < this.canSelectList.length
         && this.multipleSelection.length > 0
       );
     },
@@ -179,6 +192,17 @@ export default {
         return { ...temp, _OrderList, _Weight };
       });
     },
+    cancelObj: {
+      get() {
+        return {
+          PayCode: this.multipleSelection,
+          isAddPrepare: this.isAddPrepare,
+        };
+      },
+      set({ isAddPrepare }) {
+        this.isAddPrepare = isAddPrepare;
+      },
+    },
   },
   methods: {
     onWidthChange(newW, w) {
@@ -195,8 +219,17 @@ export default {
       const { scrollTop, scrollHeight, offsetHeight } = oEl;
       this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
     },
-    handleClearList(e) {
-      console.log('handleClearList', e);
+    handleClearList() {
+      this.$store.commit('unpayList/clearUnpayDataList');
+    },
+    onCancelMulClick() { // 取消选中
+      if (this.multipleSelection.length === 0) return;
+      this.cancelVisivle = true;
+      this.isAddPrepare = true;
+    },
+    submitCancelOrder() {
+      console.log('submitCancelOrder 取消选中', this.multipleSelection, this.isAddPrepare);
+      this.$store.dispatch('unpayList/getOrderCancle', [this.multipleSelection, this.isAddPrepare]);
     },
   },
   watch: {
@@ -211,6 +244,11 @@ export default {
       const difference = scrollHeight - offsetHeight;
       if (difference - 165 - scrollTop > 0) this.isFootFixed = true;
       else this.isFootFixed = false;
+    },
+    canSelectList(val) {
+      if (!val) return;
+      const ids = val.map(it => it.PayCode);
+      this.multipleSelection = this.multipleSelection.filter(it => ids.includes(it));
     },
   },
   mounted() {

@@ -1,34 +1,14 @@
 <template>
   <div id="app">
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
     <router-view/>
   </div>
 </template>
 
 <script>
-// import { throttle } from '@/assets/js/utils/throttle';
 import { mapState } from 'vuex';
 import { useCookie } from '@/assets/js/setup';
 
 export default {
-  // methods: {
-  //   handleScroll(oEl) {
-  //     if (!oEl) return;
-  //     const { scrollTop, scrollHeight, offsetHeight } = oEl;
-  //     // console.log(scrollTop, scrollHeight, offsetHeight);
-  //   },
-  // },
-  // mounted() {
-  //   const oApp = document.getElementById('app');
-  //   // const _func = throttle(this.handleScroll, 30);
-  //   if (oApp) {
-  //     window.addEventListener('scroll', () => this.handleScroll(oApp));
-  //     window.onscroll = () => // console.log(123);
-  //   }
-  // },
   computed: {
     ...mapState('common', ['customerInfo']),
   },

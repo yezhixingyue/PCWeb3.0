@@ -100,10 +100,8 @@ export default {
     onReturnClick() {
       this.$router.go(-1);
       this.$store.commit('Quotation/setCurPayInfo2Code', null);
-      // // console.log(this.$router, this.$route);
     },
     handleSubmit() {
-      // console.log('handleSubmit');
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
       const cb = () => {
         this.$router.push('/shopping/car');
@@ -113,7 +111,10 @@ export default {
         this.$store.dispatch('common/getCustomerFundBalance');
       };
       if (!this.curPayInfo2Code) {
-        const _obj = { PayInFull: this.checked, cb };
+        const submitSuccessFunc = () => {
+          this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', this.curShoppingCarDataBeforeFirstPlace);
+        };
+        const _obj = { PayInFull: this.checked, cb, submitSuccessFunc };
         this.$store.dispatch('Quotation/placeOrderFromPreCreate', _obj).catch((...args) => {
           const error = args[0];
           this.messageBox.handleLoadingError({

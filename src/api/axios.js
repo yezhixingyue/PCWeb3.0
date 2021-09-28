@@ -49,7 +49,6 @@ axios.interceptors.request.use(
       let _color = 'rgba(255, 255, 255, 0.5)';
       let _text = '加载中';
       let _customClass = 'mp-general-loading-box opAnimate';
-      // // console.log(url);
       if (url === '/Api/Quotation/Save' || url === '/Api/Order/Create') {
         _color = 'rgba(0, 0, 0, 0.7)';
         _text = '文件上传成功，正在提交...';
@@ -64,7 +63,6 @@ axios.interceptors.request.use(
       if (url === '/Api/Product/Detail') _text = '请稍候，正在获取产品信息...';
       if (url === '/Api/Quotation/List') _text = '正在获取购物车信息...';
       if (url === '/Api/Product/List') _text = '获取产品列表信息...';
-      // // console.log(url, closeLoading);
       loadingInstance = Loading.service({
         lock: true,
         text: _text,
@@ -110,8 +108,6 @@ axios.interceptors.response.use(
     // eslint-disable-next-line max-len
     const oneCondition4NotNeedToast = !([9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(response.data.Status) && ['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url));
     //  || !['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url))
-
-    // // console.log(oneCondition4NotNeedToast);
 
     if ([7025, 8037].includes(response.data.Status)) {
       // Message({
