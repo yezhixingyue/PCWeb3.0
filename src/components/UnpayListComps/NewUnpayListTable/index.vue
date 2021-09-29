@@ -31,7 +31,7 @@
             >全选</el-checkbox
           >
           <span class="gray"
-            >共检测出 <i class="is-pink">{{ unpayDataNumber }}</i> 个订单</span
+            >共检测出 <i class="is-pink">{{ unpayDataNumber }}</i> 个付款单</span
           >
         </div>
         <div class="right">
@@ -56,7 +56,7 @@
             >
             <span class="gray"
               >共检测出
-              <i class="is-pink">{{ unpayDataNumber }}</i> 个订单</span
+              <i class="is-pink">{{ unpayDataNumber }}</i> 个付款单</span
             >
           </div>
           <div class="right">
@@ -228,7 +228,6 @@ export default {
       this.isAddPrepare = true;
     },
     submitCancelOrder() {
-      console.log('submitCancelOrder 取消选中', this.multipleSelection, this.isAddPrepare);
       this.$store.dispatch('unpayList/getOrderCancle', [this.multipleSelection, this.isAddPrepare]);
     },
   },

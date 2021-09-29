@@ -1,16 +1,22 @@
 <template>
   <CanFreeCreateSelectComp
-    v-if="!isRadio"
+    v-if="!isRadio && !isMultiple"
     v-model="checkVal"
     :placeholder="placeholder"
     :isDisabled="isDisabled"
     :allow-create="Allow"
     :options="localOptions"
     :isMultiple="isMultiple"
+    :DisplayWidth='DisplayWidth'
     :DisabledOptionList='DisabledOptionList'
     @blur="onBlur"
     @change="onSelectChange"
   />
+  <el-checkbox-group v-else-if="isMultiple" v-model="checkVal" class="mp-erp-option-type-element-display-check-group-select-comp">
+    <el-checkbox v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID" :disabled='DisabledOptionList.includes(item.ID)'>
+      {{item.Name}}
+    </el-checkbox>
+  </el-checkbox-group>
   <el-radio-group v-model="checkVal" v-else :disabled="isDisabled" @change="onSelectChange">
     <el-radio v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID"
      @click.native.stop="onRadioItemClick(item)" :disabled='DisabledOptionList.includes(item.ID)'>{{
@@ -68,6 +74,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    DisplayWidth: {
+      type: Number,
+      default: 140,
+    },
   },
   components: {
     CanFreeCreateSelectComp,
@@ -77,7 +87,8 @@ export default {
       get() {
         return this.value;
       },
-      set(val) { // 单选传字符串  多选传数值
+      set(val) { // 单选传字符串  多选传数组
+        console.log(val);
         this.$emit('change', val);
       },
     },
@@ -169,4 +180,14 @@ export default {
 };
 </script>
 <style lang='scss'>
+.mp-erp-option-type-element-display-check-group-select-comp {
+  display: inline-block;
+  white-space: normal;
+  margin-left: 5px;
+  margin-bottom: -5px;
+  vertical-align: top;
+  .el-checkbox__label {
+    font-size: 13px;
+  }
+}
 </style>

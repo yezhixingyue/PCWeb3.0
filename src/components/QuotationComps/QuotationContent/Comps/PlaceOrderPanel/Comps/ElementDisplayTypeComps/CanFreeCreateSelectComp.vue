@@ -14,6 +14,7 @@
     @change="onChange"
     ref="oSelect"
     size="small"
+    :style="`width:${DisplayWidth}px`"
     class="mp-erp-option-type-element-display-select-comp">
     <el-option
       v-for="item in options"
@@ -45,10 +46,10 @@ export default {
       type: Boolean,
       default: false,
     },
-    filterable: { // 是否可多选
-      type: Boolean,
-      default: true,
-    },
+    // filterable: { // 是否可多选
+    //   type: Boolean,
+    //   default: true,
+    // },
     isDisabled: {
       type: Boolean,
       default: false,
@@ -56,6 +57,10 @@ export default {
     DisabledOptionList: {
       type: Array,
       default: () => [],
+    },
+    DisplayWidth: {
+      type: Number,
+      default: 140,
     },
   },
   computed: {
@@ -115,6 +120,16 @@ export default {
     font-size: 12px;
     &::placeholder {
       font-size: 12px;
+    }
+  }
+  &.el-select {
+    margin-right: 10px;
+    margin-left: 5px;
+    .el-input {
+      input {
+        height: 30px;
+        line-height: 28px;
+      }
     }
   }
 }

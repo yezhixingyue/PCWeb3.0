@@ -176,11 +176,9 @@ export default {
   },
   methods: {
     onOpen() {
-      console.log('onOpen 初始化渲染数据');
       this.$store.dispatch('common/getExpressList');
     },
     onClosed() {
-      console.log('onClosed 还原部分状态');
     },
     onSubmit() {
       this.$emit('submit', { ...this.requestObj, PayInFull: this.PayInFull });

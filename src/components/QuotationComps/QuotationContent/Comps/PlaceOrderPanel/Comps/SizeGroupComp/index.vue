@@ -18,14 +18,15 @@
       :isDisabled='isDisabled'
       :ElementList="Property.GroupInfo.ElementList"
       :errorElementID="errorElementID"
+      :showCheckBox='showCheckBox'
+      :isCustomize='isCustomize'
+      @checkedChange='val => isCustomize = val'
       @triggerInteraction='onTriggerInteractionClick'
     />
     <el-checkbox
       v-model="isCustomize"
-      v-if="
-        Property.AllowCustomer &&
-        Property.SizeList.length > 0
-      "
+      v-if="showCheckBox"
+      v-show="!isCustomize"
       >自定义</el-checkbox
     >
   </section>
@@ -108,6 +109,9 @@ export default {
       }
       return false;
     },
+    showCheckBox() {
+      return this.Property.AllowCustomer && this.Property.SizeList.length > 0;
+    },
   },
   methods: {
     onTriggerInteractionClick(e) {
@@ -148,6 +152,9 @@ export default {
 </script>
 <style lang='scss'>
 .mp-place-order-panel-form-item-size-group-comp-wrap {
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
   > ul.customize {
     display: inline-block;
     > li {

@@ -1,44 +1,46 @@
 <template>
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="List.length === 0 || showTop">
-      <span class="blue-span" v-show="List.length === 0" @click="onAddClick" :class="{disabled:disabled}"
+      <span class="blue-span" v-show="List.length === 0 && !hideCtrl" @click="onAddClick" :class="{disabled:disabled}"
         >+ 添加</span
       >
     </div>
-    <ul>
+    <ul :class="{'y-display': !IsHorizontalDisplay, hideCtrl: hideCtrl}">
       <li
         v-for="(item, index) in List"
         :key="item.key"
         :class="{ f: index === 0 }"
       >
-        <ElementTypeComp
-          v-for="(it) in Property.ElementList"
-          :key="it.ID"
-          :needInit="needInit"
-          :Property="it"
-          :value="getItemValue(index, it)"
-          :isDisabled='disabled'
-          @input="onItemValueChange(index, it, $event)"
-          @interaction="onTriggerInteractionClick"
-          :AffectedPropList='getChildUseAffectedPropList(it, index)'
-          :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
-        />
-        <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!(List.length === minLength && List.length === maxLength)" v-show="!disabled">
-          <li class="f" >
-            <div @click="onDelClick(index)" v-show="List.length > minLength">
-              <i class="iconfont icon-shanchu is-pink"></i>
-              <span>删除</span>
-            </div>
-          </li>
-          <li v-show="fillWidth || (index === List.length - 1 && List.length < maxLength)">
-            <span
-              class="blue-span"
-              @click="onAddClick"
-              v-show="index === List.length - 1 && List.length < maxLength"
-              >+ 添加</span
-            >
-          </li>
-        </ul>
+        <div>
+          <ElementTypeComp
+            v-for="(it) in Property.ElementList"
+            :key="it.ID"
+            :needInit="needInit"
+            :Property="it"
+            :value="getItemValue(index, it)"
+            :isDisabled='disabled'
+            @input="onItemValueChange(index, it, $event)"
+            @interaction="onTriggerInteractionClick"
+            :AffectedPropList='getChildUseAffectedPropList(it, index)'
+            :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
+          />
+          <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!hideCtrl" v-show="!disabled">
+            <li class="f" >
+              <div @click="onDelClick(index)" v-show="List.length > minLength">
+                <i class="iconfont icon-shanchu is-pink"></i>
+                <span>删除</span>
+              </div>
+            </li>
+            <li v-show="fillWidth || (index === List.length - 1 && List.length < maxLength)">
+              <span
+                class="blue-span"
+                @click="onAddClick"
+                v-show="index === List.length - 1 && List.length < maxLength"
+                >+ 添加</span
+              >
+            </li>
+          </ul>
+        </div>
       </li>
     </ul>
   </section>
@@ -122,6 +124,13 @@ export default {
         return combineList.filter((it) => it.Property && it.Property.Element && it.Property.Group);
       });
     },
+    IsHorizontalDisplay() { // 是否横轴（水平）展示
+      if (this.Property) return this.Property.IsHorizontalDisplay;
+      return true;
+    },
+    hideCtrl() {
+      return this.maxLength === this.minLength;
+    },
   },
   data() {
     return {
@@ -184,44 +193,83 @@ export default {
 .mp-place-order-panel-element-group-setup-comp-wrap {
   > ul {
     > li {
-      > .ctrl {
-        display: inline-block;
-        margin-left: 25px;
-        &.fillWidth {
-          width: 120px;
-        }
-        > li {
+      > div {
+        > .ctrl {
           display: inline-block;
-          // width: 45px;
-          > div {
+          margin-left: 25px;
+          &.fillWidth {
+            width: 120px;
+          }
+          > li {
             display: inline-block;
-            cursor: pointer;
-            > span {
-              color: #aaa;
-              margin-left: 9px;
-              user-select: none;
-              transition: color 0.1s ease-in-out;
-            }
-            > i {
-              position: relative;
-              top: -1px;
-            }
-            &:hover {
+            // width: 45px;
+            > div {
+              display: inline-block;
+              cursor: pointer;
               > span {
-                color: #585858;
+                color: #aaa;
+                margin-left: 9px;
+                user-select: none;
+                transition: color 0.1s ease-in-out;
+              }
+              > i {
+                position: relative;
+                top: -1px;
+              }
+              &:hover {
+                > span {
+                  color: #585858;
+                }
+              }
+            }
+            &.f {
+              > div {
+                padding-right: 24px;
               }
             }
           }
-          &.f {
-            > div {
-              padding-right: 24px;
-            }
+        }
+        .mp-place-order-content-element-type-show-item-comp-wrap {
+          > label.el-title {
+            width: 4em;
           }
         }
       }
       margin-top: 10px;
       &.f {
         margin-top: 0;
+      }
+    }
+    &.y-display {
+      > li {
+        > div {
+          display: inline-block;
+          position: relative;
+          padding-right: 160px;
+          > .mp-place-order-content-element-type-show-item-comp-wrap {
+            display: block;
+            margin-bottom: 10px;
+            > label.el-title {
+              width: 88px !important;
+              padding-right: 12px;
+              white-space: nowrap;
+            }
+            &:last-of-type {
+              margin-bottom: 0;
+            }
+          }
+          > ul.ctrl {
+            position: absolute;
+            right: 0;
+            bottom: -2px;
+            width: 120px;
+          }
+        }
+      }
+      &.hideCtrl {
+        > div {
+          padding-right: 0;
+        }
       }
     }
   }

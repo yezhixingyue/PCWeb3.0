@@ -335,9 +335,16 @@ export default {
       this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
       this.$emit('partInteraction');
       this.getSubGroupAffectedPropList();
-      this.$nextTick(() => {
-        this.onChangeValidate();
-      });
+      // this.$nextTick(() => {
+      //   this.onChangeValidate();
+      // });
+    },
+  },
+  watch: {
+    localAffectedPropList(newVal, oldVal) {
+      // console.log(newVal, oldVal);
+      if ((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0)) return;
+      this.onChangeValidate();
     },
   },
   mounted() {
@@ -356,7 +363,7 @@ export default {
       margin-left: -100px;
       > ul {
         > li {
-          > div {
+          > div > div {
             &:first-of-type {
               > label {
                 width: 88px;
@@ -387,7 +394,8 @@ export default {
     color: #333 !important;
   }
   &.el-form-item--mini .el-form-item__error {
-    padding-top: 2px;
+    padding-top: 1px;
+    line-height: 14px;
   }
 }
 </style>

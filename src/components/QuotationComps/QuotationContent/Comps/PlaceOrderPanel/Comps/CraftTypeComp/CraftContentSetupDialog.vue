@@ -378,7 +378,7 @@ export default {
           margin-left: -100px;
           > ul {
             > li {
-              > div {
+              > div > div {
                 &:first-of-type {
                   > label {
                     width: 88px;

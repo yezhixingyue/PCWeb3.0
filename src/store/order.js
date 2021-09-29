@@ -117,6 +117,7 @@ export default {
           t.Funds.Refund = t.Funds.HavePaid;
           t.Funds.Unpaid = 0;
           t.Status = 254;
+          state.orderTotalAmount = +(state.orderTotalAmount - t.Funds.FinalPrice).toFixed(2);
         }
       }
     },

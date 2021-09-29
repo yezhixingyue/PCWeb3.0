@@ -1,5 +1,5 @@
 <template>
-  <el-switch
+  <!-- <el-switch
     v-model="switchValue"
     active-color="#428dfa"
     inactive-color="#DCDFE6"
@@ -8,7 +8,10 @@
     :disabled='isDisabled'
     :active-text="Words"
     class="mp-erp-switch-type-element-display-select-comp">
-  </el-switch>
+  </el-switch> -->
+  <el-checkbox v-model="switchValue" :disabled='isDisabled' class="mp-erp-switch-type-element-display-select-comp">
+    {{Words}}
+  </el-checkbox>
 </template>
 
 <script>
@@ -38,6 +41,8 @@ export default {
         return this.value;
       },
       set(val) {
+        // const _val = val ? this.OpenValue : this.CloseValue;
+        console.log(val);
         this.$emit('input', val);
         this.$emit('blur', val);
       },
@@ -48,22 +53,12 @@ export default {
 <style lang='scss'>
 .mp-erp-switch-type-element-display-select-comp {
   margin-left: 5px;
-  // &.el-switch {
-  //   .el-switch__core {
-  //     height: 17px;
-  //     width: 38px !important;
-  //     &::after {
-  //       top: 1px;
-  //       height: 13px;
-  //       width: 13px;
-  //     }
-  //   }
-  //   &.is-checked .el-switch__core::after {
-  //     margin-left: -14px;
-  //   }
-  // }
-  input {
-    width: unset !important;
+  width: auto !important;
+  width: unset !important;
+  .el-checkbox__label {
+    font-size: 13px;
+    position: relative;
+    top: 1px;
   }
 }
 </style>

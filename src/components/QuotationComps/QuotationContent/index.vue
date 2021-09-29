@@ -520,7 +520,6 @@ export default {
       return resp;
     },
     clearAdd() {
-      console.log('clearAdd');
       this.$refs.oConsigneeAddressSetpComp.initCurAddIndex();
     },
   },
@@ -647,14 +646,6 @@ export default {
       .el-input {
         width: unset;
         width: auto\0;
-      }
-      input {
-        width: 140px;
-        height: 30px;
-        line-height: 28px;
-        margin-left: 5px;
-        margin-right: 10px;
-        padding: 0 20px 0 10px;
       }
       .el-input__suffix {
         right: 10px;

@@ -67,10 +67,8 @@ export default {
   },
   watch: {
     curQueryPath(newVal, oldVal) {
-      if (!newVal) return;
-      console.log(newVal, oldVal);
-      // this.handleProductSelected(newVal);
-      // console.log('curQueryPath -- watch - change', newVal);
+      if (!newVal || newVal === oldVal) return;
+      this.handleProductSelected(newVal);
     },
   },
 };

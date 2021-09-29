@@ -159,8 +159,8 @@ export default {
         position: absolute;
         top: 50%;
         left: 50%;
-        transition: 0.25s !important;
-        transform: translate(-50%, -50%) rotate(0deg);
+        transition: 0.2s !important;
+        transform: translate(-50%, -50%) rotate(90deg);
         background: url("../../../assets/images/right-arrow.png") center
           no-repeat;
         background-size: 100% 100%;

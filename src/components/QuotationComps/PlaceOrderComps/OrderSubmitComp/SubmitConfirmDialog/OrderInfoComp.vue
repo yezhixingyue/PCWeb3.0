@@ -16,7 +16,7 @@
       </li>
       <li>
         <span class="label">文件内容：</span>
-        <div class="text" style="min-height:80px;color:#888">{{orderInfo.FileContent || ''}}</div>
+        <div class="text" style="min-height:80px;color:#888">{{orderInfo.FileContent || '无'}}</div>
       </li>
       <li>
         <span class="label">交货工期：</span>

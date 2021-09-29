@@ -28,10 +28,10 @@ const getElementValueContent = (CustomerInputValues, origin, giveUpUnit) => {
       const { Unit } = origin;
       if (Value || Value === 0) return Unit && !giveUpUnit ? `${+Value}${Unit || ''}` : `${+Value}`;
     }
-    if (origin.Type === 3 && origin.SwitchAttribute) { // 开关类型
+    if (origin.Type === 3 && origin.SwitchAttribute) { // 开关类型=
       const [{ Value }] = CustomerInputValues;
       if (+Value === origin.SwitchAttribute.OpenValue) return origin.SwitchAttribute.Words;
-      if (+Value === origin.SwitchAttribute.CloseValue) return `不${origin.SwitchAttribute.Words}`;
+      // if (+Value === origin.SwitchAttribute.CloseValue) return `不${origin.SwitchAttribute.Words}`;
     }
   }
   return '';
@@ -195,6 +195,8 @@ const getElementValueContentFromDetail = (target, giveUpUnit) => {
   if (Array.isArray(target.CustomerInputValues) && target.CustomerInputValues.length > 0) {
     if (target.CustomerInputValues.length > 1) {
       Content = target.CustomerInputValues.map(it => it.Name).join('、');
+    } else if (target.Attributes.Type === 3 && !target.CustomerInputValues[0].IsOpen) {
+      Content = '';
     } else {
       Content = target.CustomerInputValues[0].Name;
       if (target.Attributes.Unit && !giveUpUnit) Content += target.Attributes.Unit;
@@ -502,9 +504,9 @@ export default class ProductDetailTypeShowClass {
             }
             break;
           case '尺寸组':
-            if (ProductParams.Size.DisplayName) {
-              const Label = ProductParams.Size?.SizeGroup?.GroupInfo?.Name || '尺寸';
-              arr.push({ type: 'Size', Label, Content: ProductParams.Size.DisplayName });
+            if (ProductParams.Size?.DisplayContent) {
+              const Label = ProductParams.Size.GroupName || '尺寸';
+              arr.push({ type: 'Size', Label, Content: ProductParams.Size.DisplayContent });
             }
             break;
           case '物料':

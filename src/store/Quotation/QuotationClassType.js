@@ -64,7 +64,7 @@ export default class QuotationClassType {
         break;
       case 3: // 开关
         if (el.SwitchAttribute) {
-          temp[0].Value = el.SwitchAttribute.DefaultOpen ? `${el.SwitchAttribute.OpenValue}` : `${el.SwitchAttribute.CloseValue}`;
+          temp[0].IsOpen = el.SwitchAttribute.DefaultOpen || false;
         }
         break;
       default:

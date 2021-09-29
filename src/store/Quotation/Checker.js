@@ -49,7 +49,7 @@ const _elementTypeChecker = (value, element) => {
             arr.fill('0');
             T = `1${arr.join('')}`;
             if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
-              const msg = `输入值不合法，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
+              const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
               return { msg, result: false };
             }
           }

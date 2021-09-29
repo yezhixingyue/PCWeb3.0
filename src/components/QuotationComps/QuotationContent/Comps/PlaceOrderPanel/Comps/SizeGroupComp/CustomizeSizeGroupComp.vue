@@ -13,8 +13,15 @@
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
       >
       <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled' @interaction="handleInteraction"
-       @focus="onFocus(i)" @blur="onBlur" isNumberic :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
+       @focus="onFocus(i)" @blur="onBlur" isNumberic :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
       <i v-if="i < ElementList.length - 1">×</i>
+    </li>
+    <li style="margin-left:20px">
+      <el-checkbox
+      v-model="checked"
+      v-if="showCheckBox"
+      >自定义</el-checkbox
+    >
     </li>
   </ul>
 </template>
@@ -38,6 +45,14 @@ export default {
       default: '',
     },
     isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    showCheckBox: {
+      type: Boolean,
+      default: false,
+    },
+    isCustomize: {
       type: Boolean,
       default: false,
     },
@@ -66,6 +81,14 @@ export default {
     },
     ElementValueActiveList() {
       return this.ElementValues.map(it => this.getIsActive(it));
+    },
+    checked: {
+      get() {
+        return this.isCustomize;
+      },
+      set(val) {
+        this.$emit('checkedChange', val);
+      },
     },
   },
   methods: {
@@ -113,14 +136,16 @@ export default {
 .mp-place-order-panel-size-group-customise-comp-containner {
   display: inline-block;
   margin-right: 20px;
-  height: 30px;
+  min-height: 30px;
+  margin-top: -11px;
   > li {
     display: inline-block;
     position: relative;
+    margin-top: 11px;
     .mp-erp-number-type-element-option-display-input-comp,
     .mp-erp-number-type-element-display-input-comp {
       input {
-        width: 80px !important;
+        // width: 80px !important;
         border: none;
         border-bottom: 1px solid rgb(229, 229, 229);
         border-radius: 0;
@@ -159,7 +184,7 @@ export default {
     &.active {
       > .fixed {
         left: -3px;
-        top: -5px;
+        top: -6px;
         font-size: 12px;
       }
     }

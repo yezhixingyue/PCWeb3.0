@@ -7,12 +7,14 @@
     size="small"
     class="mp-erp-number-type-element-display-input-comp"
     maxlength="9"
+    :style="`width:${DisplayWidth}px`"
     :disabled='isDisabled'
   ></el-input>
   <CanFreeCreateSelectComp
     v-else
     :allow-create="Allow"
     :placeholder="placeholder"
+    :DisplayWidth='DisplayWidth'
     v-model="content"
     @focus="onFocus"
     @blur="onBlur"
@@ -55,6 +57,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    DisplayWidth: {
+      type: Number,
+      default: 140,
+    },
   },
   components: {
     CanFreeCreateSelectComp,
@@ -92,6 +98,14 @@ export default {
 .mp-erp-number-type-element-display-input-comp {
   .el-input__inner {
     font-size: 12px;
+  }
+  &.el-input {
+    margin-right: 10px;
+    margin-left: 5px;
+    input {
+      height: 30px;
+      line-height: 28px;
+    }
   }
 }
 .mp-erp-number-type-element-display-select-comp {

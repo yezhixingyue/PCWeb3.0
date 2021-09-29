@@ -156,7 +156,7 @@ export default {
     },
     getSize({ ProductParams }) {
       const { Size } = ProductParams;
-      return Size && Size.DisplayName ? Size.DisplayName : '';
+      return Size && Size.DisplayContent ? Size.DisplayContent : '';
     },
     getNumber({ Attributes }) {
       const { Unit, ProductAmount, KindCount } = Attributes;

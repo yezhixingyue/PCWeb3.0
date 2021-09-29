@@ -1,6 +1,6 @@
 <template>
   <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden">
-    <label v-if="!hiddenLabel && !Property.IsNameHidden">{{Property.Name}}：</label>
+    <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">{{Property.Name}}：</label>
     <!-- 数字类型 -->
     <NumberTypeItemComp
      v-if="Property.Type === 1"
@@ -9,6 +9,7 @@
      @focus="onFocus"
      @blur="onBlur"
      :isNumberic='isNumberic'
+     :DisplayWidth='DisplayWidth'
      :isDisabled='isDisabled || disabled'
      :Allow="Property.NumbericAttribute.AllowCustomer" />
     <!-- 选项类型 -->
@@ -22,6 +23,7 @@
      :isDisabled='isDisabled || disabled'
      :DisabledOptionList='DisabledOptionList'
      :HiddenOptionList='HiddenOptionList'
+     :DisplayWidth='DisplayWidth'
      :SelectMode='Property.OptionAttribute.SelectMode'
      @blur="onBlur" />
     <!-- 开关 -->
@@ -71,6 +73,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    SuggesWidth: { // 建议元素宽度
+      type: Number,
+      default: 140,
+    },
   },
   components: {
     NumberTypeItemComp,
@@ -81,8 +87,11 @@ export default {
     ...mapState('Quotation', ['isOrderRestore']),
     PropValue: {
       get() {
-        if (this.Property.Type !== 2) { // 非选项类型
+        if (this.Property.Type === 1) { // 数值类型
           return Array.isArray(this.value) && this.value.length > 0 ? this.value[0].Value : '';
+        }
+        if (this.Property.Type === 3) { // 开关类型
+          return Array.isArray(this.value) && this.value.length > 0 ? this.value[0].IsOpen : '';
         }
         if (this.Property.OptionAttribute?.IsRadio) {
           return Array.isArray(this.value) && this.value.length > 0 ? this.value[0].Name || this.value[0].ID : '';
@@ -93,8 +102,11 @@ export default {
         return '';
       },
       set(val) {
-        if (this.Property.Type !== 2) { // 非选项类型
+        if (this.Property.Type === 1) { // 数值类型
           const temp = { Value: `${val}` };
+          this.$emit('input', [temp]);
+        } else if (this.Property.Type === 3) { // 开关
+          const temp = { IsOpen: val };
           this.$emit('input', [temp]);
         } else if (this.Property.OptionAttribute && this.Property.OptionAttribute.IsRadio) {
           const temp = { ID: '', Name: '' };
@@ -128,6 +140,20 @@ export default {
     disabledDefine() {
       return this.DisabledOptionList.includes('00000000-0000-0000-0000-000000000000');
     },
+    DisplayWidth() { // 只数值元素与选项元素有效
+      if (this.Property) {
+        const { Type, NumbericAttribute, OptionAttribute } = this.Property;
+        if (Type === 1 && NumbericAttribute) {
+          const { DisplayWidth } = NumbericAttribute;
+          if (DisplayWidth) return DisplayWidth;
+        }
+        if (Type === 2 && OptionAttribute) {
+          const { DisplayWidth } = OptionAttribute;
+          if (DisplayWidth) return DisplayWidth;
+        }
+      }
+      return this.SuggesWidth ? this.SuggesWidth : 140;
+    },
   },
   data() {
     return {
@@ -135,23 +161,6 @@ export default {
     };
   },
   methods: {
-    // handleDefaultValueInit() {
-    //   if (this.Property.Type === 2 && this.Property.OptionAttribute) { // 选项值 单选 | 多选
-    //     const ValueList = this.Property.OptionAttribute.OptionList?.filter(it => it.IsChecked).map(it => ({ ID: it.ID })) || [];
-    //     this.$emit('input', ValueList);
-    //   }
-    //   if (this.Property.Type === 1 && this.Property.NumbericAttribute) { // 数字值
-    //     let Value = this.Property.NumbericAttribute.CheckedValue;
-    //     if (!Value && Value !== 0) Value = '';
-    //     const ValueList = [{ Value: `${Value}` }];
-    //     this.$emit('input', ValueList);
-    //   }
-    //   if (this.Property.Type === 3 && this.Property.SwitchAttribute) { // 开关
-    //     const Value = this.Property.SwitchAttribute.DefaultOpen ? this.Property.SwitchAttribute.OpenValue : this.Property.SwitchAttribute.CloseValue;
-    //     const ValueList = [{ Value: `${Value}` }];
-    //     this.$emit('input', ValueList);
-    //   }
-    // },
     onFocus() {
       this.$emit('focus');
     },
@@ -165,10 +174,6 @@ export default {
     },
   },
   mounted() {
-    // 1. 后续需要有一个枚举值来确定是否需要初始化该默认数据(如编辑或还原时需保留原数据，不可使用默认数据处理)
-    // if (!this.isOrderRestore && this.needInit) {
-    //   this.handleDefaultValueInit();
-    // }
   },
 };
 </script>
@@ -176,6 +181,7 @@ export default {
 .mp-place-order-content-element-type-show-item-comp-wrap {
   display: inline-block;
   margin-right: 20px;
+  white-space: nowrap;
   &:last-of-type {
     margin-right: 0;
   }

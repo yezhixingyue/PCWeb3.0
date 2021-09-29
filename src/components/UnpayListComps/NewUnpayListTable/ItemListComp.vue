@@ -302,8 +302,8 @@ export default {
         position: absolute;
         top: calc(50% + 3px);
         right: -12px;
-        transition: 0.3s !important;
-        transform: translate(-50%, -50%) rotate(0deg);
+        transition: 0.2s !important;
+        transform: translate(-50%, -50%) rotate(90deg);
         background: url("../../../assets/images/right-arrow.png") center no-repeat;
         background-size: 7px 10px;
         &.active {
