@@ -362,6 +362,7 @@ export default {
       padding-bottom: 25px;
       margin-left: 15px\0;
       margin-right: 15px\0;
+      max-width: 1020px;
       > main {
         max-height: 420px;
         overflow-y: scroll;

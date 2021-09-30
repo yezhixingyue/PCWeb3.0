@@ -160,10 +160,9 @@ export default {
       return this.FullPayout;
     },
     PayOnDelivery() {
-      if ((this.ProductPrice || this.ProductPrice === 0) && (this.onLineAmount || this.onLineAmount === 0)) {
-        return +((this.ProductPrice - this.onLineAmount).toFixed(2));
-      }
-      return '';
+      const price = this.OrderPreData ? +(this.OrderPreData.PayOnDelivery.toFixed(2)) : '';
+      if (!this.PayInFull) return price;
+      return 0;
     },
     FundBalance() {
       return this.OrderPreData ? this.OrderPreData.FundBalance : '';

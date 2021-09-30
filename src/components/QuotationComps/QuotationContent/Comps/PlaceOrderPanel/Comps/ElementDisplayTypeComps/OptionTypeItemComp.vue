@@ -8,11 +8,13 @@
     :options="localOptions"
     :isMultiple="isMultiple"
     :DisplayWidth='DisplayWidth'
+    :DisplayWidthIsAuto='DisplayWidthIsAuto'
     :DisabledOptionList='DisabledOptionList'
     @blur="onBlur"
     @change="onSelectChange"
   />
-  <el-checkbox-group v-else-if="isMultiple" v-model="checkVal" class="mp-erp-option-type-element-display-check-group-select-comp">
+  <el-checkbox-group v-else-if="isMultiple" v-model="checkVal"
+   :disabled="isDisabled" class="mp-erp-option-type-element-display-check-group-select-comp" @change="onSelectChange">
     <el-checkbox v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID" :disabled='DisabledOptionList.includes(item.ID)'>
       {{item.Name}}
     </el-checkbox>
@@ -77,6 +79,10 @@ export default {
     DisplayWidth: {
       type: Number,
       default: 140,
+    },
+    DisplayWidthIsAuto: { // 是否宽度可自定义
+      type: Boolean,
+      default: true,
     },
   },
   components: {

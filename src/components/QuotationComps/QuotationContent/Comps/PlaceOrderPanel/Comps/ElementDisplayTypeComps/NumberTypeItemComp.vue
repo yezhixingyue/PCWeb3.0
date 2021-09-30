@@ -15,6 +15,7 @@
     :allow-create="Allow"
     :placeholder="placeholder"
     :DisplayWidth='DisplayWidth'
+    :DisplayWidthIsAuto='DisplayWidthIsAuto'
     v-model="content"
     @focus="onFocus"
     @blur="onBlur"
@@ -60,6 +61,10 @@ export default {
     DisplayWidth: {
       type: Number,
       default: 140,
+    },
+    DisplayWidthIsAuto: { // 是否宽度可自定义
+      type: Boolean,
+      default: true,
     },
   },
   components: {

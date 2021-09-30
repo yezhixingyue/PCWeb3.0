@@ -231,7 +231,7 @@ export default {
         }
         .mp-place-order-content-element-type-show-item-comp-wrap {
           > label.el-title {
-            width: 4em;
+            min-width: 4em;
           }
         }
       }

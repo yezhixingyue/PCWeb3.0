@@ -299,10 +299,11 @@ export default class QuotationClassType {
     // 转换数值 清除为空的元素值等
     const getSingleElementClearValue = ElVal => {
       if (!ElVal || !Array.isArray(ElVal.CustomerInputValues) || ElVal.CustomerInputValues.length === 0) return null;
-      const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value }) => {
+      const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen }) => {
         if (ID) return { ID };
         if (Name) return { Name };
         if (Value) return { Value };
+        if (IsOpen || IsOpen === false) return { IsOpen };
         return null;
       }).filter(it => it);
       if (CustomerInputValues.length === 0 && clearEmpty) return null;

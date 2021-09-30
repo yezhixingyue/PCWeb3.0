@@ -10,6 +10,7 @@
      @blur="onBlur"
      :isNumberic='isNumberic'
      :DisplayWidth='DisplayWidth'
+     :DisplayWidthIsAuto='DisplayWidthIsAuto'
      :isDisabled='isDisabled || disabled'
      :Allow="Property.NumbericAttribute.AllowCustomer" />
     <!-- 选项类型 -->
@@ -24,6 +25,7 @@
      :DisabledOptionList='DisabledOptionList'
      :HiddenOptionList='HiddenOptionList'
      :DisplayWidth='DisplayWidth'
+     :DisplayWidthIsAuto='DisplayWidthIsAuto'
      :SelectMode='Property.OptionAttribute.SelectMode'
      @blur="onBlur" />
     <!-- 开关 -->
@@ -140,19 +142,26 @@ export default {
     disabledDefine() {
       return this.DisabledOptionList.includes('00000000-0000-0000-0000-000000000000');
     },
-    DisplayWidth() { // 只数值元素与选项元素有效
+    SetupDisplayWidth() { // 只数值元素与选项元素有效
       if (this.Property) {
         const { Type, NumbericAttribute, OptionAttribute } = this.Property;
         if (Type === 1 && NumbericAttribute) {
-          const { DisplayWidth } = NumbericAttribute;
-          if (DisplayWidth) return DisplayWidth;
+          const { DisplayWidth, IsWidthAdaption } = NumbericAttribute;
+          if (DisplayWidth && !IsWidthAdaption) return DisplayWidth;
         }
         if (Type === 2 && OptionAttribute) {
-          const { DisplayWidth } = OptionAttribute;
-          if (DisplayWidth) return DisplayWidth;
+          const { DisplayWidth, IsWidthAdaption } = OptionAttribute;
+          if (DisplayWidth && !IsWidthAdaption) return DisplayWidth;
         }
       }
+      return 0;
+    },
+    DisplayWidth() {
+      if (this.SetupDisplayWidth) return this.SetupDisplayWidth;
       return this.SuggesWidth ? this.SuggesWidth : 140;
+    },
+    DisplayWidthIsAuto() {
+      return !this.SetupDisplayWidth || false;
     },
   },
   data() {
@@ -188,7 +197,7 @@ export default {
   > label {
     color: #888;
     font-size: 13px;
-    width: 7em;
+    // width: 7em;
     overflow: hidden;
     text-align: right;
     display: inline-block;

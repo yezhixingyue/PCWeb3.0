@@ -11,12 +11,17 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
   if (!Element || !ElementValList || !ElementList) return null;
   const t = ElementValList.find(it => it.ElementID === Element.ID);
   const _El = ElementList.find(it => it.ID === Element.ID);
+  console.log('_El', _El, _El.Name);
   if (!t || !_El) return null;
-  if (!t.CustomerInputValues || t.CustomerInputValues.length === 0) return null;
+  if (!t.CustomerInputValues || t.CustomerInputValues.length === 0) {
+    if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) return [];
+    return null;
+  }
   // 获取元素值
   let _Value = '';
   if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) { // 多选选项元素
     _Value = t.CustomerInputValues.map(it => it.ID).filter(it => it);
+    // _Value = t.CustomerInputValues.map(it => it.ID || ''); // 不筛选空值
   } else {
     const [{ ID, Name, Value, IsOpen }] = t.CustomerInputValues;
     _Value = ID || Name || Value || IsOpen;
@@ -65,13 +70,13 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
  * @return {*}
  */
 const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) => {
-  console.log('getElementGroupTypeValue');
   let _GroupValue;
   if (target && targetOriginData) {
     if (!Element) { // 元素组本身
       if (FixedType === 4) _GroupValue = target.List.length; // 元素组使用次数
     } else {
       const ElValues = target.List.map(({ List }) => getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList)).filter(_it => _it);
+      // const ElValues = target.List.map(({ List }) => getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList)); // 不筛选空值
       // temp = getElementTypeValue(Element, FixedType, ElValues);
       if (ElValues.length === 0) return null;
       switch (FixedType) {
@@ -88,9 +93,18 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
           break;
       }
       if (!FixedType && FixedType !== 0) {
-        console.log(ElValues);
-        if (Array.isArray(ElValues[0])) _GroupValue = ElValues.reduce((prev, next) => [...prev, ...next], []); // 多选选项元素时
-        else _GroupValue = [...ElValues]; // 单选时
+        // if (Array.isArray(ElValues[0])) _GroupValue = ElValues.reduce((prev, next) => [...prev, ...next], []); // 多选选项元素时
+        if (Array.isArray(ElValues[0])) _GroupValue = [...ElValues]; // 多选选项元素时
+        else { // 单选时
+          // 此处需要判断所在元素组的使用次数
+          const { UseTimes } = targetOriginData;
+          if (UseTimes && UseTimes.MinValue === 1 && UseTimes.MaxValue === 1) { // 单次使用元素组的单选元素 - 直接返回值 -> 同普通元素（非元素组元素）
+            const [_val] = ElValues;
+            _GroupValue = _val;
+          } else { // 多次使用元素组的单选元素
+            _GroupValue = [...ElValues];
+          }
+        }
         // if (Array.isArray(ElValues[0])) _GroupValue = [...ElValues]; // 多选选项元素时
         // else _GroupValue = [[...ElValues]]; // 单选时
       }
@@ -220,6 +234,50 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
   return temp;
 };
 
+const getArrayIsEqual = (arr1, arr2) => { // 都为字符串或数字组成的数组
+  if (arr1.length !== arr2.length) return false;
+  // 进行去重操作
+  const _arr1 = [...new Set(arr1)];
+  const _arr2 = [...new Set(arr2)];
+  if (_arr1.length !== _arr2.length) return false;
+  const t = _arr1.find(it => !_arr2.includes(it));
+  return !t;
+};
+
+const getValueIsContainList = (value, ValueList) => { // 获取是否包含结果
+  if (value.length === 0) return false;
+  const Values = ValueList.map(it => it.Value);
+  const compareFunc = (arr) => { // 获取到是否严格匹配的结果 匹配成功则返回true
+    const _arr = [...new Set(arr)]; // 去重
+    const len1 = _arr.length;
+    if (len1 < Values.length) return false;
+    const unionSet = [...new Set([...arr, ...Values])];
+    const len2 = unionSet.length;
+    return len1 === len2;
+  };
+  if (Array.isArray(value[0])) { // 严格匹配每一个
+    const t = value.find(arrItem => !compareFunc(arrItem));
+    return !t;
+  }
+  // 去重后再严格匹配
+  return compareFunc(value);
+};
+
+const getValueIsNotContainList = (value, ValueList) => { // 获取是否不包含结果
+  if (value.length === 0) return true;
+  const Values = ValueList.map(it => it.Value);
+  const compareFunc = (arr) => { // 获取到是否严格匹配的结果 匹配成功则返回true
+    const target = arr.find(it => Values.includes(it));
+    return !target;
+  };
+  if (Array.isArray(value[0])) { // 严格匹配每一个
+    const t = value.find(arrItem => !compareFunc(arrItem));
+    return !t;
+  }
+  // 去重后再严格匹配
+  return compareFunc(value);
+};
+
 /**
  * @description: 判断 值、关系、对比结果 是否相匹配
  * @param {*}  value: 多选元素 或 多次使用元素组的单选元素返回都为ID组成的数组 其它都为值
@@ -228,21 +286,28 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
 const matchValueWithValueList = (value, Operator, ValueList, Property) => {
   console.log('matchValueWithValueList', value, Operator, ValueList, Property);
   const getIsEqual = () => { // 判断是否相等
-    if (Array.isArray(value) && ValueList.length === 1) { // 可多次出现并等于
-      const _list = [...new Set(value)];
-      if (_list.length > 1) return false;
-      return _list[0] === ValueList[0].Value;
-    }
-    if (!Array.isArray(value) && ValueList.length === 1) { // 单次出现
-      return isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False');
-    }
-    if (ValueList.length > 1) { // 等于对比列表中其中一种
-      if (!Array.isArray(value)) { // 目前只比对不可多次出现目标
-        return ValueList.map(it => it.Value).includes(value);
+    if (!ValueList || ValueList.length === 0) return true;
+    const Values = ValueList.map(it => it.Value);
+    if (!Array.isArray(value) && ValueList.length > 0) {
+      if (ValueList.length === 1) {
+        return isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False'); // 完全相等
       }
-      if (Array.isArray(value) && value.length === 1) { // 目前只比对不可多次出现目标
-        return ValueList.map(it => it.Value).includes(value[0]);
+      return Values.includes(value); // 等于任一
+    }
+    if (Array.isArray(value) && value.length > 0 && ValueList.length > 0) {
+      if (Array.isArray(value[0])) { // 元素组（单选或多选）上的多选选项元素 -- 严格相等
+        const t = value.find(arrItem => { // 找到不符合的
+          if (arrItem.length === 0 || arrItem.length !== ValueList.length) return true;
+          // 处理严格匹配
+          return !getArrayIsEqual(arrItem, Values);
+        });
+        if (t) return false;
+        return true;
       }
+      // 普通多选元素 或 多次元素组的单选元素
+      // 1 去重
+      // 2. 执行严格匹配
+      return getArrayIsEqual(value, Values); // 内部执行去重
     }
     return false;
   };
@@ -270,12 +335,12 @@ const matchValueWithValueList = (value, Operator, ValueList, Property) => {
       break;
     case 7: // 包含...
       if (Array.isArray(value)) {
-        bool = value.includes(ValueList[0].Value);
+        bool = getValueIsContainList(value, ValueList);
       }
       break;
     case 8: // 不包含...
       if (Array.isArray(value)) {
-        bool = !value.includes(ValueList[0].Value);
+        bool = getValueIsNotContainList(value, ValueList);
       }
       break;
     case 9: // 选中...
@@ -298,7 +363,7 @@ const matchValueWithValueList = (value, Operator, ValueList, Property) => {
 export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation, isSubControl) => {
   if (!item || !ProductParams) return false;
   const { Property, Operator, ValueList } = item;
-  if (!Property || (!Operator && Operator !== 0) || !ValueList) return false;
+  if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return false;
   const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl);
   if (!targetValue && targetValue !== 0 && targetValue !== false && typeof targetValue !== 'boolean') return false;
   return matchValueWithValueList(targetValue, Operator, ValueList, Property);

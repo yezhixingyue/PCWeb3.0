@@ -14,7 +14,7 @@
     @change="onChange"
     ref="oSelect"
     size="small"
-    :style="`width:${DisplayWidth}px`"
+    :style="`width:${localDisplayWidth}px`"
     class="mp-erp-option-type-element-display-select-comp">
     <el-option
       v-for="item in options"
@@ -62,6 +62,10 @@ export default {
       type: Number,
       default: 140,
     },
+    DisplayWidthIsAuto: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     content: {
@@ -75,6 +79,16 @@ export default {
     optionLabels() {
       return this.options.map(it => it.Name);
     },
+    localDisplayWidth() {
+      if (this.localWidth && this.localWidth > this.DisplayWidth && this.DisplayWidthIsAuto) return this.localWidth;
+      return this.DisplayWidth;
+    },
+  },
+  data() {
+    return {
+      localWidth: '',
+      inputPaddingWidth: 45,
+    };
   },
   methods: {
     onBlur(e) {
@@ -100,6 +114,46 @@ export default {
     },
     onNativeChange(e) {
       this.handleBlur(e);
+    },
+    getWordsDisplayWidth(str) {
+      if (!str || typeof str !== 'string') return 0;
+      const oDiv = document.createElement('div');
+      oDiv.style.fontSize = '12px';
+      oDiv.style.float = 'left';
+      oDiv.style.opacity = 0;
+      oDiv.innerText = str;
+
+      const oApp = document.getElementById('app');
+      oApp.appendChild(oDiv);
+      const width = oDiv.offsetWidth;
+      oApp.removeChild(oDiv);
+      if (width) return width + this.inputPaddingWidth + 5;
+      return 0;
+    },
+    getAdaptiveWidth() {
+      if (!this.DisplayWidthIsAuto || (!this.value && this.value !== 0)) return; // 如果不能自定义宽度的话则不再继续执行
+      let label = this.options.find(it => {
+        const id = typeof it === 'string' ? it : it.ID;
+        return this.value === id;
+      });
+      if (!label) label = '';
+      if (typeof label === 'object') label = label.Name || '';
+      const maybeShowWordMaxCount = (this.DisplayWidth - this.inputPaddingWidth) / 12;
+      if (label.length <= maybeShowWordMaxCount) this.localWidth = this.DisplayWidth;
+      else {
+        // 计算显示宽度
+        const width = this.getWordsDisplayWidth(label);
+        if (width && width > this.DisplayWidth) this.localWidth = width;
+        else this.localWidth = this.DisplayWidth;
+      }
+    },
+  },
+  watch: {
+    value: {
+      handler() {
+        this.getAdaptiveWidth();
+      },
+      immediate: true,
     },
   },
   mounted() {

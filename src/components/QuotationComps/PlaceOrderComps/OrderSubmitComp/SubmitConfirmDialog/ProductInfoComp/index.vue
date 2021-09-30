@@ -76,16 +76,16 @@ export default {
       return null;
     },
     OriginalPrice() {
-      return this.OrderData ? this.OrderData.OriginalPrice : '';
+      return this.OrderData ? this.OrderData.Funds.OriginalPrice : 0;
     },
     FinalPrice() {
-      return this.OrderData ? this.OrderData.FinalPrice : '';
+      return this.OrderData ? this.OrderData.Funds.FinalPrice : 0;
     },
     CouponAmount() {
-      return this.OrderData ? this.OrderData.CouponAmount : '';
+      return this.OrderData ? this.OrderData.Funds.CouponAmount : 0;
     },
     PromoteAmount() {
-      return this.OrderData ? this.OrderData.PromoteAmount : '';
+      return +(this.OriginalPrice - this.OrderData.FinalPrice - this.CouponAmount).toFixed(2);
     },
   },
   data() {

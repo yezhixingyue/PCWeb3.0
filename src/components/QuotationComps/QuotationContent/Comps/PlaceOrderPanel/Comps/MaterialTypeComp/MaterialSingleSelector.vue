@@ -1,6 +1,6 @@
 <template>
   <div v-if="list && list.length > 0" class="mp-place-order-panel-material-select-single-select-comp-wrap">
-    <CanFreeCreateSelectComp v-show="!(list.length===1&&hiddenOption)" v-if="list"
+    <CanFreeCreateSelectComp v-show="!(list.length===1&&hiddenOption)" v-if="list" :DisplayWidth='108'
      :DisabledOptionList='DisabledOptionList' :options='list' v-model="val" :filterable='false'/>
     <MaterialSingleSelector :list='nextList' :key="key" @input="handleInput" :value='value' />
   </div>
