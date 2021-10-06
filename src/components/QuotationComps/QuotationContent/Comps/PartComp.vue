@@ -180,7 +180,7 @@ export default {
         margin-top: 14px;
         margin-bottom: 10px;
       }
-      padding-bottom: 28px;
+      padding-bottom: 8px;
     }
   }
 }

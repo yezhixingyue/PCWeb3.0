@@ -42,7 +42,6 @@ export default {
       },
       set(val) {
         // const _val = val ? this.OpenValue : this.CloseValue;
-        console.log(val);
         this.$emit('input', val);
         this.$emit('blur', val);
       },

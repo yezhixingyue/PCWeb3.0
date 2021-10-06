@@ -41,7 +41,8 @@ export default {
       },
       async set(val) {
         if (val === this.curProductID) return;
-        this.handleProductSelected(val);
+        // this.handleProductSelected(val);
+        this.$router.push(`?id=${val}`);
       },
     },
     curQueryPath() {

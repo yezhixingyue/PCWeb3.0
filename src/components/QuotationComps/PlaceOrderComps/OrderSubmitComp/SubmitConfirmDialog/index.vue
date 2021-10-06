@@ -226,6 +226,7 @@ export default {
           &.right {
             width: 300px;
             margin-left: 20px;
+            margin-left: 10px\0;
             > div {
               &.express {
                 height: 200px;
@@ -233,6 +234,7 @@ export default {
               &.order {
                 height: 270px;
                 margin-top: 20px;
+                margin-top: 15px\0;
               }
             }
           }

@@ -177,6 +177,8 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
     if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
   }
+  let groupName = prop && !prop.IsNameHidden ? `${prop.Name}中` : '当前组中';
+  groupName = '';
   if (valueList && valueList.length > 0 && prop && prop.ElementList && prop.ElementList.length > 0) {
     const CustomerCanUseElementList = prop.ElementList.filter(it => !it.HiddenToCustomer);
     for (let i = 0; i < valueList.length; i += 1) {
@@ -189,7 +191,7 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
         const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
         const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element && _it.Property.Element.ID === _Element.ID);
         const msg = checkElement(CustomerInputValues, _Element, ElementAffectedPropList);
-        if (msg) return { msg, ElementID, index: i };
+        if (msg) return { msg: `${groupName}${msg}`, ElementID, index: i };
       }
     }
     for (let i = 0; i < CustomerCanUseElementList.length; i += 1) {
@@ -212,7 +214,7 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
         }).filter(it => it !== '');
         if (getStrArrIsRepeat(values)) {
           return {
-            msg: `${Element.Name}值不允许重复，请检查重复值`,
+            msg: `${groupName}${Element.Name}值不允许重复，请检查重复值`,
             ElementID: Element.ID,
             index: 'all',
           };

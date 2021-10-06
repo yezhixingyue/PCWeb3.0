@@ -94,7 +94,6 @@ export default {
         return this.value;
       },
       set(val) { // 单选传字符串  多选传数组
-        console.log(val);
         this.$emit('change', val);
       },
     },

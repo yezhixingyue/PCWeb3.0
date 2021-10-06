@@ -845,19 +845,19 @@ export default {
       state.selectedCoupon = null;
       state.isFullPayoutDisabled = false;
 
-      // const _keepingData = localStorage.getItem('isOrderDataKeeping');
-      // // console.log(_keepingData);
-      // if (!(_keepingData && _keepingData === 'true')) {
-      //   state.curProductID = '';
-      //   state.curProductClass = null;
-      //   state.curProductName = '';
-      //   state.curProductInfo2Quotation = null;
-      //   state.obj2GetProductPrice = {
-      //     ProductParams: {},
-      //   };
-      //   state.initPageText = '下单成功';
-      //   state.curProduct = null;
-      // }
+      const _keepingData = localStorage.getItem('isOrderDataKeeping');
+      // console.log(_keepingData);
+      if (!(_keepingData && _keepingData === 'true')) {
+        // state.curProductID = '';
+        // // state.curProductClass = null;
+        // state.curProductName = '';
+        // state.curProductInfo2Quotation = null;
+        // state.obj2GetProductPrice = {
+        //   ProductParams: {},
+        // };
+        state.initPageText = '下单成功';
+        // state.curProduct = null;
+      }
     },
     /* 下单成功后的状态清理
     -------------------------------*/

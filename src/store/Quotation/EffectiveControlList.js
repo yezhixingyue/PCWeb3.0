@@ -11,7 +11,6 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
   if (!Element || !ElementValList || !ElementList) return null;
   const t = ElementValList.find(it => it.ElementID === Element.ID);
   const _El = ElementList.find(it => it.ID === Element.ID);
-  console.log('_El', _El, _El.Name);
   if (!t || !_El) return null;
   if (!t.CustomerInputValues || t.CustomerInputValues.length === 0) {
     if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) return [];
@@ -31,28 +30,30 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
     }
   }
   // 如果 FixedType 有值 存在4种情况： 已选项数、和、最大值、最小值
-  if ((FixedType || FixedType === 0) && _El.Type === 2 && Array.isArray(_Value) && _El.OptionAttribute && _El.OptionAttribute.OptionList) {
+  if ((FixedType || FixedType === 0) && _El.Type === 2 && _El.OptionAttribute && _El.OptionAttribute.OptionList) {
     let FixedTypeValue = '';
     let _Vals;
     switch (FixedType) {
       case 0: // 已选项数
-        FixedTypeValue = _Value.length;
+        FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
+        FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
+        FixedTypeValue = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
         break;
       case 1: // 和
         if (Array.isArray(_Value)) {
-          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).filter(it => it).map(it => it.Value);
+          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
           if (_Vals.length > 0) FixedTypeValue = _Vals.reduce((prev, next) => prev + next, 0);
         }
         break;
       case 2: // 最小值
         if (Array.isArray(_Value)) {
-          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).filter(it => it).map(it => it.Value);
+          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
           if (_Vals.length > 0) FixedTypeValue = Math.min(..._Vals);
         }
         break;
       case 3: // 最大值
         if (Array.isArray(_Value)) {
-          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).filter(it => it).map(it => it.Value);
+          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
           if (_Vals.length > 0) FixedTypeValue = Math.max(..._Vals);
         }
         break;
@@ -76,10 +77,16 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
       if (FixedType === 4) _GroupValue = target.List.length; // 元素组使用次数
     } else {
       const ElValues = target.List.map(({ List }) => getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList)).filter(_it => _it);
-      // const ElValues = target.List.map(({ List }) => getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList)); // 不筛选空值
-      // temp = getElementTypeValue(Element, FixedType, ElValues);
-      if (ElValues.length === 0) return null;
+      if (ElValues.length === 0) {
+        if (FixedType === 0) {
+          return 0;
+        }
+        return null;
+      }
       switch (FixedType) {
+        case 0: // 已选项数 -- 此时ElValues中为目标元素已选项数的值，对其进行相加得出总已选项数
+          _GroupValue = [...new Set(ElValues.reduce((prev, next) => [...prev, ...next], []))].length;
+          break;
         case 1: // 和
           _GroupValue = ElValues.reduce((prev, next) => prev + next, 0);
           break;
@@ -93,7 +100,6 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
           break;
       }
       if (!FixedType && FixedType !== 0) {
-        // if (Array.isArray(ElValues[0])) _GroupValue = ElValues.reduce((prev, next) => [...prev, ...next], []); // 多选选项元素时
         if (Array.isArray(ElValues[0])) _GroupValue = [...ElValues]; // 多选选项元素时
         else { // 单选时
           // 此处需要判断所在元素组的使用次数
@@ -105,8 +111,6 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
             _GroupValue = [...ElValues];
           }
         }
-        // if (Array.isArray(ElValues[0])) _GroupValue = [...ElValues]; // 多选选项元素时
-        // else _GroupValue = [[...ElValues]]; // 单选时
       }
     }
   }
@@ -283,8 +287,7 @@ const getValueIsNotContainList = (value, ValueList) => { // 获取是否不包�
  * @param {*}  value: 多选元素 或 多次使用元素组的单选元素返回都为ID组成的数组 其它都为值
  * @return {*} 返回匹配结果：布尔值
  */
-const matchValueWithValueList = (value, Operator, ValueList, Property) => {
-  console.log('matchValueWithValueList', value, Operator, ValueList, Property);
+const matchValueWithValueList = (value, Operator, ValueList) => {
   const getIsEqual = () => { // 判断是否相等
     if (!ValueList || ValueList.length === 0) return true;
     const Values = ValueList.map(it => it.Value);

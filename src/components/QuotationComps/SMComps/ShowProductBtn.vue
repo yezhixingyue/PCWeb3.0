@@ -52,7 +52,7 @@ export default {
     background-color: #f5f5f5;
     // pointer-events: none;
     cursor: not-allowed;
-    color: #a2a2a2 !important;
+    color: #cbcbcb !important;
     border-color: #dbdee3 !important;
   }
 }

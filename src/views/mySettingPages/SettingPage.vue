@@ -10,6 +10,10 @@
           选中此项后，如果截至当日晚上9点，仍有超过半个小时未付款的订单，系统将通过短信的方式通知您
         </p>
       </div>
+      <div class="set-item">
+        <el-checkbox v-model="keepDataChecked">保留下单面板数据</el-checkbox>
+        <p>如果选中保留订单参数，则在提交订单并支付成功后，下单面板产品参数部分的数据不清空，保留已选择和已填写的数据</p>
+      </div>
     </div>
   </section>
 </template>
@@ -32,14 +36,28 @@ export default {
         let key = true;
         const resp = await this.api.getCustomConfigSave(data).catch(() => { key = false; });
         if (key && resp && resp.data.Status === 1000) {
-          // this.$message.success('设置成功');
           this.$store.commit('common/setCustomerAcceptNotify', bool);
         }
       },
     },
+    keepDataChecked: {
+      get() {
+        return !!this.iskeeping;
+      },
+      set(newVal) {
+        localStorage.setItem('isOrderDataKeeping', newVal);
+        this.iskeeping = newVal;
+      },
+    },
+  },
+  data() {
+    return {
+      iskeeping: false,
+    };
   },
   mounted() {
-    // console.log('mounted');
+    const _bool = localStorage.getItem('isOrderDataKeeping');
+    if (_bool === 'true') this.iskeeping = true;
   },
 };
 </script>
@@ -49,6 +67,7 @@ export default {
   > .content {
     padding-top: 30px;
     > .set-item {
+      margin-bottom: 24px;
       > label {
         color: #333;
         .el-checkbox__label {

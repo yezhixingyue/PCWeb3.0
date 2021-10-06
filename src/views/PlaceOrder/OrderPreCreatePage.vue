@@ -143,7 +143,6 @@ export default {
       this.$store.commit('Quotation/setCurPayInfo2Code', null);
     }
     const _bool = localStorage.getItem('isOrderDataKeeping');
-    // // console.log(_bool);
     if (_bool === 'true') this.iskeeping = true;
   },
 };

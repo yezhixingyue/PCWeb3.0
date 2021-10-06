@@ -39,7 +39,7 @@ axios.interceptors.request.use(
       curConfig.headers.common.SessionID = Cookie.getCookie('SessionID');
     }
     let key = true;
-    const arr = ['/Api/Order/Create', '/Api/PaymentOrder/PayResult', '/Api/Upload/File']; // 不需要展示loading的api地址
+    const arr = ['/Api/Order/Create', '/Api/PaymentOrder/PayResult', '/Api/Upload/File', '/Api/FileType/List']; // 不需要展示loading的api地址
     for (let i = 0; i < arr.length; i += 1) {
       if (curConfig.url.includes(arr[i]) || store.state.common.isLoading) {
         key = false;

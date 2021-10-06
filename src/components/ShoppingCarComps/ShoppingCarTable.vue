@@ -256,13 +256,11 @@ export default {
       if (res) this.$router.push('/shopping/submit');
     },
     handleDel(item) {
-      console.log(item);
       if (!item && this.multipleSelection.length === 0) {
         this.$message.error('请选择订单');
         return;
       }
       const title = item ? '确定删除该订单吗' : '确定删除选中订单吗';
-      // // console.log(item);
       let msg = '';
       if (item) {
         if (!item.ProductParams || !item.ProductParams.Attributes) return;

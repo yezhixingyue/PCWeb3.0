@@ -57,7 +57,8 @@ import { mapState } from 'vuex';
 import { Loading } from 'element-ui';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
 import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
-import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
+// import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
+import ComputedResultComp from '@/components/QuotationComps/QuotationContent/Comps/ComputedResultComp';
 import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
 import FileListForm from './FileListForm/index.vue';
 import SubmitConfirmDialog from './SubmitConfirmDialog/index.vue';
@@ -160,7 +161,6 @@ export default {
         this.scrollToTop();
       };
       await this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
-      // console.log('加入购物车返回内容', resp);
     },
     scrollToTop() {
       this.$nextTick(() => {
@@ -299,6 +299,10 @@ export default {
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
       const cb = () => {
         this.$store.dispatch('common/getCustomerFundBalance');
+        this.fileContent = '';
+        this.$refs.contentValidateForm.resetFields();
+        this.$refs.FileForm.clearAllFile();
+        this.$emit('clearAdd');
         this.scrollToTop();
       };
       const temp = { ...data, List: [{ ...data.List[0], FileList }] };

@@ -116,7 +116,6 @@ export default {
       this.$store.commit('shoppingCar/clearStateForNewCustomer');
       this.$store.commit('summary/clearStateForNewCustomer');
       this.$store.commit('unpayList/clearStateForNewCustomer');
-      // sessionStorage.removeItem('customerInfo');
       sessionStorage.removeItem('couponCenterData');
       if (!useCookie) sessionStorage.setItem('token', token);
       const oneDay = 24 * 60 * 60;
@@ -132,14 +131,11 @@ export default {
         if (useCookie) Cookie.setCookie('token', token, oneDay);
         else localStorage.removeItem('token');
       }
-      // // console.log(this.repath);
-      // this.$router.push(`${this.repath}`);
       const { source, id, redirect } = this.$route.query;
       if (source && source === 'home') {
         window.location.href = homeUrl;
         return;
       }
-      // console.log('domain', domain);
       const host = window.location.hostname;
       if (host.includes(domain)) {
         let path = '/placeOrder';
@@ -148,7 +144,7 @@ export default {
         } else if (redirect) {
           path = redirect;
         }
-        // const path = id ? `/placeOrder?id=${id}` : '/placeOrder';
+        // console.log(path, document.cookie, Cookie.getCookie('token'), useCookie);
         this.$router.push(path);
       } else {
         // 登录域名不匹配，请使用正确域名登录

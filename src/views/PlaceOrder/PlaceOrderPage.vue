@@ -4,11 +4,16 @@
       <PlaceOrderProductClassifyComp />
     </header>
     <div class="content">
-      <QuotationContent v-if="curProductInfo2Quotation" :placeData='curProductInfo2Quotation' />
-      <div v-else-if='initPageText && !curProductInfo2Quotation' class="empty">
-        <span class="iconfont icon-wancheng is-success"></span>
-        <span>{{initPageText}}</span>
+      <div v-if='initPageText' class="empty">
+        <div>
+          <img src="@/assets/images/order-success.png" alt="">
+        </div>
+        <p class="success-ctrl is-font-13" v-show="$route.query.id">
+          <span style="margin-right:10px" class="is-gray">{{initPageText}}</span>
+          <span class="blue-span" @click="closeSuccessState">  ＜ 返回当前产品</span>
+        </p>
       </div>
+      <QuotationContent v-else-if="curProductInfo2Quotation" :placeData='curProductInfo2Quotation' />
       <!-- <div v-else class="bg-empty-wrap"></div> -->
       <div v-else-if="initLoading" class="init-loading-box">
         <p><i class="el-icon-loading"></i>请稍候，正在加载中。。。</p>
@@ -44,6 +49,7 @@ export default {
     async handlePathDataFetch() {
       const productID = this.$route.query.id;
       if (!productID) return;
+      this.$store.commit('Quotation/setInitPageText', '');
       this.initLoading = true;
       const detailData = await this.$store.dispatch('Quotation/getProductDetail', [{ closeloading: true }, productID]);
       if (detailData) {
@@ -51,6 +57,10 @@ export default {
       }
       this.$store.commit('Quotation/setSelectedCoupon', null);
       this.initLoading = false;
+    },
+    closeSuccessState() {
+      this.$store.commit('Quotation/setCurProductInfo2Quotation', this.curProductInfo2Quotation);
+      this.$store.commit('Quotation/setInitPageText', '');
     },
   },
   mounted() {
@@ -77,13 +87,17 @@ export default {
   > .content {
     > .empty {
       text-align: center;
-      margin-top: 168px;
+      margin-top: 220px;
       font-size: 18px;
       color: #585858;
+      padding-right: 150px;
       > .iconfont {
         font-size: 30px;
         margin-right: 12px;
         vertical-align: -10%;
+      }
+      .success-ctrl {
+        padding-top: 20px;
       }
     }
     > .bg-empty-wrap {

@@ -513,7 +513,7 @@ export default {
             }
             if (parentID || parentID === 0) {
               const res = await this.api.getAddressIDList(parentID).catch(() => {});
-              if (res && it.data.Status === 1000) return it.data.Data;
+              if (res && res.data.Status === 1000) return res.data.Data;
             }
             return [];
           };

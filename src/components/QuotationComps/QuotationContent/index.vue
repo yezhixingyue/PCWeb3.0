@@ -42,7 +42,7 @@
               v-if="!priceGetErrMsg"
             />
             <div class="result center" v-if="priceGetErrMsg">
-              <span class="is-pink">{{ priceGetErrMsg }}</span>
+              <span class="is-pink error-msg">{{ priceGetErrMsg }}</span>
             </div>
             <div
               class="result center"
@@ -62,8 +62,8 @@
             </div>
           </header>
           <footer>
-            <el-collapse v-model="activeNames" @change="handleChange">
-              <el-collapse-item name="1">
+            <el-collapse :value="activeNames">
+              <el-collapse-item name="1" disabled>
                 <template slot="title">
                   <el-button
                     class="button-title-pink is-font-13"
@@ -459,6 +459,9 @@ export default {
         target = evt.target.parentNode.parentNode;
       }
       target.blur();
+      if (this.activeNames.length === 0) this.activeNames = ['1'];
+      else this.activeNames = [];
+      this.handleChange(this.activeNames);
     },
     async getCouponActivate() {
       if (!this.couponCode2Add) return;
@@ -564,6 +567,7 @@ export default {
     curProductID() {
       this.priceGetErrMsg = '';
       this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
+      this.activeNames = [];
     },
   },
 };
@@ -680,6 +684,10 @@ export default {
             top: 2px;
             // height: 100px;
             width: 538px;
+            display: flex;
+            align-items: center;
+            max-height: 80px;
+            min-height: 34px;
             > span,
             > div > span {
               margin-right: 20px;
@@ -712,6 +720,9 @@ export default {
               height: 100%;
               vertical-align: middle;
               margin-right: -0.25em; /* Adjusts for spacing */
+            }
+            .error-msg {
+              line-height: 24px;
             }
           }
           > button {

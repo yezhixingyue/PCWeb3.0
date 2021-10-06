@@ -65,7 +65,6 @@ export default class InterAction {
       const bool = it.Property && it.Property.Craft && !it.Property.Element && !it.Property.Group && it.Operator === 23;
       if (bool) {
         const t = disabledCraftList.find(_it => _it.ID === it.Property.Craft.ID);
-        console.log(t);
         if (t && t.index <= i) return false; // 在必选时已先被禁用
         return true;
       }

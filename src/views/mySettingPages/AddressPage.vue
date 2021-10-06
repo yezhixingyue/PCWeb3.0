@@ -59,7 +59,7 @@
         </div>
       </li>
     </ul>
-    <AddMapComp :openType='openType' :curEditInfo='curEditInfo' @changeStatus='changeDiaStatus' :visible='diaVisible'/>
+    <AddMapComp :openType='openType' :curEditInfo='curEditInfo' @changeStatus='changeDiaStatus' :visible.sync='diaVisible'/>
   </section>
 </template>
 
@@ -306,7 +306,7 @@ export default {
             color: #428dfa;
             transition: color 0.2s;
           }
-          > .address-item-sign,{
+          > .address-item-sign {
             display: block;
             opacity: 1;
           }

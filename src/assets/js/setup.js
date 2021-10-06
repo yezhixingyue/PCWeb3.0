@@ -38,7 +38,7 @@ if (mode === 'production') {
  */
 if (mode === 'development') {
   _homeUrl = 'http://192.168.3.85:3000/'; // 和测试官网保持相同
-  _domain = '';
+  _domain = 'http://localhost/';
   // _imgUrl = 'http://192.168.1.92:8055/'; // 和测试生产环境保持相同 故此处不再修改 -- 开发环境 反向代理接口使用该地址
   _productJumpUrl = 'http://192.168.3.85:3000/';
   // _agreementID = '60'; // 和测试生产环境保持相同 故此处不再修改
@@ -49,6 +49,7 @@ if (mode === 'development') {
 
 export const homeUrl = _homeUrl; // 网站地址
 export const domain = _domain; // 保存cookie时的所属域名
+// export const useCookie = process.env.NODE_ENV !== 'development'; // 使用cookie模式
 export const useCookie = true; // 使用cookie模式
 export const imgUrl = _imgUrl; // 图片引用地址
 export const productJumpUrl = _productJumpUrl; // 官网地址 产品跳转地址 和 第一个相同
