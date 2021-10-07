@@ -153,7 +153,7 @@ export default {
       } else { // 上传失败
         this.$notify.error({
           title: `${file.name}上传失败`,
-          message: '抱歉，文件上传失败，请重试!',
+          message: '请检查文件或重试!',
         });
         onError(new Error('文件上传失败'));
       }
@@ -356,6 +356,12 @@ export default {
           color: #aaa;
           > i {
             font-size: 14px;
+          }
+          &.is-error {
+            .iconfont {
+              font-size: 13px;
+              margin-right: 4px;
+            }
           }
         }
         .el-progress__text {

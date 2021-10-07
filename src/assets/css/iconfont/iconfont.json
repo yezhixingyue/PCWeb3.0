@@ -6,32 +6,46 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "7904813",
-      "name": "双箭头-右",
-      "font_class": "yincangxiangqing",
-      "unicode": "e625",
-      "unicode_decimal": 58917
+      "icon_id": "24431861",
+      "name": "对号",
+      "font_class": "duihao",
+      "unicode": "e628",
+      "unicode_decimal": 58920
     },
     {
-      "icon_id": "17775712",
-      "name": "喇叭",
-      "font_class": "laba",
-      "unicode": "e624",
-      "unicode_decimal": 58916
+      "icon_id": "24431862",
+      "name": "感叹号 (2)",
+      "font_class": "a-gantanhao2",
+      "unicode": "e629",
+      "unicode_decimal": 58921
     },
     {
-      "icon_id": "3916416",
-      "name": "退出登录",
-      "font_class": "tuichudenglu",
-      "unicode": "e64d",
-      "unicode_decimal": 58957
+      "icon_id": "14596875",
+      "name": "对号",
+      "font_class": "correct-1-mini-copy",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
     },
     {
-      "icon_id": "13183638",
-      "name": "双箭头-右",
-      "font_class": "left-double-arrow",
+      "icon_id": "8776716",
+      "name": "credits",
+      "font_class": "icon-test",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "18491740",
+      "name": "banner管理",
+      "font_class": "bannerguanli",
       "unicode": "e623",
       "unicode_decimal": 58915
+    },
+    {
+      "icon_id": "18491741",
+      "name": "意见建议管理",
+      "font_class": "yijianjianyiguanli",
+      "unicode": "e624",
+      "unicode_decimal": 58916
     },
     {
       "icon_id": "17199476",
@@ -242,13 +256,6 @@
       "font_class": "wancheng",
       "unicode": "e606",
       "unicode_decimal": 58886
-    },
-    {
-      "icon_id": "16787986",
-      "name": "check",
-      "font_class": "check",
-      "unicode": "e604",
-      "unicode_decimal": 58884
     },
     {
       "icon_id": "17024281",

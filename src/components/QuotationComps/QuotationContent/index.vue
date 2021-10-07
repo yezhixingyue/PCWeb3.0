@@ -543,6 +543,11 @@ export default {
     obj2GetProductPrice: {
       handler() {
         this.$store.commit('Quotation/setProductQuotationResult', null);
+        this.activeNames = [];
+        this.priceGetErrMsg = '';
+        this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
+        this.isCouponGet = false;
+        this.isOpenCouponCenter = false;
       },
       deep: true,
     },
@@ -565,9 +570,6 @@ export default {
       immediate: true,
     },
     curProductID() {
-      this.priceGetErrMsg = '';
-      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
-      this.activeNames = [];
     },
   },
 };

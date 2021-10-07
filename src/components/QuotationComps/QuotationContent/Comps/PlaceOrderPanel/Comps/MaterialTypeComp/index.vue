@@ -57,7 +57,12 @@ export default {
         }));
         list.push(..._list);
       });
-      return list;
+      const sortList = list.sort((a, b) => {
+        const AIndex = a.Index || a.Index === 0 ? a.Index : 999;
+        const BIndex = b.Index || b.Index === 0 ? b.Index : 999;
+        return AIndex - BIndex;
+      });
+      return sortList;
     },
     showList() {
       const list = [];

@@ -38,7 +38,7 @@ if (mode === 'production') {
  */
 if (mode === 'development') {
   _homeUrl = 'http://192.168.3.85:3000/'; // 和测试官网保持相同
-  _domain = 'http://localhost/';
+  _domain = '';
   // _imgUrl = 'http://192.168.1.92:8055/'; // 和测试生产环境保持相同 故此处不再修改 -- 开发环境 反向代理接口使用该地址
   _productJumpUrl = 'http://192.168.3.85:3000/';
   // _agreementID = '60'; // 和测试生产环境保持相同 故此处不再修改

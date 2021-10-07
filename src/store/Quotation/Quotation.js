@@ -1013,9 +1013,13 @@ export default {
       if (saveOldData) commit('setIsFetchingPartProductData', false);
       if (isError) {
         if (saveOldData) commit('setIsFetchingPartProductData', false);
+        router.push('');
         return false;
       }
-      if (res.data.Status !== 1000) return false;
+      if (res.data.Status !== 1000) {
+        router.push('');
+        return false;
+      }
       commit('setCurProductInfo2Quotation', res.data.Data);
       if (!router.currentRoute.query.id || router.currentRoute.query.id !== (id || state.curProductID)) {
         router.push(`?id=${id || state.curProductID}`);

@@ -41,8 +41,7 @@ export default {
       },
       async set(val) {
         if (val === this.curProductID) return;
-        // this.handleProductSelected(val);
-        this.$router.push(`?id=${val}`);
+        if (val && val.length > 10) this.$router.push(`?id=${val}`);
       },
     },
     curQueryPath() {

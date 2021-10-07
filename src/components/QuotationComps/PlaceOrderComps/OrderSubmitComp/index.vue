@@ -136,7 +136,7 @@ export default {
           this.FileCount = this.getFileCount();
           this.visible = true;
         } else {
-          console.log('页面提示返回数据', resp);
+          // console.log('页面提示返回数据', resp); // 不做处理
         }
       }
     },
@@ -293,7 +293,7 @@ export default {
       this.uploadType = 'create';
       const FileList = await this.handleFileUpload();
       this.submitText = '直接下单';
-      if (!FileList) return;
+      if (!FileList || FileList.includes(false)) return;
       // 完成后 提交
       // 打开支付弹窗
       this.$store.commit('Quotation/setIsShow2PayDialog', true);

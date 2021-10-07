@@ -47,9 +47,9 @@ export default {
   },
   methods: {
     async handlePathDataFetch() {
+      this.$store.commit('Quotation/setInitPageText', '');
       const productID = this.$route.query.id;
       if (!productID) return;
-      this.$store.commit('Quotation/setInitPageText', '');
       this.initLoading = true;
       const detailData = await this.$store.dispatch('Quotation/getProductDetail', [{ closeloading: true }, productID]);
       if (detailData) {
