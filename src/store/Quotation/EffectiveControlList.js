@@ -8,10 +8,28 @@ import { isEqual, isGreatThen, isLessThen } from '@/assets/js/utils/utils';
  * @return {*}
  */
 const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize) => {
+  console.log('getElementTypeValue', Element, FixedType, ElementValList, ElementList, isSize);
   if (!Element || !ElementValList || !ElementList) return null;
   const t = ElementValList.find(it => it.ElementID === Element.ID);
   const _El = ElementList.find(it => it.ID === Element.ID);
-  if (!t || !_El) return null;
+  if (!_El) return null;
+  if (!t) {
+    if (_El.HiddenToCustomer && (_El.DefaultValue || _El.DefaultValue === 0)) {
+      // 对客户隐藏 但设置有隐藏值
+      if (_El.Type === 1) return _El.DefaultValue;
+      if (_El.Type === 3) {
+        if (_El.DefaultValue === _El.SwitchAttribute.CloseValue) return false;
+        if (_El.DefaultValue === _El.SwitchAttribute.OpenValue) return true;
+      }
+      if (_El.Type === 2) {
+        const o = _El.OptionAttribute.OptionList.find(_it => _it.Value === _El.DefaultValue);
+        if (o) {
+          return _El.OptionAttribute.IsRadio ? o.ID : [o.ID];
+        }
+      }
+    }
+    return null;
+  }
   if (!t.CustomerInputValues || t.CustomerInputValues.length === 0) {
     if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) return [];
     return null;
@@ -40,22 +58,22 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
         FixedTypeValue = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
         break;
       case 1: // 和
-        if (Array.isArray(_Value)) {
-          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
-          if (_Vals.length > 0) FixedTypeValue = _Vals.reduce((prev, next) => prev + next, 0);
-        }
+        FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
+        FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
+        _Vals = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
+        if (_Vals.length > 0) FixedTypeValue = _Vals.reduce((prev, next) => prev + next, 0);
         break;
       case 2: // 最小值
-        if (Array.isArray(_Value)) {
-          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
-          if (_Vals.length > 0) FixedTypeValue = Math.min(..._Vals);
-        }
+        FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
+        FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
+        _Vals = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
+        if (_Vals.length > 0) FixedTypeValue = Math.min(..._Vals);
         break;
       case 3: // 最大值
-        if (Array.isArray(_Value)) {
-          _Vals = _Value.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
-          if (_Vals.length > 0) FixedTypeValue = Math.max(..._Vals);
-        }
+        FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
+        FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
+        _Vals = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
+        if (_Vals.length > 0) FixedTypeValue = Math.max(..._Vals);
         break;
       default:
         break;
@@ -114,6 +132,11 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
       }
     }
   }
+  //  else if (targetOriginData) {
+  //   if (Element) {
+
+  //   }
+  // }
   return _GroupValue;
 };
 
@@ -124,12 +147,14 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
  */
 const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData) => {
   let _CraftValue;
-  if (!Element && !Group && !FixedType) _CraftValue = !!target; // 工艺是否选中 返回布尔值
+  if (target && target.disabledByInteraction) _CraftValue = false;
+  else if (!Element && !Group && !FixedType) _CraftValue = !!target && !target.disabledByInteraction; // 工艺是否选中 返回布尔值
   else if (target) {
     if (Group) { // 工艺上属性组
       const targetGroup = target.GroupList.find(_it => _it.GroupID === Group.ID);
       const targetGroupOriginData = targetOriginData.GroupList.find(_it => _it.ID === Group.ID);
       _CraftValue = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData);
+      console.log(_CraftValue, Element, FixedType, targetGroup, targetGroupOriginData);
     } else {
       _CraftValue = getElementTypeValue(Element, FixedType, target.ElementList, targetOriginData.ElementList);
     }
@@ -219,6 +244,7 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       break;
     case 3: // 独立元素
       temp = getElementTypeValue(Element, FixedType, targetPartItem.ElementList, targetPartData.ElementList);
+      console.log(temp);
       break;
     case 4: // 工艺
       target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
@@ -293,6 +319,7 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
     const Values = ValueList.map(it => it.Value);
     if (!Array.isArray(value) && ValueList.length > 0) {
       if (ValueList.length === 1) {
+        console.log(value, ValueList, isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False'));
         return isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False'); // 完全相等
       }
       return Values.includes(value); // 等于任一
@@ -369,6 +396,7 @@ export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Q
   if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return false;
   const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl);
   if (!targetValue && targetValue !== 0 && targetValue !== false && typeof targetValue !== 'boolean') return false;
+  console.log(targetValue);
   return matchValueWithValueList(targetValue, Operator, ValueList, Property);
 };
 
@@ -400,6 +428,7 @@ export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Qu
  * @return {*}
  */
 export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation, SubControlList) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
+  // console.log('getEffectiveControlList');
   if (!ProductParams || !curProductInfo2Quotation) return null;
   let InteractionControlList;
   let isSubControl = false;

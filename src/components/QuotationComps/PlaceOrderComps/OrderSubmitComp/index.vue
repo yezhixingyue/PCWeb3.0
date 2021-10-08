@@ -181,7 +181,7 @@ export default {
         this.loadingInstance = Loading.service({
           lock: true,
           spinner: '123',
-          background: 'rgba(255, 255, 255, 0)',
+          background: 'rgba(255, 255, 255, 0.1)',
         });
         const _FileList = await this.$refs.FileForm.submitAll(); // 执行文件上传 ------------- bool处还应返回文件解析名称 --- 然后生成文件上传格式对象，加入到提交对象中 -- 后面完成
         this.$store.commit('Quotation/setIsUploading', false);
@@ -447,7 +447,7 @@ export default {
           top: -3px;
         }
         & + button {
-          margin-left: 40px;
+          margin-left: 25px;
         }
         .el-icon-loading {
           font-size: 17px;
@@ -466,7 +466,8 @@ export default {
       > div {
        position: absolute;
        top: 0;
-       left: 360px;
+       left: 335px;
+       width: 525px;
       }
     }
     > .tips-box-wrap {

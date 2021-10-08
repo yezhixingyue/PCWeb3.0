@@ -27,6 +27,7 @@
 import ShowProductBtn from '@/components/QuotationComps/SMComps/ShowProductBtn.vue';
 import InterAction from '@/store/Quotation/Interaction';
 import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
+import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import CraftContentSetupDialog from './CraftContentSetupDialog.vue';
 
 export default {
@@ -83,7 +84,10 @@ export default {
     filteredGroupShowList() {
       // 筛选后可用于客户设置的工艺元素组列表
       return (
-        this.Craft?.GroupList?.filter((_it) => !_it.HiddenToCustomer) || []
+        this.Craft?.GroupList?.filter((_it) => !_it.HiddenToCustomer).filter(it => {
+          const t = it.ElementList.find(_it => !_it.HiddenToCustomer);
+          return !!t;
+        }) || []
       );
     },
     withoutContent() {
@@ -120,11 +124,11 @@ export default {
       }
       if (this.withoutContent) {
         // 无元素和元素组工艺
-        this.$emit('change', {
-          CraftID: this.Craft.ID,
-          ElementList: [],
-          GroupList: [],
-        });
+        const _data = QuotationClassType.getCraftItemSubmitData(
+          this.Craft,
+          this.ChildSubControlList,
+        );
+        this.$emit('change', _data);
         return;
       }
       this.visible = true;
@@ -180,14 +184,23 @@ export default {
         if (Operator === 21) {
           this.disabled = true;
           this.required = false;
+          if (this.value && !(this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
+            this.$emit('change', { ...this.value, disabledByInteraction: true, requiredByInteraction: false });
+          }
         }
         if (Operator === 23) {
           this.disabled = false;
           this.required = true;
+          if (this.value && !(!this.value.disabledByInteraction && this.value.requiredByInteraction)) {
+            this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: true });
+          }
         }
       } else {
         this.disabled = false;
         this.required = false;
+        if (this.value && !(!this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
+          this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: false });
+        }
       }
     },
     required(newVal, oldVal) {

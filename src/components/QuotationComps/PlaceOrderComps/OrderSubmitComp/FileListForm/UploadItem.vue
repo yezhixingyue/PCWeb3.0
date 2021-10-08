@@ -141,8 +141,8 @@ export default {
         if (this.utils.getValueIsOrNotNumber(progress)) onProgress({ percent: progress >= 2 ? progress : 2 });
       };
 
-      const key = await FileTypeClass.UploadFileByBreakPoint(file, name, onUploadProgressFunc, 100);
-      if (key) { // 上传成功
+      const res = await FileTypeClass.UploadFileByBreakPoint(file, name, onUploadProgressFunc, 100);
+      if (res && res.status) { // 上传成功
         onSuccess();
         this.uploadResultList.push({ // 添加对象，包含：文件大小FileSize、文件解析名称FilePath、文件名称FileName
           FileSize: file.size,
@@ -153,9 +153,9 @@ export default {
       } else { // 上传失败
         this.$notify.error({
           title: `${file.name}上传失败`,
-          message: '请检查文件或重试!',
+          message: res.error.message || '请检查文件或重试!',
         });
-        onError(new Error('文件上传失败'));
+        onError(new Error(res.error.message || '文件上传失败'));
       }
     },
     submit() { // 提交 判断是否有文件需要上传（非必传文件时），如果没有则直接返回结果
@@ -359,7 +359,7 @@ export default {
           }
           &.is-error {
             .iconfont {
-              font-size: 13px;
+              font-size: 12px;
               margin-right: 4px;
             }
           }

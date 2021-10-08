@@ -157,10 +157,6 @@
                       class="span-title-blue"
                       >前往领券中心</span
                     >
-                    <!-- <span  v-if="isOpenCouponCenter" @click="fetchCouponList">
-                      <i style="margin: 0 8px">|</i>
-                      <span class="span-title-blue">已领取优惠券</span>
-                    </span> -->
                   </footer>
                 </section>
               </el-collapse-item>
@@ -665,26 +661,45 @@ export default {
       // ------------------------------- ⬆
     }
     > article {
-      // margin-top: -5px;
       > .coupon-calculate-price-wrap {
         position: relative;
         > header {
           text-align: left;
-          // margin-top: 38px;
-          // margin-bottom: 22px;
           position: absolute;
           top: 0px;
           left: 165px;
+          > button {
+            position: absolute;
+            width: 120px;
+            padding: 0;
+            height: 40px;
+            line-height: 38px;
+            margin-right: 28px;
+            padding-right: 4px;
+            vertical-align: top;
+            top: 0;
+            left: -18px;
+            > i {
+              font-size: 16px;
+              vertical-align: -1px;
+            }
+          }
+          .ml-0 {
+            margin-left: -12px;
+            margin-right: 12px !important;
+          }
+          .place-price-result {
+            left: 130px;
+            width: 568px;
+          }
           > .result {
             display: inline-block;
             margin-right: 6px;
             line-height: 33px;
-            // white-space: nowrap;
             white-space: normal;
             position: absolute;
             left: 160px;
             top: 2px;
-            // height: 100px;
             width: 538px;
             display: flex;
             align-items: center;
@@ -693,7 +708,6 @@ export default {
             > span,
             > div > span {
               margin-right: 20px;
-              // white-space: nowrap;
               float: left;
               &.no-margin {
                 margin: 0;
@@ -702,12 +716,7 @@ export default {
                 margin-left: -10px;
               }
             }
-            // display: flex;
-            // align-items: center;
-            // flex-wrap: wrap;
             > div {
-              // display: inline-block;
-              // white-space: nowrap;
               white-space: normal;
               display: flex;
               flex-wrap: wrap;
@@ -726,25 +735,6 @@ export default {
             .error-msg {
               line-height: 24px;
             }
-          }
-          > button {
-            position: absolute;
-            width: 120px;
-            padding: 0;
-            height: 40px;
-            line-height: 38px;
-            margin-right: 28px;
-            padding-right: 4px;
-            vertical-align: top;
-            top: 0;
-            > i {
-              font-size: 16px;
-              vertical-align: -1px;
-            }
-          }
-          .ml-0 {
-            margin-left: -12px;
-            margin-right: 12px !important;
           }
         }
         > footer {
@@ -781,7 +771,6 @@ export default {
                     line-height: 28px;
                     padding: 0;
                     vertical-align: top;
-                    // margin-right: 28px;
                     padding-left: 8px;
                     > span > i {
                       transition: 0.2s;
@@ -797,7 +786,6 @@ export default {
               }
               .el-collapse-item__wrap {
                 border: none;
-                // padding-top: 35px;
                 > .el-collapse-item__content {
                   padding: 0;
                   > .coupon-wrap {
@@ -805,18 +793,6 @@ export default {
                       margin-bottom: 50px;
                       margin-top: 35px;
                       text-align: center;
-                      // .span-title-blue {
-                      //   display: inline-block;
-                      //   &::before {
-                      //     content: '';
-                      //     display: inline-block;
-                      //     height: 23px;
-                      //     width: 1px;
-                      //     background-color: #428dfa;
-                      //     margin: 0 15px 0px 35px;
-                      //     vertical-align: middle;
-                      //   }
-                      // }
                       > .el-input {
                         width: 300px;
                         > input {
@@ -838,10 +814,8 @@ export default {
                     }
                     > .coupon-list {
                       padding: 0 8px;
-                      // display: flex;
                       max-height: 322px;
                       overflow-y: auto;
-                      // margin-left: -26px;
                       > li {
                         width: 240px;
                         height: 135px;
@@ -858,7 +832,6 @@ export default {
                           height: 60px;
                           background-color: #9399ff;
                           padding: 5px 20px 0;
-                          // padding-bottom: 10px;
                           box-sizing: border-box;
                           color: #fff;
                           float: left;
@@ -926,9 +899,6 @@ export default {
                             no-repeat right bottom / 100% 100%;
                           &:hover {
                             opacity: 0.75;
-                            // width: 42px;
-                            // height: 43px;
-                            // transform: scale(1.05);
                           }
                         }
                         &:hover > .aside {
@@ -969,7 +939,6 @@ export default {
         width: 1200px;
         height: 15px;
         margin: 15px -30px 0;
-        // background-color: rgb(245, 245, 245);
       }
       > .comp-title {
         height: 40px;

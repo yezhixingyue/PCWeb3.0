@@ -1,6 +1,7 @@
 <template>
   <el-form-item :label="label" :prop="propName"
    v-if="target && !hidden && showFormItem"
+   v-show="showGroup"
    :label-width='labelWidth'
    :rules="[
       { validator: validateFormItem, trigger: 'change' }
@@ -205,6 +206,15 @@ export default {
       }
       return true;
     },
+    showGroup() {
+      if (this.curTypeName === '元素组') {
+        if (this.target) {
+          const t = this.target.ElementList.find(it => !it.HiddenToCustomer);
+          return !!t;
+        }
+      }
+      return true;
+    },
     propName() {
       if (!this.target) return 'propName';
       if (this.target.Name) return this.target.Name;
@@ -255,46 +265,56 @@ export default {
     };
   },
   methods: {
-    validateFormItem(rule, value, callback) {
-      if (this.AffectedHidden) { // 如果该项目隐藏了，则直接通过验证
+    delay(duration = 10) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve();
+        }, duration);
+      });
+    },
+    async validateFormItem(rule, value, callback) {
+      await this.delay();
+      this.$nextTick(() => {
+        if (this.AffectedHidden) { // 如果该项目隐藏了，则直接通过验证
+          callback();
+          return;
+        }
+        this.errorElementID = '';
+        this.errorIndex = '';
+        if (this.curTypeName === '元素') {
+          const res = checkElement(this.itemValue, this.target, this.localAffectedPropList);
+          if (res && typeof res === 'string') {
+            callback(new Error(res));
+            return;
+          }
+        }
+        if (this.curTypeName === '元素组' && this.isNormalGroup) {
+          const res = checkElementGroup(this.itemValue, this.target, this.localAffectedPropList, this.subGroupAffectedPropList);
+          if (res && typeof res === 'object' && res.msg) {
+            this.errorElementID = res.ElementID;
+            this.errorIndex = res.index;
+            callback(new Error(res.msg));
+            return;
+          }
+        }
+        if (this.curTypeName === '尺寸组') { // 尺寸组
+          const res = checkSizeGroup(this.itemValue, this.target, this.localAffectedPropList);
+          if (res && typeof res === 'object' && res.msg) {
+            this.errorElementID = res.ElementID;
+            callback(new Error(res.msg));
+            return;
+          }
+        }
+        if (this.curTypeName === '工艺') { // 工艺
+          const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList,
+            this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
+          if (res && typeof res === 'string') {
+            callback(new Error(res));
+            return;
+          }
+        }
         callback();
-        return;
-      }
-      this.errorElementID = '';
-      this.errorIndex = '';
-      if (this.curTypeName === '元素') {
-        const res = checkElement(this.itemValue, this.target, this.localAffectedPropList);
-        if (res && typeof res === 'string') {
-          callback(new Error(res));
-          return;
-        }
-      }
-      if (this.curTypeName === '元素组' && this.isNormalGroup) {
-        const res = checkElementGroup(this.itemValue, this.target, this.localAffectedPropList, this.subGroupAffectedPropList);
-        if (res && typeof res === 'object' && res.msg) {
-          this.errorElementID = res.ElementID;
-          this.errorIndex = res.index;
-          callback(new Error(res.msg));
-          return;
-        }
-      }
-      if (this.curTypeName === '尺寸组') { // 尺寸组
-        const res = checkSizeGroup(this.itemValue, this.target, this.localAffectedPropList);
-        if (res && typeof res === 'object' && res.msg) {
-          this.errorElementID = res.ElementID;
-          callback(new Error(res.msg));
-          return;
-        }
-      }
-      if (this.curTypeName === '工艺') { // 工艺
-        const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList,
-          this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
-        if (res && typeof res === 'string') {
-          callback(new Error(res));
-          return;
-        }
-      }
-      callback();
+      });
     },
     onChangeValidate() { // 重新单独校验
       this.$emit('changeValidate', this.propName);

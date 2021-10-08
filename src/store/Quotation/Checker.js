@@ -87,7 +87,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
   if (!prop) return '';
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
-    if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
+    if (InterAction.getDisabledOrNot(AffectedPropList) || InterAction.getIsHiddenOrNot(AffectedPropList)) return '';
     if (prop.Type === 2) { // 选项元素，判断是否有值在禁用或隐藏列表中
       const disabledList = InterAction.getDisabledOptionList(AffectedPropList);
       const hiddenList = InterAction.getHiddenedOptionList(AffectedPropList);

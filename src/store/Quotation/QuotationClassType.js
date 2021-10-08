@@ -53,22 +53,26 @@ export default class QuotationClassType {
       Name: '',
       Value: '',
     }];
-    switch (el.Type) {
-      case 1: // 数字值
-        if (el.NumbericAttribute && (el.NumbericAttribute.CheckedValue || el.NumbericAttribute.CheckedValue === 0)) {
-          temp[0].Value = `${el.NumbericAttribute.CheckedValue}`;
-        }
-        break;
-      case 2: // 选项值
-        temp = el.OptionAttribute?.OptionList?.filter(it => it.IsChecked && !it.HiddenToCustomer).map(it => ({ ID: it.ID })) || temp;
-        break;
-      case 3: // 开关
-        if (el.SwitchAttribute) {
-          temp[0].IsOpen = el.SwitchAttribute.DefaultOpen || false;
-        }
-        break;
-      default:
-        break;
+    if (!el.HiddenToCustomer) {
+      switch (el.Type) {
+        case 1: // 数字值
+          if (el.NumbericAttribute && (el.NumbericAttribute.CheckedValue || el.NumbericAttribute.CheckedValue === 0)) {
+            temp[0].Value = `${el.NumbericAttribute.CheckedValue}`;
+          }
+          break;
+        case 2: // 选项值
+          temp = el.OptionAttribute?.OptionList?.filter(it => it.IsChecked && !it.HiddenToCustomer).map(it => ({ ID: it.ID })) || temp;
+          break;
+        case 3: // 开关
+          if (el.SwitchAttribute) {
+            temp[0].IsOpen = el.SwitchAttribute.DefaultOpen || false;
+          }
+          break;
+        default:
+          break;
+      }
+    } else if (el.DefaultValue || el.DefaultValue === 0) {
+      temp[0].Value = el.DefaultValue;
     }
     return temp;
   }
@@ -110,7 +114,7 @@ export default class QuotationClassType {
       temp = {};
       let isCraftInited = false;
       let _list = [];
-      if (Array.isArray(subControlList)) _list = subControlList.filter(it => (!it.PartID && PartData.ProductClass) || it.PartID === PartData.ID);
+      if (Array.isArray(subControlList)) _list = subControlList.filter(it => (!it.PartID && PartData.ShowName) || it.PartID === PartData.ID);
       // 部件本身的子交互：
       temp.SubControlList = _list.filter(_it => _it.PartID && !_it.GroupID && !_it.CraftID);
       // 部件上元素组 或 部件工艺元素组上的子交互
@@ -123,7 +127,7 @@ export default class QuotationClassType {
           let target = null;
           switch (TypeName) {
             case '元素':
-              target = PartData.ElementList.find(it => it.ID === item.Property.ID && !it.HiddenToCustomer);
+              target = PartData.ElementList.find(it => it.ID === item.Property.ID);
               if (target) {
                 if (!temp.ElementList) temp.ElementList = [];
                 temp.ElementList.push({ ElementID: target.ID, CustomerInputValues: this.getInitCustomerInputValues(target) });
@@ -171,7 +175,7 @@ export default class QuotationClassType {
               }
               if (Array.isArray(requiredCraftList)) {
                 requiredCraftList.forEach(({ Property }) => {
-                  if ((!Property.Part && PartData.ProductClass) || (Property.Part && Property.Part.ID === PartData.ID)) {
+                  if ((!Property.Part && PartData.ShowName) || (Property.Part && Property.Part.ID === PartData.ID)) {
                     // 同为产品 或 同一部件
                     // 接着判断是否已勾选
                     const _craft = PartData.CraftList.find(_it => _it.ID === Property.Craft.ID && !_it.HiddenToCustomer);
@@ -212,8 +216,7 @@ export default class QuotationClassType {
         List: [],
         key: Math.random().toString(36).slice(-10),
       };
-      _item.List = ElementList.filter(_it => !_it.HiddenToCustomer)
-        .map(_it => ({ ElementID: _it.ID, CustomerInputValues: this.getInitCustomerInputValues(_it) }));
+      _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: this.getInitCustomerInputValues(_it) }));
       return _item;
     };
     if (isItem) return getItem();
@@ -238,19 +241,21 @@ export default class QuotationClassType {
     let GroupList = [];
     let ElementList = [];
     if (Array.isArray(_craft.ElementList)) {
-      ElementList = _craft.ElementList.filter(el => !el.HiddenToCustomer).map(el => ({
+      ElementList = _craft.ElementList.map(el => ({
         ElementID: el.ID,
         CustomerInputValues: this.getInitCustomerInputValues(el),
       }));
     }
     if (Array.isArray(_craft.GroupList)) {
       const _otherSubControlList = otherSubControlList.filter(it => it.CraftID === _craft.ID);
-      GroupList = _craft.GroupList.filter(_it => !_it.HiddenToCustomer).map(_it => this.getGroupItemSubmitData(_it, false, _otherSubControlList));
+      GroupList = _craft.GroupList.map(_it => this.getGroupItemSubmitData(_it, false, _otherSubControlList));
     }
     const _item = {
       CraftID: _craft.ID,
       GroupList,
       ElementList,
+      disabledByInteraction: false,
+      requiredByInteraction: false,
     };
     return _item;
   }
@@ -302,7 +307,7 @@ export default class QuotationClassType {
       const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen }) => {
         if (ID) return { ID };
         if (Name) return { Name };
-        if (Value) return { Value };
+        if (Value || Value === 0) return { Value };
         if (IsOpen || IsOpen === false) return { IsOpen };
         return null;
       }).filter(it => it);

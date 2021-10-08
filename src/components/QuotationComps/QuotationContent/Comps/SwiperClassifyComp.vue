@@ -56,6 +56,7 @@ export default {
       else this.isEnd = false;
     },
     async handleProductSelected(val) {
+      if (this.curProductID && this.curProductID === val) return;
       const item = this.classiftList.find(it => it.ID === val);
       if (item) {
         this.$store.commit('Quotation/setCurProductInfo', item);

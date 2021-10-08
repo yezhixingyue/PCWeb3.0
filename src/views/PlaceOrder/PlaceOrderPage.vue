@@ -49,7 +49,14 @@ export default {
     async handlePathDataFetch() {
       this.$store.commit('Quotation/setInitPageText', '');
       const productID = this.$route.query.id;
-      if (!productID) return;
+      // console.log(this.curProductInfo2Quotation);
+      if (!productID) {
+        if (this.curProductInfo2Quotation && this.curProductInfo2Quotation.ID) {
+          this.$router.replace(`?id=${this.curProductInfo2Quotation.ID}`);
+        }
+        return;
+      }
+      if (this.curProductInfo2Quotation && this.curProductInfo2Quotation.ID && this.curProductInfo2Quotation.ID === productID) return;
       this.initLoading = true;
       const detailData = await this.$store.dispatch('Quotation/getProductDetail', [{ closeloading: true }, productID]);
       if (detailData) {

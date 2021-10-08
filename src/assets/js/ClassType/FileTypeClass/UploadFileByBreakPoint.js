@@ -91,30 +91,33 @@ async function checkIsTrue(data, uniqueName) {
 async function breakPointUpload(data, uniqueName, onUploadProgressFunc, finalPercentage = 98) {
   // console.log(data);
   // if (true) return false;
-  let key = true;
-  const hasUploadedInfo = await api.getUploadedProgress(uniqueName).catch(() => {
-    key = false;
+  let error;
+  const hasUploadedInfo = await api.getUploadedProgress(uniqueName).catch((err) => {
+    error = err;
+    if (error.message === 'Network Error') error = new Error('网络连接错误');
+    if (error.message.includes('timeout')) error = new Error('网络超时');
   });
-  if (!key) return false;
-  if (hasUploadedInfo.data.Status !== 1000) return false; // 获取已上传信息
+  if (error) return { status: false, error };
+  if (hasUploadedInfo.data.Status !== 1000) return { status: false, error: new Error(hasUploadedInfo.data.Message) }; // 获取已上传信息
 
   if (+hasUploadedInfo.data.Data < +data.size) {
     onUploadProgressFunc(_getPercentage(hasUploadedInfo.data.Data, data.size, finalPercentage)); // 根据已上传信息设置初始已上传百分比
 
     const chunkCount = Math.ceil((data.size - hasUploadedInfo.data.Data) / (chunkSize)); // 计算出总共需要上传的次数
     const curChunkNum = +hasUploadedInfo.data.Data; // 获取到当前已上传的节点位置
-    let key2 = true;
     await uploadFile(chunkCount, curChunkNum, {
       data, uniqueName, onUploadProgressFunc, finalPercentage,
-    }).catch(() => {
-      key2 = false;
+    }).catch((err) => {
+      error = err;
+      if (error.message === 'Network Error') error = new Error('网络出错');
+      if (error.message.includes('timeout')) error = new Error('网络超时');
     }); // 上传
-    if (!key2) return false;
-    if (await checkIsTrue(data, uniqueName)) return true;
-    return false;
+    if (error) return { status: false, error };
+    if (await checkIsTrue(data, uniqueName)) return { status: true, error: '' };
+    return { status: false, error: '文件上传失败' };
   }
   onUploadProgressFunc(+finalPercentage);
-  return true;
+  return { status: true, error: '' };
 }
 
 export default breakPointUpload;
