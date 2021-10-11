@@ -21,6 +21,14 @@ export default class InterAction {
     return false;
   }
 
+  static getUnusabledValueByInteraction(AffectedPropList) { // 获取禁用或隐藏时的计算值
+    if (AffectedPropList.length > 0) {
+      const t = AffectedPropList.find(it => it.Property && !it.Property.FixedType && it.Property.FixedType !== 0 && it.OptionList.length === 0);
+      if (t && (t.Operator === 21 || t.Operator === 22)) return t.DefaultValue || t.DefaultValue === 0 ? t.DefaultValue : '';
+    }
+    return '';
+  }
+
   static getDisabledOptionList(AffectedPropList) { // 获取禁用掉的选项列表
     if (AffectedPropList.length > 0) {
       const t = AffectedPropList.find(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0);
@@ -115,10 +123,10 @@ export default class InterAction {
 
   static getDisabledOrHiddenedElementIDList(AffectedPropList) {
     if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
-      const list = AffectedPropList
-        .filter(it => [21, 22].includes(it.Operator) && it.Property.Element && (!it.Property.FixedType && it.Property.FixedType !== 0))
-        .map(it => it.Property.Element.ID)
-        .filter(it => it);
+      let list = AffectedPropList
+        .filter(it => [21, 22].includes(it.Operator) && it.Property.Element && (!it.Property.FixedType && it.Property.FixedType !== 0));
+      // console.log(AffectedPropList, list.map(it => ({ ElementID: it.Property.Element.ID, DisabledOrHideDefaultValue: it.DefaultValue })));
+      list = list.map(it => ({ ElementID: it.Property.Element.ID, DisabledOrHideDefaultValue: it.DefaultValue })).filter(it => it.ElementID);
       return list;
     }
     return [];

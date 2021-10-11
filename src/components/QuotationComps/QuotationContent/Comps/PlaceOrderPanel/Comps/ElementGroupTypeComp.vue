@@ -154,7 +154,15 @@ export default {
     onItemValueChange(lv1Index, it, value) {
       const temp = JSON.parse(JSON.stringify(this.value));
       const t = temp[lv1Index].List.find(_it => _it.ElementID === it.ID);
-      if (t) t.CustomerInputValues = value;
+      if (t) {
+        const {
+          CustomerInputValues, disabledByInteraction, hiddenByInteraction, DisabledValue,
+        } = value;
+        t.CustomerInputValues = CustomerInputValues;
+        t.disabledByInteraction = disabledByInteraction;
+        t.hiddenByInteraction = hiddenByInteraction;
+        t.DisabledValue = DisabledValue;
+      }
       this.List = temp;
     },
     getItemValue(index, it) {

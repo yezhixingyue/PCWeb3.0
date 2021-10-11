@@ -221,12 +221,17 @@ export default {
       const t = data.GroupList.find((it) => it.GroupID === ID);
       return t ? t.List : [];
     },
-    handleElementChange(CustomerInputValues, el) {
+    handleElementChange({
+      CustomerInputValues, disabledByInteraction, hiddenByInteraction, DisabledValue,
+    }, el) {
       const t = this.localSetupData.ElementList.find(
         (it) => it.ElementID === el.ID,
       );
       if (t) {
         t.CustomerInputValues = CustomerInputValues;
+        t.disabledByInteraction = disabledByInteraction;
+        t.hiddenByInteraction = hiddenByInteraction;
+        t.DisabledValue = DisabledValue;
       }
     },
     handleGroupChange(List, group) {

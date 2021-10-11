@@ -113,9 +113,15 @@ export default {
       const temp = JSON.parse(JSON.stringify(this.value));
       const t = temp.find((it) => it.ElementID === item.ID);
       if (t) {
-        t.CustomerInputValues = e;
+        const {
+          CustomerInputValues, disabledByInteraction, hiddenByInteraction, DisabledValue,
+        } = e;
+        t.CustomerInputValues = CustomerInputValues;
+        t.disabledByInteraction = disabledByInteraction;
+        t.hiddenByInteraction = hiddenByInteraction;
+        t.DisabledValue = DisabledValue;
       } else {
-        temp.push({ ElementID: item.ID, CustomerInputValues: e });
+        temp.push({ ElementID: item.ID, ...e });
       }
       this.$emit('input', temp);
     },

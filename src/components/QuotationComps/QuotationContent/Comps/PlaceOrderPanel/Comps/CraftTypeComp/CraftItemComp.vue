@@ -143,17 +143,32 @@ export default {
     handleElementAffectedListChange(ElementAffectedList, ElementValList, ElementList) {
       const _ElementList = ElementValList.map(it => {
         const _list = ElementAffectedList.filter(_it => _it.Property.Element.ID === it.ElementID);
-        if (_list.length === 0) return it;
+        if (_list.length === 0) {
+          return {
+            ...it, disabledByInteraction: false, hiddenByInteraction: false, DisabledValue: '',
+          };
+        }
         const t = ElementList.find(_it => _it.ID === it.ElementID);
+        console.log(t, _list, InterAction.getDisabledOrNot(_list), InterAction.getIsHiddenOrNot(_list),
+          !InterAction.getDisabledOrNot(_list) && !InterAction.getIsHiddenOrNot(_list));
         if (t) {
           if (!InterAction.getDisabledOrNot(_list) && !InterAction.getIsHiddenOrNot(_list)) {
             if (t.Type === 2) {
               const arr = [...InterAction.getDisabledOptionList(_list), ...InterAction.getHiddenedOptionList(_list)];
               return {
                 ...it,
+                disabledByInteraction: false,
+                hiddenByInteraction: false,
+                DisabledValue: '',
                 CustomerInputValues: it.CustomerInputValues.map(_it => (!arr.includes(_it.ID) ? _it : null)).filter(_it => _it),
               };
             }
+            return {
+              ...it,
+              disabledByInteraction: false,
+              hiddenByInteraction: false,
+              DisabledValue: '',
+            };
           }
         }
         return it;
@@ -212,6 +227,7 @@ export default {
       }
     },
     ChildUseAffectedPropList(val) { // 监听子元素或子元素组上交互属性列表 当其发生变化时：
+      console.log('ChildUseAffectedPropList', val);
       if (JSON.stringify(this.recordInfo) === JSON.stringify(val)) return;
       this.recordInfo = val;
       //  1. 查看当前是否已选，如果已选则检查取值是否符合交互，不符合则提示报错；2.当原来有提示，现在交互为空则重新触发提示进行取消 -- 可用一个状态来记录是否已触发错误提示
@@ -220,6 +236,7 @@ export default {
       const GroupAffectedList = val.filter(it => it.Property && it.Property.Group);
       const ElementList = this.handleElementAffectedListChange(ElementAffectedList, this.value.ElementList, this.Craft.ElementList);
       const GroupList = this.handleGroupAffectedListChange(GroupAffectedList);
+      console.log(GroupList);
       this.$emit('change', { ...this.value, ElementList, GroupList });
     },
   },

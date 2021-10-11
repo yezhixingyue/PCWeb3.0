@@ -16,7 +16,7 @@
       v-model="List"
       class="customize"
       :isDisabled='isDisabled'
-      :ElementList="Property.GroupInfo.ElementList"
+      :ElementList="Property.GroupInfo.ElementList.filter(it => !it.HiddenToCustomer)"
       :errorElementID="errorElementID"
       :showCheckBox='showCheckBox'
       :isCustomize='isCustomize'

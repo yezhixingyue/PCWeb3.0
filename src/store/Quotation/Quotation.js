@@ -174,16 +174,25 @@ export default {
     curCraftRelationList(state, getters, rootVal) {
       const _CraftRelationList = rootVal.common.CraftRelationList;
       if (_CraftRelationList.length === 0) return [];
-      // const _ProductClass = state.obj2GetProductPrice.ProductParams.ProductClass;
-      // if (!_ProductClass) return [];
-      // const _list = _CraftRelationList.filter(item => {
-      //   const { First, Second } = item.ProductClass;
-      //   return First === _ProductClass.First && Second === _ProductClass.Second;
-      // });
-      // return _list;
       return _CraftRelationList;
     },
-
+    /* 当前选中产品交互条件列表所需要的涉及到的元素ID列表
+    -------------------------------*/
+    affectedElementIDsByInteraction(state) {
+      if (!state.curProductInfo2Quotation || !Array.isArray(state.curProductInfo2Quotation.ControlList) || state.curProductInfo2Quotation.ControlList.length === 0) return [];
+      const list = state.curProductInfo2Quotation.ControlList.map(it => {
+        const _list = [];
+        if (it.Constraint && Array.isArray(it.Constraint.ItemList)) {
+          it.Constraint.ItemList.forEach(_it => {
+            if (_it.Property && _it.Property.Element && _it.Property.Element.ID) {
+              _list.push(_it.Property.Element.ID);
+            }
+          });
+        }
+        return _list;
+      }).reduce((l1, l2) => [...l1, ...l2], []);
+      return [...new Set(list)];
+    },
   },
   mutations: {
     /* 设置产品分类相关
@@ -922,7 +931,15 @@ export default {
       switch (Type) {
         case '元素':
           target = TargetPart.ElementList.find(it => it.ElementID === ID);
-          if (target) target.CustomerInputValues = Value;
+          if (target) {
+            const {
+              CustomerInputValues, disabledByInteraction, hiddenByInteraction, DisabledValue,
+            } = Value;
+            target.CustomerInputValues = CustomerInputValues;
+            target.disabledByInteraction = disabledByInteraction;
+            target.hiddenByInteraction = hiddenByInteraction;
+            target.DisabledValue = DisabledValue;
+          }
           break;
         case '元素组':
           target = TargetPart.GroupList.find(it => it.GroupID === ID);

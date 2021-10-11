@@ -2,34 +2,52 @@
 /* eslint-disable object-curly-newline */
 import { isEqual, isGreatThen, isLessThen } from '@/assets/js/utils/utils';
 
+export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
+  if (!DefaultOrDisabledValue && DefaultOrDisabledValue !== 0) return '';
+  const _t = {
+    CustomerInputValues: [{}],
+    DisabledValue: '',
+    ElementID: Element.ID,
+    disabledByInteraction: false,
+    hiddenByInteraction: false,
+  };
+  if (_El.Type === 1) _t.CustomerInputValues[0].Value = DefaultOrDisabledValue;
+  if (_El.Type === 3) {
+    let bool;
+    if (DefaultOrDisabledValue === _El.SwitchAttribute.CloseValue) bool = false;
+    if (DefaultOrDisabledValue === _El.SwitchAttribute.OpenValue) bool = true;
+    if (typeof bool === 'boolean') _t.CustomerInputValues[0].IsOpen = bool;
+  }
+  if (_El.Type === 2) {
+    const o = _El.OptionAttribute.OptionList.find(_it => _it.Value === DefaultOrDisabledValue);
+    if (o) {
+      _t.CustomerInputValues[0].ID = o.ID;
+    } else {
+      _t.CustomerInputValues[0].Name = DefaultOrDisabledValue;
+    }
+  }
+  return _t;
+};
+
 /**
  * @description: 获取元素的值，仅多选选项元素选取本身结果时返回数组；其它均返回单一值
  * @param {*}
  * @return {*}
  */
 const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize) => {
-  console.log('getElementTypeValue', Element, FixedType, ElementValList, ElementList, isSize);
   if (!Element || !ElementValList || !ElementList) return null;
-  const t = ElementValList.find(it => it.ElementID === Element.ID);
+  let t = ElementValList.find(it => it.ElementID === Element.ID);
   const _El = ElementList.find(it => it.ID === Element.ID);
   if (!_El) return null;
-  if (!t) {
-    if (_El.HiddenToCustomer && (_El.DefaultValue || _El.DefaultValue === 0)) {
-      // 对客户隐藏 但设置有隐藏值
-      if (_El.Type === 1) return _El.DefaultValue;
-      if (_El.Type === 3) {
-        if (_El.DefaultValue === _El.SwitchAttribute.CloseValue) return false;
-        if (_El.DefaultValue === _El.SwitchAttribute.OpenValue) return true;
-      }
-      if (_El.Type === 2) {
-        const o = _El.OptionAttribute.OptionList.find(_it => _it.Value === _El.DefaultValue);
-        if (o) {
-          return _El.OptionAttribute.IsRadio ? o.ID : [o.ID];
-        }
-      }
-    }
-    return null;
+  if (_El.HiddenToCustomer && (_El.DefaultValue || _El.DefaultValue === 0)) {
+    // 对客户隐藏 但设置有隐藏值
+    t = creatNewTargetValue(_El.DefaultValue, _El);
   }
+  if (!t) return null;
+  if (!_El.HiddenToCustomer && (t.hiddenByInteraction || t.disabledByInteraction) && (t.DisabledValue || t.DisabledValue === 0)) {
+    t = creatNewTargetValue(t.DisabledValue, _El);
+  }
+  // }
   if (!t.CustomerInputValues || t.CustomerInputValues.length === 0) {
     if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) return [];
     return null;
@@ -153,8 +171,9 @@ const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData) 
     if (Group) { // 工艺上属性组
       const targetGroup = target.GroupList.find(_it => _it.GroupID === Group.ID);
       const targetGroupOriginData = targetOriginData.GroupList.find(_it => _it.ID === Group.ID);
+      console.log('获取工艺元素组元素值1');
       _CraftValue = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData);
-      console.log(_CraftValue, Element, FixedType, targetGroup, targetGroupOriginData);
+      console.log('获取工艺元素组元素值2');
     } else {
       _CraftValue = getElementTypeValue(Element, FixedType, target.ElementList, targetOriginData.ElementList);
     }
@@ -244,7 +263,6 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       break;
     case 3: // 独立元素
       temp = getElementTypeValue(Element, FixedType, targetPartItem.ElementList, targetPartData.ElementList);
-      console.log(temp);
       break;
     case 4: // 工艺
       target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
@@ -319,7 +337,6 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
     const Values = ValueList.map(it => it.Value);
     if (!Array.isArray(value) && ValueList.length > 0) {
       if (ValueList.length === 1) {
-        console.log(value, ValueList, isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False'));
         return isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False'); // 完全相等
       }
       return Values.includes(value); // 等于任一
@@ -396,7 +413,6 @@ export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Q
   if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return false;
   const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl);
   if (!targetValue && targetValue !== 0 && targetValue !== false && typeof targetValue !== 'boolean') return false;
-  console.log(targetValue);
   return matchValueWithValueList(targetValue, Operator, ValueList, Property);
 };
 
@@ -428,7 +444,6 @@ export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Qu
  * @return {*}
  */
 export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation, SubControlList) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
-  // console.log('getEffectiveControlList');
   if (!ProductParams || !curProductInfo2Quotation) return null;
   let InteractionControlList;
   let isSubControl = false;

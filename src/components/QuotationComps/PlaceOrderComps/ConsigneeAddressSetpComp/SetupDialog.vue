@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :visible.sync="visible"
+    :visible.sync="localVisible"
     top="20vh"
     :close-on-click-modal="false"
     v-dialogDrag
@@ -207,6 +207,14 @@ export default {
         this.localNewAddressInfo.Mobile = newVal.replace(/[^\d.]/g, '');
       },
     },
+    localVisible: {
+      get() {
+        return this.visible;
+      },
+      set(val) {
+        this.$emit('update:visible', val);
+      },
+    },
   },
   data() {
     const validateMobile = (rule, value, callback) => {
@@ -357,7 +365,6 @@ export default {
     onOpen() { // 打开时初始化数据
       this.localOutPlateNo = this.OutPlateNo;
       this.localNewAddressInfo = JSON.parse(JSON.stringify(this.NewAddressInfo));
-      console.log(this.NewAddressInfo);
       this.$nextTick(() => {
         this.radio = this.curAddIndex;
       });

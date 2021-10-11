@@ -16,7 +16,7 @@
           <span class="del" @click='onPartRemoveClick(i)'><i class="iconfont icon-shanchu is-pink"></i> 删除</span>
         </div>
         <hr>
-        <div v-if="!hiddenAdd">
+        <div v-if="!hiddenAdd" v-show="i === PartData.List.length - 1">
           <span class="blue-span" @click="onPartAddClick(i)">+ 添加{{PartName}}</span>
         </div>
       </div>

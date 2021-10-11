@@ -130,7 +130,13 @@ export default class QuotationClassType {
               target = PartData.ElementList.find(it => it.ID === item.Property.ID);
               if (target) {
                 if (!temp.ElementList) temp.ElementList = [];
-                temp.ElementList.push({ ElementID: target.ID, CustomerInputValues: this.getInitCustomerInputValues(target) });
+                temp.ElementList.push({ // 生成一个元素数据
+                  ElementID: target.ID,
+                  CustomerInputValues: this.getInitCustomerInputValues(target),
+                  disabledByInteraction: false,
+                  hiddenByInteraction: false,
+                  DisabledValue: '',
+                });
               }
               break;
             case '元素组':
@@ -212,11 +218,17 @@ export default class QuotationClassType {
   static getGroupItemSubmitData(Prop, isItem = false, otherSubControlList) { // 获取元素组提交数据
     const { UseTimes, ID, ElementList } = Prop;
     const getItem = () => {
-      const _item = {
+      const _item = { // 生成元素组数据
         List: [],
         key: Math.random().toString(36).slice(-10),
       };
-      _item.List = ElementList.map(_it => ({ ElementID: _it.ID, CustomerInputValues: this.getInitCustomerInputValues(_it) }));
+      _item.List = ElementList.map(_it => ({ // 生成元素组中元素数据
+        ElementID: _it.ID,
+        CustomerInputValues: this.getInitCustomerInputValues(_it),
+        disabledByInteraction: false,
+        hiddenByInteraction: false,
+        DisabledValue: '',
+      }));
       return _item;
     };
     if (isItem) return getItem();
@@ -273,7 +285,11 @@ export default class QuotationClassType {
             const _t = partData.SizeGroup.GroupInfo.ElementList.find(_it => _it.ID === First);
             const _temp = { Value: '', ID: '' };
             if (_t) {
-              if (_t.Type === 2) _temp.ID = Second;
+              if (_t.HiddenToCustomer) {
+                if (_t.DefaultValue || _t.DefaultValue === 0) {
+                  _temp.Value = _t.DefaultValue;
+                }
+              } else if (_t.Type === 2) _temp.ID = Second;
               else _temp.Value = Second;
             }
             return { ElementID: First, CustomerInputValues: [_temp] };
@@ -317,9 +333,17 @@ export default class QuotationClassType {
         CustomerInputValues,
       };
     };
-    const getElementListValueFilter = (ElementList, disabledElementIDs = []) => {
+    const getElementListValueFilter = (ElementList, disabledElements = []) => {
       if (!ElementList || !Array.isArray(ElementList)) return [];
-      return ElementList.map(it => (disabledElementIDs.includes(it.ElementID) ? null : getSingleElementClearValue(it))).filter(it => it);
+      return ElementList.map(it => {
+        const t = disabledElements.find(_it => _it.ElementID === it.ElementID);
+        if (t) {
+          return t.DisabledOrHideDefaultValue || t.DisabledOrHideDefaultValue === 0
+            ? { ElementID: t.ElementID, CustomerInputValues: [{ Value: t.DisabledOrHideDefaultValue }] }
+            : null;
+        }
+        return getSingleElementClearValue(it);
+      }).filter(it => it);
     };
     const getGroupListValueFilter = (GroupList, GroupAffectedPropList = [], CraftID) => {
       if (!GroupList || !Array.isArray(GroupList)) return [];

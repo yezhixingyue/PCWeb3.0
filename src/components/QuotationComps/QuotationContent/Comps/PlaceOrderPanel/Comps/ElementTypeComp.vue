@@ -42,8 +42,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import InterAction from '@/store/Quotation/Interaction';
+import { creatNewTargetValue } from '@/store/Quotation/EffectiveControlList';
 import NumberTypeItemComp from './ElementDisplayTypeComps/NumberTypeItemComp.vue';
 import OptionTypeItemComp from './ElementDisplayTypeComps/OptionTypeItemComp.vue';
 import SwitchTypeItemComp from './ElementDisplayTypeComps/SwitchTypeItemComp.vue';
@@ -87,29 +88,32 @@ export default {
   },
   computed: {
     ...mapState('Quotation', ['isOrderRestore']),
+    ...mapGetters('Quotation', ['affectedElementIDsByInteraction']),
     PropValue: {
       get() {
+        let _value = this.value;
+        if (this.disabled && this.DisabledValue) _value = this.DisabledValue;
         if (this.Property.Type === 1) { // 数值类型
-          return Array.isArray(this.value) && this.value.length > 0 ? this.value[0].Value : '';
+          return Array.isArray(_value) && _value.length > 0 ? _value[0].Value : '';
         }
         if (this.Property.Type === 3) { // 开关类型
-          return Array.isArray(this.value) && this.value.length > 0 ? this.value[0].IsOpen : '';
+          return Array.isArray(_value) && _value.length > 0 ? _value[0].IsOpen : '';
         }
         if (this.Property.OptionAttribute?.IsRadio) {
-          return Array.isArray(this.value) && this.value.length > 0 ? this.value[0].Name || this.value[0].ID : '';
+          return Array.isArray(_value) && _value.length > 0 ? _value[0].Name || _value[0].ID : '';
         }
         if (this.Property.OptionAttribute && !this.Property.OptionAttribute?.IsRadio) {
-          return Array.isArray(this.value) && this.value.length > 0 ? this.value.map(it => it.ID) : [];
+          return Array.isArray(_value) && _value.length > 0 ? _value.map(it => it.ID) : [];
         }
         return '';
       },
       set(val) {
         if (this.Property.Type === 1) { // 数值类型
           const temp = { Value: `${val}` };
-          this.$emit('input', [temp]);
+          this.$emit('input', { CustomerInputValues: [temp], ...this.disabledInfoObj });
         } else if (this.Property.Type === 3) { // 开关
           const temp = { IsOpen: val };
-          this.$emit('input', [temp]);
+          this.$emit('input', { CustomerInputValues: [temp], ...this.disabledInfoObj });
         } else if (this.Property.OptionAttribute && this.Property.OptionAttribute.IsRadio) {
           const temp = { ID: '', Name: '' };
           // 此处应判断是否为ID，在options中则为ID， 否则为Name
@@ -120,15 +124,20 @@ export default {
           } else {
             temp.Name = val;
           }
-          this.$emit('input', [temp]);
+          this.$emit('input', { CustomerInputValues: [temp], ...this.disabledInfoObj });
         } else if (this.Property.OptionAttribute && !this.Property.OptionAttribute.IsRadio) {
           // 多选  此时不允许自定义
-          this.$emit('input', Array.isArray(val) ? val.map(ID => ({ ID })) : []);
+          this.$emit('input', { CustomerInputValues: Array.isArray(val) ? val.map(ID => ({ ID })) : [], ...this.disabledInfoObj });
         }
       },
     },
     disabled() { // 禁用
       return InterAction.getDisabledOrNot(this.AffectedPropList);
+    },
+    DisabledValue() {
+      const t = creatNewTargetValue(InterAction.getUnusabledValueByInteraction(this.AffectedPropList), this.Property);
+      if (t && t.CustomerInputValues) return t.CustomerInputValues;
+      return '';
     },
     hidden() { // 隐藏
       return InterAction.getIsHiddenOrNot(this.AffectedPropList);
@@ -163,10 +172,20 @@ export default {
     DisplayWidthIsAuto() {
       return !this.SetupDisplayWidth || false;
     },
+    switchDisabledOrHidden() {
+      // 排除isDisabled；因为其由上一级传来且只能是元素组或尺寸时才会传递，（尺寸组和元素组不再允许禁用或隐藏，所以该值废弃，不再考虑（其发生改变时本地无隐藏值，也需传递））
+      // return this.hidden || this.isDisabled || this.disabled;
+      return this.hidden || this.disabled;
+    },
   },
   data() {
     return {
       val: '',
+      disabledInfoObj: { // 记录当前禁用及隐藏信息
+        disabledByInteraction: false,
+        hiddenByInteraction: false,
+        DisabledValue: '',
+      },
     };
   },
   methods: {
@@ -180,6 +199,25 @@ export default {
       this.$nextTick(() => {
         this.$emit('interaction');
       });
+    },
+  },
+  watch: {
+    switchDisabledOrHidden: {
+      handler(newVal, oldVal) {
+        if (!newVal === !oldVal) return;
+        this.disabledInfoObj = {
+          disabledByInteraction: this.disabled,
+          hiddenByInteraction: this.hidden,
+          DisabledValue: newVal ? InterAction.getUnusabledValueByInteraction(this.AffectedPropList) : '',
+        };
+        this.$emit('input', { CustomerInputValues: [...this.value], ...this.disabledInfoObj });
+        this.$nextTick(() => {
+          if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
+            this.$emit('interaction');
+          }
+        });
+      },
+      immediate: true,
     },
   },
   mounted() {
@@ -207,8 +245,8 @@ export default {
     font-size: 12px;
     color: #888;
   }
-  .el-input.is-disabled .el-input__inner {
-    color: rgba($color: #000000, $alpha: 0);
-  }
+  // .el-input.is-disabled .el-input__inner {
+  //   color: rgba($color: #000000, $alpha: 0);
+  // }
 }
 </style>
