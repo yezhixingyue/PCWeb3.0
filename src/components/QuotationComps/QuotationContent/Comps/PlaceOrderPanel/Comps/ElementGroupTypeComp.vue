@@ -14,7 +14,7 @@
         <div>
           <ElementTypeComp
             v-for="(it) in Property.ElementList"
-            :key="it.ID"
+            :key="it.ID + item.key"
             :needInit="needInit"
             :Property="it"
             :value="getItemValue(index, it)"
@@ -152,18 +152,19 @@ export default {
       this.onTriggerInteractionClick();
     },
     onItemValueChange(lv1Index, it, value) {
-      const temp = JSON.parse(JSON.stringify(this.value));
-      const t = temp[lv1Index].List.find(_it => _it.ElementID === it.ID);
-      if (t) {
+      let temp = {};
+      const index = this.value[lv1Index].List.findIndex(_it => _it.ElementID === it.ID);
+      if (index > -1) {
+        temp = { ...this.value[lv1Index].List[index] };
         const {
           CustomerInputValues, disabledByInteraction, hiddenByInteraction, DisabledValue,
         } = value;
-        t.CustomerInputValues = CustomerInputValues;
-        t.disabledByInteraction = disabledByInteraction;
-        t.hiddenByInteraction = hiddenByInteraction;
-        t.DisabledValue = DisabledValue;
+        temp.CustomerInputValues = CustomerInputValues;
+        temp.disabledByInteraction = disabledByInteraction;
+        temp.hiddenByInteraction = hiddenByInteraction;
+        temp.DisabledValue = DisabledValue;
+        this.$emit('groupItemChange', [lv1Index, index, temp]);
       }
-      this.List = temp;
     },
     getItemValue(index, it) {
       const t = this.List[index].List.find(_it => _it.ElementID === it.ID);

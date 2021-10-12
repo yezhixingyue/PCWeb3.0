@@ -320,7 +320,6 @@ export default {
         return this.obj2GetProductPrice.ProductParams.PropertyList;
       },
       set([data, index, type]) {
-        // // console.log("setProductParamsPropertyList", data);
         this.setProductParamsPropertyList([index, data, type]);
       },
     },

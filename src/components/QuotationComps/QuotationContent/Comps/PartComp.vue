@@ -92,6 +92,7 @@ export default {
           resolve(bool || this.transformErrorObj(obj));
         });
       });
+      if (!this.$refs.oPartPanelArray) return true;
       let resultList = await Promise.all(this.$refs.oPartPanelArray.map(async it => {
         const res = await checkItem(it.$refs.ruleForm);
         return res;

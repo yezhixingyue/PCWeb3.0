@@ -54,6 +54,7 @@
             @input="handleGroupChange($event, it)"
             @changeValidate='onChangeValidate(it.ID)'
             @triggerInteraction='getSubGroupAffectedPropLists'
+            @groupItemChange='handleGroupItemChange($event, it)'
           />
         </el-form-item>
       </el-form>
@@ -240,6 +241,15 @@ export default {
       );
       if (t) {
         t.List = List;
+      }
+    },
+    handleGroupItemChange(Value, group) {
+      const t = this.localSetupData.GroupList.find(
+        (it) => it.GroupID === group.ID,
+      );
+      if (t) {
+        const [lv1Index, index, temp] = Value;
+        t.List[lv1Index].List.splice(index, 1, temp);
       }
     },
     validateCraftValueItem(rule, value, callback) {

@@ -103,10 +103,6 @@ export default {
     },
     getValue(it) {
       const t = this.value.find((_it) => _it.ElementID === it.ID);
-      // if (t) {
-      //   if (it.Type === 1) return t.CustomerInputValues[0]?.Value || '';
-      //   if (it.Type === 2) return t.CustomerInputValues[0]?.Name || t.CustomerInputValues[0]?.ID || '';
-      // }
       return t?.CustomerInputValues || [];
     },
     onInput(e, item) {

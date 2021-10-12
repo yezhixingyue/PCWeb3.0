@@ -14,7 +14,7 @@
     <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
      :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList' :subGroupAffectedPropList='subGroupAffectedPropList'
-     @triggerInteraction='onTriggerInteractionClick' />
+     @triggerInteraction='onTriggerInteractionClick' @groupItemChange='handleGroupItemChange' />
      <!-- 尺寸 -->
     <SizeGroupComp v-if="curTypeName==='尺寸组'" :AffectedPropList='localAffectedPropList'
      :Property='target' v-model="itemValue" :errorElementID='errorElementID' @triggerInteraction='onTriggerInteractionClick' />
@@ -190,7 +190,7 @@ export default {
         return value;
       },
       set(val) {
-        console.log('formItem itemValue 触发改变', val);
+        // console.log('formItem itemValue 触发改变', val);
         const type = this.curTypeName;
         // if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams',
@@ -358,6 +358,11 @@ export default {
       // this.$nextTick(() => {
       //   this.onChangeValidate();
       // });
+    },
+    handleGroupItemChange(Value) {
+      this.$store.commit('Quotation/setObj2GetProductPriceProductParamsGroupItem',
+        [this.PartID, this.PartIndex, this.itemData.Property ? this.itemData.Property.ID : '', Value]);
+      this.$emit('changeValidate', this.placeData.CraftGroupList.map(it => it.Name));
     },
   },
   watch: {

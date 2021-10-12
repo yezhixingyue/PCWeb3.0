@@ -961,6 +961,23 @@ export default {
       // const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
       // state.PropertiesAffectedByInteraction = list;
     },
+    setObj2GetProductPriceProductParamsGroupItem(state, [PartID, PartIndex, ID, Value]) {
+      let TargetPart;
+      if (!PartID) TargetPart = state.obj2GetProductPrice.ProductParams;
+      else {
+        const t = state.obj2GetProductPrice.ProductParams.PartList.find(it => it.PartID === PartID);
+        // if (t && t.List && t.List[PartIndex]) TargetPart = t[PartIndex]; // ------------------------- ???? 为什么加了这一行代码呢
+        // TargetPart = t.List[PartIndex];
+        if (t && t.List && t.List[PartIndex]) TargetPart = t.List[PartIndex];
+      }
+      if (!TargetPart) return;
+      const target = TargetPart.GroupList.find(it => it.GroupID === ID);
+      if (target) {
+        const [lv1Index, index, temp] = Value;
+        // target.List = Value;
+        target.List[lv1Index].List.splice(index, 1, temp);
+      }
+    },
     /** 设置产品报价面板信息 -- 部件添加与删除
     ---------------------------------------- */
     setObj2GetProductPriceProductParamsPartChange(state, [PartID, index, item]) {

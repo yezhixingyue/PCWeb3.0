@@ -275,7 +275,7 @@ export default class QuotationClassType {
   static transformToSubmit(obj, curProductInfo2Quotation, PropertiesAffectedByInteraction) {
     if (!obj || !curProductInfo2Quotation) return obj;
     const clearEmpty = false; // 是否清除掉数值列表为空的元素
-
+    // console.log(obj);
     const temp = JSON.parse(JSON.stringify(obj));
     const getSizeData = (Size, partData) => {
       if (Size && !Size.isCustomize && Size.ID && partData.SizeGroup && Array.isArray(partData.SizeGroup.SizeList)) {
@@ -319,7 +319,7 @@ export default class QuotationClassType {
     }
     // 转换数值 清除为空的元素值等
     const getSingleElementClearValue = ElVal => {
-      if (!ElVal || !Array.isArray(ElVal.CustomerInputValues) || ElVal.CustomerInputValues.length === 0) return null;
+      if (!ElVal || !Array.isArray(ElVal.CustomerInputValues)) return null;
       const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen }) => {
         if (ID) return { ID };
         if (Name) return { Name };
@@ -327,46 +327,51 @@ export default class QuotationClassType {
         if (IsOpen || IsOpen === false) return { IsOpen };
         return null;
       }).filter(it => it);
-      if (CustomerInputValues.length === 0 && clearEmpty) return null;
+      if ((!CustomerInputValues || CustomerInputValues.length === 0) && clearEmpty) return null;
       return {
         ...ElVal,
         CustomerInputValues,
       };
     };
+    // eslint-disable-next-line no-unused-vars
     const getElementListValueFilter = (ElementList, disabledElements = []) => {
       if (!ElementList || !Array.isArray(ElementList)) return [];
+      // eslint-disable-next-line arrow-body-style
       return ElementList.map(it => {
-        const t = disabledElements.find(_it => _it.ElementID === it.ElementID);
-        if (t) {
-          return t.DisabledOrHideDefaultValue || t.DisabledOrHideDefaultValue === 0
-            ? { ElementID: t.ElementID, CustomerInputValues: [{ Value: t.DisabledOrHideDefaultValue }] }
-            : null;
-        }
+        // const t = disabledElements.find(_it => _it.ElementID === it.ElementID);
+        // if (t) {
+        //   console.log(t, it);
+        //   return t.DisabledOrHideDefaultValue || t.DisabledOrHideDefaultValue === 0
+        //     ? { ElementID: t.ElementID, CustomerInputValues: [{ Value: t.DisabledOrHideDefaultValue }] }
+        //     : null;
+        // }
+        // console.log(it, getSingleElementClearValue(it));
         return getSingleElementClearValue(it);
       }).filter(it => it);
     };
+    // eslint-disable-next-line no-unused-vars
     const getGroupListValueFilter = (GroupList, GroupAffectedPropList = [], CraftID) => {
       if (!GroupList || !Array.isArray(GroupList)) return [];
-      const disabledGroupIDs = InterAction.getDisabledOrHiddenedGroupIDList(GroupAffectedPropList);
+      // const disabledGroupIDs = InterAction.getDisabledOrHiddenedGroupIDList(GroupAffectedPropList);
       return GroupList.map(Group => {
         if (!Array.isArray(Group.List) || Group.List.length === 0) return null;
-        if (Group.GroupID && disabledGroupIDs.includes(Group.GroupID)) return null;
+        // if (Group.GroupID && disabledGroupIDs.includes(Group.GroupID)) return null;
         const List = Group.List.map((item) => {
-          if (disabledGroupIDs.includes(item.GroupID)) return null;
-          let subGroupAffectedPropList = [];
-          if (CraftID) {
-            subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选工艺子交互中元素组，得到受子交互影响的属性列表
-              { CraftList: [{ GroupList: [{ GroupID: Group.GroupID, List: [item] }], CraftID }] }, curProductInfo2Quotation, Group.SubControlList || [],
-            );
-          } else {
-            subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选普通元素组子交互，得到受子交互影响的属性列表
-              { GroupList: [{ GroupID: Group.GroupID, List: [item] }] }, curProductInfo2Quotation, Group.SubControlList || [],
-            );
-          }
-          const InterActionData = getCombineAffectedPropList(GroupAffectedPropList, subGroupAffectedPropList); // 合并交互与子交互
-          const groupItemAffectedPropList = InterActionData.filter(it => it.Property.Group.ID === Group.GroupID); // 筛选出当前元素组生效列表
-          const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
-          const itemList = getElementListValueFilter(item.List, disabledElementIDs); // 对其所属元素进行筛选处理
+          // if (disabledGroupIDs.includes(item.GroupID)) return null;
+          // let subGroupAffectedPropList = [];
+          // if (CraftID) {
+          //   subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选工艺子交互中元素组，得到受子交互影响的属性列表
+          //     { CraftList: [{ GroupList: [{ GroupID: Group.GroupID, List: [item] }], CraftID }] }, curProductInfo2Quotation, Group.SubControlList || [],
+          //   );
+          // } else {
+          //   subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选普通元素组子交互，得到受子交互影响的属性列表
+          //     { GroupList: [{ GroupID: Group.GroupID, List: [item] }] }, curProductInfo2Quotation, Group.SubControlList || [],
+          //   );
+          // }
+          // const InterActionData = getCombineAffectedPropList(GroupAffectedPropList, subGroupAffectedPropList); // 合并交互与子交互
+          // const groupItemAffectedPropList = InterActionData.filter(it => it.Property.Group.ID === Group.GroupID); // 筛选出当前元素组生效列表
+          // const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
+          const itemList = getElementListValueFilter(item.List); // 对其所属元素进行筛选处理
           if (itemList.length === 0) return null;
           // const _itemList = itemList.filter(_it => _it.CustomerInputValues && _it.CustomerInputValues.length > 0);
           // if (_itemList.length === 0) return null;
@@ -384,11 +389,13 @@ export default class QuotationClassType {
     };
     const getCraftListValueFilter = (CraftList, CraftAffectedPropList = []) => {
       const disabledCraftIDs = InterAction.getDisabledOrHiddenedCraftIDList(CraftAffectedPropList);
+      // console.log(1);
       return CraftList.map(Craft => {
         if (disabledCraftIDs.includes(Craft.CraftID)) return null;
         const CraftItemAffectedList = CraftAffectedPropList.filter(it => it.Property.Craft.ID === Craft.CraftID);
         const GroupAffectedPropList = InterAction.getGroupTypeAffectedPropList(CraftItemAffectedList);
         const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(CraftItemAffectedList);
+        // console.log(Craft.GroupList, getGroupListValueFilter(Craft.GroupList, GroupAffectedPropList, Craft.CraftID));
         return {
           ...Craft,
           ElementList: getElementListValueFilter(Craft.ElementList, disabledElementIDs),
@@ -409,12 +416,12 @@ export default class QuotationClassType {
       const InterActionData = getCombineAffectedPropList(_InterActionData, PartAffectedPropList);
       const _Part = Part;
       if (Array.isArray(_Part.ElementList)) {
-        const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(InterActionData);
-        _Part.ElementList = getElementListValueFilter(_Part.ElementList, disabledElementIDs);
+        // const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(InterActionData);
+        _Part.ElementList = getElementListValueFilter(_Part.ElementList);
       }
       if (Array.isArray(_Part.GroupList)) {
-        const GroupAffectedPropList = InterAction.getGroupTypeAffectedPropList(InterActionData);
-        _Part.GroupList = getGroupListValueFilter(_Part.GroupList, GroupAffectedPropList);
+        // const GroupAffectedPropList = InterAction.getGroupTypeAffectedPropList(InterActionData);
+        _Part.GroupList = getGroupListValueFilter(_Part.GroupList);
       }
       if (Array.isArray(_Part.CraftList)) {
         const CraftAffectedPropList = InterAction.getCraftTypeAffectedPropList(InterActionData);
@@ -435,6 +442,10 @@ export default class QuotationClassType {
       List: part.List.map(it => getClearPartEmptyValues(it, part.PartID)),
     }));
     // 后面或可需要在此处处理用于转换受交互限制的属性值修改任务...
+    // console.log({
+    //   ..._temp,
+    //   PartList,
+    // });
     return {
       ..._temp,
       PartList,

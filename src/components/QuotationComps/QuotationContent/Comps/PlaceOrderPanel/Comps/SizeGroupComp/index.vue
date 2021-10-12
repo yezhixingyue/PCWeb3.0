@@ -10,6 +10,7 @@
       :isDisabled='isDisabled'
       :DisabledOptionList='DisabledOptionList'
       @blur="onTriggerInteractionClick"
+      @change="onTriggerInteractionClick"
     />
     <CustomizeSizeGroupComp
       v-show="isCustomize"
@@ -115,6 +116,7 @@ export default {
   },
   methods: {
     onTriggerInteractionClick(e) {
+      // console.log('onTriggerInteractionClick', e);
       this.$nextTick(() => {
         this.$emit('triggerInteraction', e);
       });
@@ -123,6 +125,7 @@ export default {
       if (!Array.isArray(list) || list.length === 0) return;
       if (list.includes(this.value.ID)) { // 常规尺寸无默认值
         this.$emit('input', { ...this.value, ID: '' });
+        this.onTriggerInteractionClick();
       }
     },
   },
