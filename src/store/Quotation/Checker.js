@@ -226,12 +226,12 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
 };
 
 export const checkSizeGroup = (value, prop, AffectedPropList) => {
+  if (value && prop && !value.isCustomize && !value.ID) {
+    return { msg: `请选择${prop && prop.GroupInfo && prop.GroupInfo.Name && !prop.GroupInfo.IsNameHidden ? prop.GroupInfo.Name : '尺寸'}`, index: 0 };
+  }
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
     if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
-    if (value && prop && !value.isCustomize && !value.ID) {
-      return { msg: `请选择${prop && prop.GroupInfo && prop.GroupInfo.Name && !prop.GroupInfo.IsNameHidden ? prop.GroupInfo.Name : '尺寸'}`, index: 0 };
-    }
     if (value && prop && !value.isCustomize && value.ID) {
       const disabledList = InterAction.getDisabledOptionList(AffectedPropList);
       const hiddenList = InterAction.getHiddenedOptionList(AffectedPropList);

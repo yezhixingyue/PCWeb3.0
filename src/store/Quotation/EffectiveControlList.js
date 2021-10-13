@@ -270,7 +270,6 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
       targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
       temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft);
-      console.log(temp, targetOriginData, target);
       if (!temp && temp !== false) temp = 'craftIsNotExist';
       break;
     case 5: // 物料

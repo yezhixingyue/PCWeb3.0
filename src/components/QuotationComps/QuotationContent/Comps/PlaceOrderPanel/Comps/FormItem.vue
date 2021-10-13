@@ -198,6 +198,9 @@ export default {
         if (this.curTypeName === '工艺') {
           this.$emit('changeValidate', this.placeData.CraftGroupList.map(it => it.Name));
         }
+        if (type === '元素组') {
+          this.getSubGroupAffectedPropList();
+        }
       },
     },
     showFormItem() { // 判断在什么时候隐藏该子项目
@@ -343,7 +346,7 @@ export default {
         // return list;
         const t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
         if (t) {
-          const _list = t.List.map(it => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
+          const _list = t.List.map((it) => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
             .map(it => getPropertiesAffectedByInteraction(it, this.curProductInfo2Quotation, list));
           this.subGroupAffectedPropList = _list;
           return;

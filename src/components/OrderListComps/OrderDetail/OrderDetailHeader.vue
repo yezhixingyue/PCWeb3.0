@@ -55,10 +55,11 @@
         </p>
         <p class="file-content">
           <span>文件内容：</span>
-          <el-tooltip popper-class="table-item" :enterable='false'
+          <el-tooltip popper-class="table-item" :enterable='false' v-if="info4OrderSummary.Content"
             :content="info4OrderSummary.Content" placement="top-start">
             <span> {{info4OrderSummary.Content}}</span>
           </el-tooltip>
+          <span v-else> 无</span>
         </p>
       </li>
     </ul>

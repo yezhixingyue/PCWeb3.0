@@ -115,6 +115,7 @@ export default {
       return this.AffectedPropList.filter((it) => it.Property && !it.Property.Element && it.Property.Group);
     },
     ChildUseAffectedPropList() {
+      if (this.List.length === 0) return null;
       return this.List.map((group, i) => {
         if (this.disabled) return [];
         if (this.AffectedPropList.length === 0 && !Array.isArray(this.subGroupAffectedPropList) && !this.subGroupAffectedPropList[i]) return [];
@@ -147,9 +148,14 @@ export default {
       this.onTriggerInteractionClick();
     },
     onDelClick(index) {
-      this.List = this.List.filter((it, i) => i !== index);
-      this.$emit('changeValidate');
-      this.onTriggerInteractionClick();
+      this.value[index].List.forEach((it, i) => {
+        this.$emit('groupItemChange', [index, i, {}]);
+      });
+      this.$nextTick(() => {
+        this.List = this.List.filter((it, i) => i !== index);
+        this.$emit('changeValidate');
+        this.onTriggerInteractionClick();
+      });
     },
     onItemValueChange(lv1Index, it, value) {
       let temp = {};
@@ -171,6 +177,7 @@ export default {
       return t ? t.CustomerInputValues : {};
     },
     getChildUseAffectedPropList(it, index) {
+      if (!this.ChildUseAffectedPropList) return [];
       return this.ChildUseAffectedPropList[index].filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
     },
     onTriggerInteractionClick() { // 触发交互

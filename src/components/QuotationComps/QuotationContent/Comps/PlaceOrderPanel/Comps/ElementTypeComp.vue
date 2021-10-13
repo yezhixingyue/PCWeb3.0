@@ -204,8 +204,6 @@ export default {
   watch: {
     switchDisabledOrHidden: {
       handler(newVal, oldVal) {
-        // if (this.Property.ID === 'a8642c25-8453-4783-8983-adb900ee2ef1') console.log(0, newVal, oldVal);
-        // if (this.Property.ID === '031bc894-3b3e-4d8d-a083-adb900ee5ad9') console.log(0, newVal, oldVal);
         if (!newVal === !oldVal) return;
         this.disabledInfoObj = {
           disabledByInteraction: this.disabled,
@@ -217,17 +215,12 @@ export default {
           this.$nextTick(() => {
             if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
               this.$emit('interaction');
-              // if (this.Property.ID === 'a8642c25-8453-4783-8983-adb900ee2ef1') console.log(2, [...this.value], this.disabledInfoObj);
             }
           });
         });
       },
       immediate: true,
     },
-  },
-  created() {
-  },
-  mounted() {
   },
 };
 </script>

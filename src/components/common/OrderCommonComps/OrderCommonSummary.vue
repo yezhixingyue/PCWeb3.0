@@ -59,9 +59,11 @@
             effect="dark"
             :content="info4OrderSummary.Content"
             placement="top-start"
+            v-if="info4OrderSummary.Content"
           >
             <span>{{info4OrderSummary.Content || '无'}}</span>
           </el-tooltip>
+          <span v-else>无</span>
         </p>
       </li>
     </ul>
