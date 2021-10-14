@@ -348,6 +348,7 @@ export default {
         if (t) {
           const _list = t.List.map((it) => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
             .map(it => getPropertiesAffectedByInteraction(it, this.curProductInfo2Quotation, list));
+          // console.log(list, _list);
           this.subGroupAffectedPropList = _list;
           return;
         }

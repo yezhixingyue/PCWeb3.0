@@ -180,8 +180,8 @@ export default {
     onSubmit() {
       this.$refs.craftForm.validate((bool) => {
         if (bool) {
-          const obj = this.generateSubmitSetupData();
-          this.$emit('submit', obj);
+          // const obj = this.generateSubmitSetupData();
+          this.$emit('submit', this.localSetupData);
           this.onTriggerInteractionClick();
         }
       });
@@ -249,7 +249,13 @@ export default {
       );
       if (t) {
         const [lv1Index, index, temp] = Value;
-        t.List[lv1Index].List.splice(index, 1, temp);
+        const {
+          CustomerInputValues, disabledByInteraction, hiddenByInteraction, DisabledValue,
+        } = temp;
+        t.List[lv1Index].List[index].CustomerInputValues = CustomerInputValues;
+        t.List[lv1Index].List[index].disabledByInteraction = disabledByInteraction;
+        t.List[lv1Index].List[index].hiddenByInteraction = hiddenByInteraction;
+        t.List[lv1Index].List[index].DisabledValue = DisabledValue;
       }
     },
     validateCraftValueItem(rule, value, callback) {
@@ -324,7 +330,9 @@ export default {
     },
     getLocalAffectedPropList() {
       // 替换对象
-      const obj = this.generateSubmitSetupData();
+      // const obj = this.generateSubmitSetupData();
+      const obj = { ...this.localSetupData };
+      // console.log(obj);
       const temp = JSON.parse(JSON.stringify(this.obj2GetProductPrice.ProductParams));
       let target;
       if (!this.PartID) {

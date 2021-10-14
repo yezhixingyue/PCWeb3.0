@@ -189,7 +189,8 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
       for (let index = 0; index < itemValues.List.length; index += 1) {
         const { ElementID, CustomerInputValues } = itemValues.List[index];
         const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
-        const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element && _it.Property.Element.ID === _Element.ID);
+        const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element
+         && _Element && _it.Property.Element.ID === _Element.ID);
         const msg = checkElement(CustomerInputValues, _Element, ElementAffectedPropList);
         if (msg) return { msg: `${groupName}${msg}`, ElementID, index: i };
       }

@@ -106,7 +106,7 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
  * @param {*}
  * @return {*}
  */
-const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) => {
+const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, isSubControl, ControlItem) => {
   let _GroupValue;
   if (target && targetOriginData) {
     if (!Element) { // 元素组本身
@@ -142,8 +142,9 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
         if (Array.isArray(ElValues[0])) _GroupValue = [...ElValues]; // 多选选项元素时
         else { // 单选时
           // 此处需要判断所在元素组的使用次数
-          const { UseTimes } = targetOriginData;
-          if (UseTimes && UseTimes.MinValue === 1 && UseTimes.MaxValue === 1) { // 单次使用元素组的单选元素 - 直接返回值 -> 同普通元素（非元素组元素）
+          const { UseTimes, ID } = targetOriginData;
+          const { GroupID } = ControlItem;
+          if ((UseTimes && UseTimes.MinValue === 1 && UseTimes.MaxValue === 1) || (isSubControl && GroupID && GroupID === ID)) { // 单次使用元素组的单选元素 - 直接返回值 -> 同普通元素（非元素组元素）
             const [_val] = ElValues;
             _GroupValue = _val;
           } else { // 多次使用元素组的单选元素
@@ -166,7 +167,7 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData) 
  * @param {*}
  * @return {*}
  */
-const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData) => {
+const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, isSubControl, ControlItem) => {
   let _CraftValue;
   if (target && target.disabledByInteraction) _CraftValue = false;
   else if (!Element && !Group && !FixedType) _CraftValue = !!target && !target.disabledByInteraction; // 工艺是否选中 返回布尔值
@@ -174,7 +175,8 @@ const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData) 
     if (Group) { // 工艺上属性组
       const targetGroup = target.GroupList.find(_it => _it.GroupID === Group.ID);
       const targetGroupOriginData = targetOriginData.GroupList.find(_it => _it.ID === Group.ID);
-      _CraftValue = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData);
+      _CraftValue = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData, isSubControl, ControlItem);
+      // console.log(_CraftValue, targetGroup, target.GroupList, target);
     } else {
       _CraftValue = getElementTypeValue(Element, FixedType, target.ElementList, targetOriginData.ElementList);
     }
@@ -183,7 +185,6 @@ const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData) 
 };
 
 const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
-  // console.log(Size, SizeGroup, Element, FixedType);
   if (!Size || !SizeGroup) return null;
   const { ID, List, isCustomize } = Size;
   if (!isCustomize && !ID) return null;
@@ -237,7 +238,7 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
  * @param {*} isSubControl 是否是子交互
  * @return {*}
  */
-export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotation, isSubControl) => {
+export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
   /**
   * 寻找目标步骤：
   * 1. 寻找到目标部件（产品或部件）： 通过Part来确定；如果部件使用次数大于1则返回null
@@ -261,7 +262,7 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
     case 2: // 元素组 --- 1 元素组本身（Element为null）  2 元素组上的元素
       target = targetPartItem.GroupList.find(_it => _it.GroupID === Group.ID);
       targetOriginData = targetPartData.GroupList.find(_it => _it.ID === Group.ID);
-      temp = getElementGroupTypeValue(Element, FixedType, target, targetOriginData);
+      temp = getElementGroupTypeValue(Element, FixedType, target, targetOriginData, isSubControl, ControlItem);
       break;
     case 3: // 独立元素
       temp = getElementTypeValue(Element, FixedType, targetPartItem.ElementList, targetPartData.ElementList);
@@ -269,7 +270,7 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
     case 4: // 工艺
       target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
       targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
-      temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft);
+      temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem);
       if (!temp && temp !== false) temp = 'craftIsNotExist';
       break;
     case 5: // 物料
@@ -286,8 +287,9 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
 };
 
 const getArrayIsEqual = (arr1, arr2) => { // 都为字符串或数字组成的数组
-  if (arr1.length !== arr2.length) return false;
+  // if (arr1.length !== arr2.length) return false;
   // 进行去重操作
+  // console.log('getArrayIsEqual', arr1, arr2);
   const _arr1 = [...new Set(arr1)];
   const _arr2 = [...new Set(arr2)];
   if (_arr1.length !== _arr2.length) return false;
@@ -335,7 +337,6 @@ const getValueIsNotContainList = (value, ValueList) => { // 获取是否不包�
  * @return {*} 返回匹配结果：布尔值
  */
 const matchValueWithValueList = (value, Operator, ValueList) => {
-  // console.log('matchValueWithValueList', value, Operator, ValueList);
   const getIsEqual = () => { // 判断是否相等
     if (!ValueList || ValueList.length === 0) return true;
     const Values = ValueList.map(it => it.Value);
@@ -411,11 +412,11 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
  * @param {*}
  * @return {*}  boolean
  */
-export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation, isSubControl) => {
+export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
   if (!item || !ProductParams) return false;
   const { Property, Operator, ValueList } = item;
   if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return false;
-  const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl);
+  const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
   if (!targetValue && targetValue !== 0 && targetValue !== false && typeof targetValue !== 'boolean' && Operator !== 2) return false;
   if (targetValue === 'craftIsNotExist') return false;
   return matchValueWithValueList(targetValue, Operator, ValueList, Property);
@@ -433,11 +434,11 @@ export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Qu
   const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
   if (ItemList.length > 0) {
     if (FilterType === 1) { // 满足所有
-      const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl)); // 找到不符合的项目
+      const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem)); // 找到不符合的项目
       return !inconformityItem;
     }
     // 满足任一
-    const conformityItem = ItemList.find(it => getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl)); // 找到符合的项目
+    const conformityItem = ItemList.find(it => getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem)); // 找到符合的项目
     return !!conformityItem;
   }
   return true;
