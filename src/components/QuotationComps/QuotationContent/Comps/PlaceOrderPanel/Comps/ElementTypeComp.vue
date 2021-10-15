@@ -3,6 +3,8 @@
     <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">{{Property.Name}}：</label>
     <!-- 数字类型 -->
     <NumberTypeItemComp
+     class="element-type-content"
+     contentBefore=''
      v-if="Property.Type === 1"
      v-model.lazy="PropValue"
      :InputContent='Property.NumbericAttribute.InputContent'
@@ -15,6 +17,8 @@
      :Allow="Property.NumbericAttribute.AllowCustomer" />
     <!-- 选项类型 -->
     <OptionTypeItemComp
+     class="element-type-content"
+     contentBefore=''
      v-if="Property.Type === 2"
      v-model.lazy="PropValue"
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
@@ -30,6 +34,8 @@
      @blur="onBlur" />
     <!-- 开关 -->
     <SwitchTypeItemComp
+     class="element-type-content"
+     contentBefore=''
      v-if="Property.Type === 3"
      v-model.lazy="PropValue"
      :OpenValue="Property.SwitchAttribute.OpenValue"

@@ -297,6 +297,7 @@ export default class QuotationClassType {
           return { ...Size, List: _list };
         }
       }
+      if (Size.isCustomize) return { ...Size, ID: '' };
       return Size;
     };
     // 转换产品尺寸

@@ -1,11 +1,11 @@
 <template>
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="List.length === 0 || showTop">
-      <span class="blue-span" v-show="List.length === 0 && !hideCtrl" @click="onAddClick" :class="{disabled:disabled}"
-        >+ 添加</span
+      <span class="blue-span is-font-13" v-show="!hideCtrl && List.length < maxLength" @click="onAddClick" :class="{disabled:disabled}"
+        >+ 添加{{Property.Name || ''}}</span
       >
     </div>
-    <ul :class="{'y-display': !IsHorizontalDisplay, hideCtrl: hideCtrl}">
+    <ul :class="{'y-display': !IsHorizontalDisplay, hideCtrl: hideCtrl}" ref="groupContent">
       <li
         v-for="(item, index) in List"
         :key="item.key"
@@ -31,14 +31,14 @@
                 <span>删除</span>
               </div>
             </li>
-            <li v-show="fillWidth || (index === List.length - 1 && List.length < maxLength)">
+            <!-- <li v-show="fillWidth || (index === List.length - 1 && List.length < maxLength)">
               <span
                 class="blue-span"
                 @click="onAddClick"
                 v-show="index === List.length - 1 && List.length < maxLength"
                 >+ 添加</span
               >
-            </li>
+            </li> -->
           </ul>
         </div>
       </li>
@@ -78,6 +78,7 @@ export default {
       default: '',
     },
     errorIndex: {},
+    errorMsg: {},
     AffectedPropList: { // 受到交互影响的元素组列表
       type: Array,
       default: () => [],
@@ -202,6 +203,21 @@ export default {
       },
       immediate: true,
     },
+    errorIndex: {
+      handler(val) {
+        this.$nextTick(() => {
+          const targetDom = this.$refs.groupContent && this.$refs.groupContent.querySelector('.canError .element-type-content');
+          if (targetDom) {
+            if (this.errorMsg && val !== 'all') {
+              targetDom.dataset.contentBefore = this.errorMsg;
+            } else {
+              targetDom.dataset.contentBefore = '';
+            }
+          }
+        });
+      },
+      immediate: true,
+    },
   },
 };
 </script>
@@ -212,9 +228,9 @@ export default {
       > div {
         > .ctrl {
           display: inline-block;
-          margin-left: 25px;
+          margin-left: 45px;
           &.fillWidth {
-            width: 120px;
+            width: 95px;
           }
           > li {
             display: inline-block;
@@ -248,6 +264,21 @@ export default {
         .mp-place-order-content-element-type-show-item-comp-wrap {
           > label.el-title {
             min-width: 4em;
+          }
+          &.canError .element-type-content {
+            position: relative;
+            &::before {
+              content: attr(data-content-before);
+              position: absolute;
+              left: 0;
+              bottom: -5px;
+              height: 20px;
+              font-size: 12px;
+              color: #ff3769;
+              width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
           }
         }
       }

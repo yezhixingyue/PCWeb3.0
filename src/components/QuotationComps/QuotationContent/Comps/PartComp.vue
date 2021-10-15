@@ -2,7 +2,7 @@
   <ul v-if="PartData && placeData && DisplayPartData" class="mp-place-order-panel-part-form-comp-containner">
     <li v-if="PartData.List.length === 0">
       <p class="single">
-        <label>// {{PartName}} <span class="blue-span" @click="onPartAddClick(0)">+ 添加</span></label>
+        <label>// {{PartName}} <span class="blue-span" @click="onPartAddClick(0)">+ 添加{{PartName}}</span></label>
       </p>
     </li>
     <li v-for="(it, i) in PartData.List" :key="it.key">

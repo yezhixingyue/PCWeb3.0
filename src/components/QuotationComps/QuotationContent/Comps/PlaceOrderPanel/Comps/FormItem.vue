@@ -13,7 +13,8 @@
      :AffectedPropList='localAffectedPropList' @interaction="onTriggerInteractionClick" />
     <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
-     :errorElementID='errorElementID' :errorIndex='errorIndex' :AffectedPropList='localAffectedPropList' :subGroupAffectedPropList='subGroupAffectedPropList'
+     :errorElementID='errorElementID' :errorIndex='errorIndex' :errorMsg='errorMsg' :AffectedPropList='localAffectedPropList'
+     :subGroupAffectedPropList='subGroupAffectedPropList'
      @triggerInteraction='onTriggerInteractionClick' @groupItemChange='handleGroupItemChange' />
      <!-- 尺寸 -->
     <SizeGroupComp v-if="curTypeName==='尺寸组'" :AffectedPropList='localAffectedPropList'
@@ -264,6 +265,7 @@ export default {
     return {
       errorElementID: '',
       errorIndex: '',
+      errorMsg: '',
       subGroupAffectedPropList: [],
     };
   },
@@ -284,6 +286,7 @@ export default {
         }
         this.errorElementID = '';
         this.errorIndex = '';
+        this.errorMsg = '';
         if (this.curTypeName === '元素') {
           const res = checkElement(this.itemValue, this.target, this.localAffectedPropList);
           if (res && typeof res === 'string') {
@@ -296,6 +299,7 @@ export default {
           if (res && typeof res === 'object' && res.msg) {
             this.errorElementID = res.ElementID;
             this.errorIndex = res.index;
+            this.errorMsg = res.msg;
             callback(new Error(res.msg));
             return;
           }

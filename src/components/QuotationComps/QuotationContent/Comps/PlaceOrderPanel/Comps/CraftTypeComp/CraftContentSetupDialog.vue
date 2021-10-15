@@ -47,6 +47,7 @@
             fillWidth
             :errorElementID='errorElementID'
             :errorIndex='errorIndex'
+            :errorMsg='errorMsg'
             :showTop='it.Name && !it.IsNameHidden'
             :value="craftForm[it.ID].Value"
             :AffectedPropList='AffectedPropLists[i]'
@@ -171,6 +172,7 @@ export default {
       showMain: false,
       errorElementID: '',
       errorIndex: '',
+      errorMsg: '',
       AffectedPropLists: [],
       subGroupAffectedPropLists: [],
       localAffectedPropList: [], // 弹窗内使用本地交互列表，以实现实时响应数据
@@ -261,6 +263,7 @@ export default {
     validateCraftValueItem(rule, value, callback) {
       this.errorElementID = '';
       this.errorIndex = '';
+      this.errorMsg = '';
       if (value) {
         const { ID, Type, Value } = value;
         if (Type === 'Element') {
@@ -281,6 +284,7 @@ export default {
             if (res && typeof res === 'object' && res.msg) {
               this.errorElementID = res.ElementID;
               this.errorIndex = res.index;
+              this.errorMsg = res.msg;
               callback(new Error(res.msg));
               return;
             }

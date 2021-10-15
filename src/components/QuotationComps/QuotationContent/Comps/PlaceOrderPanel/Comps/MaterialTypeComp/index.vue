@@ -74,7 +74,7 @@ export default {
           const _unit = _it.Unit || '';
           return `${_label}${_value}${_unit}`;
         }).join(' ');
-        return _Name;
+        return _Name || ' ';
       };
       const _showLenList = this.MaterialList.map(it => it.UnionShowList.length);
       const showRootClass = [...new Set(_showLenList)].length > 1;
