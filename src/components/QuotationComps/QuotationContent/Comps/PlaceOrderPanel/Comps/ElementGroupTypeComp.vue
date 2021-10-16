@@ -203,21 +203,21 @@ export default {
       },
       immediate: true,
     },
-    errorIndex: {
-      handler(val) {
-        this.$nextTick(() => {
-          const targetDom = this.$refs.groupContent && this.$refs.groupContent.querySelector('.canError .element-type-content');
-          if (targetDom) {
-            if (this.errorMsg && val !== 'all') {
-              targetDom.dataset.contentBefore = this.errorMsg;
-            } else {
-              targetDom.dataset.contentBefore = '';
-            }
-          }
-        });
-      },
-      immediate: true,
-    },
+    // errorIndex: {
+    //   handler(val) {
+    //     this.$nextTick(() => {
+    //       const targetDom = this.$refs.groupContent && this.$refs.groupContent.querySelector('.canError .element-type-content');
+    //       if (targetDom) {
+    //         if (this.errorMsg && val !== 'all') {
+    //           targetDom.dataset.contentBefore = this.errorMsg;
+    //         } else {
+    //           targetDom.dataset.contentBefore = '';
+    //         }
+    //       }
+    //     });
+    //   },
+    //   immediate: true,
+    // },
   },
 };
 </script>
