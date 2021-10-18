@@ -41,6 +41,7 @@
           :prop="it.ID"
           :rules="[{ validator: validateCraftValueItem, trigger: 'change' }]"
           class="group"
+          :class="{hasError: errorIndex || errorIndex === 0}"
         >
           <ElementGroupTypeComp
             :Property="it"
@@ -213,6 +214,9 @@ export default {
     },
     onClosed() {
       this.showMain = false;
+      this.errorElementID = '';
+      this.errorIndex = '';
+      this.errorMsg = '';
     },
     getElementVal({ ID }, data) {
       const t = data.ElementList.find(

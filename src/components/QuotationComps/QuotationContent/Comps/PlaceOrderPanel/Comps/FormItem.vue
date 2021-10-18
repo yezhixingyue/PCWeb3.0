@@ -7,7 +7,7 @@
       { validator: validateFormItem, trigger: 'change' }
     ]"
    class="mp-place-order-panel-form-item-comp-wrap"
-   :class="{isNormalGroup:isNormalGroup}">
+   :class="{isNormalGroup:isNormalGroup, hasError: errorIndex || errorIndex === 0}">
     <!-- 元素 -->
     <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue"
      :AffectedPropList='localAffectedPropList' @interaction="onTriggerInteractionClick" />
@@ -390,6 +390,7 @@ export default {
   // overflow: hidden;
   > label {
     white-space: nowrap;
+    overflow: hidden;
   }
   > .el-form-item__content {
     > .mp-place-order-panel-element-group-setup-comp-wrap {
@@ -430,5 +431,8 @@ export default {
     padding-top: 1px;
     line-height: 14px;
   }
+  // &.hasError > .el-form-item__content {
+  //   border-bottom: 1px solid #ff3769;
+  // }
 }
 </style>

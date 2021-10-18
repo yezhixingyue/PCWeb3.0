@@ -24,7 +24,7 @@
           <div :style="wStyles[0]" class="is-twelve">{{getProductName(item)}}</div>
           <div :style="wStyles[1]">{{getProductCount(item.OrderID)}}</div>
           <div :style="wStyles[2]">{{item.Funds.OriginalPrice}}元</div>
-          <div :style="wStyles[3]">{{item.Funds.CouponAmount}}元</div>
+          <div :style="wStyles[3]">{{item.Funds.CouponAmount ? `-${item.Funds.CouponAmount}` : item.Funds.CouponAmount}}元</div>
           <div :style="wStyles[4]">{{item.Funds.FinalPrice}}元</div> <!-- 成交价 -->
           <div :style="wStyles[5]">{{item.Funds.Deposit}}元</div> <!-- 定金 -->
           <div :style="wStyles[6]" class="is-font-12 is-pink">{{item.ProducePeriod | getPayTime}}

@@ -29,8 +29,8 @@ const getElementValueContent = (CustomerInputValues, origin, giveUpUnit) => {
       if (Value || Value === 0) return Unit && !giveUpUnit ? `${+Value}${Unit || ''}` : `${+Value}`;
     }
     if (origin.Type === 3 && origin.SwitchAttribute) { // 开关类型=
-      const [{ Value }] = CustomerInputValues;
-      if (+Value === origin.SwitchAttribute.OpenValue) return origin.SwitchAttribute.Words;
+      const [{ IsOpen }] = CustomerInputValues;
+      if (IsOpen) return origin.SwitchAttribute.Words;
       // if (+Value === origin.SwitchAttribute.CloseValue) return `不${origin.SwitchAttribute.Words}`;
     }
   }
@@ -100,13 +100,11 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList) => 
   const EleName = IsNameHidden ? '' : Element.Name;
   if (!CustomerInputValues || CustomerInputValues.length === 0 || !Element) return '';
   if (CustomerInputValues.length === 1) {
-    const [{ ID, Name, Value }] = CustomerInputValues;
+    // eslint-disable-next-line object-curly-newline
+    const [{ ID, Name, Value, IsOpen }] = CustomerInputValues;
     if (Element.Type === 3) {
       // 开关
-      if (
-        Element.SwitchAttribute
-        && `${Element.SwitchAttribute.OpenValue}` === Value
-      ) return Element.SwitchAttribute.Words || Element.Name;
+      if (IsOpen) return Element.SwitchAttribute.Words || Element.Name;
     }
     if (Element.Type === 1 && Value) {
       // 数值
@@ -139,7 +137,7 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList) => 
         .map((id) => Element.OptionAttribute.OptionList.find((it) => it.ID === id))
         .filter((it) => it)
         .map((it) => it.Name);
-      return names.join('，');
+      return `${EleName}${EleName ? '：' : ''}${names.join('，')}`;
     }
   }
   return '';

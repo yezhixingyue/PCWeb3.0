@@ -84,7 +84,7 @@ const _elementTypeChecker = (value, element) => {
  * @return {*}
  */
 export const checkElement = (values, prop, AffectedPropList, showPropName = true) => {
-  if (!prop) return '';
+  if (!prop || !values) return '';
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
     if (InterAction.getDisabledOrNot(AffectedPropList) || InterAction.getIsHiddenOrNot(AffectedPropList)) return '';
@@ -98,7 +98,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
         const t = arr.find(it => valueIDs.includes(it));
         if (t) {
           const target = prop.OptionAttribute?.OptionList?.find(_it => _it.ID === t);
-          if (target) return `${showPropName ? prop.Name : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
+          if (target) return `${showPropName ? `[${prop.Name}] ` : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
         }
       }
       if (requiredList.length > 0) {
@@ -108,7 +108,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
           const target = t2.map(it => prop.OptionAttribute?.OptionList?.find(_it => _it.ID === it)).filter(it => it);
           if (target.length > 0) {
             const text = target.map(it => `[ ${it.Name} ]`).join('、');
-            return `${showPropName ? prop.Name : ''}选项中 ${text} 为必选项`;
+            return `${showPropName ? `[${prop.Name}] ` : ''}选项中 ${text} 为必选项`;
           }
         }
       }
@@ -118,7 +118,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
   const operation = prop.Type === 2 ? '选择' : '填写';
   if (prop.NumbericAttribute && prop.NumbericAttribute.IsRequired) IsRequired = true;
   if (prop.OptionAttribute && prop.OptionAttribute.IsRequired) IsRequired = true;
-  if (IsRequired && values.length === 0) return `请${operation}${prop.Name}`;
+  if (IsRequired && values && values.length === 0) return `请${operation}${prop.Name}`;
   // 判断是否为多选选项元素
   // let isMultiple = false;
   if (prop.Type === 2 && !prop.OptionAttribute.IsRadio) {
@@ -131,14 +131,14 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
       const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;
       if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
         // 项数不符合
-        if (MinValue === MaxValue) return `${showPropName ? prop.Name : ''}必须选择${MinValue}项`;
-        if (MaxValue === -1 || len < MinValue) return `${showPropName ? prop.Name : ''}至少选择${MinValue}项`;
-        if (len > MaxValue) return `${showPropName ? prop.Name : ''}最多选择${MaxValue}项`;
-        return `${showPropName ? prop.Name : ''}应选择${MinValue}至${MaxValue}项`;
+        if (MinValue === MaxValue) return `${showPropName ? `[${prop.Name}] ` : ''}必须选择${MinValue}项`;
+        if (MaxValue === -1 || len < MinValue) return `${showPropName ? `[${prop.Name}] ` : ''}至少选择${MinValue}项`;
+        if (len > MaxValue) return `${showPropName ? `[${prop.Name}] ` : ''}最多选择${MaxValue}项`;
+        return `${showPropName ? `[${prop.Name}] ` : ''}应选择${MinValue}至${MaxValue}项`;
       }
     }
   }
-  if (values.length === 1) {
+  if (values && values.length === 1) {
     const [{ ID, Name, Value }] = values;
     if (!ID && !Name && !Value && IsRequired) return `请${operation}${prop.Name}`;
     if (Name || Value) {

@@ -172,6 +172,7 @@ export default {
         let t = this.curMaterialList.find(it => it.disabled && it.ID !== this.value && !list.includes(it.ID));
         if (!t) t = this._MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !list.includes(it.ID));
         this.selectedMaterial = t ? t.ID : '';
+        // this.selectedMaterial = '';
       }
     },
   },

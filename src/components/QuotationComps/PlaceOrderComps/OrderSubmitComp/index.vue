@@ -228,8 +228,23 @@ export default {
     async OrderPanelChecker() { // 下单面板校验及返回页面顶部处理
       const bool = await this.getCheckResult();
       if (bool !== true) {
+        const scrollHandler = () => {
+          const oFirstErrorDom = document.getElementsByClassName('el-form-item__error')[0];
+          if (oFirstErrorDom && oFirstErrorDom.parentElement) {
+            const { top } = oFirstErrorDom.parentElement.getBoundingClientRect();
+            if (top - 130 < 0) { // 在视野外 需要滚动至上方
+              const oApp = document.getElementById('app');
+              if (oApp) {
+                const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
+                this.utils.animateScroll(oApp.scrollTop, willToTop, num => {
+                  oApp.scrollTop = num;
+                });
+              }
+            }
+          }
+        };
         this.messageBox.failSingleError({
-          title: `${this.title}失败`, msg: bool, successFunc: this.scrollToTop, failFunc: this.scrollToTop,
+          title: `${this.title}失败`, msg: bool, successFunc: scrollHandler, failFunc: scrollHandler,
         });
         return false;
       }

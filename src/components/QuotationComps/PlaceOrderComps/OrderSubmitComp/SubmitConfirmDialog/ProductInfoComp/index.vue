@@ -15,11 +15,11 @@
       </div>
       <div>
         <span class="label">活动：</span>
-        <span class="text" :class="{'is-pink': !!PromoteAmount}">{{ PromoteAmount ? `-¥${PromoteAmount}` : 0}}元</span>
+        <span class="text" :class="{'is-pink': !!PromoteAmount}">{{ PromoteAmount ? `-${PromoteAmount}` : 0}}元</span>
       </div>
       <div>
         <span class="label">优惠券：</span>
-        <span class="text" :class="{'is-pink': !!CouponAmount}">{{ CouponAmount ? `-¥${CouponAmount}` : 0}}元</span>
+        <span class="text" :class="{'is-pink': !!CouponAmount}">{{ CouponAmount ? `-${CouponAmount}` : 0}}元</span>
       </div>
       <div>
         <span class="label">成交价：</span>
@@ -85,7 +85,7 @@ export default {
       return this.OrderData ? this.OrderData.Funds.CouponAmount : 0;
     },
     PromoteAmount() {
-      return +(this.OriginalPrice - this.OrderData.FinalPrice - this.CouponAmount).toFixed(2);
+      return +(this.OriginalPrice - this.OrderData.Funds.FinalPrice - this.CouponAmount).toFixed(2);
     },
   },
   data() {

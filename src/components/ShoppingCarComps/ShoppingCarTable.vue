@@ -29,7 +29,7 @@
         </el-table-column>
         <el-table-column label="优惠券" show-overflow-tooltip width="65">
           <template slot-scope="scope"
-            >{{ scope.row.Funds.CouponAmount > 0 ? '-' +scope.row.Funds.CouponAmount.toFixed(2) : 0 }}元</template>
+            >{{ scope.row.Funds.CouponAmount > 0 ? '-' + +scope.row.Funds.CouponAmount.toFixed(2) : 0 }}元</template>
         </el-table-column>
         <el-table-column label="成交价" width="65" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Funds.FinalPrice }}元</template>

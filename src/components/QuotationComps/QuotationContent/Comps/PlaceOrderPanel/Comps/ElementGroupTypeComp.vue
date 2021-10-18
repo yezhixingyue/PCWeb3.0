@@ -1,7 +1,7 @@
 <template>
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
-    <div v-show="List.length === 0 || showTop">
-      <span class="blue-span is-font-13" v-show="!hideCtrl && List.length < maxLength" @click="onAddClick" :class="{disabled:disabled}"
+    <div v-show="minLength !== maxLength || showTop">
+      <span class="blue-span is-font-13" v-show="!hideCtrl" @click="onAddClick" :class="{disabled:List.length >= maxLength || disabled}"
         >+ 添加{{Property.Name || ''}}</span
       >
     </div>
@@ -21,6 +21,7 @@
             :isDisabled='disabled'
             @input="onItemValueChange(index, it, $event)"
             @interaction="onTriggerInteractionClick"
+            :isError="errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')"
             :AffectedPropList='getChildUseAffectedPropList(it, index)'
             :class="{canError: errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')}"
           />
@@ -133,6 +134,9 @@ export default {
     hideCtrl() {
       return this.maxLength === this.minLength;
     },
+    watchError() {
+      return this.errorIndex + this.errorMsg;
+    },
   },
   data() {
     return {
@@ -142,7 +146,7 @@ export default {
   },
   methods: {
     onAddClick() {
-      if (this.disabled) return;
+      if (this.disabled || this.List.length >= this.maxLength) return;
       const temp = QuotationClassType.getGroupItemSubmitData(this.Property, true);
       this.List = [...this.List, temp];
       this.$emit('changeValidate');
@@ -203,7 +207,7 @@ export default {
       },
       immediate: true,
     },
-    // errorIndex: {
+    // watchError: {
     //   handler(val) {
     //     this.$nextTick(() => {
     //       const targetDom = this.$refs.groupContent && this.$refs.groupContent.querySelector('.canError .element-type-content');
@@ -264,21 +268,38 @@ export default {
         .mp-place-order-content-element-type-show-item-comp-wrap {
           > label.el-title {
             min-width: 4em;
-          }
-          &.canError .element-type-content {
-            position: relative;
-            &::before {
-              content: attr(data-content-before);
-              position: absolute;
-              left: 0;
-              bottom: -5px;
-              height: 20px;
-              font-size: 12px;
-              color: #ff3769;
-              width: 100%;
-              overflow: hidden;
-              text-overflow: ellipsis;
+            > i {
+              font-weight: 700;
             }
+          }
+          &.canError {
+            .element-type-content {
+              position: relative;
+              &::before {
+                content: attr(data-content-before);
+                position: absolute;
+                left: 0;
+                bottom: -5px;
+                height: 20px;
+                font-size: 12px;
+                color: #ff3769;
+                width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: none;
+              }
+              // .el-checkbox__inner {
+              //   border-color: #ff3769;
+              // }
+            }
+            // > label.el-title {
+            //   position: relative;
+            //   > i {
+            //     position: absolute;
+            //     top: 0px;
+            //     right: 0;
+            //   }
+            // }
           }
         }
       }
@@ -322,6 +343,13 @@ export default {
   }
   > div {
     margin-left: 6px;
+    > span.disabled {
+      color: #a2a2a2 !important;
+      cursor: not-allowed;
+      &:hover {
+        opacity: 1;
+      }
+    }
   }
 }
 </style>

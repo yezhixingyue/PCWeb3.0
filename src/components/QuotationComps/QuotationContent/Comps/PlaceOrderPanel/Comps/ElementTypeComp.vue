@@ -1,6 +1,8 @@
 <template>
   <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden">
-    <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">{{Property.Name}}：</label>
+    <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">
+      <i v-show="isError" class="el-icon-close is-bold is-pink is-font-12"></i> {{Property.Name}}：</label>
+      <!-- <i v-show="isError" class="is-pink is-bold is-font-14"></i> {{Property.Name}}：</label> -->
     <!-- 数字类型 -->
     <NumberTypeItemComp
      class="element-type-content"
@@ -75,6 +77,10 @@ export default {
       default: false,
     },
     isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    isError: {
       type: Boolean,
       default: false,
     },
@@ -254,5 +260,11 @@ export default {
   // .el-input.is-disabled .el-input__inner {
   //   color: rgba($color: #000000, $alpha: 0);
   // }
+  .el-checkbox__input.is-disabled .el-checkbox__inner {
+    background-color: #f5f5f5;
+  }
+  .el-radio__input.is-disabled .el-radio__inner {
+    background-color: #f5f5f5;
+  }
 }
 </style>
