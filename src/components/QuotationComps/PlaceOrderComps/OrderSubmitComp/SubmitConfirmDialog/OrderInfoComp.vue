@@ -20,7 +20,8 @@
       </li>
       <li>
         <span class="label">交货工期：</span>
-        <div class="text is-pink" v-if="orderInfo.ProducePeriod">{{orderInfo.ProducePeriod}}</div>
+        <div class="text is-pink" v-if="orderInfo.ProducePeriod">{{orderInfo.ProducePeriod | getPayTime}}
+           {{orderInfo.ProducePeriod | getDoneTime}}</div>
         <div class="text is-gray" v-else>{{'暂无工期'}}</div>
       </li>
     </ul>
