@@ -13,13 +13,13 @@
         <span class="label">原价：</span>
         <span class="text">{{OriginalPrice}}元</span>
       </div>
-      <div>
+      <div v-if="!PromoteAmount || PromoteAmount > 0">
         <span class="label">活动：</span>
-        <span class="text" :class="{'is-pink': !!PromoteAmount}">{{ PromoteAmount ? `-${PromoteAmount}` : 0}}元</span>
+        <span class="text" :class="{'is-pink': !!PromoteAmount}">{{ PromoteAmount ? `${PromoteAmount > 0 ? '-' : ''}${Math.abs(PromoteAmount)}` : 0}}元</span>
       </div>
-      <div>
+      <div v-if="!CouponAmount || CouponAmount > 0">
         <span class="label">优惠券：</span>
-        <span class="text" :class="{'is-pink': !!CouponAmount}">{{ CouponAmount ? `-${CouponAmount}` : 0}}元</span>
+        <span class="text" :class="{'is-pink': !!CouponAmount}">{{ CouponAmount ? `${CouponAmount > 0 ? '-' : ''}${Math.abs(CouponAmount)}` : 0}}元</span>
       </div>
       <div>
         <span class="label">成交价：</span>

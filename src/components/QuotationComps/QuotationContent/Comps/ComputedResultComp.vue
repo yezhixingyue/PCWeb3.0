@@ -8,7 +8,7 @@
       </template>
       <template v-else> 总价： </template>
       <i class="is-pink is-bold is-font-20">{{ +Cost.toFixed(2) }}</i>
-      <i class="is-pink is-font-15" style="margin-right: 6px;"> 元</i>
+      <i class="is-pink is-font-15" style="margin-right: 10px;"> 元</i>
       <span
         class="is-font-12 is-gray"
         style="margin-right:5px"
@@ -43,9 +43,9 @@
       <span v-if="promotePrice > 0"
         >活动：<i class="is-pink">{{ "-" + promotePrice }}元</i></span
       >
-      <span
+      <span v-if="coupon >= 0"
         >优惠券：<i v-if="selectedCoupon && coupon" class="is-pink"
-          >{{ "-" + coupon }}元</i
+          >{{`${coupon > 0 ? '-' : ''}${Math.abs(coupon)}`}}元</i
         >
         <i v-else-if="!selectedCoupon || coupon === 0">{{ coupon }}元</i></span
       >

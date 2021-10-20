@@ -150,6 +150,14 @@ export default {
     //     this.ID = this.CustomerSizeList[0].ID;
     //   }
     // }
+    this.$nextTick(() => {
+      if (this.value && !this.value.ID) {
+        const list = this.CustomerSizeList.filter(it => !this.HiddenOptionList.includes(it.ID));
+        if (list.length > 0) {
+          this.ID = list[0].ID;
+        }
+      }
+    });
   },
 };
 </script>

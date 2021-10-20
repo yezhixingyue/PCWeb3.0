@@ -34,12 +34,13 @@
                      && curOrderDetailData.Funds.CouponAmount > 0 ? 'is-pink' : ''">
                     <template>
                       <i v-if='curOrderDetailData.Funds.CouponAmount && curOrderDetailData.Funds.CouponAmount>0'>-</i>
-                      ¥ {{(curOrderDetailData.Funds.CouponAmount ? curOrderDetailData.Funds.CouponAmount : 0)}}
+                      ¥ {{(curOrderDetailData.Funds.CouponAmount
+                       ? `${curOrderDetailData.Funds.CouponAmount > 0 ? '' : ''}${Math.abs(curOrderDetailData.Funds.CouponAmount)}` : 0)}}
                     </template>
                   </p>
                   <p :class="promotePrice > 0 ? 'is-pink' : ''">
                     <template>
-                      <i v-if='promotePrice && promotePrice>0'>-</i>¥ {{(promotePrice ? promotePrice : 0)}}
+                      <i v-if='promotePrice && promotePrice>0'>-</i>¥ {{(promotePrice ? `${promotePrice > 0 ? '' : ''}${Math.abs(promotePrice)}` : 0)}}
                     </template>
                   </p>
                   <p class="final-price is-pink">¥ <i class="is-font-18 is-bold"

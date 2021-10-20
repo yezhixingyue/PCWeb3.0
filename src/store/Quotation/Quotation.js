@@ -112,6 +112,7 @@ export default {
     FileTypeList: [],
     isUploading: false,
     RiskWarningTipsObj: { origin: '', tips: '' },
+    successNum: 0,
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -855,17 +856,11 @@ export default {
       state.isFullPayoutDisabled = false;
 
       const _keepingData = localStorage.getItem('isOrderDataKeeping');
-      // console.log(_keepingData);
       if (!(_keepingData && _keepingData === 'true')) {
-        // state.curProductID = '';
-        // // state.curProductClass = null;
-        // state.curProductName = '';
-        // state.curProductInfo2Quotation = null;
-        // state.obj2GetProductPrice = {
-        //   ProductParams: {},
-        // };
         state.initPageText = '下单成功';
         // state.curProduct = null;
+      } else {
+        state.successNum += 1;
       }
     },
     /* 下单成功后的状态清理
@@ -1152,7 +1147,7 @@ export default {
       if (res && res.data.Status === 1000) {
         return successHandler(res.data.Data, _requestObj);
       }
-      if (res && [9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
+      if (res && [9166, 9167, 9168, 9169, 9170, 9172].includes(res.data.Status)) {
         return new Promise((resolve) => {
           massage.warnCancelBox({
             title: res.data.Message,
@@ -1234,9 +1229,9 @@ export default {
 
       if (res && res.data.Status === 1000) {
         handleSuccess();
-      } else if (res && [9164, 9165, 9166, 9167, 9168, 9169, 9170].includes(res.data.Status)) {
+      } else if (res && [9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(res.data.Status)) {
         massage.warnCancelBox({
-          title: '未达到优惠券使用金额',
+          title: res.data.Message,
           msg: '是否 [ 取消使用优惠券 ] 然后加入购物车',
           successFunc: async () => {
             commit('setSelectedCoupon', null);

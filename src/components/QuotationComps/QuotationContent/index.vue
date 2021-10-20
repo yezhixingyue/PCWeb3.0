@@ -53,7 +53,7 @@
               <span
                 class="gray no-cursor is-font-12"
                 v-if="selectedCoupon"
-                @click.stop="null"
+                @click.stop
                 >已选择满 {{ selectedCoupon.MinPayAmount }}元减{{
                   selectedCoupon.Amount
                 }}元
@@ -184,6 +184,7 @@
 </template>
 
 <script>
+import anime from 'animejs/lib/anime.es';
 import {
   mapState, mapGetters, mapMutations, mapActions,
 } from 'vuex';
@@ -222,6 +223,7 @@ export default {
       'selectedCoupon',
       'addressInfo4PlaceOrder',
       'isFetchingPartProductData',
+      'successNum',
     ]),
     ...mapGetters('Quotation', ['curProductShowNameInfo']),
     ...mapState('common', ['customerInfo']),
@@ -300,15 +302,6 @@ export default {
       }
       return 0;
     },
-    // Cost() {
-    //   if (!this.ProductQuotationResult) return '';
-    //   if (!this.selectedCoupon) return this.ProductQuotationResult.CurrentCost;
-    //   if (this.ProductQuotationResult.CurrentCost >= this.selectedCoupon.MinPayAmount) {
-    //     const num = +(this.ProductQuotationResult.CurrentCost - this.selectedCoupon.Amount).toFixed(2);
-    //     return num > 0 ? num : 0;
-    //   }
-    //   return this.ProductQuotationResult.CurrentCost;
-    // },
     couponConditionText() {
       if (!this.ProductQuotationResult) return '( 点击 计算价格 查看是否可使用 )';
       if (!this.coupon) return '(尚未满足使用条件)';
@@ -339,9 +332,6 @@ export default {
     },
     isSetupError() { // 是否有配置上的错误
       if (!this.placeData) return true;
-      // if (!Array.isArray(this.placeData.FactoryList)) return true;
-      // if (this.placeData.FactoryList.length === 0) return true;
-      // if (!this.placeData.FactoryList || this.placeDate.FactoryList.length === 0) return true; // 暂时只判断工厂， 其它后面补充
       return false;
     },
   },
@@ -400,8 +390,14 @@ export default {
               const oApp = document.getElementById('app');
               if (oApp) {
                 const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
-                this.utils.animateScroll(oApp.scrollTop, willToTop, num => {
-                  oApp.scrollTop = num;
+                // this.utils.animateScroll(oApp.scrollTop, willToTop, num => {
+                //   oApp.scrollTop = num;
+                // });
+                anime({
+                  targets: oApp,
+                  scrollTop: willToTop,
+                  duration: 400,
+                  easing: 'easeInOutSine',
                 });
               }
             }
@@ -433,9 +429,8 @@ export default {
         }
       }
     },
-    handleChange(list, bool) {
+    handleChange(list) {
       if (list.length === 0) return; // 关闭
-      if (!bool && this.couponList.length > 0) return;
       if (this.isCouponGet && !this.isOpenCouponCenter) return;
       const _obj = { UseStatus: 0 };
       _obj.Product = {
@@ -449,10 +444,6 @@ export default {
         this.couponList = res.data.Data;
         this.isCouponGet = true;
       }, 200);
-    },
-    fetchCouponList() {
-      this.handleChange([1], true);
-      this.isOpenCouponCenter = false;
     },
     onBtnClick(evt) {
       let { target } = evt;
@@ -502,7 +493,6 @@ export default {
       }
     },
     handleGoToCouponCenter() {
-      // this.$router.push('/mySetting/couponCenter');
       window.open('/#/mySetting/couponCenter');
       this.isOpenCouponCenter = true;
     },
@@ -546,11 +536,8 @@ export default {
     obj2GetProductPrice: {
       handler() {
         this.$store.commit('Quotation/setProductQuotationResult', null);
-        this.activeNames = [];
         this.priceGetErrMsg = '';
         this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
-        this.isCouponGet = false;
-        this.isOpenCouponCenter = false;
       },
       deep: true,
     },
@@ -560,6 +547,9 @@ export default {
     placeData: {
       handler(val) {
         if (!val || typeof val !== 'object') return;
+        this.isCouponGet = false;
+        this.isOpenCouponCenter = false;
+        this.activeNames = [];
         const { ProductID, TipsDetail } = val;
         if (!ProductID || !TipsDetail) return;
         this.asideIntroData = null;
@@ -572,7 +562,10 @@ export default {
       },
       immediate: true,
     },
-    curProductID() {
+    successNum() {
+      this.isCouponGet = false;
+      this.isOpenCouponCenter = false;
+      this.activeNames = [];
     },
   },
 };

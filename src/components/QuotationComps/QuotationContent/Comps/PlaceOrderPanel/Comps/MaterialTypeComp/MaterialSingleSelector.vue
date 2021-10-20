@@ -37,6 +37,10 @@ export default {
   },
   computed: {
     nextList() {
+      if (this.list.length === 1 && this.hiddenOption && this.list[0].children && this.list[0].children.length > 0) {
+        // console.log(this.list);
+        return this.list[0].children;
+      }
       if (!this.val || !this.list) return null;
       const t = this.list.find(it => it.ID === this.val);
       return t && t.children ? t.children : null;

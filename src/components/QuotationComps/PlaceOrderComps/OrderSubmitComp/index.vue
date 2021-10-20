@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import anime from 'animejs/lib/anime.es';
 import { mapState } from 'vuex';
 import { Loading } from 'element-ui';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
@@ -236,8 +237,11 @@ export default {
               const oApp = document.getElementById('app');
               if (oApp) {
                 const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
-                this.utils.animateScroll(oApp.scrollTop, willToTop, num => {
-                  oApp.scrollTop = num;
+                anime({
+                  targets: oApp,
+                  scrollTop: willToTop,
+                  duration: 500,
+                  easing: 'easeInOutQuad',
                 });
               }
             }
@@ -343,7 +347,7 @@ export default {
       if (!isPaid) {
         this.messageBox.warnSingleError({
           title: '订单已生成',
-          msg: '尚未完成支付，请到未付款单中查看',
+          msg: '请到未付款单中查看',
           successFunc: this.handleSuccessFunc,
           failFunc: this.handleSuccessFunc,
         });

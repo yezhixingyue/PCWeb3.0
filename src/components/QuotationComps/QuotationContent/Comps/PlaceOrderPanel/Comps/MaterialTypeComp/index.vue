@@ -169,10 +169,10 @@ export default {
     handleInterAction(list) {
       if (!Array.isArray(list) || list.length === 0) return;
       if (list.includes(this.value)) {
-        let t = this.curMaterialList.find(it => it.disabled && it.ID !== this.value && !list.includes(it.ID));
-        if (!t) t = this._MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !list.includes(it.ID));
-        this.selectedMaterial = t ? t.ID : '';
-        // this.selectedMaterial = '';
+        // let t = this.curMaterialList.find(it => it.disabled && it.ID !== this.value && !list.includes(it.ID));
+        // if (!t) t = this._MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !list.includes(it.ID));
+        // this.selectedMaterial = t ? t.ID : '';
+        this.selectedMaterial = '';
       }
     },
   },
@@ -189,6 +189,15 @@ export default {
       },
       immediate: true,
     },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if (!this.selectedMaterial) {
+        let t = this.curMaterialList.find(it => it.disabled && it.ID !== this.value && !this.disabledMatarialList.includes(it.ID));
+        if (!t) t = this._MaterialList.find(it => !it.HiddenToCustomer && it.ID !== this.value && !this.hiddenMatarialList.includes(it.ID));
+        this.selectedMaterial = t ? t.ID : '';
+      }
+    });
   },
 };
 </script>

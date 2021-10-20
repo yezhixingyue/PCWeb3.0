@@ -2,6 +2,7 @@
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="minLength !== maxLength || showTop">
       <span class="blue-span is-font-13" v-show="!hideCtrl" @click="onAddClick" :class="{disabled:List.length >= maxLength || disabled}"
+        :title="List.length >= maxLength ? '已达最大使用次数' : ''"
         >+ 添加{{Property.Name || ''}}</span
       >
     </div>
