@@ -7,7 +7,7 @@
           <em class="is-font-13"> 返回列表</em>
         </span>
         <span class="blue-v-line is-bold is-black">{{ canEdit ? '售后申请' : '查看售后申请'}}</span>
-        <span v-if="canEdit" class="is-font-12"> （ 如果该订单有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span>
+        <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span>
       </header>
       <div>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -94,10 +94,10 @@
                 </div>
               </div>
               <el-button type="primary" @click="submitForm('ruleForm')" v-if='canEdit'>立即提交</el-button>
-              <el-button @click="resetForm('ruleForm')" v-if='canEdit'>重置</el-button>
-              <el-button type="primary" @click="handleReturn" v-if='!canEdit'>
+              <span class="blue-span is-font-12" style="margin: 0 60px 0 30px" @click="resetForm('ruleForm')" v-if='canEdit'>重置</span>
+              <el-button  @click="handleReturn">
                 <i class="el-icon-d-arrow-left is-font-15"></i>
-                <em style="margin-left: 6px">返回列表</em>
+                <em style="margin-left: 6px">返回</em>
               </el-button>
             </div>
           </el-form-item>
@@ -228,8 +228,7 @@ export default {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    handllePictureUploaded(response, file, fileList) {
-      console.log('handllePictureUploaded', response, file, fileList);
+    handllePictureUploaded(response) {
       if (response.Status !== 1000) {
         Message({
           showClose: true,
@@ -241,7 +240,8 @@ export default {
       }
     },
     handleReturn() {
-      this.$store.commit('summary/setNeedFetchListData', false);
+      if (!this.canEdit) this.$store.commit('summary/setNeedFetchListData', false);
+      else this.$store.commit('order/setShouldGetNewListData', false);
       this.$router.go(-1);
     },
   },
@@ -259,7 +259,7 @@ export default {
         }
         this.ruleForm = {
           ...this.ruleForm,
-          ...this.editFeedbackData,
+          ...JSON.parse(JSON.stringify(this.editFeedbackData)),
           QuestionList,
         };
         // console.log(this.editFeedbackData.QuestionList);

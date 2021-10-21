@@ -268,9 +268,11 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       temp = getElementTypeValue(Element, FixedType, targetPartItem.ElementList, targetPartData.ElementList);
       break;
     case 4: // 工艺
-      target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
-      targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
-      temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem);
+      if (targetPartItem && targetPartItem.CraftList && targetPartItem.CraftList.length > 0) {
+        target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
+        targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
+        temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem);
+      }
       if (!temp && temp !== false) temp = 'craftIsNotExist';
       break;
     case 5: // 物料

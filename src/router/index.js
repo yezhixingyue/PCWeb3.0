@@ -397,7 +397,9 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to, from) => {
   const oApp = document.getElementById('app');
   if ((from.name === 'orderDetail' && to.name === 'orderList')
-   || (from.name === 'feedback' && to.name === 'feedbackList')) {
+   || (from.name === 'feedback' && to.name === 'feedbackList')
+   || (from.name === 'feedback' && to.name === 'orderList' && from.params.type === 'add')) {
+    oApp.scrollTop = to.meta.y;
     setTimeout(() => {
       oApp.scrollTop = to.meta.y;
     }, 0);

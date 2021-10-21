@@ -185,7 +185,7 @@ export default {
     },
     goToFeedback(item) {
       const { OrderID, Content } = item;
-      this.$router.push({ name: 'feedback', params: { id: OrderID, desc: Content, type: 'add' } });
+      this.$router.push({ name: 'feedback', params: { id: OrderID, desc: Content || '无', type: 'add' } });
     },
     handleOrderCancel({ OrderID }) {
       this.messageBox.warnCancelBox({

@@ -1,7 +1,7 @@
 <template>
   <el-select
     v-model="content"
-    :filterable='AllowCreate'
+    :filterable='AllowCreate || isMaterial'
     default-first-option
     :multiple='isMultiple'
     :allow-create='AllowCreate'
@@ -54,6 +54,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isMaterial: {
+      type: Boolean,
+      default: false,
+    },
     DisabledOptionList: {
       type: Array,
       default: () => [],
@@ -98,7 +102,7 @@ export default {
       });
     },
     handleBlur(e) {
-      if (e.target.value && this.AllowCreate) {
+      if (e.target.value && this.AllowCreate && !this.isMaterial) {
         const t = this.options.find(it => it.Name === e.target.value);
         const _val = t ? t.ID : e.target.value;
         this.$emit('input', _val);

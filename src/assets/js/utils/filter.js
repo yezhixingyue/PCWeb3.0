@@ -117,3 +117,22 @@ Vue.filter('formatFeedbackProgress', status => {
   if (t) return t.label;
   return '';
 });
+
+/**
+ * 列举优惠券详情信息
+ */
+Vue.filter('getCouponList', ({ CouponList }) => {
+  if (Array.isArray(CouponList) && CouponList.length > 0) {
+    const list = CouponList.map(({ CouponInfo, Number }) => {
+      if (CouponInfo && CouponInfo.Data) {
+        const { Amount, MinPayAmount } = CouponInfo.Data;
+        if (MinPayAmount && Amount && Number) {
+          return `满${MinPayAmount}减${Amount}券${Number}张`;
+        }
+      }
+      return '';
+    }).filter(it => it);
+    return `${list.join('、')}`;
+  }
+  return '';
+});

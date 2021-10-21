@@ -84,7 +84,7 @@ export default {
       this.$store.commit('summary/setListDataNumber', this.dataNumber);
       this.$store.commit('summary/setEditFeedbackData', data);
       const { OrderID, Content } = data.Order;
-      this.$router.push({ name: 'feedback', params: { id: OrderID, desc: Content, type: 'detail' } });
+      this.$router.push({ name: 'feedback', params: { id: OrderID, desc: Content || '无', type: 'detail' } });
     },
     async handleCancel(ID) {
       const res = await this.api.getAfterSalesCancle(ID);
