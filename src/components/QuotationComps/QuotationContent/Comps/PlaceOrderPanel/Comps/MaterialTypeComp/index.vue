@@ -120,17 +120,33 @@ export default {
                   disabled: i === UnionShowList.length - 1 ? this.disabledMatarialList.includes(ID) : false,
                 };
                 if (i < UnionShowList.length - 1) _item.children = [];
-                // if (i > 0) {
-                // 寻找位置 加入到指定位置
-                // }
-                tempList.push(_item);
-                console.log(_item, i, _list);
+                console.log(_item);
+                const arr1 = _item.Name.match(/\d+(\.\d+)?/g);
+                if (arr1 && arr1.length > 0) {
+                  console.log(tempList);
+                  const lastIndex = tempList.findIndex(_it => {
+                    const arr2 = _it.Name.match(/\d+(\.\d+)?/g);
+                    if (arr2 && arr2.length > 0) {
+                      return arr1[arr1.length - 1] > arr2[arr2.length - 1];
+                    }
+                    return false;
+                  });
+                  if (lastIndex > -1) {
+                    tempList.splice(lastIndex, 0, _item);
+                  } else {
+                    tempList.push(_item);
+                  }
+                  console.log(_item, i, _list, arr1[arr1.length - 1]);
+                  // if (i > 0) {
+                  // 寻找位置 加入到指定位置
+                  // }
+                } else {
+                  tempList.push(_item);
+                }
               }
               target = tempList.find(_it => _it.ID === _ItemID);
               _list = target.children;
-              console.log(_list, target.children);
               if (Array.isArray(_list)) {
-                console.log(_list);
                 // _list = _list.sort((a, b) => {
                 //   // 排序 从小到大排序
                 //   const arr1 = a.match(/\d+(\.\d+)?/g);
