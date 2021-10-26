@@ -11,14 +11,14 @@ import InterAction from '@/store/Quotation/Interaction';
  * @param {*} element 所赋值的元素
  * @return {*}
  */
-const _elementTypeChecker = (value, element) => {
+const _elementTypeChecker = (value, element, showPropName = true) => {
   if (!value && value !== 0) return { msg: '值未设置', result: false };
-  const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer } = element; // 开关类型暂未判断 或可不需要
+  const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer, Name } = element; // 开关类型暂未判断 或可不需要
   if (Type === 1) { // 数值类型元素
     const { AllowDecimal, SectionList, InputContent, Allow, AllowCustomer } = NumbericAttribute;
     const isConformNumberType = getValueIsOrNotNumber(value, !AllowDecimal);
     if (!isConformNumberType) {
-      const msg = `输入值错误，请输入正确的数字类型（${AllowDecimal ? '允许小数' : '不允许小数'}）`;
+      const msg = `${showPropName ? `[${Name}] ` : ''}不正确，请输入正确的数字类型（${AllowDecimal ? '允许小数' : '不允许小数'}）`;
       return { msg, result: false };
     }
     if (SectionList && Array.isArray(SectionList) && SectionList.length > 0) {
@@ -27,10 +27,10 @@ const _elementTypeChecker = (value, element) => {
         return { msg: '', result: true };
       }
       if (!Allow && !valueList.includes(`${value}`)) {
-        return { msg: `值不正确，不允许自定义，请从${valueList}中取值`, result: false };
+        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，不允许自定义，请从${valueList}中取值`, result: false };
       }
       if (!AllowCustomer && !HiddenToCustomer && !valueList.includes(`${value}`)) {
-        return { msg: `值不正确，不允许客户自定义，请从${valueList}中取值`, result: false };
+        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，不允许客户自定义，请从${valueList}中取值`, result: false };
       }
       let isInSection = false;
       for (let i = 0; i < SectionList.length; i += 1) {
@@ -49,19 +49,19 @@ const _elementTypeChecker = (value, element) => {
             arr.fill('0');
             T = `1${arr.join('')}`;
             if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
-              const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
+              const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue} (不含) 到 ${MaxValue}之间应符合增量为${Increment}`;
               return { msg, result: false };
             }
           }
           if (IsGeneralValue) {
-            const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应从${valueList}对应区间中取值`;
+            const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue} (不含) 到 ${MaxValue}之间应从${valueList}对应区间中取值`;
             return { msg, result: false };
           }
         }
       }
       if (!isInSection) {
-        const _arrText = SectionList.map(({ MinValue, MaxValue }) => `（ ${MinValue}, ${MaxValue} ]`).join('、');
-        const msg = `输入值不正确，不在取值范围内，可选取值范围有：${_arrText}`;
+        const _arrText = SectionList.map(({ MinValue, MaxValue }) => `${MinValue} (不含) 到 ${MaxValue}`).join('、');
+        const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，不在取值范围内，可选取值范围有：${_arrText}`;
         return { msg, result: false };
       }
     }
@@ -71,7 +71,7 @@ const _elementTypeChecker = (value, element) => {
     const { Allow, OptionList } = OptionAttribute;
     const optionIDs = OptionList.map(it => it.ID);
     if (!Allow && !optionIDs.includes(value)) {
-      return { msg: '该选项元素不允许自定义', result: false };
+      return { msg: `${showPropName ? `[${Name}] ` : ''}不允许自定义`, result: false };
     }
     return { msg: '', result: true };
   }
@@ -173,10 +173,10 @@ const getStrArrIsRepeat = arr => { // 判断字符串组成的数组是否有重
 };
 
 export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAffectedPropList = []) => {
-  if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
-    // 如果已经被禁用，则直接返回空字符串，不再进行验证
-    if (InterAction.getDisabledOrNot(AffectedPropList)) return '';
-  }
+  // if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
+  //   // 如果已经被禁用，则直接返回空字符串，不再进行验证
+  //   if (InterAction.getDisabledOrNot(AffectedPropList)) return ''; // 使用该方法验证有问题--没有判断被禁用的是否为元素组本身 -- 由于元素组禁用和隐藏功能本身被废弃，故不再修改
+  // }
   let groupName = prop && !prop.IsNameHidden ? `${prop.Name}中` : '当前组中';
   groupName = '';
   if (valueList && valueList.length > 0 && prop && prop.ElementList && prop.ElementList.length > 0) {

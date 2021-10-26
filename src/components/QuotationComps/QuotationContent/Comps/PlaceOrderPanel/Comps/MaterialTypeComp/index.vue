@@ -120,10 +120,10 @@ export default {
                   disabled: i === UnionShowList.length - 1 ? this.disabledMatarialList.includes(ID) : false,
                 };
                 if (i < UnionShowList.length - 1) _item.children = [];
-                console.log(_item);
+                // console.log(_item);
                 const arr1 = _item.Name.match(/\d+(\.\d+)?/g);
-                if (arr1 && arr1.length > 0) {
-                  console.log(tempList);
+                if (arr1 && arr1.length > 0 && 0) {
+                  // console.log(tempList);
                   const lastIndex = tempList.findIndex(_it => {
                     const arr2 = _it.Name.match(/\d+(\.\d+)?/g);
                     if (arr2 && arr2.length > 0) {
@@ -136,7 +136,7 @@ export default {
                   } else {
                     tempList.push(_item);
                   }
-                  console.log(_item, i, _list, arr1[arr1.length - 1]);
+                  // console.log(_item, i, _list, arr1[arr1.length - 1]);
                   // if (i > 0) {
                   // 寻找位置 加入到指定位置
                   // }

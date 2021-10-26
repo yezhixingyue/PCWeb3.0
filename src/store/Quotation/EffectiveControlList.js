@@ -115,7 +115,7 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
       const ElValues = target.List.map(({ List }) => {
         const _itemVal = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList);
         return _itemVal;
-      }).filter(_it => _it);
+      }).filter(_it => _it || _it === 0 || _it === false);
       if (ElValues.length === 0) {
         if (FixedType === 0) {
           return 0;
@@ -176,7 +176,6 @@ const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, 
       const targetGroup = target.GroupList.find(_it => _it.GroupID === Group.ID);
       const targetGroupOriginData = targetOriginData.GroupList.find(_it => _it.ID === Group.ID);
       _CraftValue = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData, isSubControl, ControlItem);
-      // console.log(_CraftValue, targetGroup, target.GroupList, target);
     } else {
       _CraftValue = getElementTypeValue(Element, FixedType, target.ElementList, targetOriginData.ElementList);
     }
@@ -268,7 +267,7 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       temp = getElementTypeValue(Element, FixedType, targetPartItem.ElementList, targetPartData.ElementList);
       break;
     case 4: // 工艺
-      if (targetPartItem && targetPartItem.CraftList && targetPartItem.CraftList.length > 0) {
+      if (targetPartItem && targetPartItem.CraftList) {
         target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
         targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
         temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem);
@@ -291,7 +290,6 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
 const getArrayIsEqual = (arr1, arr2) => { // 都为字符串或数字组成的数组
   // if (arr1.length !== arr2.length) return false;
   // 进行去重操作
-  // console.log('getArrayIsEqual', arr1, arr2);
   const _arr1 = [...new Set(arr1)];
   const _arr2 = [...new Set(arr2)];
   if (_arr1.length !== _arr2.length) return false;
@@ -492,19 +490,25 @@ export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyLis
       // 找出差异与新增部分
       const list1 = t.OptionList;
       const list2 = imperfectProp.OptionList;
-      const newList = list2.filter(_it => !list1.includes(_it));
-      if (newList.length === 0) return true;
       if (Operator === t.Operator) { // 都为隐藏或禁用 +++ 后添加一种新的关系类型：必选
+        const newList = list2.filter(_it => !list1.includes(_it));
+        if (newList.length === 0) return true;
         return {
           index: i,
           item: { ...t, OptionList: [...t.OptionList, ...newList] },
         };
       }
       // 为不同的限制方式
-      return {
-        index: -1,
-        item: { ...imperfectProp, OptionList: newList },
+      const newList = list1.filter(_it => !list2.includes(_it));
+      const prevTemp = {
+        index: i,
+        item: { ...t, OptionList: [...newList] },
       };
+      const nextTemp = {
+        index: -1,
+        item: { ...imperfectProp },
+      };
+      return [prevTemp, nextTemp];
     }
     return true;
   }
@@ -524,13 +528,14 @@ export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo
   EffectiveControlList.forEach(({ List }) => {
     if (Array.isArray(List)) {
       List.forEach(it => {
-        // const _list = arr.map(_it => _it.Property);
         const t = getPerfectPropertyByImperfectProperty(it, arr, it.Operator);
         if (!t) arr.push(it);
-        else if (Object.prototype.toString.call(t) === '[object Object]') {
-          const { index, item } = t;
-          if (index === -1) arr.push(item);
-          else arr.splice(index, 1, item);
+        else if (Array.isArray(t)) {
+          t.forEach(_it => {
+            const { index, item } = _it;
+            if (index === -1) arr.push(item);
+            else arr.splice(index, 1, item);
+          });
         }
       });
     }
@@ -542,13 +547,14 @@ export const getCombineAffectedPropList = (AffectedPropList, PartAffectedPropLis
   const List = [...AffectedPropList, ...PartAffectedPropList];
   const arr = [];
   List.forEach(it => {
-    // const _list = arr.map(_it => _it.Property);
     const t = getPerfectPropertyByImperfectProperty(it, arr, it.Operator);
     if (!t) arr.push(it);
-    else if (Object.prototype.toString.call(t) === '[object Object]') {
-      const { index, item } = t;
-      if (index === -1) arr.push(item);
-      else arr.splice(index, 1, item);
+    else if (Array.isArray(t)) {
+      t.forEach(_it => {
+        const { index, item } = _it;
+        if (index === -1) arr.push(item);
+        else arr.splice(index, 1, item);
+      });
     }
   });
   return arr;

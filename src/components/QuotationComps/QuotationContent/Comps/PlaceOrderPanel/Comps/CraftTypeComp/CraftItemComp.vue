@@ -117,6 +117,7 @@ export default {
   },
   methods: {
     handleClick() {
+      console.log('handleClick');
       if (this.disabled) return;
       if (this.value) {
         this.$emit('change', null);
@@ -202,7 +203,8 @@ export default {
           this.disabled = true;
           this.required = false;
           if (this.value && !(this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
-            this.$emit('change', { ...this.value, disabledByInteraction: true, requiredByInteraction: false });
+            // this.$emit('change', { ...this.value, disabledByInteraction: true, requiredByInteraction: false });
+            this.$emit('change', null);
           }
         }
         if (Operator === 23) {

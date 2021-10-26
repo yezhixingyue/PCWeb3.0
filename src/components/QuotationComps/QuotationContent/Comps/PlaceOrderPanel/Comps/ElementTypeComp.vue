@@ -1,7 +1,8 @@
 <template>
-  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden">
+  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer && !hidden" :class="{isshow: !hidden}">
     <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">
-      <i v-show="isError" class="el-icon-close is-bold is-pink is-font-12"></i> {{Property.Name}}：</label>
+      <i v-show="showError" class="is-bold is-pink is-font-13">!</i>
+      {{Property.Name}}：</label>
       <!-- <i v-show="isError" class="is-pink is-bold is-font-14"></i> {{Property.Name}}：</label> -->
     <!-- 数字类型 -->
     <NumberTypeItemComp
@@ -151,6 +152,19 @@ export default {
       if (t && t.CustomerInputValues) return t.CustomerInputValues;
       return '';
     },
+    showError() {
+      if (!this.isError) return false;
+      if (this.Property.Type === 1) return false;
+      if (this.Property.Type === 2) {
+        const SelectModeEnum = [
+          { Name: '单选按钮', ID: 0 },
+          { Name: '下拉框', ID: 1 },
+        ];
+        const t = SelectModeEnum.find((it) => it.ID === this.Property.OptionAttribute.SelectMode);
+        return !(t && t.Name === '单选按钮' && this.Property.OptionAttribute.IsRadio);
+      }
+      return true;
+    },
     hidden() { // 隐藏
       return InterAction.getIsHiddenOrNot(this.AffectedPropList);
     },
@@ -214,16 +228,18 @@ export default {
     },
   },
   watch: {
-    switchDisabledOrHidden: {
+    DisabledValue: { // 之前使用switchDisabledOrHidden，判断不准确修改为该值
       handler(newVal, oldVal) {
         if (!newVal === !oldVal) return;
+        const DisabledValue = newVal ? InterAction.getUnusabledValueByInteraction(this.AffectedPropList) : '';
         this.disabledInfoObj = {
           disabledByInteraction: this.disabled,
           hiddenByInteraction: this.hidden,
-          DisabledValue: newVal ? InterAction.getUnusabledValueByInteraction(this.AffectedPropList) : '',
+          DisabledValue,
         };
         this.$nextTick(() => {
           this.$emit('input', { CustomerInputValues: [...this.value], ...this.disabledInfoObj });
+          if (this.disabled) this.PropValue = DisabledValue;
           this.$nextTick(() => {
             if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
               this.$emit('interaction');

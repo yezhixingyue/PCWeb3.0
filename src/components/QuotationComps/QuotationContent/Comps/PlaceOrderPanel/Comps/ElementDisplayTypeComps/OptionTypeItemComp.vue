@@ -139,14 +139,16 @@ export default {
       // 应分2种情况： 单选时 | 多选时
       if (!this.isMultiple) { // 单选
         if (list.includes(this.value)) {
-          const t = this.localOptions.find(it => it.IsChecked); // 找到默认值
-          let _defaultVal = '';
-          if (t && !list.includes(t.ID)) _defaultVal = t.ID;
-          this.$emit('change', _defaultVal);
+          // const t = this.localOptions.find(it => it.IsChecked); // 找到默认值
+          // let _defaultVal = '';
+          // if (t && !list.includes(t.ID)) _defaultVal = t.ID;
+          // this.$emit('change', _defaultVal);
+          this.$emit('change', '');
         }
       } else if (Array.isArray(this.value) && this.value.length > 0) { // 多选
+        // eslint-disable-next-line prefer-const
         let _val = this.value.filter(it => !list.includes(it));
-        if (_val.length === 0) _val = this.localOptions.filter(it => it.IsChecked && !list.includes(it.ID)).map(it => it.ID);
+        // if (_val.length === 0) _val = this.localOptions.filter(it => it.IsChecked && !list.includes(it.ID)).map(it => it.ID);
         this.$emit('change', _val);
       }
     },
@@ -154,10 +156,11 @@ export default {
       if (!bool && this.value && !this.isMultiple && !this.isRadio) { // 不支持多选且为下拉框时才执行 多选不支持自定义
         const t = this.localOptions.find(it => it.ID === this.value);
         if (!t) {
-          const t2 = this.localOptions.find(it => it.IsChecked); // 找到默认值
-          let _defaultVal = '';
-          if (t2 && !this.DisabledOptionList.includes(t2.ID) && !this.HiddenOptionList.includes(t2.ID)) _defaultVal = t2.ID;
-          this.$emit('change', _defaultVal);
+          // const t2 = this.localOptions.find(it => it.IsChecked); // 找到默认值
+          // let _defaultVal = '';
+          // if (t2 && !this.DisabledOptionList.includes(t2.ID) && !this.HiddenOptionList.includes(t2.ID)) _defaultVal = t2.ID;
+          // this.$emit('change', _defaultVal);
+          this.$emit('change', '');
         }
       }
     },

@@ -7,6 +7,7 @@
     :allow-create='AllowCreate'
     :placeholder='placeholder'
     :disabled='isDisabled'
+    :popper-append-to-body='false'
     @blur.native='onNativeChange'
     @change.native='onNativeChange'
     @focus.native="onFocus"

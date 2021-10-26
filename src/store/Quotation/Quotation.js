@@ -1147,7 +1147,7 @@ export default {
       if (res && res.data.Status === 1000) {
         return successHandler(res.data.Data, _requestObj);
       }
-      if (res && [9166, 9167, 9168, 9169, 9170, 9172].includes(res.data.Status)) {
+      if (res && [9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(res.data.Status)) {
         return new Promise((resolve) => {
           massage.warnCancelBox({
             title: res.data.Message,
@@ -1226,7 +1226,7 @@ export default {
       const handleError = () => { // 失败处理函数 暂未使用 -- 交由统一错误方式处理
         // massage.failSingleError({ title: '添加购物车失败!', msg: response && response.data.Message ? response.data.Message : '服务器响应失败' });
       };
-
+      console.log(res);
       if (res && res.data.Status === 1000) {
         handleSuccess();
       } else if (res && [9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(res.data.Status)) {

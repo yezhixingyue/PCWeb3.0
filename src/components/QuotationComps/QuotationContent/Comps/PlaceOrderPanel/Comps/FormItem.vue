@@ -327,6 +327,7 @@ export default {
       this.$emit('changeValidate', this.propName);
     },
     getIsSameTarget(Property) {
+      if (!this.target) return false;
       if (this.curTypeName === '元素' && Property.Type === 3 && Property.Element) {
         return Property.Element.ID === this.target.ID;
       }
@@ -397,7 +398,7 @@ export default {
       margin-left: -100px;
       > ul {
         > li {
-          > div > div {
+          > div > div.isshow {
             &:first-of-type {
               > label {
                 width: 88px;

@@ -393,7 +393,7 @@ export default {
       padding-bottom: 25px;
       margin-left: 15px\0;
       margin-right: 15px\0;
-      max-width: 1020px;
+      max-width: 1000px;
       > main {
         max-height: 420px;
         overflow-y: scroll;
@@ -406,16 +406,24 @@ export default {
         // .mp-place-order-panel-element-group-setup-comp-wrap {
         //   margin-left: 5px;
         // }
+        .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap{
+          margin-bottom: -10px;
+        }
         .mp-place-order-panel-element-group-setup-comp-wrap {
           margin-left: -100px;
           > ul {
             > li {
-              > div > div {
-                &:first-of-type {
+              > div {
+                > div {
+                  margin-bottom: 12px;
+                  margin-right: 10px;
+                  width: 280px;
                   > label {
                     width: 88px;
                     padding-right: 12px;
                     white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                   }
                 }
               }
