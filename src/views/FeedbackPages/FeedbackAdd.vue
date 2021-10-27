@@ -78,10 +78,10 @@
               <span style="margin-right:6px">处理进度：</span>
               <span  :class="getStatusClass(ruleForm.Status)">{{ruleForm.Status | formatFeedbackProgress}}</span>
             </p>
-            <p v-if="(ruleForm.RejectReason && ruleForm.Status === 3) || ruleForm.Remark && ruleForm.Status === 2">
+            <p v-if="(ruleForm.RejectReason && ruleForm.Status === 3) || ruleForm.Result && ruleForm.Status === 2">
               <span style="margin-right:6px">{{ruleForm.Status === 3?'拒绝原因':'处理信息'}}：</span>
               <span :class="ruleForm.Status === 3?'is-pink':''" class="is-font-12"
-               >{{ruleForm.Status === 3?ruleForm.RejectReason:ruleForm.Remark}}</span>
+               >{{ruleForm.Status === 3?ruleForm.RejectReason:ruleForm.Result}}</span>
             </p>
           </el-form-item>
           <el-form-item>

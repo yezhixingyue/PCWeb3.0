@@ -1,5 +1,6 @@
 <template>
-  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer && !hidden" :class="{isshow: !hidden}">
+  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer && !hidden"
+   :class="{isshow: !hidden, isNameHide: hiddenLabel || Property.IsNameHidden}">
     <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">
       <i v-show="showError" class="is-bold is-pink is-font-13">!</i>
       {{Property.Name}}：</label>

@@ -59,6 +59,7 @@
             effect="dark"
             :content="info4OrderSummary.Content"
             placement="top-start"
+            :visible-arrow='false'
             v-if="info4OrderSummary.Content"
           >
             <span>{{info4OrderSummary.Content || '无'}}</span>
@@ -154,9 +155,9 @@ export default {
       float: left;
       line-height: 34px;
       font-size: 14px;
-      > .first {
+      // > .first {
         // padding-bottom: 9px;
-      }
+      // }
       padding-right: 20px;
       width: 660px;
       > p {

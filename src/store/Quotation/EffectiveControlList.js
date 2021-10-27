@@ -73,7 +73,8 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
       case 0: // 已选项数
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
         FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
-        FixedTypeValue = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
+        // return (it ? it.ID : _El.OptionAttribute.CustomizeValue);
+        FixedTypeValue = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.ID : Math.random().toString(16).slice(-8)));
         break;
       case 1: // 和
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];

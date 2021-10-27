@@ -16,7 +16,7 @@
         :model="craftForm"
         ref="craftForm"
         label-width="100px"
-        class="place-order-ruleForm"
+        class="craft-dialog-ruleForm"
         size="mini"
       >
         <el-form-item
@@ -57,6 +57,7 @@
             @changeValidate='onChangeValidate(it.ID)'
             @triggerInteraction='getSubGroupAffectedPropLists'
             @groupItemChange='handleGroupItemChange($event, it)'
+            :class="{fixedWidth:fixedWidth}"
           />
         </el-form-item>
       </el-form>
@@ -165,6 +166,10 @@ export default {
     GroupAffectedPropList() {
       if (this.localAffectedPropList.length === 0) return [];
       return this.localAffectedPropList.filter((it) => it.Property && it.Property.Craft && it.Property.Group);
+    },
+    fixedWidth() { // 是否定宽（超过3个定宽）
+      const t = this.GroupList.find(it => it.ElementList.filter(_it => !_it.HiddenToCustomer).length > 3);
+      return !!t;
     },
   },
   data() {
@@ -388,12 +393,12 @@ export default {
       }
     }
     > .el-dialog__body {
-      margin-left: 20px;
-      margin-right: 15px;
+      margin-left: 10px;
+      margin-right: 5px;
       padding-bottom: 25px;
       margin-left: 15px\0;
       margin-right: 15px\0;
-      max-width: 1000px;
+      max-width: 1200px;
       > main {
         max-height: 420px;
         overflow-y: scroll;
@@ -406,6 +411,13 @@ export default {
         // .mp-place-order-panel-element-group-setup-comp-wrap {
         //   margin-left: 5px;
         // }
+        .craft-dialog-ruleForm {
+          > div.el-form-item {
+            > label {
+              padding-right: 0;
+            }
+          }
+        }
         .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap{
           margin-bottom: -10px;
         }
@@ -416,14 +428,23 @@ export default {
               > div {
                 > div {
                   margin-bottom: 12px;
-                  margin-right: 10px;
-                  width: 280px;
-                  > label {
-                    width: 88px;
-                    padding-right: 12px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                  margin-right: 15px;
+                  // min-width: 243px;
+                  // text-align: right;
+                  &:first-of-type {
+                    > label {
+                      width: 100px;
+                      // padding-right: 12px;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                  }
+                  // &.isNameHide {
+                  //   min-width: 150px;
+                  // }
+                  > div {
+                    text-align: left;
                   }
                 }
               }
@@ -433,6 +454,14 @@ export default {
             margin-left: 106px;
             margin-bottom: 4px;
             height: 30px;
+          }
+          &.fixedWidth > ul > li > div > div {
+            > label {
+              width: 100px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
           }
         }
         .group {

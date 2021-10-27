@@ -28,7 +28,7 @@
           />
           <ul class="ctrl" :class="{fillWidth:fillWidth}" v-if="!hideCtrl" v-show="!disabled">
             <li class="f" >
-              <div @click="onDelClick(index)" v-show="List.length > minLength">
+              <div @click="onDelClick(index)" v-show="List.length > minLength || fillWidth" :class="{isDisabled: List.length <= minLength}">
                 <i class="iconfont icon-shanchu is-pink"></i>
                 <span>删除</span>
               </div>
@@ -51,7 +51,7 @@
 <script>
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import { getCombineAffectedPropList } from '@/store/Quotation/EffectiveControlList';
-import ElementTypeComp from './ElementTypeComp';
+import ElementTypeComp from './ElementTypeComp.vue';
 
 export default {
   props: {
@@ -154,6 +154,7 @@ export default {
       this.onTriggerInteractionClick();
     },
     onDelClick(index) {
+      if (this.List.length <= this.minLength) return;
       this.value[index].List.forEach((it, i) => {
         this.$emit('groupItemChange', [index, i, {}]);
       });
@@ -251,11 +252,17 @@ export default {
               }
               > i {
                 position: relative;
-                top: -1px;
+                top: 0.5px;
               }
               &:hover {
                 > span {
                   color: #585858;
+                }
+              }
+              &.isDisabled {
+                pointer-events: none;
+                > span, > i {
+                  color: #cbcbcb !important;
                 }
               }
             }
@@ -319,8 +326,8 @@ export default {
             display: block;
             margin-bottom: 10px;
             > label.el-title {
-              width: 88px !important;
-              padding-right: 12px;
+              // width: 88px !important;
+              // padding-right: 12px;
               white-space: nowrap;
             }
             &:last-of-type {
@@ -330,7 +337,7 @@ export default {
           > ul.ctrl {
             position: absolute;
             right: 0;
-            bottom: -2px;
+            bottom: 12px;
             width: 120px;
           }
         }
@@ -345,8 +352,9 @@ export default {
   > div {
     margin-left: 6px;
     > span.disabled {
-      color: #a2a2a2 !important;
+      color: #050404 !important;
       cursor: not-allowed;
+      pointer-events: none;
       &:hover {
         opacity: 1;
       }

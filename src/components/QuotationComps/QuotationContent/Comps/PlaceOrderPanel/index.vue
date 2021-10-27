@@ -108,6 +108,9 @@ export default {
         color: #888;
         font-size: 14px;
       }
+      .el-title {
+        font-size: 14px;
+      }
       &.is-error > .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap .el-input__inner,
       &.is-error > .el-form-item__content > .mp-place-order-panel-form-item-size-group-comp-wrap .el-input__inner,
       &.is-error .mp-place-order-panel-comp-craft-type-item-comp-wrap .el-input__inner{
