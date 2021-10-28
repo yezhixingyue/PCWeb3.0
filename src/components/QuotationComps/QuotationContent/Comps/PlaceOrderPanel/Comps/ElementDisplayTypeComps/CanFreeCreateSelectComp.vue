@@ -13,6 +13,7 @@
     @focus.native="onFocus"
     @blur="onBlur"
     @change="onChange"
+    @visible-change='onVisibleChange'
     ref="oSelect"
     size="small"
     :style="`width:${localDisplayWidth}px`"
@@ -30,6 +31,10 @@
 <script>
 export default {
   props: {
+    CtrlZIndex: {
+      type: Boolean,
+      default: false,
+    },
     AllowCreate: { // 是否允许自定义
       type: Boolean,
       default: false,
@@ -116,6 +121,10 @@ export default {
       this.$nextTick(() => {
         this.$emit('change', e);
       });
+    },
+    onVisibleChange(e) {
+      if (this.CtrlZIndex) return;
+      this.$store.commit('common/setIsPopperVisible', e);
     },
     onNativeChange(e) {
       this.handleBlur(e);

@@ -73,17 +73,18 @@ export default {
     },
     accept() {
       if (this.FileInfo) {
-        return this.FileInfo.TypeList.map(({ ID }) => {
+        const str = this.FileInfo.TypeList.map(({ ID }) => {
           const t = this.FileTypeList.find((_it) => _it.ID === ID);
           if (t) {
             return t.Name.split('/')
-              .map((it) => `.${it}`)
+              .map(it => (it === '*' ? it : `.${it}`))
               .join(',');
           }
           return null;
         })
           .filter((it) => it)
           .join(',');
+        return str.includes('*') ? '*' : str;
       }
       return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z';
     },
@@ -214,6 +215,7 @@ export default {
 
       // 去除格式不符合文件
       const list = arr.filter(_file => {
+        if (this.accept === '*') return true;
         const extname = this.utils.extname(_file.name);
         return this.accept.includes(extname);
       });

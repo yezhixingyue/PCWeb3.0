@@ -149,7 +149,7 @@ export default {
     },
     hidden() {
       if (Object.prototype.toString.call(this.target) === '[object Object]') {
-        return this.target.HiddenToCustomer || (this.target.GroupInfo && this.target.GroupInfo.HiddenToCustomer) || this.AffectedHidden;
+        return this.target.HiddenToCustomer || (this.target.GroupInfo && this.target.GroupInfo.HiddenToCustomer);
       }
       return false;
     },
@@ -217,6 +217,7 @@ export default {
           return !!t;
         }
       }
+      if (this.AffectedHidden) return false;
       return true;
     },
     propName() {

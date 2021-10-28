@@ -9,6 +9,7 @@ import Cookie from '@/assets/js/Cookie';
 export default {
   namespaced: true,
   state: {
+    isPopperVisible: false,
     /** 单位类型列表
     ---------------------------------------- */
     UnitTypeList: [
@@ -251,6 +252,11 @@ export default {
   getters: {
   },
   mutations: {
+    /** 当下拉框展示时修改该状态，用以触发顶部zindex的值以适应对下拉框的覆盖
+    ---------------------------------------- */
+    setIsPopperVisible(state, bool) {
+      state.isPopperVisible = bool;
+    },
     /** 设置客户信息
     ---------------------------------------- */
     setCustomerInfo(state, [data, bool]) {

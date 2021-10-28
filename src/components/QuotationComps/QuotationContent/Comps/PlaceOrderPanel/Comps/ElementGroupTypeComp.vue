@@ -71,6 +71,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    CtrlZIndex: {
+      type: Boolean,
+      default: false,
+    },
     showTop: {
       type: Boolean,
       default: true,
@@ -352,7 +356,7 @@ export default {
   > div {
     margin-left: 6px;
     > span.disabled {
-      color: #050404 !important;
+      color: #aaa !important;
       cursor: not-allowed;
       pointer-events: none;
       &:hover {

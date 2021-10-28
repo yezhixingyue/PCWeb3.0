@@ -10,6 +10,7 @@
     :DisplayWidth='DisplayWidth'
     :DisplayWidthIsAuto='DisplayWidthIsAuto'
     :DisabledOptionList='DisabledOptionList'
+    CtrlZIndex
     @blur="onBlur"
     @change="onSelectChange"
   />
@@ -19,7 +20,7 @@
       {{item.Name}}
     </el-checkbox>
   </el-checkbox-group>
-  <el-radio-group v-model="checkVal" v-else :disabled="isDisabled" @change="onSelectChange">
+  <el-radio-group v-model="checkVal" v-else :disabled="isDisabled" @change="onSelectChange('radio')">
     <el-radio v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID"
      @click.native.stop="onRadioItemClick(item)" :disabled='DisabledOptionList.includes(item.ID)'>{{
       item.Name
@@ -36,6 +37,10 @@ export default {
     event: 'change',
   },
   props: {
+    CtrlZIndex: {
+      type: Boolean,
+      default: false,
+    },
     placeholder: {
       type: String,
       default: '请选择',
@@ -132,7 +137,9 @@ export default {
       this.$emit('blur', this.value);
     },
     onSelectChange(e) {
-      this.$emit('blur', e);
+      let t = e;
+      if (t === 'radio') t = Math.random();
+      this.$emit('blur', t);
     },
     handleInterAction(list) { // 处理选项列表变动时
       if (!Array.isArray(list) || list.length === 0) return;

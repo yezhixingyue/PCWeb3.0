@@ -5,13 +5,13 @@ import { isEqual, isGreatThen, isLessThen } from '@/assets/js/utils/utils';
 export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
   if (!DefaultOrDisabledValue && DefaultOrDisabledValue !== 0) return '';
   const _t = {
-    CustomerInputValues: [{}],
+    CustomerInputValues: [{ IsInteractionResult: true }],
     DisabledValue: '',
     ElementID: _El.ID,
     disabledByInteraction: false,
     hiddenByInteraction: false,
   };
-  if (_El.Type === 1) _t.CustomerInputValues[0].Value = DefaultOrDisabledValue;
+  _t.CustomerInputValues[0].Value = DefaultOrDisabledValue;
   if (_El.Type === 3) {
     let bool;
     if (DefaultOrDisabledValue === _El.SwitchAttribute.CloseValue) bool = false;
@@ -22,8 +22,6 @@ export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
     const o = _El.OptionAttribute.OptionList.find(_it => _it.Value === DefaultOrDisabledValue);
     if (o) {
       _t.CustomerInputValues[0].ID = o.ID;
-    } else {
-      _t.CustomerInputValues[0].Name = DefaultOrDisabledValue;
     }
   }
   return _t;
@@ -34,7 +32,7 @@ export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
  * @param {*}
  * @return {*}
  */
-const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize) => {
+const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize, isGroup) => {
   if (!Element || !ElementValList || !ElementList) return null;
   let t = ElementValList.find(it => it.ElementID === Element.ID);
   const _El = ElementList.find(it => it.ID === Element.ID);
@@ -59,7 +57,8 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
     // _Value = t.CustomerInputValues.map(it => it.ID || ''); // 不筛选空值
   } else {
     const [{ ID, Name, Value, IsOpen }] = t.CustomerInputValues;
-    _Value = ID || Name || Value || IsOpen;
+    _Value = ID || Name || IsOpen;
+    if (!_Value && _Value !== false) _Value = Value;
     if (isSize && ID) {
       const _t = _El.OptionAttribute.OptionList.find(it => it.ID === ID);
       return _t ? _t.Value : '';
@@ -75,6 +74,7 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
         FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
         // return (it ? it.ID : _El.OptionAttribute.CustomizeValue);
         FixedTypeValue = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.ID : Math.random().toString(16).slice(-8)));
+        if (!isGroup) return FixedTypeValue.length;
         break;
       case 1: // 和
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
@@ -114,7 +114,9 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
       if (FixedType === 4) _GroupValue = target.List.length; // 元素组使用次数
     } else {
       const ElValues = target.List.map(({ List }) => {
-        const _itemVal = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList);
+        const isSize = false;
+        const isGroup = true;
+        const _itemVal = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList, isSize, isGroup);
         return _itemVal;
       }).filter(_it => _it || _it === 0 || _it === false);
       if (ElValues.length === 0) {

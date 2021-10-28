@@ -28,9 +28,11 @@
         >
           <ElementTypeComp
             hiddenLabel
+            CtrlZIndex
             :Property="it"
             :value="craftForm[it.ID].Value"
             :AffectedPropList='getElementAffectedPropList(it)'
+            @interaction="getLocalAffectedPropList"
             @input="handleElementChange($event, it)"
           />
         </el-form-item>
@@ -46,6 +48,7 @@
           <ElementGroupTypeComp
             :Property="it"
             fillWidth
+            CtrlZIndex
             :errorElementID='errorElementID'
             :errorIndex='errorIndex'
             :errorMsg='errorMsg'

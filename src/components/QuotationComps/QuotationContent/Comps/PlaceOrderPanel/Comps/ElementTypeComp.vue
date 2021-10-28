@@ -1,5 +1,5 @@
 <template>
-  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer && !hidden"
+  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden || hidden"
    :class="{isshow: !hidden, isNameHide: hiddenLabel || Property.IsNameHidden}">
     <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">
       <i v-show="showError" class="is-bold is-pink is-font-13">!</i>
@@ -9,6 +9,7 @@
     <NumberTypeItemComp
      class="element-type-content"
      contentBefore=''
+     CtrlZIndex
      v-if="Property.Type === 1"
      v-model.lazy="PropValue"
      :InputContent='Property.NumbericAttribute.InputContent'
@@ -25,6 +26,7 @@
      contentBefore=''
      v-if="Property.Type === 2"
      v-model.lazy="PropValue"
+     CtrlZIndex
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
      :Allow='Property.OptionAttribute.AllowCustomer && !disabledDefine'
      :isMultiple='!Property.OptionAttribute.IsRadio'
@@ -94,6 +96,10 @@ export default {
       type: Number,
       default: 140,
     },
+    CtrlZIndex: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     NumberTypeItemComp,
@@ -122,27 +128,9 @@ export default {
         return '';
       },
       set(val) {
-        if (this.Property.Type === 1) { // 数值类型
-          const temp = { Value: `${val}` };
-          this.$emit('input', { CustomerInputValues: [temp], ...this.disabledInfoObj });
-        } else if (this.Property.Type === 3) { // 开关
-          const temp = { IsOpen: val };
-          this.$emit('input', { CustomerInputValues: [temp], ...this.disabledInfoObj });
-        } else if (this.Property.OptionAttribute && this.Property.OptionAttribute.IsRadio) {
-          const temp = { ID: '', Name: '' };
-          // 此处应判断是否为ID，在options中则为ID， 否则为Name
-          if (Array.isArray(this.Property.OptionAttribute.OptionList) && val) {
-            const t = this.Property.OptionAttribute.OptionList.find(it => it.ID === val);
-            if (t) temp.ID = val;
-            else temp.Name = val;
-          } else {
-            temp.Name = val;
-          }
-          this.$emit('input', { CustomerInputValues: [temp], ...this.disabledInfoObj });
-        } else if (this.Property.OptionAttribute && !this.Property.OptionAttribute.IsRadio) {
-          // 多选  此时不允许自定义
-          this.$emit('input', { CustomerInputValues: Array.isArray(val) ? val.map(ID => ({ ID })) : [], ...this.disabledInfoObj });
-        }
+        const value = this.getElementSubmitValue(val);
+        if (!value) return;
+        this.$emit('input', value);
       },
     },
     disabled() { // 禁用
@@ -202,7 +190,8 @@ export default {
     switchDisabledOrHidden() {
       // 排除isDisabled；因为其由上一级传来且只能是元素组或尺寸时才会传递，（尺寸组和元素组不再允许禁用或隐藏，所以该值废弃，不再考虑（其发生改变时本地无隐藏值，也需传递））
       // return this.hidden || this.isDisabled || this.disabled;
-      return this.hidden || this.disabled;
+      const unable = this.hidden || this.disabled;
+      return `${unable}${JSON.stringify(this.DisabledValue)}`;
     },
   },
   data() {
@@ -227,20 +216,54 @@ export default {
         this.$emit('interaction');
       });
     },
+    getElementSubmitValue(val, IsInteractionResult) {
+      if (IsInteractionResult) {
+        let CustomerInputValues = [{ Value: '', IsInteractionResult }];
+        if (val) CustomerInputValues = val;
+        return { CustomerInputValues, ...this.disabledInfoObj };
+      }
+      if (this.Property.Type === 1) { // 数值类型
+        const temp = { Value: `${val}` };
+        return { CustomerInputValues: [temp], ...this.disabledInfoObj };
+      }
+      if (this.Property.Type === 3) { // 开关
+        const temp = { IsOpen: val };
+        return { CustomerInputValues: [temp], ...this.disabledInfoObj };
+      }
+      if (this.Property.OptionAttribute) {
+        if (this.Property.OptionAttribute.IsRadio) {
+          const temp = { ID: '', Name: '', Value: '' };
+          // 此处应判断是否为ID，在options中则为ID， 否则为Name
+          if (Array.isArray(this.Property.OptionAttribute.OptionList) && val) {
+            const t = this.Property.OptionAttribute.OptionList.find(it => it.ID === val);
+            if (t) temp.ID = val;
+            else temp.Name = val;
+          } else {
+            temp.Name = val;
+          }
+          return { CustomerInputValues: [temp], ...this.disabledInfoObj };
+        }
+        // 多选  此时不允许自定义
+        return { CustomerInputValues: Array.isArray(val) ? val.map(ID => ({ ID })) : [], ...this.disabledInfoObj };
+      }
+      return null;
+    },
   },
   watch: {
-    DisabledValue: { // 之前使用switchDisabledOrHidden，判断不准确修改为该值
+    switchDisabledOrHidden: { // 之前使用switchDisabledOrHidden，判断不准确修改为该值
       handler(newVal, oldVal) {
-        if (!newVal === !oldVal) return;
-        const DisabledValue = newVal ? InterAction.getUnusabledValueByInteraction(this.AffectedPropList) : '';
+        if (newVal === oldVal) return;
+        const unable = this.hidden || this.disabled;
+        const DisabledValue = unable ? InterAction.getUnusabledValueByInteraction(this.AffectedPropList) : '';
         this.disabledInfoObj = {
           disabledByInteraction: this.disabled,
           hiddenByInteraction: this.hidden,
           DisabledValue,
         };
         this.$nextTick(() => {
-          this.$emit('input', { CustomerInputValues: [...this.value], ...this.disabledInfoObj });
-          if (this.disabled) this.PropValue = DisabledValue;
+          const value = this.getElementSubmitValue(this.disabled || this.hidden ? this.DisabledValue : this.PropValue, this.disabled || this.hidden);
+          if (!value) return;
+          this.$emit('input', value);
           this.$nextTick(() => {
             if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
               this.$emit('interaction');

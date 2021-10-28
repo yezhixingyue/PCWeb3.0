@@ -17,6 +17,7 @@
     :DisplayWidth='DisplayWidth'
     :DisplayWidthIsAuto='DisplayWidthIsAuto'
     v-model="content"
+    CtrlZIndex
     @focus="onFocus"
     @blur="onBlur"
     @change="onSelectChange"
@@ -35,6 +36,10 @@ export default {
     event: 'change',
   },
   props: {
+    CtrlZIndex: {
+      type: Boolean,
+      default: false,
+    },
     placeholder: {
       type: String,
       default: '',

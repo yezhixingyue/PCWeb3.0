@@ -158,7 +158,7 @@ export default {
     PlaceOrderProductClassifyComp,
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo']),
+    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
     },
@@ -307,6 +307,9 @@ export default {
         if (!this.showBoxShadow) return;
         this.showBoxShadow = false;
       }
+    },
+    isPopperVisible(bool) {
+      this.oStyles.zIndex = bool ? 3000 : 1000;
     },
   },
   async mounted() {

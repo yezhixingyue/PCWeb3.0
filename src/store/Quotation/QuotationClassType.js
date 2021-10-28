@@ -321,18 +321,24 @@ export default class QuotationClassType {
     // 转换数值 清除为空的元素值等
     const getSingleElementClearValue = ElVal => {
       if (!ElVal || !Array.isArray(ElVal.CustomerInputValues)) return null;
-      const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen }) => {
-        if (ID) return { ID };
-        if (Name) return { Name };
-        if (Value || Value === 0) return { Value };
-        if (IsOpen || IsOpen === false) return { IsOpen };
-        return null;
+      const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen, IsInteractionResult = false }) => {
+        if (!IsInteractionResult && !ID && !Name && !(Value || Value === 0) && !(IsOpen || IsOpen === false)) return null;
+        const _item = { IsInteractionResult };
+        if (ID) _item.ID = ID;
+        if (Name) _item.Name = Name;
+        if (Value || Value === 0) _item.Value = Value;
+        if (IsOpen || IsOpen === false) _item.IsOpen = IsOpen;
+        return _item;
       }).filter(it => it);
       if ((!CustomerInputValues || CustomerInputValues.length === 0) && clearEmpty) return null;
-      return {
+      const _temp = {
         ...ElVal,
         CustomerInputValues,
       };
+      delete _temp.DisabledValue;
+      delete _temp.disabledByInteraction;
+      delete _temp.hiddenByInteraction;
+      return _temp;
     };
     // eslint-disable-next-line no-unused-vars
     const getElementListValueFilter = (ElementList, disabledElements = []) => {
