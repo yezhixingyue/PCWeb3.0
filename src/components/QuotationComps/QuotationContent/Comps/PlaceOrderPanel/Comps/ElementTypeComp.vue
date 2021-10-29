@@ -1,5 +1,5 @@
 <template>
-  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden || hidden"
+  <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden"
    :class="{isshow: !hidden, isNameHide: hiddenLabel || Property.IsNameHidden}">
     <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">
       <i v-show="showError" class="is-bold is-pink is-font-13">!</i>
@@ -9,7 +9,7 @@
     <NumberTypeItemComp
      class="element-type-content"
      contentBefore=''
-     CtrlZIndex
+     :CtrlZIndex='CtrlZIndex'
      v-if="Property.Type === 1"
      v-model.lazy="PropValue"
      :InputContent='Property.NumbericAttribute.InputContent'
@@ -26,7 +26,7 @@
      contentBefore=''
      v-if="Property.Type === 2"
      v-model.lazy="PropValue"
-     CtrlZIndex
+     :CtrlZIndex='CtrlZIndex'
      :options='Property.OptionAttribute.OptionList.filter(it => !it.HiddenToCustomer)'
      :Allow='Property.OptionAttribute.AllowCustomer && !disabledDefine'
      :isMultiple='!Property.OptionAttribute.IsRadio'
@@ -50,6 +50,7 @@
      :Words="Property.SwitchAttribute.Words || ''"
      @blur="onBlur" />
     <span v-if="Property.Unit">{{Property.Unit}}</span>
+    <HelpTipsComp :tipsData='localTipData' :title="localTipTitle" />
   </div>
 </template>
 
@@ -57,6 +58,7 @@
 import { mapState, mapGetters } from 'vuex';
 import InterAction from '@/store/Quotation/Interaction';
 import { creatNewTargetValue } from '@/store/Quotation/EffectiveControlList';
+import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
 import NumberTypeItemComp from './ElementDisplayTypeComps/NumberTypeItemComp.vue';
 import OptionTypeItemComp from './ElementDisplayTypeComps/OptionTypeItemComp.vue';
 import SwitchTypeItemComp from './ElementDisplayTypeComps/SwitchTypeItemComp.vue';
@@ -100,11 +102,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    PropTipsDataList: { // 所在部件所有属性提示列表数据 -- 从中找到当前元素对应的项 用以展示
+      type: Array,
+      default: () => [],
+    },
+    label: {
+      type: String,
+      default: '',
+    },
   },
   components: {
     NumberTypeItemComp,
     OptionTypeItemComp,
     SwitchTypeItemComp,
+    HelpTipsComp,
   },
   computed: {
     ...mapState('Quotation', ['isOrderRestore']),
@@ -150,7 +161,7 @@ export default {
           { Name: '下拉框', ID: 1 },
         ];
         const t = SelectModeEnum.find((it) => it.ID === this.Property.OptionAttribute.SelectMode);
-        return !(t && t.Name === '单选按钮' && this.Property.OptionAttribute.IsRadio);
+        if (t && t.Name === '下拉框' && this.Property.OptionAttribute.IsRadio) return false;
       }
       return true;
     },
@@ -192,6 +203,16 @@ export default {
       // return this.hidden || this.isDisabled || this.disabled;
       const unable = this.hidden || this.disabled;
       return `${unable}${JSON.stringify(this.DisabledValue)}`;
+    },
+    localTipTitle() {
+      if (this.Property.IsNameHidden) return '提示';
+      const str = this.label || this.Property.Name;
+      return str ? str.replace('：', '') : '';
+    },
+    localTipData() {
+      if (this.PropTipsDataList.length === 0) return null;
+      const t = this.PropTipsDataList.find(it => it.Property.ID === this.Property.ID);
+      return t || null;
     },
   },
   data() {

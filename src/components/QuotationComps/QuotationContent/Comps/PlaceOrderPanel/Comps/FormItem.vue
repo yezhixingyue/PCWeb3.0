@@ -9,18 +9,19 @@
    class="mp-place-order-panel-form-item-comp-wrap"
    :class="{isNormalGroup:isNormalGroup, hasError: errorIndex || errorIndex === 0}">
     <!-- 元素 -->
-    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue"
+    <ElementTypeComp v-if="curTypeName==='元素'" :Property='target' hiddenLabel v-model="itemValue" :PropTipsDataList='PropTipsDataList' :label='label'
      :AffectedPropList='localAffectedPropList' @interaction="onTriggerInteractionClick" />
     <!-- 元素组 -->
     <ElementGroupTypeComp v-if="isNormalGroup" :Property='target' v-model="itemValue" :showTop='!!label' @changeValidate='onChangeValidate'
      :errorElementID='errorElementID' :errorIndex='errorIndex' :errorMsg='errorMsg' :AffectedPropList='localAffectedPropList'
-     :subGroupAffectedPropList='subGroupAffectedPropList'
+     :subGroupAffectedPropList='subGroupAffectedPropList' :PropTipsDataList='PropTipsDataList'
      @triggerInteraction='onTriggerInteractionClick' @groupItemChange='handleGroupItemChange' />
      <!-- 尺寸 -->
-    <SizeGroupComp v-if="curTypeName==='尺寸组'" :AffectedPropList='localAffectedPropList'
-     :Property='target' v-model="itemValue" :errorElementID='errorElementID' @triggerInteraction='onTriggerInteractionClick' />
+    <SizeGroupComp v-if="curTypeName==='尺寸组'" :AffectedPropList='localAffectedPropList' :SizeTipsData='SizeTipsData' :label='label'
+     :Property='target' v-model="itemValue" :errorElementID='errorElementID'
+      @triggerInteraction='onTriggerInteractionClick' :PropTipsDataList='PropTipsDataList' />
      <!-- 物料 -->
-    <MaterialTypeComp v-if="curTypeName==='物料'" @triggerInteraction='onTriggerInteractionClick'
+    <MaterialTypeComp v-if="curTypeName==='物料'" @triggerInteraction='onTriggerInteractionClick' :MaterialTipsData='MaterialTipsData' :label='label'
      :AffectedPropList='localAffectedPropList' :MaterialList='target' v-model="itemValue"/>
     <!-- 工艺 -->
     <CraftTypeComp
@@ -31,6 +32,7 @@
      :AffectedPropList='localAffectedPropList'
      :CraftConditionList='placeData.CraftConditionList || []'
      :ChildSubControlList='submitData.ChildSubControlList'
+     :CraftTipsDataList='CraftTipsDataList'
      :PartID='PartID'
      :PartIndex='PartIndex'
      :PartAffectedPropList='PartAffectedPropList'
@@ -45,6 +47,7 @@ import {
 } from '@/store/Quotation/Checker';
 import InterAction from '@/store/Quotation/Interaction';
 import { getPropertiesAffectedByInteraction, getCombineAffectedPropList } from '@/store/Quotation/EffectiveControlList';
+import tipEnums from '@/assets/js/utils/tipEnums';
 import ElementTypeComp from './ElementTypeComp.vue';
 import ElementGroupTypeComp from './ElementGroupTypeComp.vue';
 import SizeGroupComp from './SizeGroupComp/index.vue';
@@ -76,6 +79,10 @@ export default {
     PartAffectedPropList: { // 部件子交互生效属性控制信息列表
       type: Array,
       default: null,
+    },
+    PartBaseTips: { // 提示说明列表
+      type: Array,
+      default: () => [],
     },
   },
   components: {
@@ -221,10 +228,9 @@ export default {
       return true;
     },
     propName() {
-      if (!this.target) return 'propName';
-      if (this.target.Name) return this.target.Name;
-      if (this.target.GroupInfo) return this.target.GroupInfo.Name || 'propName';
-      return 'propName';
+      if (!this.target) return '';
+      const str = this.label ? this.label.replace('：', '') : '';
+      return str || 'propName';
     },
     CraftAffectedPropList() { // 工艺子交互
       if (this.curTypeName === '工艺') {
@@ -260,6 +266,30 @@ export default {
         }
       }
       return false;
+    },
+    SizeTipsData() {
+      if (!this.PartBaseTips || this.PartBaseTips.length === 0) return null;
+      const t = this.PartBaseTips.find(it => it.Type === tipEnums.Size);
+      if (!t) return null;
+      return t;
+    },
+    MaterialTipsData() {
+      if (!this.PartBaseTips || this.PartBaseTips.length === 0) return null;
+      const t = this.PartBaseTips.find(it => it.Type === tipEnums.Material);
+      if (!t) return null;
+      return t;
+    },
+    PropTipsDataList() {
+      if (!this.PartBaseTips || this.PartBaseTips.length === 0) return [];
+      const arr = this.PartBaseTips.filter(it => it.Type === tipEnums.Property);
+      return arr;
+    },
+    CraftTipsDataList() {
+      if (this.curProductInfo2Quotation && this.curProductInfo2Quotation.TipsDetail) {
+        const { CraftTips } = this.curProductInfo2Quotation.TipsDetail;
+        if (Array.isArray(CraftTips)) return CraftTips;
+      }
+      return [];
     },
   },
   data() {
@@ -318,6 +348,12 @@ export default {
             this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
           if (res && typeof res === 'string') {
             callback(new Error(res));
+            return;
+          }
+        }
+        if (this.curTypeName === '物料') {
+          if (!this.itemValue) {
+            callback(new Error('请选择物料'));
             return;
           }
         }

@@ -1,11 +1,13 @@
 <template>
   <section v-if="_MaterialList.length > 0">
     <MaterialSingleSelector :list='showList' v-model="selectedMaterial" hiddenOption />
+    <HelpTipsComp :tipsData='MaterialTipsData' :title="label" />
   </section>
 </template>
 
 <script>
 // 该组件暂不支持数据还原 及 指定默认物料功能，后续需要时再补充(订单编辑等功能) - 默认物料功能可以通过顺序调整至第一个实现（排序目前仅支持一级大类排序）
+import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
 import MaterialSingleSelector from './MaterialSingleSelector.vue';
 
 export default {
@@ -23,9 +25,18 @@ export default {
       type: Array,
       default: () => [],
     },
+    MaterialTipsData: {
+      type: Object,
+      default: null,
+    },
+    label: {
+      type: String,
+      default: '物料',
+    },
   },
   components: {
     MaterialSingleSelector,
+    HelpTipsComp,
   },
   computed: {
     hiddenMatarialList() { // 隐藏物料列表  Operator 21 禁用    22 隐藏    23 必选

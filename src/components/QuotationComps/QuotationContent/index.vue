@@ -18,7 +18,7 @@
             </span>
           </section>
           <SwiperClassifyComp />
-          <PlaceOrderPanel ref="oProductPanel" :placeData='placeData' :submitData='obj2GetProductPrice.ProductParams' />
+          <PlaceOrderPanel ref="oProductPanel" :placeData='placeData' :submitData='obj2GetProductPrice.ProductParams' :PartBaseTips='ProductBaseTips' />
           <template v-if='!isSetupError'>
             <PartComp ref="oPartPanels" v-for="item in obj2GetProductPrice.ProductParams.PartList" :key="item.PartID" :PartData='item' :placeData='placeData' />
           </template>
@@ -177,7 +177,7 @@
      :asideAboutData='asideAboutData'
      :asideIntroData='asideIntroData'
      :isError='getAboutIsError'
-     :productName='placeData.ProductName'
+     :productName='placeData.ShowName'
      @getProductAsideIntroData='getProductAsideIntroData'
      />
   </article>
@@ -227,20 +227,6 @@ export default {
     ]),
     ...mapGetters('Quotation', ['curProductShowNameInfo']),
     ...mapState('common', ['customerInfo']),
-    // 数量下拉列表数据
-    countOption() {
-      if (
-        !this.obj2GetProductPrice.ProductParams.RecommendNumberList
-        || this.obj2GetProductPrice.ProductParams.RecommendNumberList.length === 0
-      ) return [];
-      // { text: 40, value: 40 }
-      return this.obj2GetProductPrice.ProductParams.RecommendNumberList.map(
-        (item) => ({
-          text: item,
-          value: item,
-        }),
-      );
-    },
     computedCouponCode2Add: {
       get() {
         return this.couponCode2Add;
@@ -266,31 +252,6 @@ export default {
         this.setProductParams(['ProductAmount', `${newVal}`]);
       },
     },
-    // 产品款数
-    KindCount: {
-      get() {
-        return this.obj2GetProductPrice.ProductParams.KindCount;
-      },
-      set(newVal) {
-        let _str = newVal;
-        if (newVal.length > 9) _str = '';
-        this.setProductParams(['KindCount', `${_str}`]);
-      },
-    },
-    RequiredCraft() {
-      if (this.obj2GetProductPrice.ProductParams.CraftList.length === 0) return null;
-      const _data = this.obj2GetProductPrice.ProductParams.CraftList.find(
-        (it) => it.ChoiceType === 2,
-      );
-      return _data;
-    },
-    notRequiredCraft() {
-      if (this.obj2GetProductPrice.ProductParams.CraftList.length === 0) return null;
-      const _data = this.obj2GetProductPrice.ProductParams.CraftList.find(
-        (it) => it.ChoiceType === 1,
-      );
-      return _data;
-    },
     coupon() {
       if (!this.ProductQuotationResult) return 0;
       if (!this.selectedCoupon) return 0;
@@ -307,32 +268,19 @@ export default {
       if (!this.coupon) return '(尚未满足使用条件)';
       return '';
     },
-    // 产品属性
-    AttributeList: {
-      get() {
-        return this.obj2GetProductPrice.ProductParams.PropertyList;
-      },
-      set([data, index, type]) {
-        this.setProductParamsPropertyList([index, data, type]);
-      },
-    },
     watchAddInfoChange() {
       if (!this.addressInfo4PlaceOrder) return null;
       return this.addressInfo4PlaceOrder.Address.Express;
     },
-    countTipsData() {
-      if (!this.placeData || !this.placeData.TipsDetail) return null;
-      const { BaseTips } = this.placeData.TipsDetail;
-      if (!BaseTips || BaseTips.length === 0) return null;
-      const _arr = BaseTips.filter(it => it.Type === tipEnums.Number);
-      if (_arr.length === 0) return null;
-      const t = _arr.find(it => !it.Part);
-      if (!t) return null;
-      return t;
-    },
     isSetupError() { // 是否有配置上的错误
       if (!this.placeData) return true;
       return false;
+    },
+    ProductBaseTips() {
+      if (!this.placeData || !this.placeData.TipsDetail || !this.placeData.TipsDetail.BaseTips || this.placeData.TipsDetail.BaseTips.length === 0) return [];
+      const _arr = this.placeData.TipsDetail.BaseTips.filter(it => !it.Part && it.Type !== tipEnums.Product);
+      if (_arr.length === 0) return [];
+      return _arr;
     },
   },
   data() {
@@ -497,11 +445,11 @@ export default {
       this.isOpenCouponCenter = true;
     },
     async getProductAsideIntroData() {
-      const { ProductID } = this.placeData;
+      const { ID } = this.placeData;
       let bool = true;
       this.asideAboutData = null;
       this.getAboutIsError = false;
-      const res = await this.api.getProductIntroDetail(ProductID).catch(() => { bool = false; });
+      const res = await this.api.getProductIntroDetail(ID).catch(() => { bool = false; });
       if (bool && res && res.data.Status === 1000) {
         this.asideAboutData = res.data.Data;
       } else {
@@ -509,7 +457,7 @@ export default {
       }
     },
     onHomeDetailClick() {
-      window.open(`${productJumpUrl}product/${this.placeData.ProductID}.html`);
+      window.open(`${productJumpUrl}product/${this.placeData.ID}.html`);
     },
     async asyncInputchecker() {
       const resp = await this.$refs.oConsigneeAddressSetpComp.inputChecker();
@@ -520,19 +468,10 @@ export default {
     },
   },
   mounted() {
-    if (this.countOption.length > 0 && !this.ProductAmount) {
-      const _count = this.countOption[0].value;
-      this.setProductParams(['ProductAmount', `${_count}`]);
-    }
     this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
     // this.getCraftRelationList();
   },
   watch: {
-    countOption(newVal) {
-      if (newVal.length > 0) {
-        this.setProductParams(['ProductAmount', `${newVal[0].value}`]);
-      }
-    },
     obj2GetProductPrice: {
       handler() {
         this.$store.commit('Quotation/setProductQuotationResult', null);
@@ -550,8 +489,9 @@ export default {
         this.isCouponGet = false;
         this.isOpenCouponCenter = false;
         this.activeNames = [];
-        const { ProductID, TipsDetail } = val;
-        if (!ProductID || !TipsDetail) return;
+        const { ID, TipsDetail } = val;
+        if (!ID || !TipsDetail) return;
+
         this.asideIntroData = null;
         const { BaseTips } = TipsDetail;
         if (BaseTips && BaseTips.length > 0) {

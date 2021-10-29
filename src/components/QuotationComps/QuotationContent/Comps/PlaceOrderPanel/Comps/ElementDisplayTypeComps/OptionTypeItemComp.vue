@@ -10,7 +10,7 @@
     :DisplayWidth='DisplayWidth'
     :DisplayWidthIsAuto='DisplayWidthIsAuto'
     :DisabledOptionList='DisabledOptionList'
-    CtrlZIndex
+    :CtrlZIndex='CtrlZIndex'
     @blur="onBlur"
     @change="onSelectChange"
   />

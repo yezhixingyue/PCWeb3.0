@@ -9,7 +9,7 @@
     :active-text="Words"
     class="mp-erp-switch-type-element-display-select-comp">
   </el-switch> -->
-  <el-checkbox v-model="switchValue" :disabled='isDisabled' class="mp-erp-switch-type-element-display-select-comp">
+  <el-checkbox v-model="switchValue" :disabled='isDisabled' @change='onChange' class="mp-erp-switch-type-element-display-select-comp">
     {{Words}}
   </el-checkbox>
 </template>
@@ -41,10 +41,13 @@ export default {
         return this.value;
       },
       set(val) {
-        // const _val = val ? this.OpenValue : this.CloseValue;
         this.$emit('input', val);
-        this.$emit('blur', val);
       },
+    },
+  },
+  methods: {
+    onChange() {
+      this.$emit('blur', Math.random());
     },
   },
 };

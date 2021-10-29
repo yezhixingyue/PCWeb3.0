@@ -8,8 +8,10 @@
     <li v-for="(it, i) in PartData.List" :key="it.key">
       <p>
         <label>// {{PartName}}{{i > 0 ? ` - ${i + 1}` : ''}}</label>
+        <HelpTipsComp :tipsData='tipsData' :title="PartName" />
       </p>
-      <PlaceOrderPanel :PartID='PartData.PartID' :PartIndex='i' :placeData='DisplayPartData' :submitData='it' ref='oPartPanelArray' />
+      <PlaceOrderPanel :PartID='PartData.PartID' :PartIndex='i'
+       :placeData='DisplayPartData' :PartBaseTips='PartBaseTips' :submitData='it' ref='oPartPanelArray' />
       <!-- <div class="ctrl" v-if="!(hiddenDelete && hiddenAdd)"> -->
       <div class="ctrl">
         <div v-if="!hiddenDelete">
@@ -26,6 +28,8 @@
 
 <script>
 import QuotationClassType, { getRequiredCraftListAndSubControlList } from '@/store/Quotation/QuotationClassType';
+import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
+import tipEnums from '@/assets/js/utils/tipEnums';
 import PlaceOrderPanel from './PlaceOrderPanel';
 
 export default {
@@ -41,6 +45,7 @@ export default {
   },
   components: {
     PlaceOrderPanel,
+    HelpTipsComp,
   },
   computed: {
     DisplayPartData() {
@@ -70,6 +75,20 @@ export default {
     },
     hiddenAdd() {
       return this.PartData.List.length >= this.maxLength;
+    },
+    tipsData() {
+      if (!this.placeData || !this.placeData.TipsDetail || !this.placeData.TipsDetail.BaseTips || this.placeData.TipsDetail.BaseTips.length === 0) return null;
+      const _arr = this.placeData.TipsDetail.BaseTips.filter(it => it.Type === tipEnums.Part);
+      if (_arr.length === 0) return null;
+      const t = _arr.find(it => it.Part.ID === this.PartData.PartID);
+      if (!t) return null;
+      return t;
+    },
+    PartBaseTips() {
+      if (!this.placeData || !this.placeData.TipsDetail || !this.placeData.TipsDetail.BaseTips || this.placeData.TipsDetail.BaseTips.length === 0) return [];
+      const _arr = this.placeData.TipsDetail.BaseTips.filter(it => it.Part && it.Part.ID === this.PartData.PartID && it.Type !== tipEnums.Part);
+      if (_arr.length === 0) return [];
+      return _arr;
     },
   },
   methods: {

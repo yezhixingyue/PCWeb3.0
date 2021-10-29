@@ -115,7 +115,10 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
     }
   }
   let IsRequired = false;
-  const operation = prop.Type === 2 ? '选择' : '填写';
+  let operation = '输入';
+  if (prop.Type === 2 && (prop.OptionAttribute?.OptionList?.length > 0 || prop.OptionAttribute?.AllowCustomer === false)) {
+    operation = '选择';
+  }
   if (prop.NumbericAttribute && prop.NumbericAttribute.IsRequired) IsRequired = true;
   if (prop.OptionAttribute && prop.OptionAttribute.IsRequired) IsRequired = true;
   if (IsRequired && values && values.length === 0) return `请${operation}${prop.Name}`;
@@ -125,7 +128,9 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
     // 多选元素
     const len = values.length;
     // 需要判断 1. 必选情况下 未选值 (长度为0)
-    if (len === 0 && IsRequired) return `请选择${prop.Name}`;
+    if (len === 0 && IsRequired) {
+      return `请选择${prop.Name}`;
+    }
     // 2. 在已选择的情况下(长度大于0)，选项的数量与限制数量不符合
     if (prop.OptionAttribute.UseTimes) {
       const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;

@@ -10,6 +10,7 @@
       :PartID='PartID'
       :PartIndex='PartIndex'
       :value="getCraftValue(it)"
+      :CraftTipsDataList='CraftTipsDataList'
       :AffectedPropList='getCraftAffectedPropList(it.ID)'
       :ChildSubControlList='ChildSubControlList'
       :PartAffectedPropList='PartAffectedPropList'
@@ -56,6 +57,10 @@ export default {
     PartAffectedPropList: { // 部件子交互生效属性控制信息列表
       type: Array,
       default: null,
+    },
+    CraftTipsDataList: { // 工艺提示列表
+      type: Array,
+      default: () => [],
     },
   },
   components: {

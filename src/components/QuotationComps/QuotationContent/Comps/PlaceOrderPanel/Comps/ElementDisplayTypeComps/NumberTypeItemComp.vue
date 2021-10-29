@@ -17,7 +17,7 @@
     :DisplayWidth='DisplayWidth'
     :DisplayWidthIsAuto='DisplayWidthIsAuto'
     v-model="content"
-    CtrlZIndex
+    :CtrlZIndex='CtrlZIndex'
     @focus="onFocus"
     @blur="onBlur"
     @change="onSelectChange"

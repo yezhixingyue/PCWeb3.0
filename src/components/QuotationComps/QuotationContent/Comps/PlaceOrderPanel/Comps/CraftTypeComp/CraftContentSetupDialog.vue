@@ -419,6 +419,15 @@ export default {
             > label {
               padding-right: 0;
             }
+            &.is-error > .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap .el-input__inner,
+            &.is-error > .el-form-item__content > .mp-place-order-panel-form-item-size-group-comp-wrap .el-input__inner,
+            &.is-error .mp-place-order-panel-comp-craft-type-item-comp-wrap .el-input__inner{
+              border-color: rgb(229, 229, 229) !important;
+            }
+            &.is-error > .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap .canError .el-input__inner,
+            &.is-error > .el-form-item__content > .mp-place-order-panel-form-item-size-group-comp-wrap .canError .el-input__inner {
+              border-color: #ff3769 !important;
+            }
           }
         }
         .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap{

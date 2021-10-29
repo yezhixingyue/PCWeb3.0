@@ -9,6 +9,7 @@
     <template v-if="value && !withoutContent">
       <i class="iconfont icon-bianji is-cyan" @click="handleEditClick"></i>
     </template>
+    <HelpTipsComp :tipsData='craftTipsData' :title="Craft.ShowName" />
     <CraftContentSetupDialog
       :visible.sync="visible"
       :Craft="Craft"
@@ -28,6 +29,8 @@ import ShowProductBtn from '@/components/QuotationComps/SMComps/ShowProductBtn.v
 import InterAction from '@/store/Quotation/Interaction';
 import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
+import { creatNewTargetValue } from '@/store/Quotation/EffectiveControlList';
+import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
 import CraftContentSetupDialog from './CraftContentSetupDialog.vue';
 
 export default {
@@ -61,10 +64,15 @@ export default {
       type: Array,
       default: null,
     },
+    CraftTipsDataList: { // 工艺提示列表
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     ShowProductBtn,
     CraftContentSetupDialog,
+    HelpTipsComp,
   },
   data() {
     return {
@@ -114,10 +122,16 @@ export default {
       if (this.disabled || this.AffectedPropList.length === 0) return [];
       return this.AffectedPropList.filter((it) => it.Property && it.Property.Craft && (it.Property.Element || it.Property.Group));
     },
+    craftTipsData() {
+      if (this.CraftTipsDataList && this.CraftTipsDataList.length > 0) {
+        const t = this.CraftTipsDataList.find(it => it.ID === this.Craft.ID);
+        return t || null;
+      }
+      return null;
+    },
   },
   methods: {
     handleClick() {
-      console.log('handleClick');
       if (this.disabled) return;
       if (this.value) {
         this.$emit('change', null);
@@ -167,11 +181,13 @@ export default {
               CustomerInputValues: _CustomerInputValues,
             };
           }
+          const DisabledValue = InterAction.getUnusabledValueByInteraction(_list);
+          const temp = creatNewTargetValue(DisabledValue, t);
           return {
-            ...it,
+            ...temp,
             disabledByInteraction,
             hiddenByInteraction,
-            DisabledValue: InterAction.getUnusabledValueByInteraction(_list),
+            DisabledValue,
           };
         }
         return it;

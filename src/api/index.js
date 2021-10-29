@@ -68,7 +68,7 @@ const api = {
   },
   getProductDetail([productID, closeLoading]) { // 根据产品ID获取到产品详细信息  GET /Api/Product/Detail  productID
     return instance.get(
-      `/Api/Product/Detail?productID=${productID}&placeOrder=${true}`,
+      `/Api/Product/Detail?productID=${productID}&includeTips=${true}`,
       { closeLoading },
     );
   },

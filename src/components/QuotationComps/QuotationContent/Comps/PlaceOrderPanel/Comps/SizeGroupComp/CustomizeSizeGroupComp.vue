@@ -13,7 +13,8 @@
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
       >
       <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled' @interaction="handleInteraction"
-       @focus="onFocus(i)" @blur="onBlur" isNumberic :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
+       :PropTipsDataList='PropTipsDataList'
+       @focus="onFocus(i)" @blur="onBlur" :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
       <i v-if="i < ElementList.length - 1">×</i>
     </li>
     <li style="margin-left:20px">
@@ -55,6 +56,10 @@ export default {
     isCustomize: {
       type: Boolean,
       default: false,
+    },
+    PropTipsDataList: { // 所在部件所有属性提示列表数据 -- 从中找到当前元素对应的项 用以展示
+      type: Array,
+      default: () => [],
     },
   },
   components: {

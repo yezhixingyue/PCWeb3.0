@@ -25,6 +25,7 @@
         :PartIndex='PartIndex'
         :placeData="placeData"
         :submitData="submitData"
+        :PartBaseTips='PartBaseTips'
         :PartAffectedPropList='PartAffectedPropList'
         @changeValidate='handleChangeValidate'
         @partInteraction='getPartAffectedPropList'
@@ -55,6 +56,10 @@ export default {
     PartIndex: {
       type: Number,
       default: 0,
+    },
+    PartBaseTips: {
+      type: Array,
+      default: () => [],
     },
   },
   components: {
@@ -112,12 +117,12 @@ export default {
         font-size: 14px;
       }
       &.is-error > .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap .el-input__inner,
-      &.is-error > .el-form-item__content > .mp-place-order-panel-form-item-size-group-comp-wrap .el-input__inner,
+      &.is-error > .el-form-item__content .mp-place-order-panel-size-group-customise-comp-containner .el-input__inner,
       &.is-error .mp-place-order-panel-comp-craft-type-item-comp-wrap .el-input__inner{
         border-color: rgb(229, 229, 229) !important;
       }
       &.is-error > .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap .canError .el-input__inner,
-      &.is-error > .el-form-item__content > .mp-place-order-panel-form-item-size-group-comp-wrap .canError .el-input__inner {
+      &.is-error > .el-form-item__content .mp-place-order-panel-size-group-customise-comp-containner .canError .el-input__inner {
         border-color: #ff3769 !important;
       }
     }

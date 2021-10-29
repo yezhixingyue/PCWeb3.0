@@ -1,5 +1,17 @@
 <template>
+  <el-input
+    @focus="onFocus($event, 'inp')"
+    @blur="onBlur"
+    v-model.trim.lazy="content"
+    v-if="AllowCreate && options.length === 0"
+    size="small"
+    class="mp-erp-number-type-element-display-input-comp"
+    maxlength="9"
+    :style="`width:${localDisplayWidth}px`"
+    :disabled='isDisabled'
+  ></el-input>
   <el-select
+    v-else
     v-model="content"
     :filterable='AllowCreate || isMaterial'
     default-first-option
@@ -124,6 +136,7 @@ export default {
     },
     onVisibleChange(e) {
       if (this.CtrlZIndex) return;
+      console.log('onVisibleChange');
       this.$store.commit('common/setIsPopperVisible', e);
     },
     onNativeChange(e) {

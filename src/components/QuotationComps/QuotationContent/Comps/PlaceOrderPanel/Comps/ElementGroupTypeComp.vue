@@ -20,6 +20,8 @@
             :Property="it"
             :value="getItemValue(index, it)"
             :isDisabled='disabled'
+            :CtrlZIndex='CtrlZIndex'
+            :PropTipsDataList='PropTipsDataList'
             @input="onItemValueChange(index, it, $event)"
             @interaction="onTriggerInteractionClick"
             :isError="errorElementID === it.ID && (index === errorIndex || errorIndex === 'all')"
@@ -90,6 +92,10 @@ export default {
       default: () => [],
     },
     subGroupAffectedPropList: { // 受到子交互影响的元素组列表
+      type: Array,
+      default: () => [],
+    },
+    PropTipsDataList: { // 所在部件所有属性提示列表数据
       type: Array,
       default: () => [],
     },
@@ -286,20 +292,20 @@ export default {
           }
           &.canError {
             .element-type-content {
-              position: relative;
-              &::before {
-                content: attr(data-content-before);
-                position: absolute;
-                left: 0;
-                bottom: -5px;
-                height: 20px;
-                font-size: 12px;
-                color: #ff3769;
-                width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: none;
-              }
+              // position: relative;
+              // &::before {
+              //   content: attr(data-content-before);
+              //   position: absolute;
+              //   left: 0;
+              //   bottom: -5px;
+              //   height: 20px;
+              //   font-size: 12px;
+              //   color: #ff3769;
+              //   width: 100%;
+              //   overflow: hidden;
+              //   text-overflow: ellipsis;
+              //   display: none;
+              // }
               // .el-checkbox__inner {
               //   border-color: #ff3769;
               // }

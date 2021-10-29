@@ -21,6 +21,7 @@
       :errorElementID="errorElementID"
       :showCheckBox='showCheckBox'
       :isCustomize='isCustomize'
+      :PropTipsDataList='PropTipsDataList'
       @checkedChange='val => isCustomize = val'
       @triggerInteraction='onTriggerInteractionClick'
     />
@@ -30,12 +31,14 @@
       v-show="!isCustomize"
       >自定义</el-checkbox
     >
+    <HelpTipsComp :tipsData='SizeTipsData' :title="label" />
   </section>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import InterAction from '@/store/Quotation/Interaction';
+import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
 import CanFreeCreateSelectComp from '../ElementDisplayTypeComps/CanFreeCreateSelectComp.vue';
 import CustomizeSizeGroupComp from './CustomizeSizeGroupComp.vue';
 
@@ -58,10 +61,23 @@ export default {
       type: Array,
       default: () => [],
     },
+    SizeTipsData: {
+      type: Object,
+      default: null,
+    },
+    label: {
+      type: String,
+      default: '尺寸',
+    },
+    PropTipsDataList: { // 所在部件所有属性提示列表数据 -- 从中找到当前元素对应的项 用以展示
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     CanFreeCreateSelectComp,
     CustomizeSizeGroupComp,
+    HelpTipsComp,
   },
   data() {
     return {};

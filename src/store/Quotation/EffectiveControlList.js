@@ -3,7 +3,7 @@
 import { isEqual, isGreatThen, isLessThen } from '@/assets/js/utils/utils';
 
 export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
-  if (!DefaultOrDisabledValue && DefaultOrDisabledValue !== 0) return '';
+  // if (!DefaultOrDisabledValue && DefaultOrDisabledValue !== 0) return '';
   const _t = {
     CustomerInputValues: [{ IsInteractionResult: true }],
     DisabledValue: '',
@@ -42,7 +42,7 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
     t = creatNewTargetValue(_El.DefaultValue, _El);
   }
   if (!t) return null;
-  if (!_El.HiddenToCustomer && (t.hiddenByInteraction || t.disabledByInteraction) && (t.DisabledValue || t.DisabledValue === 0)) {
+  if (!_El.HiddenToCustomer && (t.hiddenByInteraction || t.disabledByInteraction)) {
     t = creatNewTargetValue(t.DisabledValue, _El);
   }
   // }
