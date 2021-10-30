@@ -136,7 +136,6 @@ export default {
     },
     onVisibleChange(e) {
       if (this.CtrlZIndex) return;
-      console.log('onVisibleChange');
       this.$store.commit('common/setIsPopperVisible', e);
     },
     onNativeChange(e) {

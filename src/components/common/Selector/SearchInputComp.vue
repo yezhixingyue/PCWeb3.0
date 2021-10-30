@@ -95,8 +95,11 @@ export default {
     this.handleThrottleFunc = throttle(this.requestFunc, 350);
   },
   watch: {
-    searchWatchKey() {
-      this.inpVal = this.word;
+    searchWatchKey: {
+      handler() {
+        this.inpVal = this.word;
+      },
+      immediate: true,
     },
   },
 };

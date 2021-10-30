@@ -5,6 +5,92 @@ import { getNumberValueList, getValueIsOrNotNumber } from '@/assets/js/utils/uti
 import { getCombineAffectedPropList, getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
 import InterAction from '@/store/Quotation/Interaction';
 
+const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit }) => {
+  let isInSection = false;
+  let msgArr = [];
+  for (let i = 0; i < SectionList.length; i += 1) {
+    const section = SectionList[i];
+    const { MinValue, MaxValue, IsGeneralValue, Increment } = section;
+    if (+value > MinValue && (+value <= MaxValue || MaxValue === -1)) { // 符合范围区间 进入判断
+      isInSection = true;
+      let temp = null;
+      if (!IsGeneralValue) {
+        let T = Increment.toString().indexOf('.');
+        T = T === -1 ? 0 : Increment.toString().length - T - 1;
+        const arr = new Array(T);
+        arr.fill('0');
+        T = `1${arr.join('')}`;
+        if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
+          temp = {
+            MinValue,
+            MaxValue,
+            IncrementList: [Increment],
+            isIncrement: true,
+          };
+        }
+      }
+      if (IsGeneralValue && valueList) {
+        temp = {
+          MinValue,
+          MaxValue,
+          ValueList: valueList,
+          isIncrement: false,
+        };
+      }
+      if (temp) {
+        const t = msgArr.find(it => it.MinValue === MinValue && it.MaxValue === MaxValue);
+        if (!t) {
+          msgArr.push(temp);
+        } else if (t.isIncrement && !t.IncrementList.includes(Increment)) {
+          t.IncrementList.push(Increment);
+        }
+      } else {
+        msgArr.push('isRight');
+      }
+    }
+  }
+  if (!isInSection) {
+    const list = [];
+    SectionList.forEach(it => {
+      const { MinValue, MaxValue } = it;
+      const t = list.find(_it => _it.MinValue === MinValue && _it.MaxValue === MaxValue);
+      if (!t) list.push(it);
+    });
+    const minList = list.map(it => it.MinValue);
+    const maxList = list.map(it => it.MaxValue);
+    const min = Math.min(...minList);
+    if (value <= min) return `${propName}必须大于${min}${Unit}`;
+    const max = Math.max(...maxList);
+    if (value > max) return `${propName}不能超过${max}${Unit}`;
+    const _arrText = list.map(({ MinValue, MaxValue }) => {
+      if (MaxValue === -1) return `大于${MinValue}`;
+      return `大于${MinValue}且小于等于${MaxValue}`;
+    }).join('、');
+    const msg = `${propName}输入不正确，不在取值范围内，可选取值范围：${_arrText}`;
+    return msg;
+  }
+
+  msgArr = msgArr.map(it => {
+    if (typeof it === 'object') {
+      const { MinValue, MaxValue, isIncrement, IncrementList, ValueList } = it;
+      if (isIncrement) {
+        const list = IncrementList.map(_it => `${_it}${Unit}`);
+        return `${MinValue}${Unit}以上每次增加${list.join('或')}`;
+      }
+      if (MaxValue === -1) {
+        return `${MinValue}${Unit}以上应从${ValueList}中取值`;
+      }
+      return `[ 大于${MinValue}且小于等于${MaxValue} ]时应从${ValueList}中取值`;
+    }
+    return it;
+  });
+  const t = msgArr.find(it => it === 'isRight');
+  if (t === undefined) {
+    return `${propName}${msgArr.join(' 或 ')}`;
+  }
+  return '';
+};
+
 /**
  * @description: 检查元素值是否符合规范
  * @param {*} value 值
@@ -13,7 +99,7 @@ import InterAction from '@/store/Quotation/Interaction';
  */
 const _elementTypeChecker = (value, element, showPropName = true) => {
   if (!value && value !== 0) return { msg: '值未设置', result: false };
-  const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer, Name } = element; // 开关类型暂未判断 或可不需要
+  const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer, Name, Unit } = element; // 开关类型暂未判断 或可不需要
   if (Type === 1) { // 数值类型元素
     const { AllowDecimal, SectionList, InputContent, Allow, AllowCustomer } = NumbericAttribute;
     const isConformNumberType = getValueIsOrNotNumber(value, !AllowDecimal);
@@ -27,43 +113,13 @@ const _elementTypeChecker = (value, element, showPropName = true) => {
         return { msg: '', result: true };
       }
       if (!Allow && !valueList.includes(`${value}`)) {
-        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，不允许自定义，请从${valueList}中取值`, result: false };
+        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，请从${valueList}中取值`, result: false };
       }
       if (!AllowCustomer && !HiddenToCustomer && !valueList.includes(`${value}`)) {
-        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，不允许客户自定义，请从${valueList}中取值`, result: false };
+        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，请从${valueList}中取值`, result: false };
       }
-      let isInSection = false;
-      for (let i = 0; i < SectionList.length; i += 1) {
-        const section = SectionList[i];
-        const { MinValue, MaxValue, IsGeneralValue, Increment } = section;
-        if (+value > MinValue && (+value <= MaxValue || MaxValue === -1)) { // 符合范围区间 进入判断
-          isInSection = true;
-          // if (!IsGeneralValue && (+value - MinValue) % Increment !== 0) {
-          //   const msg = `输入值不正确，（${MinValue}, ${MaxValue}]区间内应符合增量为${Increment}`;
-          //   return { msg, result: false };
-          // }
-          if (!IsGeneralValue) {
-            let T = Increment.toString().indexOf('.');
-            T = T === -1 ? 0 : Increment.toString().length - T - 1;
-            const arr = new Array(T);
-            arr.fill('0');
-            T = `1${arr.join('')}`;
-            if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
-              const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue}(不含) 至 ${MaxValue !== -1 ? MaxValue : '无限大'}之间应符合增量为${Increment}`;
-              return { msg, result: false };
-            }
-          }
-          if (IsGeneralValue) {
-            const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue}(不含) 至 ${MaxValue !== -1 ? MaxValue : '无限大'}之间应从${valueList}对应区间中取值`;
-            return { msg, result: false };
-          }
-        }
-      }
-      if (!isInSection) {
-        const _arrText = SectionList.map(({ MinValue, MaxValue }) => `${MinValue}(不含) 至 ${MaxValue !== -1 ? MaxValue : '无限大'}`).join('、');
-        const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，不在取值范围内，可选取值范围：${_arrText}`;
-        return { msg, result: false };
-      }
+      const msg = checkNumberSectionList(value, SectionList, valueList, { propName: showPropName ? Name : '', Unit });
+      if (msg) return { msg, result: false };
     }
     return { msg: '', result: true };
   }
