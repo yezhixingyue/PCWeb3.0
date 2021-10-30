@@ -49,18 +49,18 @@ const _elementTypeChecker = (value, element, showPropName = true) => {
             arr.fill('0');
             T = `1${arr.join('')}`;
             if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
-              const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue}(不含) 至 ${MaxValue}之间应符合增量为${Increment}`;
+              const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue}(不含) 至 ${MaxValue !== -1 ? MaxValue : '无限大'}之间应符合增量为${Increment}`;
               return { msg, result: false };
             }
           }
           if (IsGeneralValue) {
-            const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue}(不含) 至 ${MaxValue}之间应从${valueList}对应区间中取值`;
+            const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，${MinValue}(不含) 至 ${MaxValue !== -1 ? MaxValue : '无限大'}之间应从${valueList}对应区间中取值`;
             return { msg, result: false };
           }
         }
       }
       if (!isInSection) {
-        const _arrText = SectionList.map(({ MinValue, MaxValue }) => `${MinValue}(不含) 至 ${MaxValue}`).join('、');
+        const _arrText = SectionList.map(({ MinValue, MaxValue }) => `${MinValue}(不含) 至 ${MaxValue !== -1 ? MaxValue : '无限大'}`).join('、');
         const msg = `${showPropName ? `[${Name}] ` : ''}输入值不正确，不在取值范围内，可选取值范围：${_arrText}`;
         return { msg, result: false };
       }

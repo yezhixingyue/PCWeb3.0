@@ -1084,6 +1084,7 @@ export default {
       if (!res.data.Data || !res.data.Data.HavePrice) {
         return '暂无报价，请联系客服获取报价信息!';
       } // 可能为null 当需要客服咨询报价
+      console.log(res);
       commit('setProductQuotationResult', res.data.Data);
       commit('setProductQuotationDetail', productData);
       return true;

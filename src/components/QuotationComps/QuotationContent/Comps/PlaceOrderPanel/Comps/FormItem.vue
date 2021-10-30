@@ -228,9 +228,9 @@ export default {
       return true;
     },
     propName() {
-      if (!this.target) return '';
+      if (!this.target) return 'propName';
       const str = this.label ? this.label.replace('：', '') : '';
-      return str || 'propName';
+      return str || this.target.Name || this.target.GroupInfo?.Name || 'propName';
     },
     CraftAffectedPropList() { // 工艺子交互
       if (this.curTypeName === '工艺') {
