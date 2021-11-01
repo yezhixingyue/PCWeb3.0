@@ -219,9 +219,6 @@ export default {
       }
       return true;
     },
-    saveFile2Store(file) {
-      this.$store.commit('Quotation/setOrderFile4PreCreateData', file);
-    },
     async FileChecker() { // 获取文件校验结果信息
       const [bool, obj] = await this.$refs.FileForm.validate();
       return bool ? '' : Object.values(obj).map(it => it[0].message).reverse();

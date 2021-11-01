@@ -36,7 +36,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import InterAction from '@/store/Quotation/Interaction';
 import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
 import CanFreeCreateSelectComp from '../ElementDisplayTypeComps/CanFreeCreateSelectComp.vue';
@@ -83,7 +82,6 @@ export default {
     return {};
   },
   computed: {
-    ...mapState('Quotation', ['isOrderRestore']),
     DisabledOptionList() { // 禁用的选项
       return InterAction.getDisabledOptionList(this.AffectedPropList);
     },
@@ -160,12 +158,6 @@ export default {
     },
   },
   mounted() {
-    // if (!this.isOrderRestore) { // 弃用
-    //   // 非还原  执行数据初始化
-    //   if (this.CustomerSizeList.length > 0) {
-    //     this.ID = this.CustomerSizeList[0].ID;
-    //   }
-    // }
     this.$nextTick(() => {
       if (this.value && !this.value.ID) {
         const list = this.CustomerSizeList.filter(it => !this.HiddenOptionList.includes(it.ID));

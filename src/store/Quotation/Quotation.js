@@ -39,12 +39,6 @@ export default {
     /* 获取产品报价结果信息
     -------------------------------*/
     ProductQuotationResult: null,
-    /* 获取产品报价时的产品信息
-    -------------------------------*/
-    ProductQuotationDetail: null,
-    /* 修改信息以通知工艺组件进行禁用状态的工艺取消
-    -------------------------------*/
-    watchTarget2DelCraft: 0,
     /* 下单地址相关信息
     -------------------------------*/
     addressInfo4PlaceOrder: null,
@@ -60,9 +54,6 @@ export default {
     /* 预下单后获取到的数据信息
     -------------------------------*/
     PreCreateData: null,
-    /* 预下单中存放的订单文件
-    -------------------------------*/
-    orderFile4PreCreateData: null,
     /* 支付二维码信息
     -------------------------------*/
     curPayInfo2Code: null,
@@ -72,9 +63,6 @@ export default {
     /* 控制弹窗3- 支付二维码弹窗显示状态
     -------------------------------*/
     isShow2PayDialog: false,
-    /* 下单时 - 支付全款是否为禁用状态  （初始不禁用， 下单成功后禁用， 返回其它页面时重新设置为不禁用）
-    -------------------------------*/
-    isFullPayoutDisabled: false,
     /* 初始页面字体
     -------------------------------*/
     initPageText: '',
@@ -84,16 +72,6 @@ export default {
     /** 是否为点击tag标签获取产品报价信息  （ 此时不全清下单报价页面信息 只部分展示loading ）
     ---------------------------------------- */
     isFetchingPartProductData: false,
-    // /** 报价页面产品右侧边栏推荐信息
-    // ---------------------------------------- */
-    // productAsideIntroData: null,
-    /**
-     * 产品元素映射
-     */
-    ProductElementTypeList: [
-      { Name: '数量', ID: 0 },
-      { Name: '款数', ID: 1 },
-    ],
     ProductDisplayPropertyTypeList: [
       { Name: '元素', ID: 0 },
       { Name: '元素组', ID: 1 },
@@ -102,7 +80,6 @@ export default {
       { Name: '工厂', ID: 5 },
       { Name: '尺寸组', ID: 6 },
     ],
-    isOrderRestore: false,
     /** 受到交互影响的属性列表数据
     ---------------------------------------- */
     PropertiesAffectedByInteraction: [],
@@ -170,13 +147,6 @@ export default {
       const SecondName = SecondLevel.Name;
       return [FirstName, SecondName, state.curProductName];
     },
-    /* 当前选中产品工艺关系列表
-    -------------------------------*/
-    curCraftRelationList(state, getters, rootVal) {
-      const _CraftRelationList = rootVal.common.CraftRelationList;
-      if (_CraftRelationList.length === 0) return [];
-      return _CraftRelationList;
-    },
     /* 当前选中产品交互条件列表所需要的涉及到的元素ID列表
     -------------------------------*/
     affectedElementIDsByInteraction(state) {
@@ -239,560 +209,10 @@ export default {
       state.obj2GetProductPrice.ProductParams = {};
       state.ProductQuotationResult = null;
     },
-    /* 初始化数据
-    ------------------------------- */
-    initInfo2Quotation(state) {
-      state.curProductInfo2Quotation = null;
-      state.obj2GetProductPrice.ProductParams = {};
-      state.curProductID = '';
-      state.curProductClass = null;
-      state.curProductName = '';
-    },
-    /* 设置获取产品报价请求信息
-    -------------------------------*/
-    setProductParams(state, [type, value]) {
-      state.obj2GetProductPrice.ProductParams[type] = value;
-    },
-    /* 设置产品报价信息中产品属性列表中值的信息
-    -------------------------------*/
-    setProductParamsPropertyList(state, [index, value, type]) {
-      if (!type) {
-        // 说明为选项值
-        state.obj2GetProductPrice.ProductParams.PropertyList[
-          index
-        ].CustomerInputValue = value;
-      } else {
-        state.obj2GetProductPrice.ProductParams.PropertyList[
-          index
-        ].CustomizedOptionValue = value;
-      }
-    },
-    /* 设置产品报价中产品工艺信息 三种修改类型: add   del   maybeEdit
-    -------------------------------*/
-    setProductParamsCraftList(state, [type, item, cb, isSystemSelect = false]) {
-      const _curCraftRelationList = this.getters[// 当前产品需要满足的工艺条件信息，只当增加工艺的时候需要使用， 删除时也需要
-        'Quotation/curCraftRelationList'
-      ];
-      const _curCraftRules = [];
-      // 获取到当前要添加工艺所符合的工艺关系列表
-      _curCraftRelationList.forEach(it => {
-        if (it.MasterCraft && it.MasterCraft.CraftID === item.CraftID) {
-          _curCraftRules.push(it);
-          return;
-        }
-        it.CraftList.forEach(it2 => {
-          if (it2.CraftID === item.CraftID) {
-            _curCraftRules.push(it);
-          }
-        });
-      });
-      let _key = '';
-      let _ids;
-      const _targetCraftList = state.obj2GetProductPrice.ProductParams.CraftList.find(it => it.ChoiceType === 1);
-
-      switch (type) {
-        case 'add':
-          state.obj2GetProductPrice.ProductParams.CraftList2Req.First.push(item);
-          if (
-            _targetCraftList && _targetCraftList.CraftList.find(it => it.CraftID === item.CraftID)
-          ) {
-            _targetCraftList.CraftList.find(
-              it => it.CraftID === item.CraftID,
-            ).isSystemSelect = isSystemSelect;
-          }
-          _key = 'add';
-          break;
-        case 'del':
-          // console.log(item, item.CraftName);
-          // eslint-disable-next-line no-case-declarations
-          const _delTarget = state.obj2GetProductPrice.ProductParams.CraftList2Req.First.find(
-            _it => _it.CraftID === item.CraftID,
-          );
-          if (!_delTarget) return;
-          state.obj2GetProductPrice.ProductParams.CraftList2Req.First = state.obj2GetProductPrice.ProductParams.CraftList2Req.First.filter(
-            it => it.CraftID !== item.CraftID,
-          );
-          _key = 'del';
-          break;
-        case 'maybeEdit': // 可能为编辑模式
-          _ids = state.obj2GetProductPrice.ProductParams.CraftList2Req.First.map(
-            it => it.CraftID,
-          );
-          if (_ids.includes(item.CraftID)) {
-            state.obj2GetProductPrice.ProductParams.CraftList2Req.First = state.obj2GetProductPrice.ProductParams.CraftList2Req.First.map(
-              it => {
-                if (it.CraftID !== item.CraftID) return it;
-                return item;
-              },
-            );
-          } else {
-            state.obj2GetProductPrice.ProductParams.CraftList2Req.First.push(
-              item,
-            );
-            // 下面只判断可选工艺 为其添加增加方式的状态，必选工艺未使用，不做处理 || 一个工艺不可能同时是可选和必选工艺
-            if (
-              _targetCraftList && _targetCraftList.CraftList.find(it => it.CraftID === item.CraftID)
-            ) {
-              _targetCraftList.CraftList.find(
-                it => it.CraftID === item.CraftID,
-              ).isSystemSelect = isSystemSelect;
-            }
-            _key = 'add';
-          }
-
-          state.obj2GetProductPrice.ProductParams.CraftList.forEach(
-            _listItem => {
-              _listItem.CraftList.forEach(_item => {
-                if (_item.CraftID === item.CraftID) {
-                  _item.historyData = item.historyData;
-                }
-              });
-            },
-          );
-
-          break;
-        default:
-          break;
-      }
-
-      const IDs = state.obj2GetProductPrice.ProductParams.CraftList2Req.First.map(
-        it => it.CraftID,
-      );
-
-      if (_curCraftRules.length > 0 && _key === 'add') {
-        // 执行工艺关系设置
-        _curCraftRules.forEach(rule => {
-          if (rule.MasterCraft) {
-            if (rule.MasterCraft.CraftID === item.CraftID) {
-              // 此种情况 当前工艺依赖于rule.CraftList中的所有工艺项，如果其以在列表则不管，如果不在列表且不需要再进行选择或输入则直接勾选，否则看情况是否进行提示
-              rule.CraftList.forEach(it => {
-                if (!IDs.includes(it.CraftID)) {
-                  cb({
-                    list: [it],
-                    type: 'add',
-                  }); // 返回回去由组件继续进行判断添加处理(如果已在列表中则不用做额外处理)
-                }
-              });
-            } else if (rule.MasterCraft.CraftID !== item.CraftID) {
-              // 此种情况，当前工艺类型和上面一样同为单向和双向依赖，根据情况进行判断，如果为单向依赖则不做处理，如果为双向依赖则返回进行继续添加任务
-              if (
-                rule.RelationType === 3
-                && !IDs.includes(rule.MasterCraft.CraftID)
-              ) {
-                cb({
-                  list: [rule.MasterCraft],
-                  type: 'add',
-                });
-              }
-            }
-          } else {
-            // 此中目前必为互斥关系，为以后扩展情况发生，进行进一步条件判断
-            // eslint-disable-next-line no-lonely-if
-            if (rule.RelationType === 1) {
-              // 互斥 --- 对列表中其它工艺依次进行删除
-              rule.CraftList.forEach(craft => {
-                if (
-                  craft.CraftID !== item.CraftID
-                  && IDs.includes(craft.CraftID)
-                ) {
-                  cb({
-                    list: [craft],
-                    type: 'del',
-                  });
-                }
-              });
-            }
-          }
-        });
-      }
-
-      if (_curCraftRules.length > 0 && _key === 'del') {
-        // 此时需要把单向依赖(其为被依赖项时)和双向依赖的工艺一起去除
-        _curCraftRules.forEach(rule => {
-          if (rule.MasterCraft) {
-            if (
-              rule.MasterCraft.CraftID === item.CraftID
-              && rule.RelationType === 3
-            ) {
-              rule.CraftList.forEach(it => {
-                if (IDs.includes(it.CraftID)) {
-                  cb({
-                    list: [it],
-                    type: 'del',
-                  });
-                }
-              });
-            } else if (rule.MasterCraft.CraftID !== item.CraftID) {
-              if (IDs.includes(rule.MasterCraft.CraftID)) {
-                cb({
-                  list: [rule.MasterCraft],
-                  type: 'del',
-                });
-              }
-            }
-          }
-        });
-      }
-    },
-    /* 修改产品报价部件信息 -- 修改部件平面信息
-    -------------------------------*/
-    setQuotationPartPlainInfo(state, [indexLv1, indexLv2, type, value]) {
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ][type].First = value;
-    },
-    /* 修改产品报价部件信息 -- 修改部件属性列表信息
-    -------------------------------*/
-    setQuotationPartPropertyList(
-      state,
-      [indexLv1, indexLv2, index, value, type],
-    ) {
-      if (!type) {
-        state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-          indexLv2
-        ].PropertyList[index].CustomerInputValue = value;
-      } else {
-        state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-          indexLv2
-        ].PropertyList[index].CustomizedOptionValue = value;
-      }
-    },
-    /* 修改产品报价部件信息 -- 修改部件印刷属性列表信息
-    -------------------------------*/
-    setQuotationPartPrintPropertyList(
-      state,
-      [indexLv1, indexLv2, value, index],
-    ) {
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ].PrintTypeList[index].CustomerInputValue = value.OptionID;
-    },
-    /* 修改产品报价部件信息 -- 修改部件尺寸信息
-    -------------------------------*/
-    setQuotationPartSizePropertyList(state, [indexLv1, indexLv2, value]) {
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ].SizePropertyList = [...value];
-    },
-    /* 修改产品报价部件信息 -- 设置印刷属性组信息
-    -------------------------------*/
-    setPrintPropertyGroupList(
-      state,
-      [indexLv1, indexLv2, index1, index2, index3, value, type],
-    ) {
-      // // console.log(state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-      //   indexLv2
-      // ].PrintPropertyGroupList[index1].PropertyList);
-      if (!type) {
-        state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-          indexLv2
-        ].PrintPropertyGroupList[index1].PropertyList[index2].Second[
-          index3
-        ].CustomerInputValue = value;
-      } else {
-        state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-          indexLv2
-        ].PrintPropertyGroupList[index1].PropertyList[index2].Second[
-          index3
-        ].CustomizedOptionValue = value;
-      }
-    },
-    /* 修改产品报价部件信息 -- 设置普通属性组信息
-    -------------------------------*/
-    setPropertyGroupList(
-      state,
-      [indexLv1, indexLv2, index1, index2, index3, value, type],
-    ) {
-      if (!type) {
-        state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-          indexLv2
-        ].PropertyGroupList[index1].PropertyList[index2].Second[
-          index3
-        ].CustomerInputValue = value;
-      } else {
-        state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-          indexLv2
-        ].PropertyGroupList[index1].PropertyList[index2].Second[
-          index3
-        ].CustomizedOptionValue = value;
-      }
-    },
-    /* 设置产品报价部件信息 -- 设置产品工艺信息 三种修改类型: add   del   maybeEdit
-    -------------------------------*/
-    setPartProductParamsCraftList(
-      state,
-      [indexLv1, indexLv2, [type, item, cb, isSystemSelect = false]],
-    ) {
-      const _curCraftRelationList = this.getters[// 当前产品需要满足的工艺条件信息，只当增加工艺的时候需要使用， 删除时也需要
-        'Quotation/curCraftRelationList'
-      ];
-      const _curCraftRules = [];
-      // 获取到当前要添加工艺所符合的工艺关系列表
-      _curCraftRelationList.forEach(it => {
-        if (it.MasterCraft && it.MasterCraft.CraftID === item.CraftID) {
-          _curCraftRules.push(it);
-          return;
-        }
-        it.CraftList.forEach(it2 => {
-          if (it2.CraftID === item.CraftID) {
-            _curCraftRules.push(it);
-          }
-        });
-      });
-      let _key = '';
-      let _ids;
-      switch (type) {
-        case 'add':
-          state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[indexLv2].PartCraftList2Req.First.push(item);
-          if (
-            state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-              indexLv2
-            ].CraftList.find(it => it.ChoiceType === 1)
-            && state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-              indexLv2
-            ].CraftList.find(it => it.ChoiceType === 1).CraftList.find(
-              it => it.CraftID === item.CraftID,
-            )
-          ) {
-            state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-              indexLv2
-            ].CraftList.find(it => it.ChoiceType === 1).CraftList.find(
-              it => it.CraftID === item.CraftID,
-            ).isSystemSelect = isSystemSelect;
-          }
-          _key = 'add';
-          break;
-        case 'del':
-          state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-            indexLv2
-          ].PartCraftList2Req.First = state.obj2GetProductPrice.ProductParams.PartList[
-            indexLv1
-          ].PartList[indexLv2].PartCraftList2Req.First.filter(
-            it => it.CraftID !== item.CraftID,
-          );
-          _key = 'del';
-          break;
-        case 'maybeEdit': // 可能为编辑模式
-          _ids = state.obj2GetProductPrice.ProductParams.PartList[
-            indexLv1
-          ].PartList[indexLv2].PartCraftList2Req.First.map(it => it.CraftID);
-          if (_ids.includes(item.CraftID)) {
-            state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-              indexLv2
-            ].PartCraftList2Req.First = state.obj2GetProductPrice.ProductParams.PartList[
-              indexLv1
-            ].PartList[indexLv2].PartCraftList2Req.First.map(it => {
-              if (it.CraftID !== item.CraftID) return it;
-              return item;
-            });
-          } else {
-            _key = 'add';
-            state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-              indexLv2
-            ].PartCraftList2Req.First.push(item);
-            // console.log(
-            //   state.obj2GetProductPrice.ProductParams.PartList[indexLv1]
-            //     .PartList[indexLv2],
-            // );
-            const _list2SetSystemSelec = state.obj2GetProductPrice.ProductParams.PartList[
-              indexLv1
-            ].PartList[indexLv2].CraftList.find(it => it.ChoiceType === 1);
-            if (
-              _list2SetSystemSelec
-              && _list2SetSystemSelec.CraftList.find(
-                it => it.CraftID === item.CraftID,
-              )
-            ) {
-              state.obj2GetProductPrice.ProductParams.PartList[
-                indexLv1
-              ].PartList[indexLv2].CraftList.find(
-                it => it.ChoiceType === 1,
-              ).CraftList.find(
-                it => it.CraftID === item.CraftID,
-              ).isSystemSelect = isSystemSelect;
-            }
-          }
-          state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-            indexLv2
-          ].CraftList.forEach(_listItem => {
-            _listItem.CraftList.forEach(_item => {
-              if (_item.CraftID === item.CraftID) {
-                _item.historyData = item.historyData;
-              }
-            });
-          });
-          break;
-        default:
-          break;
-      }
-
-      const IDs = state.obj2GetProductPrice.ProductParams.PartList[
-        indexLv1
-      ].PartList[indexLv2].PartCraftList2Req.First.map(it => it.CraftID);
-
-      if (_curCraftRules.length > 0 && _key === 'add') {
-        // 执行工艺关系设置
-        _curCraftRules.forEach(rule => {
-          if (rule.MasterCraft) {
-            if (rule.MasterCraft.CraftID === item.CraftID) {
-              // 此种情况 当前工艺依赖于rule.CraftList中的所有工艺项，如果其以在列表则不管，如果不在列表且不需要再进行选择或输入则直接勾选，否则看情况是否进行提示
-              rule.CraftList.forEach(it => {
-                if (!IDs.includes(it.CraftID)) {
-                  cb({
-                    list: [it],
-                    type: 'add',
-                  }); // 返回回去由组件继续进行判断添加处理(如果已在列表中则不用做额外处理)
-                }
-              });
-            } else if (rule.MasterCraft.CraftID !== item.CraftID) {
-              // 此种情况，当前工艺类型和上面一样同为单向和双向依赖，根据情况进行判断，如果为单向依赖则不做处理，如果为双向依赖则返回进行继续添加任务
-              if (
-                rule.RelationType === 3
-                && !IDs.includes(rule.MasterCraft.CraftID)
-              ) {
-                cb({
-                  list: [rule.MasterCraft],
-                  type: 'add',
-                });
-              }
-            }
-          } else {
-            // 此中目前必为互斥关系，为以后扩展情况发生，进行进一步条件判断
-            // eslint-disable-next-line no-lonely-if
-            if (rule.RelationType === 1) {
-              // 互斥 --- 对列表中其它工艺依次进行删除
-              rule.CraftList.forEach(craft => {
-                if (
-                  craft.CraftID !== item.CraftID
-                  && IDs.includes(craft.CraftID)
-                ) {
-                  cb({
-                    list: [craft],
-                    type: 'del',
-                  });
-                }
-              });
-            }
-          }
-        });
-      }
-
-      if (_curCraftRules.length > 0 && _key === 'del') {
-        // 此时需要把单向依赖(其为被依赖项时)和双向依赖的工艺一起去除
-        _curCraftRules.forEach(rule => {
-          if (rule.MasterCraft) {
-            if (
-              rule.MasterCraft.CraftID === item.CraftID
-              && rule.RelationType === 3
-            ) {
-              // 此种情况 当前工艺依赖于rule.CraftList中的所有工艺项，如果其以在列表则不管，如果不在列表且不需要再进行选择或输入则直接勾选，否则看情况是否进行提示
-              rule.CraftList.forEach(it => {
-                if (IDs.includes(it.CraftID)) {
-                  cb({
-                    list: [it],
-                    type: 'del',
-                  });
-                }
-              });
-            } else if (rule.MasterCraft.CraftID !== item.CraftID) {
-              // 此种情况，当前工艺类型和上面一样同为单向和双向依赖，根据情况进行判断，如果为单向依赖则不做处理，如果为双向依赖则删除
-              if (IDs.includes(rule.MasterCraft.CraftID)) {
-                cb({
-                  list: [rule.MasterCraft],
-                  type: 'del',
-                });
-              }
-            }
-          }
-        });
-      }
-    },
-    /* 设置产品报价产品信息 -- 新增部件
-    -------------------------------*/
-    addPartProductParamsPartList(state, [indexLv1, item]) {
-      const _item = JSON.parse(JSON.stringify(item));
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList.push(
-        _item,
-      );
-    },
-    /* 设置产品报价产品信息 -- 删除部件
-    -------------------------------*/
-    delPartProductParamsPartList(state, [indexLv1, indexLv2]) {
-      state.obj2GetProductPrice.ProductParams.PartList[
-        indexLv1
-      ].PartList.splice(indexLv2, 1);
-    },
-    /* 设置产品报价部件信息 -- 新增印刷属性组
-    -------------------------------*/
-    addPartPrintPropertyGroupList(
-      state,
-      [indexLv1, indexLv2, [index1, itemData]],
-    ) {
-      const _itemData = JSON.parse(JSON.stringify(itemData));
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ].PrintPropertyGroupList[index1].PropertyList.push(_itemData);
-    },
-    /* 设置产品报价部件信息 -- 删除印刷属性组
-    -------------------------------*/
-    delPartPrintPropertyGroupList(
-      state,
-      [indexLv1, indexLv2, [index1, index2]],
-    ) {
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ].PrintPropertyGroupList[index1].PropertyList.splice(index2, 1);
-    },
-    /* 设置产品报价部件信息 -- 新增属性组
-    -------------------------------*/
-    addPartPropertyGroupList(state, [indexLv1, indexLv2, [index1, itemData]]) {
-      const _itemData = JSON.parse(JSON.stringify(itemData));
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ].PropertyGroupList[index1].PropertyList.push(_itemData);
-    },
-    /* 设置产品报价部件信息 -- 删除属性组
-    -------------------------------*/
-    delPartPropertyGroupList(state, [indexLv1, indexLv2, [index1, index2]]) {
-      state.obj2GetProductPrice.ProductParams.PartList[indexLv1].PartList[
-        indexLv2
-      ].PropertyGroupList[index1].PropertyList.splice(index2, 1);
-    },
     /* 设置获取产品报价结果信息
     -------------------------------*/
     setProductQuotationResult(state, data) {
       state.ProductQuotationResult = data;
-    },
-    /* 设置获取产品报价结果信息
-    -------------------------------*/
-    setProductQuotationDetail(state, data) {
-      state.ProductQuotationDetail = data;
-    },
-    /* 设置某个工艺状态为disabled
-    -------------------------------*/
-    setCraftItemDisabled(state, [CraftID, type, bool]) {
-      if (type === 'isMain') {
-        const _list = state.obj2GetProductPrice.ProductParams.CraftList.find(
-          it => it.ChoiceType === 1,
-        ).CraftList;
-        const _t = _list.find(it => it.CraftID === CraftID);
-        _t.disabled = bool;
-      }
-    },
-    /* 设置部件某个工艺状态为disabled
-    -------------------------------*/
-    setCraftItemDisabled4Part(state, [indexLv1, indexLv2, [CraftID, bool]]) {
-      const _list = state.obj2GetProductPrice.ProductParams.PartList[
-        indexLv1
-      ].PartList[indexLv2].CraftList.find(it => it.ChoiceType === 1).CraftList;
-      const _t = _list.find(it => it.CraftID === CraftID);
-      _t.disabled = bool;
-      // }
-    },
-    /* 修改信息以通知工艺组件进行禁用状态的工艺取消
-    -------------------------------*/
-    setWatchTarget2DelCraft(state) {
-      state.watchTarget2DelCraft += 1;
     },
     /* 设置下单地址相关信息
     -------------------------------*/
@@ -814,11 +234,6 @@ export default {
     setPreCreateData(state, data) {
       if (!data) return;
       state.PreCreateData = data;
-    },
-    /* 设置预下单中存放的订单文件
-    -------------------------------*/
-    setOrderFile4PreCreateData(state, file) {
-      state.orderFile4PreCreateData = file;
     },
     /* 设置当前预下单文件内容
     -------------------------------*/
@@ -845,15 +260,12 @@ export default {
     setPaySuccessOrderDataStatus(state) {
       // '设置订单付款成功后的状态,清除一些数据的状态值'); ----------------- !!!
       state.PreCreateData = null;
-      state.orderFile4PreCreateData = null;
 
       state.ProductQuotationResult = null;
-      state.ProductQuotationDetail = null;
       state.curFileContent = '';
       state.curPayInfo2Code = null;
       state.curReqObj4PreCreate = null;
       state.selectedCoupon = null;
-      state.isFullPayoutDisabled = false;
 
       const _keepingData = localStorage.getItem('isOrderDataKeeping');
       if (!(_keepingData && _keepingData === 'true')) {
@@ -866,14 +278,7 @@ export default {
     /* 下单成功后的状态清理
     -------------------------------*/
     clearStateAfterPlaceOrderSuccess(state) {
-      // // console.log(1231232132132131);
       state.selectedCoupon = null;
-      state.isFullPayoutDisabled = true;
-    },
-    /* 设置支付全款禁用状态    下单时 - 支付全款是否为禁用状态  （初始不禁用， 下单成功后禁用， 返回其它页面时重新设置为不禁用）
-    -------------------------------*/
-    setIsFullPayoutDisabled(state, bool) {
-      state.isFullPayoutDisabled = bool;
     },
     /* 设置初始页面字体
     -------------------------------*/
@@ -890,20 +295,22 @@ export default {
       state.curProductInfo2Quotation = null;
       state.obj2GetProductPrice = { ProductParams: {} };
       state.ProductQuotationResult = null;
-      state.ProductQuotationDetail = null;
-      state.watchTarget2DelCraft = 0;
       state.addressInfo4PlaceOrder = null;
       state.selectedCoupon = null;
       state.curSelectStatus = '报价';
       state.curFileContent = '';
       state.PreCreateData = null;
-      state.orderFile4PreCreateData = null;
       state.curPayInfo2Code = null;
       state.curReqObj4PreCreate = null;
       state.isShow2PayDialog = false;
-      state.isFullPayoutDisabled = false;
       state.initPageText = '';
       state.curProduct = null;
+      state.PropertiesAffectedByInteraction = [];
+      state.RiskWarningTipsObj = { origin: '', tips: '' };
+      state.FileList = [];
+      state.FileTypeList = [];
+      state.isUploading = false;
+      state.successNum = 0;
     },
     /** 设置是否为点击tag标签获取产品报价信息  （ 此时不全清下单报价页面信息 只部分展示loading ）
     ---------------------------------------- */
@@ -952,9 +359,6 @@ export default {
         default:
           break;
       }
-      // 获取受交互影响属性列表
-      // const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
-      // state.PropertiesAffectedByInteraction = list;
     },
     setObj2GetProductPriceProductParamsGroupItem(state, [PartID, PartIndex, ID, Value]) {
       let TargetPart;
@@ -969,7 +373,6 @@ export default {
       const target = TargetPart.GroupList.find(it => it.GroupID === ID);
       if (target) {
         const [lv1Index, index, temp] = Value;
-        // target.List = Value;
         target.List[lv1Index].List.splice(index, 1, temp);
       }
     },
@@ -1072,7 +475,6 @@ export default {
       const _data = {};
       _data.ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
       commit('setProductQuotationResult', null);
-      commit('setProductQuotationDetail', null);
       if (state.addressInfo4PlaceOrder && state.addressInfo4PlaceOrder.Address.Address.Consignee && state.addressInfo4PlaceOrder.Address.Address.Latitude) {
         _data.Address = state.addressInfo4PlaceOrder.Address;
       }
@@ -1086,7 +488,6 @@ export default {
       } // 可能为null 当需要客服咨询报价
       console.log(res);
       commit('setProductQuotationResult', res.data.Data);
-      commit('setProductQuotationDetail', productData);
       return true;
     },
     delay(storeObj, duration) {

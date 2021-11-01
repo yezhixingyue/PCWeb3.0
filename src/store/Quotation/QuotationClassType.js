@@ -1,15 +1,8 @@
 /* eslint-disable object-curly-newline */
 /* eslint-disable no-use-before-define */
-import massage from '@/assets/js/utils/message';
 import store from '@/store';
 import { getPropertiesAffectedByInteraction, getCombineAffectedPropList, getFileListInEffect } from './EffectiveControlList';
 import InterAction from './Interaction';
-
-// eslint-disable-next-line no-unused-vars
-function _setErrMsg(errMsg) {
-  const msg = store.state.Quotation.curSelectStatus;
-  massage.failSingleError({ title: `${msg}失败`, msg: errMsg });
-}
 
 export const getRequiredCraftListAndSubControlList = (obj) => {
   const ControlList = obj.ControlList?.filter(it => it.ControlType === 0 && it.Constraint?.ItemList?.length === 0);

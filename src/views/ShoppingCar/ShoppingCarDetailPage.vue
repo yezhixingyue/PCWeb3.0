@@ -84,11 +84,8 @@ export default {
   },
   methods: {
     onReturnClick(e) {
-      // console.log('onReturnClick');
-      // console.log(e.target);
       e.target.blur();
       this.$router.replace('/shopping/car');
-      // this.$store.commit('Quotation/setIsFullPayoutDisabled', false);
     },
     async handleSubmit() {
       // eslint-disable-next-line max-len

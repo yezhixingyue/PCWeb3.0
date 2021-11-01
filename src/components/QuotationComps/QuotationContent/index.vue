@@ -186,7 +186,7 @@
 <script>
 import anime from 'animejs/lib/anime.es';
 import {
-  mapState, mapGetters, mapMutations, mapActions,
+  mapState, mapGetters, mapActions,
 } from 'vuex';
 import tipEnums from '@/assets/js/utils/tipEnums';
 import { productJumpUrl } from '@/assets/js/setup';
@@ -233,23 +233,6 @@ export default {
       },
       set(newVal) {
         this.couponCode2Add = newVal.replace(/[^\w]/g, '');
-      },
-    },
-    // 活动价格
-    promotePrice() {
-      if (!this.ProductQuotationResult || this.priceGetErrMsg) return '';
-      return +(
-        this.ProductQuotationResult.OriginalCost
-        - this.ProductQuotationResult.CurrentCost
-      ).toFixed(2);
-    },
-    // 产品数量
-    ProductAmount: {
-      get() {
-        return this.obj2GetProductPrice.ProductParams.ProductAmount;
-      },
-      set(newVal) {
-        this.setProductParams(['ProductAmount', `${newVal}`]);
       },
     },
     coupon() {
@@ -300,12 +283,6 @@ export default {
     };
   },
   methods: {
-    // eslint-disable-next-line max-len
-    ...mapMutations('Quotation', [
-      'setProductParams',
-      'setProductParamsPropertyList',
-      'setProductParamsCraftList',
-    ]),
     ...mapActions('Quotation', ['getProductPrice']),
     transformErrorObj(obj) {
       return Object.values(obj).map(it => `[ 产品 - ${it[0].field} ] 中，${it[0].message}`);
@@ -369,8 +346,6 @@ export default {
       } else if (typeof msg === 'object') {
         // 此时应显示报价信息，执行报价信息显示操作（存放数据）
         this.$store.commit('Quotation/setProductQuotationResult', msg.Data);
-        console.log(msg);
-        this.$store.commit('Quotation/setProductQuotationDetail', this.obj2GetProductPrice.ProductParams);
         if (msg.DisplayMode === 2) {
           this.messageBox.warnSingleError({ title: '温馨提示', msg: msg.Message.split('#') });
         } else if (msg.DisplayMode === 3) {

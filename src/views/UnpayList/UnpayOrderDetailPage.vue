@@ -89,7 +89,6 @@ export default {
   methods: {
     onReturnClick() {
       this.$router.replace('/unpay/list');
-      // this.$store.commit('Quotation/setIsFullPayoutDisabled', false);
     },
     async handleSubmit() {
       // eslint-disable-next-line max-len

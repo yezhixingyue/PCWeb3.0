@@ -67,7 +67,6 @@ export default {
   },
   computed: {
     ...mapState('Quotation', [
-      'ProductElementTypeList',
       'ProductDisplayPropertyTypeList',
       'curProductInfo2Quotation',
     ]),

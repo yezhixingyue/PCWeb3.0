@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import InterAction from '@/store/Quotation/Interaction';
 import { creatNewTargetValue } from '@/store/Quotation/EffectiveControlList';
 import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
@@ -118,7 +118,6 @@ export default {
     HelpTipsComp,
   },
   computed: {
-    ...mapState('Quotation', ['isOrderRestore']),
     ...mapGetters('Quotation', ['affectedElementIDsByInteraction']),
     PropValue: {
       get() {
