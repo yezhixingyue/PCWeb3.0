@@ -12,7 +12,7 @@
           <span class="gray" slot-scope="scope">{{scope.row.ProductAmount + Unit}}</span>
         </el-table-column>
         <el-table-column label="配送" width="180">
-          <span class="gray" slot-scope="scope">{{ scope.row && Express}}</span>
+          <span class="gray" slot-scope="scope">{{ scope.row.Logistics && scope.row.Logistics.ExpressName }}</span>
         </el-table-column>
         <el-table-column label="配送进度" width="120">
           <template slot-scope="scope">{{ scope.row.Status | formatStatus4PackageList}}</template>
@@ -22,7 +22,9 @@
         </el-table-column>
         <el-table-column label="操作" width="140">
           <template slot-scope="scope">
-            <span class="span-title-blue is-font-12" @click="onExpressClick(scope.row)">配送进度</span>
+            <span class="span-title-blue is-font-12"
+             v-if="scope.row && scope.row.Logistics && scope.row.Logistics.BillNo" @click="onExpressClick(scope.row)">配送进度</span>
+            <span v-else>暂无进度</span>
           </template>
         </el-table-column>
         <el-table-column label="" width="239" class-name='total-col'>

@@ -237,6 +237,7 @@ export default {
       });
     },
     getElementSubmitValue(val, IsInteractionResult) {
+      console.log(val);
       if (IsInteractionResult) {
         let CustomerInputValues = [{ Value: '', IsInteractionResult }];
         if (val) CustomerInputValues = val;
@@ -264,7 +265,7 @@ export default {
           return { CustomerInputValues: [temp], ...this.disabledInfoObj };
         }
         // 多选  此时不允许自定义
-        return { CustomerInputValues: Array.isArray(val) ? val.map(ID => ({ ID })) : [], ...this.disabledInfoObj };
+        return { CustomerInputValues: Array.isArray(val) ? val.filter(it => it).map(ID => ({ ID })) : [], ...this.disabledInfoObj };
       }
       return null;
     },
@@ -282,6 +283,7 @@ export default {
         };
         this.$nextTick(() => {
           const value = this.getElementSubmitValue(this.disabled || this.hidden ? this.DisabledValue : this.PropValue, this.disabled || this.hidden);
+          console.log(value);
           if (!value) return;
           this.$emit('input', value);
           this.$nextTick(() => {

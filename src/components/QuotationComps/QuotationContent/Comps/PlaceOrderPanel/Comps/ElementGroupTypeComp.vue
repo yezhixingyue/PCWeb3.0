@@ -1,10 +1,10 @@
 <template>
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="minLength !== maxLength || showTop">
-      <span class="blue-span is-font-13" v-show="!hideCtrl" @click="onAddClick" :class="{disabled:List.length >= maxLength || disabled}"
-        :title="List.length >= maxLength ? '已达最大使用次数' : ''"
-        >+ 添加{{Property.Name || ''}}</span
-      >
+      <span class="blue-span is-font-13" v-show="!hideCtrl" @click="onAddClick" :class="{disabled:List.length >= maxLength || disabled}">
+        <template v-if="List.length >= maxLength">已达上限</template>
+        <template v-else>+ 添加{{Property.Name || ''}}</template>
+      </span>
     </div>
     <ul :class="{'y-display': !IsHorizontalDisplay, hideCtrl: hideCtrl}" ref="groupContent">
       <li
@@ -370,5 +370,9 @@ export default {
       }
     }
   }
+}
+.mp-place-order-panel-form-item-comp-wrap > .el-form-item__content > .mp-place-order-panel-element-group-setup-comp-wrap > ul.y-display label.el-title {
+  width: 88px !important;
+  padding-right: 12px;
 }
 </style>

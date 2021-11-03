@@ -150,13 +150,13 @@ export default {
           // let _defaultVal = '';
           // if (t && !list.includes(t.ID)) _defaultVal = t.ID;
           // this.$emit('change', _defaultVal);
-          this.$emit('change', '');
+          if (!this.isDisabled) this.$emit('change', '');
         }
       } else if (Array.isArray(this.value) && this.value.length > 0) { // 多选
         // eslint-disable-next-line prefer-const
         let _val = this.value.filter(it => !list.includes(it));
         // if (_val.length === 0) _val = this.localOptions.filter(it => it.IsChecked && !list.includes(it.ID)).map(it => it.ID);
-        this.$emit('change', _val);
+        if (!this.isDisabled) this.$emit('change', _val);
       }
     },
     handleAllowChange(bool) { // 主要用于在动态切换为不允许自定义时，清除掉原来已设置的自定义的内容，仅为下拉框且为单选的情况下才会出现该情况
