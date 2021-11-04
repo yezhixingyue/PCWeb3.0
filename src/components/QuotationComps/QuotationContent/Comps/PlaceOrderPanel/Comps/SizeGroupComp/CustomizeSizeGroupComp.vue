@@ -156,12 +156,18 @@ export default {
         border: none;
         border-bottom: 1px solid rgb(229, 229, 229);
         border-radius: 0;
+        padding-right: 20px !important;
         padding-left: 10px !important;
-        padding-right: 4px !important;
         &:focus {
           border-color: #428dfa;
         }
       }
+    }
+    .mp-erp-number-type-element-display-input-comp input {
+      padding-right: 4px !important;
+    }
+    .mp-erp-number-type-element-option-display-input-comp .el-input__icon::before {
+      right: -8px;
     }
     > .label {
       font-size: 14px;

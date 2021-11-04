@@ -130,12 +130,12 @@ export default {
   },
   methods: {
     onTriggerInteractionClick(e) {
-      // console.log('onTriggerInteractionClick', e);
       this.$nextTick(() => {
         this.$emit('triggerInteraction', e);
       });
     },
     handleInterAction(list) {
+      console.log(list);
       if (!Array.isArray(list) || list.length === 0) return;
       if (list.includes(this.value.ID)) { // 常规尺寸无默认值
         this.$emit('input', { ...this.value, ID: '' });

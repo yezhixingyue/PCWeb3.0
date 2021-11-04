@@ -23,6 +23,7 @@
     @blur.native='onNativeChange'
     @change.native='onNativeChange'
     @focus.native="onFocus"
+    @focus="onFocus"
     @blur="onBlur"
     @change="onChange"
     @visible-change='onVisibleChange'

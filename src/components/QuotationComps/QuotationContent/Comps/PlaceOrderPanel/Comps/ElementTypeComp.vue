@@ -37,6 +37,7 @@
      :DisplayWidth='DisplayWidth'
      :DisplayWidthIsAuto='DisplayWidthIsAuto'
      :SelectMode='Property.OptionAttribute.SelectMode'
+     @focus="onFocus"
      @blur="onBlur" />
     <!-- 开关 -->
     <SwitchTypeItemComp
@@ -237,7 +238,6 @@ export default {
       });
     },
     getElementSubmitValue(val, IsInteractionResult) {
-      console.log(val);
       if (IsInteractionResult) {
         let CustomerInputValues = [{ Value: '', IsInteractionResult }];
         if (val) CustomerInputValues = val;
@@ -283,7 +283,6 @@ export default {
         };
         this.$nextTick(() => {
           const value = this.getElementSubmitValue(this.disabled || this.hidden ? this.DisabledValue : this.PropValue, this.disabled || this.hidden);
-          console.log(value);
           if (!value) return;
           this.$emit('input', value);
           this.$nextTick(() => {

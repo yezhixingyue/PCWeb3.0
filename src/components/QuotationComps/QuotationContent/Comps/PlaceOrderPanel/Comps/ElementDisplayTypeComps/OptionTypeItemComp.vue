@@ -11,6 +11,7 @@
     :DisplayWidthIsAuto='DisplayWidthIsAuto'
     :DisabledOptionList='DisabledOptionList'
     :CtrlZIndex='CtrlZIndex'
+    @focus="onFocus"
     @blur="onBlur"
     @change="onSelectChange"
   />
@@ -135,6 +136,9 @@ export default {
     },
     onBlur() {
       this.$emit('blur', this.value);
+    },
+    onFocus() {
+      this.$emit('focus');
     },
     onSelectChange(e) {
       let t = e;
