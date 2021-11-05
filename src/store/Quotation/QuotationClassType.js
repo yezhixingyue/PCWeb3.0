@@ -314,9 +314,12 @@ export default class QuotationClassType {
     // 转换数值 清除为空的元素值等
     const getSingleElementClearValue = ElVal => {
       if (!ElVal || !Array.isArray(ElVal.CustomerInputValues)) return null;
+      let _IsInteractionResult = false;
       const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen, IsInteractionResult = false }) => {
         if (!IsInteractionResult && !ID && !Name && !(Value || Value === 0) && !(IsOpen || IsOpen === false)) return null;
-        const _item = { IsInteractionResult };
+        // const _item = { IsInteractionResult };
+        const _item = {};
+        _IsInteractionResult = IsInteractionResult;
         if (ID) _item.ID = ID;
         if (Name) _item.Name = Name;
         if (Value || Value === 0) _item.Value = Value;
@@ -326,6 +329,7 @@ export default class QuotationClassType {
       if ((!CustomerInputValues || CustomerInputValues.length === 0) && clearEmpty) return null;
       const _temp = {
         ...ElVal,
+        IsInteractionResult: _IsInteractionResult,
         CustomerInputValues,
       };
       delete _temp.DisabledValue;

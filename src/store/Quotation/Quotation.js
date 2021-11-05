@@ -486,7 +486,6 @@ export default {
       if (!res.data.Data || !res.data.Data.HavePrice) {
         return '暂无报价，请联系客服获取报价信息!';
       } // 可能为null 当需要客服咨询报价
-      console.log(res);
       commit('setProductQuotationResult', res.data.Data);
       return true;
     },
@@ -628,7 +627,6 @@ export default {
       const handleError = () => { // 失败处理函数 暂未使用 -- 交由统一错误方式处理
         // massage.failSingleError({ title: '添加购物车失败!', msg: response && response.data.Message ? response.data.Message : '服务器响应失败' });
       };
-      console.log(res);
       if (res && res.data.Status === 1000) {
         handleSuccess();
       } else if (res && [9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(res.data.Status)) {

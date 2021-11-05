@@ -167,7 +167,6 @@ const api = {
     return instance.post(`/Api/Upload/WholeFile?uniqueName=${uniqueName}`, formData, config);
   },
   getUploadedProgress(uniqueName) { // 获取断点续传文件已上传的位置  GET /Api/FileNode
-    // // console.log('getUploadedProgress', uniqueName);
     return instance.get(`/Api/FileNode?uniqueName=${uniqueName}`, { closeLoading: true });
   },
   UploadFileBreakpointResume(data, uniqueName, first, last, length, onUploadProgressFunc) { // 断点续传上传文件 /Api/Upload/File
