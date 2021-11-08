@@ -574,9 +574,9 @@ export const getFileListInEffect = (ProductParams, curProductInfo2Quotation, Fil
     if (allFiles.length > 0) {
       let hasPrintFile = false; // 是否已有印刷文件，如果有则不再添加印刷文件
       allFiles.forEach(it => {
-        const { IsPrintFile } = it.File;
+        const { IsPrintFile } = it;
         // if ((IsPrintFile && hasPrintFile)) return;
-        const t = FileListInEffect.find(_it => _it.File.ID === it.File.ID);
+        const t = FileListInEffect.find(_it => _it.ID === it.ID);
         if (!t && !(IsPrintFile && hasPrintFile)) {
           FileListInEffect.push(it);
           if (IsPrintFile) hasPrintFile = true;

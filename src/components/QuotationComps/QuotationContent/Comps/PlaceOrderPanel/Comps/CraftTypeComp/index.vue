@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import CraftItemComp from './CraftItemComp.vue';
 
 export default {
@@ -67,6 +68,7 @@ export default {
     CraftItemComp,
   },
   computed: {
+    ...mapGetters('Quotation', ['affectedCraftIDsByInteraction']),
     localCraftList() {
       if (
         !this.CraftData
@@ -112,7 +114,9 @@ export default {
       }
       this.selectedCraftList = temp;
       this.$nextTick(() => {
-        this.$emit('triggerInteraction');
+        if (this.affectedCraftIDsByInteraction.includes(item.ID)) {
+          this.$emit('triggerInteraction');
+        }
       });
     },
     getCraftAffectedPropList(ID) {

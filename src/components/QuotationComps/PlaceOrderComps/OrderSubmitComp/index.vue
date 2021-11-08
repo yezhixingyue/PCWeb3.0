@@ -104,7 +104,7 @@ export default {
     },
     isSpotGoods() {
       if (!Array.isArray(this.FileList) || this.FileList.length === 0) return true;
-      const t = this.FileList.find(it => it.File && it.File.IsPrintFile);
+      const t = this.FileList.find(it => it.IsPrintFile);
       return !t;
     },
   },

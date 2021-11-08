@@ -147,11 +147,20 @@ export default {
       const SecondName = SecondLevel.Name;
       return [FirstName, SecondName, state.curProductName];
     },
+    localAllControlList(state) {
+      if (!state.curProductInfo2Quotation) return [];
+      if ((!Array.isArray(state.curProductInfo2Quotation.ControlList) || state.curProductInfo2Quotation.ControlList.length === 0)
+       && (!Array.isArray(state.curProductInfo2Quotation.FileList) || state.curProductInfo2Quotation.FileList.length === 0)) return [];
+      const list1 = state.curProductInfo2Quotation.ControlList || [];
+      const list2 = state.curProductInfo2Quotation.FileList || [];
+      return [...list1, ...list2];
+    },
     /* 当前选中产品交互条件列表所需要的涉及到的元素ID列表
     -------------------------------*/
-    affectedElementIDsByInteraction(state) {
-      if (!state.curProductInfo2Quotation || !Array.isArray(state.curProductInfo2Quotation.ControlList) || state.curProductInfo2Quotation.ControlList.length === 0) return [];
-      const list = state.curProductInfo2Quotation.ControlList.map(it => {
+    affectedElementIDsByInteraction(state, getters) {
+      console.log(this, getters);
+      if (getters.localAllControlList.length === 0) return [];
+      const list = getters.localAllControlList.map(it => {
         const _list = [];
         if (it.Constraint && Array.isArray(it.Constraint.ItemList)) {
           it.Constraint.ItemList.forEach(_it => {
@@ -163,6 +172,76 @@ export default {
         return _list;
       }).reduce((l1, l2) => [...l1, ...l2], []);
       return [...new Set(list)];
+    },
+    /* 当前选中产品交互条件列表所需要的涉及到的元素组本身ID列表
+    -------------------------------*/
+    affectedElementGroupIDsByInteraction(state, getters) {
+      if (getters.localAllControlList.length === 0) return [];
+      const list = getters.localAllControlList.map(it => {
+        const _list = [];
+        if (it.Constraint && Array.isArray(it.Constraint.ItemList)) {
+          it.Constraint.ItemList.forEach(_it => {
+            if (_it.Property && _it.Property.Group && _it.Property.Group.ID) {
+              _list.push(_it.Property.Group.ID);
+            }
+          });
+        }
+        return _list;
+      }).reduce((l1, l2) => [...l1, ...l2], []);
+      return [...new Set(list)];
+    },
+    /* 当前选中产品交互条件列表所需要的涉及到的 工艺ID列表
+    -------------------------------*/
+    affectedCraftIDsByInteraction(state, getters) {
+      if (getters.localAllControlList.length === 0) return [];
+      const list = getters.localAllControlList.map(it => {
+        const _list = [];
+        if (it.Constraint && Array.isArray(it.Constraint.ItemList)) {
+          it.Constraint.ItemList.forEach(_it => {
+            if (_it.Property && _it.Property.Craft && _it.Property.Craft.ID) {
+              _list.push(_it.Property.Craft.ID);
+            }
+          });
+        }
+        return _list;
+      }).reduce((l1, l2) => [...l1, ...l2], []);
+      return [...new Set(list)];
+    },
+    /* 当前选中产品交互条件列表是否需要触发尺寸 boolean
+    -------------------------------*/
+    affectedSizeByInteraction(state, getters) {
+      if (getters.localAllControlList.length === 0) return false;
+      const t = getters.localAllControlList.find(it => {
+        if (it.Constraint && Array.isArray(it.Constraint.ItemList)) {
+          const t1 = it.Constraint.ItemList.find(_it => {
+            if (_it.Property && _it.Property.Type === 6 && !_it.Property.Element) {
+              return true;
+            }
+            return false;
+          });
+          if (t1) return true;
+        }
+        return false;
+      });
+      return !!t;
+    },
+    /* 当前选中产品交互条件列表是否需要触发物料 boolean
+    -------------------------------*/
+    affectedMaterialByInteraction(state, getters) {
+      if (getters.localAllControlList.length === 0) return false;
+      const t = getters.localAllControlList.find(it => {
+        if (it.Constraint && Array.isArray(it.Constraint.ItemList)) {
+          const t1 = it.Constraint.ItemList.find(_it => {
+            if (_it.Property && _it.Property.Type === 5) {
+              return true;
+            }
+            return false;
+          });
+          if (t1) return true;
+        }
+        return false;
+      });
+      return !!t;
     },
   },
   mutations: {
@@ -407,9 +486,9 @@ export default {
       state.RiskWarningTipsObj = { origin, tips };
     },
     setItemFlieList(state, [list, id]) {
-      const t = state.FileList.find(({ File }) => File.ID === id);
+      const t = state.FileList.find(it => it.ID === id);
       if (t) {
-        t.File.FileList = list;
+        t.FileList = list;
       }
     },
   },

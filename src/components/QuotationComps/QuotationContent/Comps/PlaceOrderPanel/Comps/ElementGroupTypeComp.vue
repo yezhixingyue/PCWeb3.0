@@ -2,7 +2,7 @@
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="minLength !== maxLength || showTop">
       <span class="blue-span is-font-13" v-show="!hideCtrl" @click="onAddClick" :class="{disabled:List.length >= maxLength || disabled}">
-        <template v-if="List.length >= maxLength">已达上限</template>
+        <template v-if="List.length >= maxLength">已达次数上限</template>
         <template v-else>+ 添加{{Property.Name || ''}}</template>
       </span>
     </div>
@@ -53,6 +53,7 @@
 <script>
 import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import { getCombineAffectedPropList } from '@/store/Quotation/EffectiveControlList';
+import { mapGetters } from 'vuex';
 import ElementTypeComp from './ElementTypeComp.vue';
 
 export default {
@@ -104,6 +105,7 @@ export default {
     ElementTypeComp,
   },
   computed: {
+    ...mapGetters('Quotation', ['affectedElementGroupIDsByInteraction']),
     maxLength() {
       if (!this.Property || !this.Property.UseTimes) return Infinity;
       const { MaxValue } = this.Property.UseTimes;
@@ -161,7 +163,9 @@ export default {
       const temp = QuotationClassType.getGroupItemSubmitData(this.Property, true);
       this.List = [...this.List, temp];
       this.$emit('changeValidate');
-      this.onTriggerInteractionClick();
+      if (this.affectedElementGroupIDsByInteraction.includes(this.Property.ID)) {
+        this.onTriggerInteractionClick();
+      }
     },
     onDelClick(index) {
       if (this.List.length <= this.minLength) return;
@@ -171,7 +175,11 @@ export default {
       this.$nextTick(() => {
         this.List = this.List.filter((it, i) => i !== index);
         this.$emit('changeValidate');
-        this.onTriggerInteractionClick();
+        // this.onTriggerInteractionClick();
+        console.log(this.affectedElementGroupIDsByInteraction, this.affectedElementGroupIDsByInteraction.includes(this.Property.ID), this.Property.ID);
+        if (this.affectedElementGroupIDsByInteraction.includes(this.Property.ID)) {
+          this.onTriggerInteractionClick();
+        }
       });
     },
     onItemValueChange(lv1Index, it, value) {

@@ -52,7 +52,7 @@ const getDisplayContentByElement = (ElementValList, item, ElementDataList, giveU
     if (origin) {
       temp.Label = origin.Name;
       const valueData = ElementValList.find(it => it.ElementID === item.Property.ID);
-      if (valueData) {
+      if (valueData && !(valueData.IsInteractionResult && valueData.hiddenByInteraction)) {
         temp.Content = getElementValueContent(valueData.CustomerInputValues, origin, giveUpUnit);
         return temp;
       }

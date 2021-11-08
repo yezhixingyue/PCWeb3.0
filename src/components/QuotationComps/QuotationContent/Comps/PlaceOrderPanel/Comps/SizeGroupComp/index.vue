@@ -9,8 +9,8 @@
       :options="CustomerSizeList"
       :isDisabled='isDisabled'
       :DisabledOptionList='DisabledOptionList'
-      @blur="onTriggerInteractionClick"
-      @change="onTriggerInteractionClick"
+      @blur="onTriggerInteractionClickSelf"
+      @change="onTriggerInteractionClickSelf"
     />
     <CustomizeSizeGroupComp
       v-show="isCustomize"
@@ -38,6 +38,7 @@
 <script>
 import InterAction from '@/store/Quotation/Interaction';
 import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
+import { mapGetters } from 'vuex';
 import CanFreeCreateSelectComp from '../ElementDisplayTypeComps/CanFreeCreateSelectComp.vue';
 import CustomizeSizeGroupComp from './CustomizeSizeGroupComp.vue';
 
@@ -82,6 +83,7 @@ export default {
     return {};
   },
   computed: {
+    ...mapGetters('Quotation', ['affectedSizeByInteraction']),
     DisabledOptionList() { // 禁用的选项
       return InterAction.getDisabledOptionList(this.AffectedPropList);
     },
@@ -140,6 +142,9 @@ export default {
         this.$emit('input', { ...this.value, ID: '' });
         this.onTriggerInteractionClick();
       }
+    },
+    onTriggerInteractionClickSelf() {
+      if (this.affectedSizeByInteraction) this.onTriggerInteractionClick();
     },
   },
   watch: {

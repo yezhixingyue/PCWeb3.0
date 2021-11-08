@@ -8,6 +8,7 @@
 <script>
 // 该组件暂不支持数据还原 及 指定默认物料功能，后续需要时再补充(订单编辑等功能) - 默认物料功能可以通过顺序调整至第一个实现（排序目前仅支持一级大类排序）
 import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
+import { mapGetters } from 'vuex';
 import MaterialSingleSelector from './MaterialSingleSelector.vue';
 
 export default {
@@ -39,6 +40,7 @@ export default {
     HelpTipsComp,
   },
   computed: {
+    ...mapGetters('Quotation', ['affectedMaterialByInteraction']),
     hiddenMatarialList() { // 隐藏物料列表  Operator 21 禁用    22 隐藏    23 必选
       if (this.AffectedPropList.length === 0) return [];
       if (this.AffectedPropList[0].Operator === 22 && this.AffectedPropList[0].OptionList.length > 0) {
@@ -194,9 +196,11 @@ export default {
       },
       set(val) {
         this.$emit('input', val);
-        this.$nextTick(() => {
-          this.$emit('triggerInteraction');
-        });
+        if (this.affectedMaterialByInteraction) {
+          this.$nextTick(() => {
+            this.$emit('triggerInteraction');
+          });
+        }
       },
     },
     curMaterialList() {

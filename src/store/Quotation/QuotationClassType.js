@@ -334,7 +334,7 @@ export default class QuotationClassType {
       };
       delete _temp.DisabledValue;
       delete _temp.disabledByInteraction;
-      delete _temp.hiddenByInteraction;
+      // delete _temp.hiddenByInteraction;
       return _temp;
     };
     // eslint-disable-next-line no-unused-vars
@@ -465,13 +465,13 @@ export default class QuotationClassType {
     const { FileList } = curProductInfo2Quotation;
     if (!Array.isArray(FileList) || FileList.length === 0) return [];
     const list = getFileListInEffect(ProductParams, curProductInfo2Quotation, FileList);
-    return list.sort((p, n) => p.File.ShowIndex - n.File.ShowIndex);
+    return list.sort((p, n) => p.ShowIndex - n.ShowIndex);
   }
 
   static getCreateFileItem(item) { // 创建生成一个文件项目
     return {
       ...item,
-      File: { ...item.File, FileList: [] },
+      FileList: [],
       display: true,
       key: Math.random().toString(36).slice(-10),
     };
@@ -479,24 +479,24 @@ export default class QuotationClassType {
 
   static setFileListInEffect(ProductParams, curProductInfo2Quotation, FileList) { // 设置当前产品上传文件列表
     const _list = this.getFileListInEffect(ProductParams, curProductInfo2Quotation);
-    const nextIDs = _list.map(it => it.File.ID);
-    const _FileList = FileList.filter(it => nextIDs.includes(it.File.ID));
+    const nextIDs = _list.map(it => it.ID);
+    const _FileList = FileList.filter(it => nextIDs.includes(it.ID));
     _FileList.forEach(it => {
       const _it = it;
-      if (!nextIDs.includes(it.File.ID)) _it.display = false; // 已被上面筛选掉，此种情况不会再出现
+      if (!nextIDs.includes(it.ID)) _it.display = false; // 已被上面筛选掉，此种情况不会再出现
       else {
         _it.display = true;
-        const t = _list.find(a => a.File.ID === it.File.ID);
+        const t = _list.find(a => a.ID === it.ID);
         if (t) {
           _it.IsRequired = t.IsRequired;
           _it.MaxSize = t.MaxSize;
         }
       }
     });
-    const prevIDs = _FileList.map(it => it.File.ID);
+    const prevIDs = _FileList.map(it => it.ID);
     _list.forEach(it => {
-      if (!prevIDs.includes(it.File.ID)) {
-        const index = _FileList.findIndex((_it) => it.File.ShowIndex < _it.File.ShowIndex);
+      if (!prevIDs.includes(it.ID)) {
+        const index = _FileList.findIndex((_it) => it.ShowIndex < _it.ShowIndex);
         const item = this.getCreateFileItem(it);
         if (index > -1) {
           _FileList.splice(index, 0, item);

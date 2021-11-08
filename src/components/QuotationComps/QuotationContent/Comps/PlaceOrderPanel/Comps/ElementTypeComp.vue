@@ -234,7 +234,10 @@ export default {
       if (this.val === e) return;
       this.val = e;
       this.$nextTick(() => {
-        this.$emit('interaction');
+        // this.$emit('interaction');
+        if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
+          this.$emit('interaction');
+        }
       });
     },
     getElementSubmitValue(val, IsInteractionResult) {

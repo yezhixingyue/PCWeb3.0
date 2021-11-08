@@ -6,7 +6,7 @@
       v-show="it.display"
       :required="it.IsRequired"
       :maxSize='it.MaxSize'
-      :FileInfo="it.File"
+      :FileInfo="it"
       :disabled='disabled'
       ref="UploadItem"
       @validateField="handleValidateField"
