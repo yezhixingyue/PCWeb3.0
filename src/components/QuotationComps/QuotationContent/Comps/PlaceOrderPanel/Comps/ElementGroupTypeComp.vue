@@ -176,7 +176,6 @@ export default {
         this.List = this.List.filter((it, i) => i !== index);
         this.$emit('changeValidate');
         // this.onTriggerInteractionClick();
-        console.log(this.affectedElementGroupIDsByInteraction, this.affectedElementGroupIDsByInteraction.includes(this.Property.ID), this.Property.ID);
         if (this.affectedElementGroupIDsByInteraction.includes(this.Property.ID)) {
           this.onTriggerInteractionClick();
         }

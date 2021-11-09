@@ -115,7 +115,7 @@ export default {
       // const _options = this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it)
       //  || (this.value === it.ID || this.value === it || (Array.isArray(this.value) && this.value.includes(it.ID || it))));
       const _options = this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it));
-      if (!this.IsRequired && !this.isMultiple && !this.isRadio) _options.unshift({ ID: '', Name: '请选择' });
+      if (!this.IsRequired && !this.isMultiple && !this.isRadio) _options.unshift({ ID: null, Name: '请选择' });
       return _options;
     },
   },

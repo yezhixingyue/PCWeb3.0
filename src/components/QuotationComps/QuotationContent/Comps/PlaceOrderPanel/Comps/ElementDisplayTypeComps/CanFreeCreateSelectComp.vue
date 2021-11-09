@@ -214,4 +214,7 @@ export default {
     }
   }
 }
+.only-new {
+  opacity: 0;
+}
 </style>
