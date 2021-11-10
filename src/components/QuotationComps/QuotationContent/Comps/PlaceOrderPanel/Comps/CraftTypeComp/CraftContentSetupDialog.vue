@@ -337,8 +337,10 @@ export default {
       this.subGroupAffectedPropLists = this.GroupList.map(it => {
         const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
         if (t && t.SubControlList) {
+          const { SubControlList } = t;
+          const { curProductInfo2Quotation } = this;
           const _list = t.List.map(_it => ({ CraftList: [{ GroupList: [{ GroupID: t.GroupID, List: [_it] }], CraftID: this.Craft.ID }] }))
-            .map(_it => getPropertiesAffectedByInteraction(_it, this.curProductInfo2Quotation, t.SubControlList));
+            .map(_it => getPropertiesAffectedByInteraction({ ProductParams: _it, curProductInfo2Quotation, SubControlList }));
           return _list;
         }
         return [];
@@ -365,7 +367,7 @@ export default {
       const i = target.findIndex(it => it.CraftID === obj.CraftID);
       if (i > -1) target.splice(i, 1, obj);
       else target.push(obj);
-      const list = QuotationClassType.getPropertiesAffectedByInteraction(temp, this.curProductInfo2Quotation)
+      const list = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams: temp, curProductInfo2Quotation: this.curProductInfo2Quotation })
         .filter(it => it && it.Property && it.Property.Craft && it.Property.Craft.ID === this.Craft.ID && (it.Property.Element || it.Property.Group));
       const _PartAffectedPropList = this.PartAffectedPropList
         .filter(it => it && it.Property && it.Property.Craft && it.Property.Craft.ID === this.Craft.ID && (it.Property.Element || it.Property.Group));

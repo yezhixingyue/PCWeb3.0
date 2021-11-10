@@ -425,17 +425,52 @@ export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Q
   return matchValueWithValueList(targetValue, Operator, ValueList, Property);
 };
 
+const getTargetIsMatchedOrNot = (target, ItemList) => {
+  // let bool = true;
+  let targetProp;
+  switch (target.type) {
+    case '元素':
+      targetProp = ItemList.find(({ Property }) => Property && Property.Element && !Property.Group && !Property.Craft && Property.Element.ID === target.target.ID);
+      break;
+    case '元素组':
+      targetProp = ItemList.find(({ Property }) => Property && Property.Group && !Property.Craft && Property.Group.ID === target.target.ID);
+      break;
+    case '尺寸组':
+      targetProp = ItemList.find(({ Property }) => Property && Property.Type && Property.Type === 6);
+      break;
+    case '物料':
+      targetProp = ItemList.find(({ Property }) => Property && Property.Type && Property.Type === 5);
+      break;
+    case '工艺':
+      targetProp = ItemList.find(({ Property }) => Property && Property.Craft && Property.Craft.ID === target.target.ID);
+      break;
+    case '工厂': // 工厂隐藏
+      // targetProp = this.placeData.FactoryList;
+      break;
+    default:
+      break;
+  }
+  return !!targetProp;
+};
+
 /**
  * @description: 判断一条交互的触发条件是否能够匹配上
  * @param {*}
  * @return {*} 返回匹配结果: bool值
  */
-export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Quotation, isSubControl) => {
+export const judgeWhetherItWork = ({ ControlItem, ProductParams, curProductInfo2Quotation, isSubControl, target }) => {
   if (!ControlItem) return false;
   const { Constraint } = ControlItem;
   if (!Constraint) return false;
   const { FilterType, ItemList } = Constraint; // ItemList：条件列表    FilterType：满足方式 1 满足所有   2 满足任一
-  if (ItemList.length > 0) {
+  if (ItemList && ItemList.length > 0) {
+    if (target) {
+      // 判断当前正在匹配的交互条目是否能和目标对应上，如果可以对应上，则继续向下进行继续重新判断；如果对应不上则沿用上次判断的结果
+      const bool = getTargetIsMatchedOrNot(target, ItemList);
+      if (!bool) {
+        return target.lastIDList.includes(ControlItem.ID);
+      }
+    }
     if (FilterType === 1) { // 满足所有
       const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem)); // 找到不符合的项目
       return !inconformityItem;
@@ -452,7 +487,7 @@ export const judgeWhetherItWork = (ControlItem, ProductParams, curProductInfo2Qu
  * @param {*}
  * @return {*}
  */
-export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation, SubControlList) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
+export const getEffectiveControlList = ({ ProductParams, curProductInfo2Quotation, SubControlList, target }) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
   if (!ProductParams || !curProductInfo2Quotation) return null;
   let InteractionControlList;
   let isSubControl = false;
@@ -464,7 +499,8 @@ export const getEffectiveControlList = (ProductParams, curProductInfo2Quotation,
     if (!Array.isArray(ControlList) || ControlList.length === 0) return null;
     InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
   }
-  const list = InteractionControlList.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation, isSubControl))
+  const curTarget = target ? { ...target, lastIDList: target.lastEffectiveList.map(it => it.ID) } : undefined;
+  const list = InteractionControlList.filter(it => judgeWhetherItWork({ ControlItem: it, ProductParams, curProductInfo2Quotation, isSubControl, target: curTarget }))
     .sort((f, s) => f.Priority - s.Priority); // 按照优先级进行排序
   return list;
 };
@@ -523,10 +559,18 @@ export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyLis
  * @param {*}
  * @return {*}
  */
-export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo2Quotation, SubControlList) => {
+export const getPropertiesAffectedByInteraction = ({ ProductParams, curProductInfo2Quotation, SubControlList, target, getList }) => {
   // 获取到当前  正在生效的  且  已按照优先级从重要到不重要的顺序进行排序的  交互列表
-  const EffectiveControlList = getEffectiveControlList(ProductParams, curProductInfo2Quotation, SubControlList);
-  if (!EffectiveControlList) return [];
+  const EffectiveControlList = getEffectiveControlList({ ProductParams, curProductInfo2Quotation, SubControlList, target });
+  if (!EffectiveControlList) {
+    if (getList) {
+      return {
+        propList: [],
+        EffectiveControlList: [],
+      };
+    }
+    return [];
+  }
   const arr = [];
   EffectiveControlList.forEach(({ List }) => {
     if (Array.isArray(List)) {
@@ -539,10 +583,20 @@ export const getPropertiesAffectedByInteraction = (ProductParams, curProductInfo
             if (index === -1) arr.push(item);
             else arr.splice(index, 1, item);
           });
+        } else if (typeof t === 'object') {
+          const { index, item } = t;
+          if (index === -1) arr.push(item);
+          else arr.splice(index, 1, item);
         }
       });
     }
   });
+  if (getList) {
+    return {
+      propList: arr,
+      EffectiveControlList,
+    };
+  }
   return arr;
 };
 
@@ -558,6 +612,10 @@ export const getCombineAffectedPropList = (AffectedPropList, PartAffectedPropLis
         if (index === -1) arr.push(item);
         else arr.splice(index, 1, item);
       });
+    } else if (typeof t === 'object') {
+      const { index, item } = t;
+      if (index === -1) arr.push(item);
+      else arr.splice(index, 1, item);
     }
   });
   return arr;
@@ -566,7 +624,7 @@ export const getCombineAffectedPropList = (AffectedPropList, PartAffectedPropLis
 export const getFileListInEffect = (ProductParams, curProductInfo2Quotation, FileList) => {
   if (!Array.isArray(FileList) || FileList.length === 0) return [];
   const _list = JSON.parse(JSON.stringify(FileList));
-  const list = _list.filter(it => judgeWhetherItWork(it, ProductParams, curProductInfo2Quotation))
+  const list = _list.filter(it => judgeWhetherItWork({ ControlItem: it, ProductParams, curProductInfo2Quotation }))
     .sort((f, s) => f.Priority - s.Priority).filter(it => it.FileList && it.FileList.length > 0); // 按照优先级进行排序
   if (list.length > 0) {
     const allFiles = list.map(it => it.FileList).reduce((prev, next) => [...prev, ...next], []);

@@ -444,7 +444,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
+    // this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
     // this.getCraftRelationList();
   },
   watch: {

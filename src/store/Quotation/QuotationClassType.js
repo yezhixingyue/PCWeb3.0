@@ -317,7 +317,6 @@ export default class QuotationClassType {
       let _IsInteractionResult = false;
       const CustomerInputValues = ElVal.CustomerInputValues.map(({ ID, Name, Value, IsOpen, IsInteractionResult = false }) => {
         if (!IsInteractionResult && !ID && !Name && !(Value || Value === 0) && !(IsOpen || IsOpen === false)) return null;
-        // const _item = { IsInteractionResult };
         const _item = {};
         _IsInteractionResult = IsInteractionResult;
         if (ID) _item.ID = ID;
@@ -334,51 +333,21 @@ export default class QuotationClassType {
       };
       delete _temp.DisabledValue;
       delete _temp.disabledByInteraction;
-      // delete _temp.hiddenByInteraction;
       return _temp;
     };
     // eslint-disable-next-line no-unused-vars
     const getElementListValueFilter = (ElementList, disabledElements = []) => {
       if (!ElementList || !Array.isArray(ElementList)) return [];
-      // eslint-disable-next-line arrow-body-style
-      return ElementList.map(it => {
-        // const t = disabledElements.find(_it => _it.ElementID === it.ElementID);
-        // if (t) {
-        //   console.log(t, it);
-        //   return t.DisabledOrHideDefaultValue || t.DisabledOrHideDefaultValue === 0
-        //     ? { ElementID: t.ElementID, CustomerInputValues: [{ Value: t.DisabledOrHideDefaultValue }] }
-        //     : null;
-        // }
-        // console.log(it, getSingleElementClearValue(it));
-        return getSingleElementClearValue(it);
-      }).filter(it => it);
+      return ElementList.map(it => getSingleElementClearValue(it)).filter(it => it);
     };
     // eslint-disable-next-line no-unused-vars
     const getGroupListValueFilter = (GroupList, GroupAffectedPropList = [], CraftID) => {
       if (!GroupList || !Array.isArray(GroupList)) return [];
-      // const disabledGroupIDs = InterAction.getDisabledOrHiddenedGroupIDList(GroupAffectedPropList);
       return GroupList.map(Group => {
         if (!Array.isArray(Group.List) || Group.List.length === 0) return null;
-        // if (Group.GroupID && disabledGroupIDs.includes(Group.GroupID)) return null;
         const List = Group.List.map((item) => {
-          // if (disabledGroupIDs.includes(item.GroupID)) return null;
-          // let subGroupAffectedPropList = [];
-          // if (CraftID) {
-          //   subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选工艺子交互中元素组，得到受子交互影响的属性列表
-          //     { CraftList: [{ GroupList: [{ GroupID: Group.GroupID, List: [item] }], CraftID }] }, curProductInfo2Quotation, Group.SubControlList || [],
-          //   );
-          // } else {
-          //   subGroupAffectedPropList = getPropertiesAffectedByInteraction( // 筛选普通元素组子交互，得到受子交互影响的属性列表
-          //     { GroupList: [{ GroupID: Group.GroupID, List: [item] }] }, curProductInfo2Quotation, Group.SubControlList || [],
-          //   );
-          // }
-          // const InterActionData = getCombineAffectedPropList(GroupAffectedPropList, subGroupAffectedPropList); // 合并交互与子交互
-          // const groupItemAffectedPropList = InterActionData.filter(it => it.Property.Group.ID === Group.GroupID); // 筛选出当前元素组生效列表
-          // const disabledElementIDs = InterAction.getDisabledOrHiddenedElementIDList(groupItemAffectedPropList);
           const itemList = getElementListValueFilter(item.List); // 对其所属元素进行筛选处理
           if (itemList.length === 0) return null;
-          // const _itemList = itemList.filter(_it => _it.CustomerInputValues && _it.CustomerInputValues.length > 0);
-          // if (_itemList.length === 0) return null;
           return {
             ...item,
             List: itemList,
@@ -416,7 +385,11 @@ export default class QuotationClassType {
         _InterActionData = PropertiesAffectedByInteraction
           .filter(it => (!it.Property.Part && !PartID) || (it.Property.Part && it.Property.Part.ID === PartID));
       }
-      const PartAffectedPropList = getPropertiesAffectedByInteraction(Part, curProductInfo2Quotation, Part.SubControlList || []);
+      const PartAffectedPropList = getPropertiesAffectedByInteraction({
+        ProductParams: Part,
+        curProductInfo2Quotation,
+        SubControlList: Part.SubControlList || [],
+      });
       const InterActionData = getCombineAffectedPropList(_InterActionData, PartAffectedPropList);
       const _Part = Part;
       if (Array.isArray(_Part.ElementList)) {
@@ -456,8 +429,8 @@ export default class QuotationClassType {
     };
   }
 
-  static getPropertiesAffectedByInteraction(ProductParams, curProductInfo2Quotation) { // 获取到当前受到交互影响的需要处理的属性列表
-    return getPropertiesAffectedByInteraction(ProductParams, curProductInfo2Quotation);
+  static getPropertiesAffectedByInteraction(data) { // 获取到当前受到交互影响的需要处理的属性列表
+    return getPropertiesAffectedByInteraction(data);
   }
 
   static getFileListInEffect(ProductParams, curProductInfo2Quotation) {

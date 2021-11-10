@@ -354,7 +354,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('Quotation/getFileTypeList');
+    // this.$store.dispatch('Quotation/getFileTypeList');
   },
   watch: {
     curProductID() {

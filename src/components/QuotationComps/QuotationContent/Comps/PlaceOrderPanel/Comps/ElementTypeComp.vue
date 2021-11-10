@@ -277,7 +277,7 @@ export default {
     switchDisabledOrHidden: { // 之前使用switchDisabledOrHidden，判断不准确修改为该值
       handler(newVal, oldVal) {
         if (newVal === oldVal) return;
-        const unable = this.hidden || this.disabled;
+        const unable = this.hidden || this.disabled; // 不可用状态： 被禁用或隐藏
         const DisabledValue = unable ? InterAction.getUnusabledValueByInteraction(this.AffectedPropList) : '';
         this.disabledInfoObj = {
           disabledByInteraction: this.disabled,
@@ -285,7 +285,7 @@ export default {
           DisabledValue,
         };
         this.$nextTick(() => {
-          const value = this.getElementSubmitValue(this.disabled || this.hidden ? this.DisabledValue : this.PropValue, this.disabled || this.hidden);
+          const value = this.getElementSubmitValue(unable ? this.DisabledValue : this.PropValue, unable);
           if (!value) return;
           this.$emit('input', value);
           this.$nextTick(() => {
@@ -295,7 +295,7 @@ export default {
           });
         });
       },
-      immediate: true,
+      immediate: false,
     },
   },
 };

@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import FileTypeClass from '@/assets/js/ClassType/FileTypeClass';
 
 export default {
@@ -66,22 +65,18 @@ export default {
     };
   },
   computed: {
-    ...mapState('Quotation', ['FileTypeList']),
     multiple() {
       if (this.FileInfo) return this.FileInfo.AllowMultiple;
       return false;
     },
     accept() {
       if (this.FileInfo) {
-        const str = this.FileInfo.TypeList.map(({ ID }) => {
-          const t = this.FileTypeList.find((_it) => _it.ID === ID);
-          if (t) {
-            return t.Name.split('/')
-              .map(it => (it === '*' ? it : `.${it}`))
-              .join(',');
-          }
-          return null;
-        })
+        if (this.FileInfo.FormatString) {
+          return this.FileInfo.FormatString.split(',').map(it => (it ? `.${it}` : '')).filter(it => it).join(',');
+        }
+        const str = this.FileInfo.TypeList.map(({ Name }) => Name.split('/')
+          .map(it => (it === '*' ? it : `.${it}`))
+          .join(','))
           .filter((it) => it)
           .join(',');
         return str.includes('*') ? '*' : str;

@@ -84,7 +84,12 @@ export default {
     },
     getPartAffectedPropList() {
       const SubControlList = this.submitData?.SubControlList || [];
-      this.PartAffectedPropList = getPropertiesAffectedByInteraction(this.submitData, this.curProductInfo2Quotation, SubControlList);
+      const ProductParams = this.submitData;
+      this.PartAffectedPropList = getPropertiesAffectedByInteraction({
+        ProductParams,
+        curProductInfo2Quotation: this.curProductInfo2Quotation,
+        SubControlList,
+      });
     },
   },
   mounted() {

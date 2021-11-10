@@ -402,9 +402,10 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
             // 4.1 子交互
             let _subGroupAffectedPropList = [];
             if (groupValItem.SubControlList) {
+              const { SubControlList } = groupValItem;
               _subGroupAffectedPropList = groupValItem.List
                 .map(_item => ({ _CraftList: [{ GroupList: [{ GroupID: groupValItem.GroupID, List: [_item] }], CraftID: craftValItem.CraftID }] }))
-                .map(_item => getPropertiesAffectedByInteraction(_item, curProductInfo2Quotation, groupValItem.SubControlList));
+                .map(_item => getPropertiesAffectedByInteraction({ ProductParams: _item, curProductInfo2Quotation, SubControlList }));
             }
             const errMsg = checkElementGroup(groupValItem.List || [], groupDataItem, _groupAffectedPropList, _subGroupAffectedPropList);
             // 5. 对工艺设置参数进行校验并返回结果

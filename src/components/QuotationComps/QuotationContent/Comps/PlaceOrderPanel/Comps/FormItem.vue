@@ -384,26 +384,22 @@ export default {
     },
     getSubGroupAffectedPropList() { // 元素组子交互
       if (this.isNormalGroup && Array.isArray(this.submitData.ChildSubControlList) && Array.isArray(this.submitData.GroupList)) {
-        const list = this.submitData.ChildSubControlList.filter(it => !it.CraftID && it.GroupID === this.target.ID);
-        // return list;
+        const SubControlList = this.submitData.ChildSubControlList.filter(it => !it.CraftID && it.GroupID === this.target.ID);
         const t = this.submitData.GroupList.find(it => it.GroupID === this.itemData.Property.ID);
         if (t) {
+          const { curProductInfo2Quotation } = this;
           const _list = t.List.map((it) => ({ GroupList: [{ GroupID: t.GroupID, List: [it] }] }))
-            .map(it => getPropertiesAffectedByInteraction(it, this.curProductInfo2Quotation, list));
-          // console.log(list, _list);
+            .map(it => getPropertiesAffectedByInteraction({ ProductParams: it, curProductInfo2Quotation, SubControlList }));
           this.subGroupAffectedPropList = _list;
           return;
         }
       }
       this.subGroupAffectedPropList = [];
     },
-    onTriggerInteractionClick() {
-      this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
+    onTriggerInteractionClick(e) {
+      this.$store.commit('Quotation/setPropertiesAffectedByInteraction', { target: e || this.target, type: this.curTypeName });
       this.$emit('partInteraction');
       this.getSubGroupAffectedPropList();
-      // this.$nextTick(() => {
-      //   this.onChangeValidate();
-      // });
     },
     handleGroupItemChange(Value) {
       this.$store.commit('Quotation/setObj2GetProductPriceProductParamsGroupItem',
@@ -413,8 +409,7 @@ export default {
   },
   watch: {
     localAffectedPropList(newVal, oldVal) {
-      // console.log(newVal, oldVal);
-      if ((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0)) return;
+      if (((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0)) || JSON.stringify(newVal) === JSON.stringify(oldVal)) return;
       this.onChangeValidate();
     },
   },

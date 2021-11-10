@@ -97,7 +97,7 @@ export default {
         this.selectedCraftList.find((it) => it.CraftID === itemData.ID) || null
       );
     },
-    onCraftItemChange(e, item) {
+    onCraftItemChange(e, item, needInterAction = true) {
       let temp = this.selectedCraftList.filter((it) => it.CraftID !== item.ID);
       if (e) {
         // 也可能是编辑 也可能是添加 此时需做单选工艺处理 即判断其是否在单选工艺列表中 如果是则在添加的时候清除掉同组其它的工艺
@@ -113,11 +113,11 @@ export default {
         temp.push(e);
       }
       this.selectedCraftList = temp;
-      this.$nextTick(() => {
-        if (this.affectedCraftIDsByInteraction.includes(item.ID)) {
-          this.$emit('triggerInteraction');
-        }
-      });
+      if (needInterAction && this.affectedCraftIDsByInteraction.includes(item.ID)) {
+        this.$nextTick(() => {
+          this.$emit('triggerInteraction', item);
+        });
+      }
     },
     getCraftAffectedPropList(ID) {
       if (!Array.isArray(this.AffectedPropList) || this.AffectedPropList.length === 0) return [];

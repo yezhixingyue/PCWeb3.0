@@ -227,14 +227,14 @@ export default {
           this.disabled = false;
           this.required = true;
           if (this.value && !(!this.value.disabledByInteraction && this.value.requiredByInteraction)) {
-            this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: true });
+            this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: true }, false);
           }
         }
       } else {
         this.disabled = false;
         this.required = false;
         if (this.value && !(!this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
-          this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: false });
+          this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: false }, false);
         }
       }
     },
@@ -270,6 +270,10 @@ export default {
     box-sizing: border-box;
     line-height: 26px;
     &.active {
+      border-color: #428dfa;
+      color: #428dfa;
+    }
+    &:active {
       border-color: #428dfa;
       color: #428dfa;
     }

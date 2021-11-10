@@ -83,6 +83,7 @@ export default {
     /** 受到交互影响的属性列表数据
     ---------------------------------------- */
     PropertiesAffectedByInteraction: [],
+    curEffectiveControlList: [],
     /** 当前产品正在生效的 需要上传的文件列表
     ---------------------------------------- */
     FileList: [],
@@ -158,7 +159,6 @@ export default {
     /* 当前选中产品交互条件列表所需要的涉及到的元素ID列表
     -------------------------------*/
     affectedElementIDsByInteraction(state, getters) {
-      console.log(this, getters);
       if (getters.localAllControlList.length === 0) return [];
       const list = getters.localAllControlList.map(it => {
         const _list = [];
@@ -273,11 +273,18 @@ export default {
     setCurProductInfo2Quotation(state, data) {
       if (!data && data !== null) return;
       // 处理产品信息
-      state.curProductInfo2Quotation = QuotationClassType.initOriginData(data);
-      state.obj2GetProductPrice.ProductParams = QuotationClassType.init(data);
+      const curProductInfo2Quotation = QuotationClassType.initOriginData(data);
+      const ProductParams = QuotationClassType.init(data);
+
+      state.curProductInfo2Quotation = curProductInfo2Quotation;
+      state.obj2GetProductPrice.ProductParams = ProductParams;
+
       state.initPageText = '';
-      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
-      state.PropertiesAffectedByInteraction = list;
+
+      const { propList, EffectiveControlList } = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams, curProductInfo2Quotation, getList: true });
+      state.PropertiesAffectedByInteraction = propList;
+      state.curEffectiveControlList = EffectiveControlList;
+
       state.FileList = QuotationClassType.getFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation)
         .map(it => QuotationClassType.getCreateFileItem(it));
     },
@@ -385,6 +392,7 @@ export default {
       state.initPageText = '';
       state.curProduct = null;
       state.PropertiesAffectedByInteraction = [];
+      state.curEffectiveControlList = [];
       state.RiskWarningTipsObj = { origin: '', tips: '' };
       state.FileList = [];
       state.FileTypeList = [];
@@ -465,15 +473,20 @@ export default {
       } else { // 添加
         t.List.push(item);
       }
-      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
-      state.PropertiesAffectedByInteraction = list;
+      const { ProductParams } = state.obj2GetProductPrice;
+      const { propList, EffectiveControlList } = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams, curProductInfo2Quotation: state.curProductInfo2Quotation, getList: true });
+      state.PropertiesAffectedByInteraction = propList;
+      state.curEffectiveControlList = EffectiveControlList;
       state.RiskWarningTipsObj = { origin: '', tips: '' };
       state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
     },
-    setPropertiesAffectedByInteraction(state) { // 获取受交互影响属性列表
+    setPropertiesAffectedByInteraction(state, data) { // 获取受交互影响属性列表
       state.RiskWarningTipsObj = { origin: '', tips: '' };
-      const list = QuotationClassType.getPropertiesAffectedByInteraction(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation);
-      state.PropertiesAffectedByInteraction = list;
+      const { ProductParams } = state.obj2GetProductPrice;
+      const target = { ...data, lastEffectiveList: state.curEffectiveControlList };
+      const { propList, EffectiveControlList } = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams, curProductInfo2Quotation: state.curProductInfo2Quotation, target, getList: true });
+      state.PropertiesAffectedByInteraction = propList;
+      state.curEffectiveControlList = EffectiveControlList;
       state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
     },
     setFileTypeList(state, list) {
