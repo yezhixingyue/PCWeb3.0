@@ -100,6 +100,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    isCraftUse: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     ElementTypeComp,
@@ -226,6 +230,12 @@ export default {
       },
       immediate: true,
     },
+    ChildUseAffectedPropList(newVal, oldVal) {
+      if (!this.isCraftUse
+       || ((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0))
+       || JSON.stringify(newVal) === JSON.stringify(oldVal)) return;
+      this.$emit('changeValidate');
+    },
     // watchError: {
     //   handler(val) {
     //     this.$nextTick(() => {
@@ -296,35 +306,6 @@ export default {
             > i {
               font-weight: 700;
             }
-          }
-          &.canError {
-            .element-type-content {
-              // position: relative;
-              // &::before {
-              //   content: attr(data-content-before);
-              //   position: absolute;
-              //   left: 0;
-              //   bottom: -5px;
-              //   height: 20px;
-              //   font-size: 12px;
-              //   color: #ff3769;
-              //   width: 100%;
-              //   overflow: hidden;
-              //   text-overflow: ellipsis;
-              //   display: none;
-              // }
-              // .el-checkbox__inner {
-              //   border-color: #ff3769;
-              // }
-            }
-            // > label.el-title {
-            //   position: relative;
-            //   > i {
-            //     position: absolute;
-            //     top: 0px;
-            //     right: 0;
-            //   }
-            // }
           }
         }
       }

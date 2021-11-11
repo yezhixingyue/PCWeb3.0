@@ -295,7 +295,7 @@ export default {
           });
         });
       },
-      immediate: false,
+      immediate: true,
     },
   },
 };

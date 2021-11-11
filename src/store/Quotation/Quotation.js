@@ -768,7 +768,7 @@ export default {
         item = [...rootState.shoppingCar.curShoppingCarDataBeforeFirstPlace];
         _obj.List = item;
       }
-
+      _obj.List = _obj.List.map(it => ({ ...it, IsFileInLan: true }));
       const res = await api.CreateOrderFromPreCreate(_obj).catch(() => {});
       if (!res || res.data.Status !== 1000) {
         throw new Error(res && res.data.Message ? res.data.Message : '服务器未响应');

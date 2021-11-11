@@ -49,6 +49,7 @@
             :Property="it"
             fillWidth
             CtrlZIndex
+            isCraftUse
             :errorElementID='errorElementID'
             :errorIndex='errorIndex'
             :errorMsg='errorMsg'
@@ -350,7 +351,6 @@ export default {
       // 替换对象
       // const obj = this.generateSubmitSetupData();
       const obj = { ...this.localSetupData };
-      // console.log(obj);
       const temp = JSON.parse(JSON.stringify(this.obj2GetProductPrice.ProductParams));
       let target;
       if (!this.PartID) {

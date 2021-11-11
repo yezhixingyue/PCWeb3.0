@@ -142,8 +142,9 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
           break;
       }
       if (!FixedType && FixedType !== 0) {
-        if (Array.isArray(ElValues[0])) _GroupValue = [...ElValues]; // 多选选项元素时
-        else { // 单选时
+        if (Array.isArray(ElValues[0])) {
+          _GroupValue = [...ElValues]; // 多选选项元素时
+        } else { // 单选时
           // 此处需要判断所在元素组的使用次数
           const { UseTimes, ID } = targetOriginData;
           const { GroupID } = ControlItem;
@@ -167,10 +168,10 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
 
 /**
  * @description: 获取工艺值 （包含是否选中）
- * @param {*}
+ * @param {*} Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem
  * @return {*}
  */
-const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, isSubControl, ControlItem) => {
+const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem) => {
   let _CraftValue;
   if (target && target.disabledByInteraction) _CraftValue = false;
   else if (!Element && !Group && !FixedType) _CraftValue = !!target && !target.disabledByInteraction; // 工艺是否选中 返回布尔值
