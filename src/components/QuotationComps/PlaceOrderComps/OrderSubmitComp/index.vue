@@ -84,7 +84,9 @@ export default {
     },
   },
   computed: {
-    ...mapState('Quotation', ['selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading', 'curProductID']),
+    ...mapState('Quotation', [
+      'selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading', 'curProductID', 'RiskWarningTipsTypes',
+    ]),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -135,7 +137,29 @@ export default {
           this.OrderPreData = PreCreateData;
           this.requestObj = requestObj;
           this.FileCount = this.getFileCount();
-          this.visible = true;
+          if (PreCreateData.RiskList && PreCreateData.RiskList.length > 0) {
+            const tipsList = PreCreateData.RiskList.filter(it => it.First === 3).map(it => it.Second);
+            if (tipsList.length > 0) this.$store.commit('Quotation/setRiskWarningTips', { origin: 'place', tipsList });
+            const msgArray = PreCreateData.RiskList.filter(it => it.First === 2).map(it => it.Second);
+            if (msgArray.length > 0) {
+              this.messageBox.warnCancelBox({
+                title: '存在风险，是否继续下单?',
+                msg: msgArray,
+                confirmButtonText: '继续下单',
+                successFunc: async () => {
+                  this.visible = true;
+                },
+                failFunc: () => {
+                  this.OrderPreData = null;
+                  this.requestObj = null;
+                },
+              });
+            } else {
+              this.visible = true;
+            }
+          } else {
+            this.visible = true;
+          }
         } else {
           // console.log('页面提示返回数据', resp); // 不做处理
         }
@@ -165,7 +189,7 @@ export default {
     },
     scrollToTop() {
       this.$nextTick(() => {
-        this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
+        this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
         const backDom = document.getElementsByClassName('el-backtop')[0];
         if (backDom) backDom.click();
       });
@@ -298,7 +322,7 @@ export default {
         return false;
       }
       if (!bool) return false;
-      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
+      // this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
       return true;
     },
     async handleSubmit(data) { // 创建订单

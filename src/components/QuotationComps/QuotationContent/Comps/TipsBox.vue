@@ -1,10 +1,10 @@
 <template>
-  <div class="mp-quotation-content-tips-box-comp-wrap" @click.stop="">
+  <div class="mp-quotation-content-tips-box-comp-wrap mp-scroll-wrap" @click.stop="">
     <ul v-show="localTipsArr" class="tips">
       <li class="icon"><i class="el-icon-warning"></i> 温馨提示：</li>
       <li class="tips-content" v-for="it in localTipsArr" :key="it">{{it}}</li>
     </ul>
-    <ul v-if="ProductQuotationResult && ProductQuotationResult.Content" class="detail">
+    <ul v-if="ProductQuotationResult && ProductQuotationResult.Content && !onlyTips" class="detail">
       <!-- <li class="icon"><i class="el-icon-warning"></i> 温馨提示：</li>
       <li v-for="it in localTipsArr" :key="it">{{it}}</li> -->
       <li ref="detailBox">
@@ -26,11 +26,16 @@
 import { mapState } from 'vuex';
 
 export default {
+  props: {
+    onlyTips: {
+      default: false,
+      type: Boolean,
+    },
+  },
   computed: {
     ...mapState('Quotation', ['RiskWarningTipsObj', 'ProductQuotationResult']),
     localTipsArr() {
-      if (!this.RiskWarningTipsObj.tips) return '';
-      return this.RiskWarningTipsObj.tips.split('#');
+      return this.RiskWarningTipsObj.tipsList && this.RiskWarningTipsObj.tipsList.length > 0 ? this.RiskWarningTipsObj.tipsList : null;
     },
   },
   data() {
@@ -82,17 +87,18 @@ export default {
     border-radius: 5px;
     position: relative;
     padding-bottom: 3px;
-    line-height: 20px;
-    padding: 4px 0;
+    line-height: 16px;
+    padding: 3px 0 5px;
     margin-bottom: 10px;
     > li {
-      padding-left: 96px;
+      // padding-left: 96px;
       font-size: 12px;
       color: #F4A307;
+      padding: 2px 0 2px 96px;
       &.icon {
         position: absolute;
         left: -88px;
-        padding-top: 0px;
+        padding-top: 2px;
         i {
           font-size: 15px;
           margin-right: 4px;

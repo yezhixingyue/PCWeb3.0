@@ -5,7 +5,7 @@
     custom-class="mp-place-order-panel-comp-order-submit-comfirm-dialog-comp-wrap"
     v-dialogDrag
     @open="onOpen"
-    top="9vh"
+    top="4%"
     @closed="onClosed"
   >
     <header slot="title">
@@ -26,6 +26,7 @@
       </div>
     </main>
     <footer>
+      <TipsBox onlyTips />
       <ul v-if="OrderPreData">
         <li>
           <span class="label">在线支付：</span>
@@ -54,6 +55,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
 import ProductInfoComp from './ProductInfoComp/index.vue';
 import OrderInfoComp from './OrderInfoComp.vue';
 import ExpressInfoComp from './ExpressInfoComp';
@@ -81,6 +83,7 @@ export default {
     OrderInfoComp,
     ExpressInfoComp,
     ProductInfoComp,
+    TipsBox,
   },
   computed: {
     ...mapState('common', ['ExpressList']),
@@ -274,6 +277,15 @@ export default {
         text-align: right;
         margin-top: 13px;
         padding-right: 10px;
+        > .mp-quotation-content-tips-box-comp-wrap {
+          width: 702px;
+          margin-left: 8px;
+          max-height: 60px;
+          overflow-y: auto;
+          > .tips {
+            margin: 0;
+          }
+        }
         > ul {
           padding-right: 2px;
           padding-bottom: 12px;

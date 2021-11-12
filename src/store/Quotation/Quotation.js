@@ -89,8 +89,15 @@ export default {
     FileList: [],
     FileTypeList: [],
     isUploading: false,
-    RiskWarningTipsObj: { origin: '', tips: '' },
+    RiskWarningTipsObj: { origin: '', tipsList: '' },
     successNum: 0,
+    /** 报价、预下单、加入购物车时的忽略风险提示类型列表  传值：IgnoreRiskLevel
+    ---------------------------------------- */
+    RiskWarningTipsTypes: {
+      None: 0, // 不忽略提示 服务器默认为0
+      PageTips: 1, // 忽略页面提示（ 加入购物车默认忽略 ）
+      All: 2, // 忽略所有提示
+    },
   },
   getters: {
     /* 全部产品分类结构树，用于报价目录展示
@@ -393,7 +400,7 @@ export default {
       state.curProduct = null;
       state.PropertiesAffectedByInteraction = [];
       state.curEffectiveControlList = [];
-      state.RiskWarningTipsObj = { origin: '', tips: '' };
+      state.RiskWarningTipsObj = { origin: '', tipsList: '' };
       state.FileList = [];
       state.FileTypeList = [];
       state.isUploading = false;
@@ -477,11 +484,11 @@ export default {
       const { propList, EffectiveControlList } = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams, curProductInfo2Quotation: state.curProductInfo2Quotation, getList: true });
       state.PropertiesAffectedByInteraction = propList;
       state.curEffectiveControlList = EffectiveControlList;
-      state.RiskWarningTipsObj = { origin: '', tips: '' };
+      state.RiskWarningTipsObj = { origin: '', tipsList: '' };
       state.FileList = QuotationClassType.setFileListInEffect(state.obj2GetProductPrice.ProductParams, state.curProductInfo2Quotation, state.FileList);
     },
     setPropertiesAffectedByInteraction(state, data) { // 获取受交互影响属性列表
-      state.RiskWarningTipsObj = { origin: '', tips: '' };
+      state.RiskWarningTipsObj = { origin: '', tipsList: '' };
       const { ProductParams } = state.obj2GetProductPrice;
       const target = { ...data, lastEffectiveList: state.curEffectiveControlList };
       const { propList, EffectiveControlList } = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams, curProductInfo2Quotation: state.curProductInfo2Quotation, target, getList: true });
@@ -495,8 +502,8 @@ export default {
     setIsUploading(state, bool) {
       state.isUploading = bool;
     },
-    setRiskWarningTips(state, { origin, tips }) { // origin：price | car | place
-      state.RiskWarningTipsObj = { origin, tips };
+    setRiskWarningTips(state, { origin, tipsList }) { // origin：price | car | place
+      state.RiskWarningTipsObj = { origin, tipsList };
     },
     setItemFlieList(state, [list, id]) {
       const t = state.FileList.find(it => it.ID === id);
@@ -573,11 +580,17 @@ export default {
       let key = true;
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;
-      if (res.data.Status === 6225) return res.data;
+      // if (res.data.Status === 6225) return res.data;
       if (res.data.Status !== 1000) return res.data.Message;
       if (!res.data.Data || !res.data.Data.HavePrice) {
         return '暂无报价，请联系客服获取报价信息!';
       } // 可能为null 当需要客服咨询报价
+      if (res.data.Data && res.data.Data.RiskList && res.data.Data.RiskList.length > 0) {
+        const tipsList = res.data.Data.RiskList.filter(it => it.First === 3).map(it => it.Second);
+        if (tipsList.length > 0) commit('setRiskWarningTips', { origin: 'place', tipsList });
+        const msgArray = res.data.Data.RiskList.filter(it => it.First === 2).map(it => it.Second);
+        if (msgArray.length > 0) massage.warnSingleError({ title: '温馨提示', msg: msgArray });
+      }
       commit('setProductQuotationResult', res.data.Data);
       return true;
     },
@@ -620,6 +633,8 @@ export default {
       const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
+
+      if (state.ProductQuotationResult) _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
 
       // 9. 最终完成提交信息
       _requestObj.List.push(_itemObj);
@@ -679,14 +694,14 @@ export default {
             });
           });
         }
-        commit('setRiskWarningTips', { origin: 'place', tips: res.data.Message });
+        commit('setRiskWarningTips', { origin: 'place', tipsList: res.data.Message });
         return res.data;
       }
     },
     /* 下单 - 保存购物车
     -------------------------------*/
     async getQuotationSave2Car({ state, commit, dispatch }, { FileList, fileContent, callBack }) {
-      const _itemObj = {};
+      const _itemObj = { IgnoreRiskLevel: state.RiskWarningTipsTypes.PageTips };
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
       if (FileList) _itemObj.FileList = FileList;
       _itemObj.FileHaveUpload = true;
@@ -705,6 +720,9 @@ export default {
       const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
+
+      if (state.ProductQuotationResult) _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
+
       const res = await api.getQuotationSave(_itemObj).catch(() => {});
 
       const handleSuccess = async () => { // 处理成功后的函数
@@ -720,7 +738,24 @@ export default {
         // massage.failSingleError({ title: '添加购物车失败!', msg: response && response.data.Message ? response.data.Message : '服务器响应失败' });
       };
       if (res && res.data.Status === 1000) {
-        handleSuccess();
+        if (res.data.Data && res.data.Data.RiskList && res.data.Data.RiskList.length > 0) {
+          const msgArray = res.data.Data.RiskList.filter(it => it.First === 2).map(it => it.Second);
+          if (msgArray.length > 0) {
+            massage.warnCancelBox({
+              title: '存在风险，是否继续加入购物车?',
+              msg: msgArray,
+              confirmButtonText: '继续加入',
+              successFunc: async () => {
+                _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
+                const resp = await api.getQuotationSave(_itemObj).catch(() => {});
+                if (resp && resp.data.Status === 1000) handleSuccess();
+                else handleError(resp);
+              },
+            });
+          }
+        } else {
+          handleSuccess();
+        }
       } else if (res && [9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(res.data.Status)) {
         massage.warnCancelBox({
           title: res.data.Message,
@@ -733,23 +768,6 @@ export default {
             else handleError(resp);
           },
         });
-      } else if (res && res.data.Status === 6225) {
-        if (res.data.DisplayMode !== 3) {
-          massage.warnCancelBox({
-            title: '存在风险，是否继续加入购物车?',
-            msg: res.data.Message.split('#'),
-            confirmButtonText: '继续加入',
-            successFunc: async () => {
-              _itemObj.ProductParams.IsIgnoreRisk = true;
-              const resp = await api.getQuotationSave(_itemObj).catch(() => {});
-              if (resp && resp.data.Status === 1000) handleSuccess();
-              else handleError(resp);
-            },
-          });
-        } else {
-          commit('setRiskWarningTips', { origin: 'car', tips: res.data.Message });
-          return res.data;
-        }
       } else {
         handleError(res);
       }
@@ -761,14 +779,14 @@ export default {
       const res = await api.getPayResult(state.curPayInfo2Code.PayCode);
       if (res.data.Status === 1000) cb(res.data.Data);
     },
-    async placeOrderFromPreCreate({ commit, rootState }, { temp, cb, isFormOrder, PayInFull, submitSuccessFunc }) {
+    async placeOrderFromPreCreate({ state, commit, rootState }, { temp, cb, isFormOrder, PayInFull, submitSuccessFunc }) {
       const _obj = temp ? { ...temp } : { OrderType: 2, PayInFull, List: [] };
       let item;
       if (!isFormOrder) {
         item = [...rootState.shoppingCar.curShoppingCarDataBeforeFirstPlace];
         _obj.List = item;
       }
-      _obj.List = _obj.List.map(it => ({ ...it, IsFileInLan: true }));
+      _obj.List = _obj.List.map(it => ({ ...it, IsFileInLan: true, IgnoreRiskLevel: state.RiskWarningTipsTypes.All }));
       const res = await api.CreateOrderFromPreCreate(_obj).catch(() => {});
       if (!res || res.data.Status !== 1000) {
         throw new Error(res && res.data.Message ? res.data.Message : '服务器未响应');

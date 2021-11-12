@@ -336,21 +336,13 @@ export default {
     async getProductPriceLocal() {
       this.priceGetErrMsg = '';
       this.isGettingPrice = true;
-      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
+      this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
       const msg = await this.getProductPrice();
       this.isGettingPrice = false;
       if (msg === true) {
         // this.$router.push('/offerResult');
       } else if (typeof msg === 'string') {
         this.priceGetErrMsg = msg;
-      } else if (typeof msg === 'object') {
-        // 此时应显示报价信息，执行报价信息显示操作（存放数据）
-        this.$store.commit('Quotation/setProductQuotationResult', msg.Data);
-        if (msg.DisplayMode === 2) {
-          this.messageBox.warnSingleError({ title: '温馨提示', msg: msg.Message.split('#') });
-        } else if (msg.DisplayMode === 3) {
-          this.$store.commit('Quotation/setRiskWarningTips', { origin: 'price', tips: msg.Message });
-        }
       }
     },
     handleChange(list) {
@@ -452,7 +444,7 @@ export default {
       handler() {
         this.$store.commit('Quotation/setProductQuotationResult', null);
         this.priceGetErrMsg = '';
-        this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tips: '' });
+        this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
       },
       deep: true,
     },
