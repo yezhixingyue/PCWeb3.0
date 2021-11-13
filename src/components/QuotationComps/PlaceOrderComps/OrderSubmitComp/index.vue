@@ -406,6 +406,7 @@ export default {
               font-size: 13px;
               line-height: 26px\0;
               width: 100%;
+              padding-right: 65px;
               &::placeholder {
                 font-size: 12px;
                 line-height: 24px;

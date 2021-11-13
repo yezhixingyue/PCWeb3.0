@@ -190,6 +190,7 @@ const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, 
 const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
   if (!Size || !SizeGroup) return null;
   const { ID, List, isCustomize } = Size;
+  if (FixedType === 35) return isCustomize; // 是否自定义
   if (!isCustomize && !ID) return null;
   if (FixedType === 7) { // 常规尺寸
     return isCustomize ? '' : ID; // 如果为自定义则返回空，否则返回ID
@@ -282,6 +283,7 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       temp = targetPartItem.MaterialID;
       break;
     case 6: // 尺寸组
+      if (FixedType === 35) console.log(Property, FixedType);
       temp = getSiztTypeValue(targetPartItem.Size, targetPartData.SizeGroup, Element, FixedType);
       break;
     default:
