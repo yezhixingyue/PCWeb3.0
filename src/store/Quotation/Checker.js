@@ -5,6 +5,11 @@ import { getNumberValueList, getValueIsOrNotNumber } from '@/assets/js/utils/uti
 import { getCombineAffectedPropList, getPropertiesAffectedByInteraction } from '@/store/Quotation/EffectiveControlList';
 import InterAction from '@/store/Quotation/Interaction';
 
+const getMatchedValuesInSection = (ValueList, MinValue, MaxValue) => {
+  const list = ValueList.filter(it => it > MinValue && (it <= MaxValue || MaxValue === -1));
+  return list;
+};
+
 const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit }) => {
   let isInSection = false;
   let msgArr = [];
@@ -77,10 +82,11 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
         const list = IncrementList.map(_it => `${_it}${Unit}`);
         return `${MinValue}${Unit}以上每次增加${list.join('或')}`;
       }
+      const filterValueList = getMatchedValuesInSection(ValueList, MinValue, MaxValue);
       if (MaxValue === -1) {
-        return `${MinValue}${Unit}以上应从${ValueList}中取值`;
+        return `${MinValue}${Unit}以上应从${filterValueList}中取值`;
       }
-      return `[ 大于${MinValue}且小于等于${MaxValue} ]时应从${ValueList}中取值`;
+      return `[ 大于${MinValue}且小于等于${MaxValue} ]时应从${filterValueList}中取值`;
     }
     return it;
   });

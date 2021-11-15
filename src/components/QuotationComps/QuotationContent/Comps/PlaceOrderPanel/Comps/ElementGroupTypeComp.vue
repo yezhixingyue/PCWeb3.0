@@ -209,6 +209,7 @@ export default {
       return this.ChildUseAffectedPropList[index].filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
     },
     onTriggerInteractionClick() { // 触发交互
+      console.log('onTriggerInteractionClick');
       this.$nextTick(() => {
         this.$emit('triggerInteraction');
       });

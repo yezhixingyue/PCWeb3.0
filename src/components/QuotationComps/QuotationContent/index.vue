@@ -7,15 +7,21 @@
             class="content-title"
             v-if="curProductShowNameInfo && curProductShowNameInfo.length === 3"
           >
-            <div>
-              <span class="blue-v-line">{{ curProductShowNameInfo[0] }}</span>
-              <span>{{ curProductShowNameInfo[1] }}</span>
-              <span>-</span>
-              <span>{{ curProductShowNameInfo[2] }}</span>
+            <div class="left">
+              <div>
+                <span class="blue-v-line">{{ curProductShowNameInfo[0] }}</span>
+                <span>{{ curProductShowNameInfo[1] }}</span>
+                <span>-</span>
+                <span>{{ curProductShowNameInfo[2] }}</span>
+              </div>
+              <span @click="onHomeDetailClick" v-if="asideIntroData" class="span-title-blue">产品说明
+                <i class="el-icon-d-arrow-right"></i>
+              </span>
             </div>
-            <span @click="onHomeDetailClick" v-if="asideIntroData" class="span-title-blue">产品说明
-              <i class="el-icon-d-arrow-right"></i>
-            </span>
+            <div class="right is-gray" v-if="placeData.Remark" :title="placeData.Remark">
+              <img src="@/assets/images/m.png" alt="">
+              <span>{{placeData.Remark}}</span>
+            </div>
           </section>
           <SwiperClassifyComp />
           <PlaceOrderPanel ref="oProductPanel" :placeData='placeData' :submitData='obj2GetProductPrice.ProductParams' :PartBaseTips='ProductBaseTips' />
@@ -495,44 +501,80 @@ export default {
     background-color: #fff;
     padding: 30px;
     padding-bottom: 15px;
+    padding-top: 22px;
     box-sizing: border-box;
     padding-bottom:9999px;
     margin-bottom:-9999px;
     > article > .content {
       padding-bottom: 25px;
       > .content-title {
-        > div {
-          color: #333;
-          font-weight: 700;
-          margin-bottom: 30px;
-          display: inline-block;
-          vertical-align: top;
-          max-width: 720px;
+        overflow: hidden;
+        margin-bottom: 28px;
+        height: 30px;
+        line-height: 30px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        // justify-content: space-between;
+        > div.left {
+          float: left;
+          flex: 1;
+          display: flex;
+          height: 100%;
           overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          > .blue-v-line {
-            margin-right: 6px;
+          min-width: 360px;
+          > div {
+            color: #333;
+            font-weight: 700;
+            display: inline-block;
+            vertical-align: top;
+            overflow: hidden;
+            max-width: 600px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            flex: 0 1 auto;
+            > .blue-v-line {
+              margin-right: 6px;
+              &::before {
+                vertical-align: middle;
+              }
+            }
+          }
+          > span {
+            flex: none;
+            display: inline-block;
+            vertical-align: top;
+            // width: 80px;
+            margin-left: 15px;
+            text-align: right;
+            // color: #888;
+            font-size: 13px;
+            transition: color 0.05s ease-in-out;
+            cursor: pointer;
+            user-select: none;
+            padding: 0 6px;
+            // &:hover {
+            //   color:mix(#428dfa, #fff, 80%);
+            // }
+            // &:active {
+            //   color: #428dfa
+            // }
           }
         }
-        > span {
-          display: inline-block;
-          vertical-align: top;
-          // width: 80px;
-          margin-left: 15px;
-          text-align: right;
-          // color: #888;
-          font-size: 13px;
-          transition: color 0.05s ease-in-out;
-          cursor: pointer;
-          user-select: none;
-          padding-top: 2px;
-          // &:hover {
-          //   color:mix(#428dfa, #fff, 80%);
-          // }
-          // &:active {
-          //   color: #428dfa
-          // }
+        > div.right {
+          float: right;
+          flex: none;
+          > img {
+            vertical-align: middle;
+            margin-right: 12px;
+          }
+          > span {
+            display: inline-block;
+            &::before {
+              content: '|  ';
+              margin-right: 6px;
+            }
+          }
         }
       }
       > .count-model-box {

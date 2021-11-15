@@ -143,6 +143,7 @@ export default {
         this.uploadResultList.push({ // 添加对象，包含：文件大小FileSize、文件解析名称FilePath、文件名称FileName
           FileSize: file.size,
           FilePath: name,
+          UniqueName: name,
           FileName: file.name,
           uid: file.uid,
         });

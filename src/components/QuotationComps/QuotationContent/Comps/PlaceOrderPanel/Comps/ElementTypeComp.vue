@@ -111,6 +111,10 @@ export default {
       type: String,
       default: '',
     },
+    isSizeUse: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     NumberTypeItemComp,
@@ -119,7 +123,7 @@ export default {
     HelpTipsComp,
   },
   computed: {
-    ...mapGetters('Quotation', ['affectedElementIDsByInteraction']),
+    ...mapGetters('Quotation', ['affectedElementIDsByInteraction', 'affectedSizeByInteraction']),
     PropValue: {
       get() {
         let _value = this.value;
@@ -233,9 +237,14 @@ export default {
       this.$emit('blur');
       if (this.val === e) return;
       this.val = e;
+      this.handleInteractionEmit();
+    },
+    handleInteractionEmit() {
       this.$nextTick(() => {
-        // this.$emit('interaction');
-        if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
+        // this.$emit('interaction');isSizeUse
+        if (this.affectedSizeByInteraction && this.isSizeUse) {
+          this.$emit('interaction');
+        } else if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
           this.$emit('interaction');
         }
       });
@@ -288,11 +297,7 @@ export default {
           const value = this.getElementSubmitValue(unable ? this.DisabledValue : this.PropValue, unable);
           if (!value) return;
           this.$emit('input', value);
-          this.$nextTick(() => {
-            if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
-              this.$emit('interaction');
-            }
-          });
+          this.handleInteractionEmit();
         });
       },
       immediate: true,

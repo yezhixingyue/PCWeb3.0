@@ -31,24 +31,33 @@ export default class InterAction {
 
   static getDisabledOptionList(AffectedPropList) { // 获取禁用掉的选项列表
     if (AffectedPropList.length > 0) {
-      const t = AffectedPropList.find(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0);
-      if (t && t.Operator === 21) return t.OptionList;
+      const list = AffectedPropList
+        .filter(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0 && it.Operator === 21);
+      if (list.length > 0) {
+        return list.map(it => it.OptionList).reduce((prev, next) => [...prev, ...next], []);
+      }
     }
     return [];
   }
 
   static getHiddenedOptionList(AffectedPropList) { // 获取隐藏掉的选项列表
     if (AffectedPropList.length > 0) {
-      const t = AffectedPropList.find(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0);
-      if (t && t.Operator === 22) return t.OptionList;
+      const list = AffectedPropList
+        .filter(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0 && it.Operator === 22);
+      if (list.length > 0) {
+        return list.map(it => it.OptionList).reduce((prev, next) => [...prev, ...next], []);
+      }
     }
     return [];
   }
 
   static getRequirededOptionList(AffectedPropList) { // 获取必选的选项列表
     if (AffectedPropList.length > 0) {
-      const t = AffectedPropList.find(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0);
-      if (t && t.Operator === 23) return t.OptionList;
+      const list = AffectedPropList
+        .filter(it => it.Property && (it.Property.FixedType || it.Property.FixedType === 0) && it.OptionList.length > 0 && it.Operator === 23);
+      if (list.length > 0) {
+        return list.map(it => it.OptionList).reduce((prev, next) => [...prev, ...next], []);
+      }
     }
     return [];
   }

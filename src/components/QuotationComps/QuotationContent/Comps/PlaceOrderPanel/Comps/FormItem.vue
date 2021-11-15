@@ -397,7 +397,11 @@ export default {
       this.subGroupAffectedPropList = [];
     },
     onTriggerInteractionClick(e) {
-      this.$store.commit('Quotation/setPropertiesAffectedByInteraction', { target: e || this.target, type: this.curTypeName });
+      if (!e && this.curTypeName === '工艺') {
+        this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
+      } else {
+        this.$store.commit('Quotation/setPropertiesAffectedByInteraction', { target: e || this.target, type: this.curTypeName });
+      }
       this.$emit('partInteraction');
       this.getSubGroupAffectedPropList();
     },

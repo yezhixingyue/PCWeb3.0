@@ -132,6 +132,7 @@ export default {
   },
   methods: {
     onTriggerInteractionClick(e) {
+      console.log('onTriggerInteractionClick');
       this.$nextTick(() => {
         this.$emit('triggerInteraction', e);
       });

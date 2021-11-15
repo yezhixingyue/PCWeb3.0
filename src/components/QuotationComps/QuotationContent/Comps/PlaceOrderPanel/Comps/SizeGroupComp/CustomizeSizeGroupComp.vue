@@ -13,7 +13,7 @@
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
       >
       <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled' @interaction="handleInteraction"
-       :PropTipsDataList='PropTipsDataList'
+       :PropTipsDataList='PropTipsDataList' isSizeUse
        @focus="onFocus(i)" @blur="onBlur" :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
       <i v-if="i < ElementList.length - 1">×</i>
     </li>
@@ -104,6 +104,7 @@ export default {
       this.activeIndex = '';
     },
     handleInteraction() {
+      console.log('triggerInteraction');
       this.$emit('triggerInteraction');
     },
     getValue(it) {

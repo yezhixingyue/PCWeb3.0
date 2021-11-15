@@ -283,7 +283,6 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
       temp = targetPartItem.MaterialID;
       break;
     case 6: // 尺寸组
-      if (FixedType === 35) console.log(Property, FixedType);
       temp = getSiztTypeValue(targetPartItem.Size, targetPartData.SizeGroup, Element, FixedType);
       break;
     default:

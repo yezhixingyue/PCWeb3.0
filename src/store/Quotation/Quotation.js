@@ -490,7 +490,7 @@ export default {
     setPropertiesAffectedByInteraction(state, data) { // 获取受交互影响属性列表
       state.RiskWarningTipsObj = { origin: '', tipsList: '' };
       const { ProductParams } = state.obj2GetProductPrice;
-      const target = { ...data, lastEffectiveList: state.curEffectiveControlList };
+      const target = data ? { ...data, lastEffectiveList: state.curEffectiveControlList } : undefined;
       const { propList, EffectiveControlList } = QuotationClassType.getPropertiesAffectedByInteraction({ ProductParams, curProductInfo2Quotation: state.curProductInfo2Quotation, target, getList: true });
       state.PropertiesAffectedByInteraction = propList;
       state.curEffectiveControlList = EffectiveControlList;
@@ -609,7 +609,7 @@ export default {
       const _itemObj = {};
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
       // 2. 编译文件名称 --- 此处需要修改
-      if (compiledName) _itemObj.FilePath = compiledName;
+      if (compiledName) _itemObj.UniqueName = compiledName;
       // 3. 补充平台单号
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
       // 4. 填充收货地址与配送方式
@@ -703,7 +703,10 @@ export default {
     async getQuotationSave2Car({ state, commit, dispatch }, { FileList, fileContent, callBack }) {
       const _itemObj = { IgnoreRiskLevel: state.RiskWarningTipsTypes.PageTips };
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
-      if (FileList) _itemObj.FileList = FileList;
+      if (FileList) {
+        _itemObj.FileList = FileList;
+        _itemObj.Position = 255;
+      }
       _itemObj.FileHaveUpload = true;
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
       _itemObj.Address = {};
@@ -786,7 +789,7 @@ export default {
         item = [...rootState.shoppingCar.curShoppingCarDataBeforeFirstPlace];
         _obj.List = item;
       }
-      _obj.List = _obj.List.map(it => ({ ...it, IsFileInLan: true, IgnoreRiskLevel: state.RiskWarningTipsTypes.All }));
+      _obj.List = _obj.List.map(it => ({ ...it, Position: 255, IgnoreRiskLevel: state.RiskWarningTipsTypes.All }));
       const res = await api.CreateOrderFromPreCreate(_obj).catch(() => {});
       if (!res || res.data.Status !== 1000) {
         throw new Error(res && res.data.Message ? res.data.Message : '服务器未响应');

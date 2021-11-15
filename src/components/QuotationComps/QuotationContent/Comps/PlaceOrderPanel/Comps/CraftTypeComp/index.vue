@@ -99,6 +99,7 @@ export default {
     },
     onCraftItemChange(e, item, needInterAction = true) {
       let temp = this.selectedCraftList.filter((it) => it.CraftID !== item.ID);
+      let bool = true;
       if (e) {
         // 也可能是编辑 也可能是添加 此时需做单选工艺处理 即判断其是否在单选工艺列表中 如果是则在添加的时候清除掉同组其它的工艺
         if (
@@ -108,14 +109,16 @@ export default {
           const t = this.CraftConditionList.find((it) => it.List.includes(e.CraftID));
           if (t) {
             temp = temp.filter((it) => !t.List.includes(it.CraftID));
+            bool = false; // 必选工艺会影响到交互条件
           }
         }
         temp.push(e);
       }
       this.selectedCraftList = temp;
-      if (needInterAction && this.affectedCraftIDsByInteraction.includes(item.ID)) {
+      if (needInterAction && (this.affectedCraftIDsByInteraction.includes(item.ID) || !bool)) {
+        const target = !bool ? undefined : item;
         this.$nextTick(() => {
-          this.$emit('triggerInteraction', item);
+          this.$emit('triggerInteraction', target);
         });
       }
     },

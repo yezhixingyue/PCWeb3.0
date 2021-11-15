@@ -3,7 +3,7 @@
     @focus="onFocus($event, 'inp')"
     @blur="onBlur"
     v-model.trim.lazy="content"
-    v-if="AllowCreate && options.length === 0"
+    v-if="AllowCreate && filterOptions.length === 0"
     size="small"
     class="mp-erp-number-type-element-display-input-comp"
     maxlength="9"
@@ -105,6 +105,9 @@ export default {
     localDisplayWidth() {
       if (this.localWidth && this.localWidth > this.DisplayWidth && this.DisplayWidthIsAuto) return this.localWidth;
       return this.DisplayWidth;
+    },
+    filterOptions() {
+      return this.options.filter(it => it.Name !== '请选择' && it.ID !== null);
     },
   },
   data() {
