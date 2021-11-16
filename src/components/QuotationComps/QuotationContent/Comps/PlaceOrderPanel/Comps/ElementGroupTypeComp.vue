@@ -179,7 +179,6 @@ export default {
       this.$nextTick(() => {
         this.List = this.List.filter((it, i) => i !== index);
         this.$emit('changeValidate');
-        // this.onTriggerInteractionClick();
         if (this.affectedElementGroupIDsByInteraction.includes(this.Property.ID)) {
           this.onTriggerInteractionClick();
         }
@@ -209,7 +208,6 @@ export default {
       return this.ChildUseAffectedPropList[index].filter((_it) => _it.Property && _it.Property.Element.ID === it.ID);
     },
     onTriggerInteractionClick() { // 触发交互
-      console.log('onTriggerInteractionClick');
       this.$nextTick(() => {
         this.$emit('triggerInteraction');
       });

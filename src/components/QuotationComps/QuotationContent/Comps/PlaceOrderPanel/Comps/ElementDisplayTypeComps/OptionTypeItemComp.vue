@@ -23,7 +23,7 @@
   </el-checkbox-group>
   <el-radio-group v-model="checkVal" v-else :disabled="isDisabled" @change="onSelectChange('radio')">
     <el-radio v-for="item in localOptions" :key="item.ID || item.Name" :label="item.ID"
-     @click.native.stop="onRadioItemClick(item)" :disabled='DisabledOptionList.includes(item.ID)'>{{
+     @click.native.stop="onRadioItemClick(item, DisabledOptionList.includes(item.ID))" :disabled='DisabledOptionList.includes(item.ID)'>{{
       item.Name
     }}</el-radio>
   </el-radio-group>
@@ -112,8 +112,6 @@ export default {
       return t && t.Name === '单选按钮' && !this.isMultiple;
     },
     localOptions() {
-      // const _options = this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it)
-      //  || (this.value === it.ID || this.value === it || (Array.isArray(this.value) && this.value.includes(it.ID || it))));
       const _options = this.options.filter(it => !this.HiddenOptionList.includes(it.ID || it));
       if (!this.IsRequired && !this.isMultiple && !this.isRadio) _options.unshift({ ID: null, Name: '请选择' });
       return _options;
@@ -125,8 +123,8 @@ export default {
     };
   },
   methods: {
-    onRadioItemClick(e) {
-      if (!this.value || this.IsRequired || this.value !== e.ID) return;
+    onRadioItemClick(e, disabled) {
+      if (!this.value || this.IsRequired || this.value !== e.ID || disabled) return;
       if (this.timer) clearTimeout(this.timer);
       this.timer = setTimeout(() => {
         this.checkVal = '';
@@ -150,27 +148,17 @@ export default {
       // 应分2种情况： 单选时 | 多选时
       if (!this.isMultiple) { // 单选
         if (list.includes(this.value)) {
-          // const t = this.localOptions.find(it => it.IsChecked); // 找到默认值
-          // let _defaultVal = '';
-          // if (t && !list.includes(t.ID)) _defaultVal = t.ID;
-          // this.$emit('change', _defaultVal);
-          if (!this.isDisabled) this.$emit('change', '');
+          if (!this.isDisabled && this.value !== '') this.$emit('change', '');
         }
       } else if (Array.isArray(this.value) && this.value.length > 0) { // 多选
-        // eslint-disable-next-line prefer-const
-        let _val = this.value.filter(it => !list.includes(it));
-        // if (_val.length === 0) _val = this.localOptions.filter(it => it.IsChecked && !list.includes(it.ID)).map(it => it.ID);
-        if (!this.isDisabled) this.$emit('change', _val);
+        const _val = this.value.filter(it => !list.includes(it));
+        if (!this.isDisabled && JSON.stringify(this.value) !== JSON.stringify(_val)) this.$emit('change', _val);
       }
     },
     handleAllowChange(bool) { // 主要用于在动态切换为不允许自定义时，清除掉原来已设置的自定义的内容，仅为下拉框且为单选的情况下才会出现该情况
       if (!bool && this.value && !this.isMultiple && !this.isRadio) { // 不支持多选且为下拉框时才执行 多选不支持自定义
         const t = this.localOptions.find(it => it.ID === this.value);
         if (!t) {
-          // const t2 = this.localOptions.find(it => it.IsChecked); // 找到默认值
-          // let _defaultVal = '';
-          // if (t2 && !this.DisabledOptionList.includes(t2.ID) && !this.HiddenOptionList.includes(t2.ID)) _defaultVal = t2.ID;
-          // this.$emit('change', _defaultVal);
           this.$emit('change', '');
         }
       }

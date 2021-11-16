@@ -241,7 +241,6 @@ export default {
     },
     handleInteractionEmit() {
       this.$nextTick(() => {
-        // this.$emit('interaction');isSizeUse
         if (this.affectedSizeByInteraction && this.isSizeUse) {
           this.$emit('interaction');
         } else if (this.affectedElementIDsByInteraction.includes(this.Property.ID)) {
