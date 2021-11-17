@@ -20,7 +20,8 @@
             </div>
             <div class="right is-gray" v-if="placeData.Remark" :title="placeData.Remark">
               <img src="@/assets/images/m.png" alt="">
-              <span>{{placeData.Remark}}</span>
+              <!-- <span v-html="placeData.Remark.replaceAll(/\s/g, '&nbsp;')"></span> -->
+              <pre>{{placeData.Remark}}</pre>
             </div>
           </section>
           <SwiperClassifyComp />
@@ -568,7 +569,7 @@ export default {
             vertical-align: middle;
             margin-right: 12px;
           }
-          > span {
+          > pre {
             display: inline-block;
             &::before {
               content: '|  ';
