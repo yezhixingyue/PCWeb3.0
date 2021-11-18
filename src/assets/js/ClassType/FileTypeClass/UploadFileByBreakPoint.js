@@ -88,8 +88,6 @@ async function checkIsTrue(data, uniqueName) {
  * @returns 返回true或false，用于告知该函数上传结果: 成功 还是 失败
  */
 async function breakPointUpload(data, uniqueName, onUploadProgressFunc, finalPercentage = 98) {
-  // console.log(data);
-  // if (true) return false;
   let error;
   const hasUploadedInfo = await api.getUploadedProgress(uniqueName).catch((err) => {
     error = err;

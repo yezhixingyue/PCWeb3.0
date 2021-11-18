@@ -31,7 +31,7 @@
       <div class="common-header-menus-wrap float">
         <ul class="menu-list float">
           <router-link tag="li"
-            to="/placeOrder"
+            :to="{path: '/placeOrder', query: curProductID ? { id: curProductID} : {}}"
             class="placeorder"
             showClassify
             :class="{
@@ -159,6 +159,7 @@ export default {
   },
   computed: {
     ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible']),
+    ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
     },

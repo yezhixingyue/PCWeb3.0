@@ -104,7 +104,6 @@ export default {
       this.activeIndex = '';
     },
     handleInteraction() {
-      console.log('triggerInteraction');
       this.$emit('triggerInteraction');
     },
     getValue(it) {

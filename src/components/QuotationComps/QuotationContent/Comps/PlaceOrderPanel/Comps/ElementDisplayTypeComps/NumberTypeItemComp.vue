@@ -65,7 +65,7 @@ export default {
     },
     DisplayWidth: {
       type: Number,
-      default: 140,
+      default: 60,
     },
     DisplayWidthIsAuto: { // 是否宽度可自定义
       type: Boolean,
@@ -115,6 +115,7 @@ export default {
     input {
       height: 30px;
       line-height: 28px;
+      padding-right: 20px;
     }
   }
 }

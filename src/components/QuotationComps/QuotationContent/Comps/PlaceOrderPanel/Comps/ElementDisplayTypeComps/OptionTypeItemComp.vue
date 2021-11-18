@@ -44,7 +44,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: '请选择',
+      default: '',
     },
     value: {},
     options: {
@@ -84,7 +84,7 @@ export default {
     },
     DisplayWidth: {
       type: Number,
-      default: 140,
+      default: 60,
     },
     DisplayWidthIsAuto: { // 是否宽度可自定义
       type: Boolean,

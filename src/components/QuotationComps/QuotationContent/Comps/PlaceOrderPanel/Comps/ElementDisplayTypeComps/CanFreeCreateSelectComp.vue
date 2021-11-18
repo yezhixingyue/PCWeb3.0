@@ -83,7 +83,7 @@ export default {
     },
     DisplayWidth: {
       type: Number,
-      default: 140,
+      default: 60,
     },
     DisplayWidthIsAuto: {
       type: Boolean,
@@ -208,11 +208,15 @@ export default {
   }
   &.el-select {
     margin-right: 10px;
-    margin-left: 5px;
+    margin-left: 6px;
     .el-input {
       input {
         height: 30px;
         line-height: 28px;
+        // padding-right: 25px;
+      }
+      .el-input__suffix {
+        right: 3px !important;
       }
     }
   }

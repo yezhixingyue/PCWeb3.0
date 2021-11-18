@@ -8,7 +8,7 @@
         <div>
           <img src="@/assets/images/order-success.png" alt="">
         </div>
-        <p class="success-ctrl is-font-13" v-show="$route.query.id || initPageText">
+        <p class="success-ctrl is-font-13" v-show="$route.query.id">
           <span style="margin-right:10px" class="is-gray">{{initPageText}}</span>
           <span class="blue-span" @click="closeSuccessState">  ＜ 返回当前产品</span>
         </p>
