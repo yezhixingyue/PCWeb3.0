@@ -97,7 +97,7 @@ export default {
     },
     SuggesWidth: { // 建议元素宽度
       type: Number,
-      default: 60,
+      default: 100,
     },
     CtrlZIndex: {
       type: Boolean,

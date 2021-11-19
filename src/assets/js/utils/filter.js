@@ -75,7 +75,7 @@ Vue.filter('getPayTime', ProducePeriod => {
 Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
   if (!ProducePeriod) return '';
   const { IncludeDiliveryTime, TotalTime } = ProducePeriod;
-  const str = IncludeDiliveryTime ? '送达' : '出货';
+  const str = IncludeDiliveryTime ? '送达' : '生产完成';
   const fullDay = TotalTime.split('T')[0];
   const m = fullDay.split('-')[1];
   const d = fullDay.split('-')[2];
@@ -99,9 +99,9 @@ Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
   let timeStr = dayTimeStr || `${m}月${d}日`;
   if (showTime && dayTimeStr) timeStr += ` (${m}月${d}日) `;
   // console.log(showTime, 'showTime', ProducePeriod, `${m}月${d}日`, fullDay);
-  // const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
-  const hour = ''; // 不显示具体时间
-  return `预计${timeStr}${hour}${str}`;
+  const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
+  // const hour = ''; // 不显示具体时间
+  return `预计${timeStr} ${hour} ${str}`;
 });
 
 const { AppealList } = store.state.common;

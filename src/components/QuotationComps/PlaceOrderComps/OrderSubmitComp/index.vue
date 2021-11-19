@@ -204,8 +204,8 @@ export default {
         // 2. 判断当前文件是否必须上传 --- 在提交方法中完成：当不必须上传且未传文件时，直接返回true
         this.$store.commit('Quotation/setIsUploading', true);
         this.loadingInstance = Loading.service({
-          lock: true,
-          spinner: '123',
+          lock: false,
+          spinner: '文件上传中',
           background: 'rgba(255, 255, 255, 0.1)',
         });
         const _FileList = await this.$refs.FileForm.submitAll(); // 执行文件上传 ------------- bool处还应返回文件解析名称 --- 然后生成文件上传格式对象，加入到提交对象中 -- 后面完成
@@ -226,7 +226,7 @@ export default {
       return count;
     },
     fillFileContent(name) {
-      this.fileContent = name;
+      if (!this.fileContent) this.fileContent = name;
     },
     async getProductPriceLocal() { // 校验函数  用来判断是否可以进行下单
       const res = await this.OrderPanelChecker();
@@ -336,6 +336,20 @@ export default {
       if (!FileList || FileList.includes(false)) return;
       // 完成后 提交
       // 打开支付弹窗
+      if (FileList.length > 0) {
+        const list = FileList.filter(it => it.List && it.List.length > 1);
+        if (list.length > 0) {
+          for (let i = 0; i < list.length; i += 1) {
+            const _list = list[i].List.map(_it => _it.UniqueName);
+            const len1 = _list.length;
+            const len2 = [...new Set(_list)].length;
+            if (len1 > len2) {
+              this.messageBox.failSingleError({ title: '下单失败', msg: '存在重复文件（名称不同但文件相同），请检查' });
+              return;
+            }
+          }
+        }
+      }
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
       const cb = () => {
         this.$store.dispatch('common/getCustomerFundBalance');
@@ -453,7 +467,7 @@ export default {
         > div {
           padding-top: 33px;
           > p {
-            line-height: 33px;
+            line-height: 29px;
             &.final-price {
               margin-top: 6px;
             }
@@ -512,7 +526,7 @@ export default {
       }
     }
     > .tips-box-wrap {
-      padding-top: 22px;
+      padding-top: 42px;
       padding-bottom: 80px;
     }
   }

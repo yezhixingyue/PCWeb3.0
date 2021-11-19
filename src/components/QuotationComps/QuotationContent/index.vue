@@ -923,5 +923,8 @@ export default {
     background-color: #f8f8f8;
     border-color: #eee;
   }
+  .mp-quotation-content-tips-box-comp-wrap {
+    padding-top: 10px;
+  }
 }
 </style>

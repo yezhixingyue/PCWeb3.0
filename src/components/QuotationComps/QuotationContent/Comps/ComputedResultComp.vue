@@ -18,13 +18,6 @@
         "
         >（含运费：<i>{{ ProductQuotationResult.ExpressCost }}元</i>）</span
       >
-      <template v-if="ProductQuotationResult.ProducePeriod">
-        <span class="is-pink is-font-13" >
-          {{ProductQuotationResult.ProducePeriod | getPayTime}}
-        </span>
-        <span class="is-pink is-bold is-font-13" style="margin-right:5px">
-          {{ProductQuotationResult.ProducePeriod | getDoneTime}}</span>
-      </template>
     </div>
     <div
       class="show-info"
@@ -53,6 +46,14 @@
         重量：<i>{{ ProductQuotationResult.Weight }}kg</i></span
       >
       <span class="mg-left"> )</span>
+    </div>
+    <div v-if="ProductQuotationResult.ProducePeriod">
+      <span class="is-pink is-font-13" > {{ ProductQuotationResult.ProducePeriod | getPayTime }}</span>
+      <span class="is-pink is-font-13 is-bold" style="margin-right:5px"
+        >{{ ProductQuotationResult.ProducePeriod | getDoneTime }}</span>
+      <span class="is-pink is-font-12" style="margin-right:0"
+        v-if="!ProductQuotationResult.ProducePeriod.IncludeDiliveryTime"
+        >( 配送时间视快递物流速度 )</span>
     </div>
   </div>
 </template>
@@ -112,7 +113,7 @@ export default {
 .place-price-result {
   display: inline-block;
   margin-right: 6px;
-  line-height: 33px;
+  line-height: 29px;
   white-space: normal;
   position: absolute;
   left: 160px;
