@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     handleChangeValidate(key) {
-      this.$refs.ruleForm.validateField(key);
+      if (this.$refs.ruleForm) this.$refs.ruleForm.validateField(key);
     },
     getPartAffectedPropList() {
       const SubControlList = this.submitData?.SubControlList || [];

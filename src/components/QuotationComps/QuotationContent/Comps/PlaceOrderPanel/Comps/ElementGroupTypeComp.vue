@@ -229,11 +229,14 @@ export default {
       },
       immediate: true,
     },
-    ChildUseAffectedPropList(newVal, oldVal) {
-      if (!this.isCraftUse
-       || ((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0))
-       || JSON.stringify(newVal) === JSON.stringify(oldVal)) return;
-      this.$emit('changeValidate');
+    ChildUseAffectedPropList: {
+      handler(newVal, oldVal) {
+        if (!this.isCraftUse
+        || ((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0))
+        || JSON.stringify(newVal) === JSON.stringify(oldVal)) return;
+        this.$emit('changeValidate');
+      },
+      immediate: true,
     },
     // watchError: {
     //   handler(val) {

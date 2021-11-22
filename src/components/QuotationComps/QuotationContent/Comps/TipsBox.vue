@@ -123,6 +123,9 @@ export default {
       > span.info {
         margin-right: 25px;
       }
+      span.blue-span {
+        white-space: nowrap;
+      }
     }
   }
 }

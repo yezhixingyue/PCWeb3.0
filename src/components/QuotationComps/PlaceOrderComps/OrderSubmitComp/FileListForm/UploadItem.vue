@@ -18,7 +18,7 @@
     >
       <div class="header">
         <i>+</i>
-        <span class="title">添加{{ FileInfo.Name}}</span>
+        <span class="title">{{operationText}}{{ FileInfo.Name}}</span>
         <span class="tips">
           <i>（</i>
           <template v-if="required"><i class="is-pink">必传，</i></template>
@@ -26,11 +26,16 @@
           <template v-if="multiple">可上传多个，</template>
           <em :title="FileInfo.Remark.length > 40 ? FileInfo.Remark : ''">
             {{ FileInfo.Remark }}
+            <i>）</i>
           </em>
-          <i>）</i>
         </span>
       </div>
     </el-upload>
+    <p class="remark" v-show="fileList.length">
+      <span>当前已选择{{fileList.length}}个文件</span>
+      <span class="clear" v-show="fileList.length > 0" @click.stop="clearFiles">
+        <i class="el-icon-refresh-right"></i>{{multiple ? '清除所有文件' : '清除文件'}}</span>
+    </p>
   </el-form-item>
 </template>
 
@@ -62,6 +67,7 @@ export default {
       // maxSize: 50,
       timer: null, // 上传定时器，获取状态使用
       uploadResultList: [],
+      lastFileList: [],
     };
   },
   computed: {
@@ -83,18 +89,28 @@ export default {
       }
       return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z';
     },
+    operationText() {
+      if (this.fileList.length > 0) return '重新选择';
+      return '选择';
+    },
   },
   methods: {
     handleRemove(file, fileList) {
       this.fileList = fileList;
+      this.lastFileList = fileList;
     },
     onFileChange(file, fileList) {
-      if (!this.multiple) {
-        this.fileList = [fileList[fileList.length - 1]];
-      } else {
-        this.fileList = fileList;
-      }
+      // if (!this.multiple) {
+      //   this.fileList = [fileList[fileList.length - 1]];
+      // } else {
+      //   this.fileList = fileList;
+      // }
+      const lUiDs = this.lastFileList.map(it => it.uid);
+      this.fileList = fileList.filter(it => !lUiDs.includes(it.uid));
       if (this.FileInfo.IsPrintFile && file.status === 'ready') this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
+      this.$nextTick(() => {
+        this.lastFileList = this.fileList;
+      });
     },
     itemValidator(rule, value, callback) { // 校验
       if (this.fileList.length === 0 && this.required) {
@@ -188,6 +204,8 @@ export default {
     },
     clearFiles() {
       this.$refs.upload.clearFiles();
+      this.fileList = [];
+      this.lastFileList = [];
     },
   },
   watch: {
@@ -238,6 +256,7 @@ export default {
           message,
         });
         this.fileList = list;
+        this.lastFileList = list;
       }
     },
   },
@@ -276,6 +295,7 @@ export default {
           text-overflow: ellipsis;
           display: flex;
           align-items: center;
+          width: calc(100% - 100px);
           > i {
             display: inline-block;
             width: 20px;
@@ -305,6 +325,7 @@ export default {
               white-space: nowrap;
               overflow: hidden;
               display: flex;
+              flex: 1;
               > em {
                 white-space: nowrap;
                 overflow: hidden;
@@ -339,6 +360,7 @@ export default {
       line-height: 16px;
       transition: 0.15s ease-in-out;
       transition: 0;
+      transition: none;
       > li {
         margin-top: 0;
         display: inline-block;
@@ -348,7 +370,7 @@ export default {
         padding-left: 10px;
         line-height: 24px;
         transition: 0.15s ease-in-out;
-        transition: 0;
+        transition: none;
         > a.el-upload-list__item-name {
           font-size: 12px;
           color: #aaa;
@@ -364,6 +386,9 @@ export default {
         }
         .el-progress__text {
           color: #428dfa;
+        }
+        .el-icon-close { // 隐藏文件删除功能
+          display: none;
         }
       }
     }
@@ -397,6 +422,30 @@ export default {
             border-color: #428dfa;
           }
         }
+      }
+    }
+  }
+  .remark {
+    font-size: 12px;
+    color: #989898;
+    line-height: 24px;
+    padding-left: 8px;
+    // text-align: right;
+    .clear {
+      color: #ff3769;
+      user-select: none;
+      margin-left: 10px;
+      margin-right: 6px;
+      flex: none;
+      i {
+        // font-size: 13px;
+        font-weight: 700;
+      }
+      &:hover {
+        color: #ff5f87;
+      }
+      &:active {
+        color: #f51f55;
       }
     }
   }

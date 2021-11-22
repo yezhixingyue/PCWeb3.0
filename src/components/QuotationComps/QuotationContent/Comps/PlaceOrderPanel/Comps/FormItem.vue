@@ -412,9 +412,12 @@ export default {
     },
   },
   watch: {
-    localAffectedPropList(newVal, oldVal) {
-      if (((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0)) || JSON.stringify(newVal) === JSON.stringify(oldVal)) return;
-      this.onChangeValidate();
+    localAffectedPropList: {
+      handler(newVal, oldVal) {
+        if (((!newVal || newVal.length === 0) && (!oldVal || oldVal.length === 0)) || JSON.stringify(newVal) === JSON.stringify(oldVal)) return;
+        this.onChangeValidate();
+      },
+      immediate: true,
     },
   },
   mounted() {

@@ -117,6 +117,7 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
         const isSize = false;
         const isGroup = true;
         const _itemVal = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList, isSize, isGroup);
+        console.log(_itemVal);
         return _itemVal;
       }).filter(_it => _it || _it === 0 || _it === false);
       if (ElValues.length === 0) {
@@ -153,6 +154,10 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
             _GroupValue = _val;
           } else { // 多次使用元素组的单选元素
             _GroupValue = [...ElValues];
+            if (_GroupValue.length < target.List.length) {
+              const d = target.List.length - _GroupValue.length;
+              _GroupValue = [..._GroupValue, ...new Array(d)];
+            }
           }
         }
       }

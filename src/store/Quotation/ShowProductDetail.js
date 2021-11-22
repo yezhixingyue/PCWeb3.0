@@ -96,8 +96,10 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList) => 
       if (InterAction.getDisabledOrNot(list) || InterAction.getIsHiddenOrNot(list)) return '';
     }
   }
-  const { IsNameHidden } = Element;
-  const EleName = IsNameHidden ? '' : Element.Name;
+  // const { IsNameHidden } = Element;
+  // const EleName = IsNameHidden ? '' : Element.Name;
+  const list = ['长', '宽', '高'];
+  const EleName = list.includes(Element.Name) ? Element.Name : ''; // 移除名称 不再显示
   if (!CustomerInputValues || CustomerInputValues.length === 0 || !Element) return '';
   if (CustomerInputValues.length === 1) {
     // eslint-disable-next-line object-curly-newline
@@ -108,7 +110,7 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList) => 
     }
     if (Element.Type === 1 && Value) {
       // 数值
-      return `${EleName}${EleName ? '：' : ''}${Value}${Element.Unit}`;
+      return `${EleName}${EleName ? '：' : ''}${Value}${EleName ? ' ' : ''}${Element.Unit}`;
     }
     if (
       Element.Type === 2
@@ -143,6 +145,22 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList) => 
   return '';
 };
 
+const handleCraftContentCombine = list => {
+  const list1 = list.filter(it => it.includes('：')).map(it => it.split('：')[1]);
+  if (list1.length <= 1) return list;
+  let combineContent = list1.join(' x ');
+  const units = list1.map(it => it.split(' ')[1]).filter(it => it);
+  const values = list1.map(it => it.split(' ')[0]).filter(it => it);
+  const list2 = list.filter(it => !it.includes('：'));
+  if (units.length === list1.length) {
+    const len = [...new Set(units)].length;
+    if (len === 1) {
+      combineContent = `${values.join(' x ')}${units[0]}`;
+    }
+  }
+  return [combineContent, ...list2].filter(it => it);
+};
+
 const getGroupValueText = (List, Group, AffectedPropList) => {
   if (AffectedPropList.length > 0) {
     const t = AffectedPropList.find(it => !it.Property.Element && it.Property.Group && it.Property.Group.ID === Group.ID && [21, 22].includes(it.Operator));
@@ -160,11 +178,16 @@ const getGroupValueText = (List, Group, AffectedPropList) => {
         const _SingleAffectedPropList = AffectedPropList.filter(_it => _it.Property
          && _it.Property.Group && _it.Property.Group.ID === Group.ID && _it.Property.Element);
         const text = getElementValueText(CustomerInputValues, t, _SingleAffectedPropList);
-        if (text) arr.push(text);
+        if (text) {
+          arr.push(text);
+        }
       }
     });
     if (arr.length > 0) {
-      return `${Group.IsNameHidden ? '' : Group.Name} [ ${arr.join(
+      // const GroupName = Group.IsNameHidden ? '' : Group.Name;
+      const _list = handleCraftContentCombine(arr);
+      const GroupName = ''; // 移除名称 不再显示
+      return `${GroupName} [ ${_list.join(
         '；',
       )} ]`;
     }
@@ -336,6 +359,7 @@ export default class ProductDetailTypeShowClass {
         }
       });
       ElContent = ElContent.filter(it => it);
+      ElContent = handleCraftContentCombine(ElContent);
     }
     if (hasGroupList) {
       GroupList.forEach((it) => {

@@ -211,32 +211,35 @@ export default {
     },
   },
   watch: {
-    OwnUseAffectedPropList(newVal) {
-      if (newVal.length === 1) {
+    OwnUseAffectedPropList: {
+      handler(newVal) {
+        if (newVal.length === 1) {
         // 目前只考虑长度为1的情况，因为目前对一个工艺只允许设置一条交互，必选或者禁用
-        const { Operator } = newVal[0]; // Operator 21 禁用    22 隐藏    23 必选
-        if (Operator === 21) {
-          this.disabled = true;
-          this.required = false;
-          if (this.value && !(this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
+          const { Operator } = newVal[0]; // Operator 21 禁用    22 隐藏    23 必选
+          if (Operator === 21) {
+            this.disabled = true;
+            this.required = false;
+            if (this.value && !(this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
             // this.$emit('change', { ...this.value, disabledByInteraction: true, requiredByInteraction: false });
-            this.$emit('change', null);
+              this.$emit('change', null);
+            }
           }
-        }
-        if (Operator === 23) {
+          if (Operator === 23) {
+            this.disabled = false;
+            this.required = true;
+            if (this.value && !(!this.value.disabledByInteraction && this.value.requiredByInteraction)) {
+              this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: true }, false);
+            }
+          }
+        } else {
           this.disabled = false;
-          this.required = true;
-          if (this.value && !(!this.value.disabledByInteraction && this.value.requiredByInteraction)) {
-            this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: true }, false);
+          this.required = false;
+          if (this.value && !(!this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
+            this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: false }, false);
           }
         }
-      } else {
-        this.disabled = false;
-        this.required = false;
-        if (this.value && !(!this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
-          this.$emit('change', { ...this.value, disabledByInteraction: false, requiredByInteraction: false }, false);
-        }
-      }
+      },
+      immediate: true,
     },
     required(newVal, oldVal) {
       if (newVal && !!this.value) return;
@@ -246,16 +249,19 @@ export default {
         // 从必选变为非必选， 触发提示
       }
     },
-    ChildUseAffectedPropList(val) { // 监听子元素或子元素组上交互属性列表 当其发生变化时：
-      if (JSON.stringify(this.recordInfo) === JSON.stringify(val)) return;
-      this.recordInfo = val;
-      //  1. 查看当前是否已选，如果已选则检查取值是否符合交互，不符合则提示报错；2.当原来有提示，现在交互为空则重新触发提示进行取消 -- 可用一个状态来记录是否已触发错误提示
-      if (!val || !this.value) return;
-      const ElementAffectedList = val.filter(it => it.Property && !it.Property.Group);
-      const GroupAffectedList = val.filter(it => it.Property && it.Property.Group);
-      const ElementList = this.handleElementAffectedListChange(ElementAffectedList, this.value.ElementList, this.Craft.ElementList);
-      const GroupList = this.handleGroupAffectedListChange(GroupAffectedList);
-      this.$emit('change', { ...this.value, ElementList, GroupList });
+    ChildUseAffectedPropList: {
+      handler(val) { // 监听子元素或子元素组上交互属性列表 当其发生变化时：
+        if (JSON.stringify(this.recordInfo) === JSON.stringify(val)) return;
+        this.recordInfo = val;
+        //  1. 查看当前是否已选，如果已选则检查取值是否符合交互，不符合则提示报错；2.当原来有提示，现在交互为空则重新触发提示进行取消 -- 可用一个状态来记录是否已触发错误提示
+        if (!val || !this.value) return;
+        const ElementAffectedList = val.filter(it => it.Property && !it.Property.Group);
+        const GroupAffectedList = val.filter(it => it.Property && it.Property.Group);
+        const ElementList = this.handleElementAffectedListChange(ElementAffectedList, this.value.ElementList, this.Craft.ElementList);
+        const GroupList = this.handleGroupAffectedListChange(GroupAffectedList);
+        this.$emit('change', { ...this.value, ElementList, GroupList });
+      },
+      immediate: true,
     },
   },
 };

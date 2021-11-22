@@ -3,19 +3,19 @@
     <li
       v-for="(it, i) in ElementList"
       :key="it.ID"
-      :class="{ active: i === activeIndex || ElementValueActiveList[i] }"
+      :class="{ active: i === activeIndex || ElementValueActiveList[i], item: 1 }"
       ref="oLis"
     >
-      <span
+      <!-- <span
         @click="onLabelClick(i)"
         class="label"
         :class="{ fixed: it.Type === 1, n: it.Type === 2 && i > 0 }"
         >{{ it.Name }}<i v-if="it.Type === 2">：</i></span
-      >
+      > -->
       <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled' @interaction="handleInteraction"
        :PropTipsDataList='PropTipsDataList' isSizeUse
-       @focus="onFocus(i)" @blur="onBlur" :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" hiddenLabel />
-      <i v-if="i < ElementList.length - 1">×</i>
+       @focus="onFocus(i)" @blur="onBlur" :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" />
+      <!-- <i v-if="i < ElementList.length - 1">×</i> -->
     </li>
     <li style="margin-left:20px">
       <el-checkbox
@@ -144,63 +144,75 @@ export default {
   display: inline-block;
   margin-right: 20px;
   min-height: 30px;
-  margin-top: -11px;
+  // margin-top: -12px;
   > li {
     display: inline-block;
     position: relative;
-    margin-top: 11px;
-    .mp-erp-number-type-element-option-display-input-comp,
-    .mp-erp-number-type-element-display-input-comp {
-      input {
-        // width: 80px !important;
-        border: none;
-        border-bottom: 1px solid rgb(229, 229, 229);
-        border-radius: 0;
-        padding-right: 20px !important;
-        padding-left: 10px !important;
-        &:focus {
-          border-color: #428dfa;
-        }
+    // margin-top: 11px;
+    > .mp-place-order-content-element-type-show-item-comp-wrap {
+      margin-right: 13px;
+      > label.el-title {
+        font-size: 13px !important;
       }
     }
-    .mp-erp-number-type-element-display-input-comp input {
-      padding-right: 4px !important;
-    }
-    .mp-erp-number-type-element-option-display-input-comp .el-input__icon::before {
-      right: -8px;
-    }
-    > .label {
-      font-size: 14px;
-      color: #888;
-      &.fixed {
-        height: 14px;
-        line-height: 14px;
-        top: 8px;
-        transition: 0.25s;
-        position: absolute;
-        left: 12px;
-        z-index: 9;
-      }
-      &.n {
-        margin-left: 5px;
+    &.item:last-of-type {
+      margin-right: 0 !important;
+      > .mp-place-order-content-element-type-show-item-comp-wrap {
+        margin-right: 0 !important;
       }
     }
+    // .mp-erp-number-type-element-option-display-input-comp,
+    // .mp-erp-number-type-element-display-input-comp {
+    //   input {
+    //     // width: 80px !important;
+    //     border: none;
+    //     border-bottom: 1px solid rgb(229, 229, 229);
+    //     border-radius: 0;
+    //     padding-right: 20px !important;
+    //     padding-left: 10px !important;
+    //     &:focus {
+    //       border-color: #428dfa;
+    //     }
+    //   }
+    // }
+    // .mp-erp-number-type-element-display-input-comp input {
+    //   padding-right: 10px !important;
+    // }
+    // .mp-erp-number-type-element-option-display-input-comp .el-input__icon::before {
+    //   right: -8px;
+    // }
+    // > .label {
+    //   font-size: 14px;
+    //   color: #888;
+    //   &.fixed {
+    //     height: 14px;
+    //     line-height: 14px;
+    //     top: 8px;
+    //     transition: 0.25s;
+    //     position: absolute;
+    //     left: 12px;
+    //     z-index: 9;
+    //   }
+    //   &.n {
+    //     margin-left: 5px;
+    //   }
+    // }
     > .unit {
       color: #888;
-      margin-right: 6px;
+      margin-right: 18px;
       font-size: 12px;
     }
-    > i {
-      margin: 0 12px;
-      color: #585858;
-    }
-    &.active {
-      > .fixed {
-        left: -3px;
-        top: -6px;
-        font-size: 12px;
-      }
-    }
+    // > i {
+    //   margin: 0 12px;
+    //   color: #585858;
+    // }
+    // &.active {
+    //   > .fixed {
+    //     left: -3px;
+    //     top: -6px;
+    //     font-size: 12px;
+    //   }
+    // }
   }
 }
 </style>

@@ -71,7 +71,7 @@ export default {
       },
     },
     DisplayWidth() {
-      return 140;
+      return 100;
     },
   },
   methods: {
