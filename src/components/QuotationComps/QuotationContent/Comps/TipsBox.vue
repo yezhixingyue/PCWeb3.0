@@ -15,7 +15,9 @@
           trigger="manual"
           v-model="visible">
           <span>{{copySuccess ? '复制成功' : '复制失败，请手动复制'}}</span>
-          <span class="blue-span" slot="reference" @click="handleCopyClick">复制订单信息</span>
+          <span class="blue-span" slot="reference" @click="handleCopyClick">
+            <img src="@/assets/images/copy.png" alt="">
+            复制订单信息</span>
         </el-popover>
       </li>
     </ul>
@@ -125,6 +127,10 @@ export default {
       }
       span.blue-span {
         white-space: nowrap;
+        img {
+          vertical-align: -3px;
+          margin-right: 2px;
+        }
       }
     }
   }

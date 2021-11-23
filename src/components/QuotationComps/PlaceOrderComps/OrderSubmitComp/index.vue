@@ -226,7 +226,8 @@ export default {
       return count;
     },
     fillFileContent(name) {
-      if (!this.fileContent) this.fileContent = name;
+      // if (!this.fileContent) this.fileContent = name;
+      this.fileContent = name;
     },
     async getProductPriceLocal() { // 校验函数  用来判断是否可以进行下单
       const res = await this.OrderPanelChecker();

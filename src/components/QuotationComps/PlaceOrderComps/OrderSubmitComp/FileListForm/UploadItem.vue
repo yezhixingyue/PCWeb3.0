@@ -2,7 +2,7 @@
   <el-form-item v-if="FileInfo" :rules="[{ validator: itemValidator, trigger: 'change' }]" :prop="`${FileInfo.ID}`"
       class="mp-pc-order-submit-upload-item-comp-wrap" :class="{disabled: disabled}">
     <el-upload
-      :class="{ em: fileList.length === 0, single: fileList.length === 1, 'mp-upload': 1 }"
+      :class="{ em: fileList.length === 0, single: fileList.length === 1, 'mp-upload': 1, 'isMouseEnter': isMouseEnter }"
       drag
       :on-remove="handleRemove"
       :auto-upload='false'
@@ -17,25 +17,31 @@
       ref="upload"
     >
       <div class="header">
-        <i>+</i>
+        <!-- <i>+</i> -->
+        <img v-if="fileList.length === 0" src="@/assets/images/select.png" alt="">
+        <img v-else src="@/assets/images/re-select.png" alt="">
         <span class="title">{{operationText}}{{ FileInfo.Name}}</span>
         <span class="tips">
           <i>（</i>
           <template v-if="required"><i class="is-pink">必传，</i></template>
           <template v-else>非必传，</template>
           <template v-if="multiple">可上传多个，</template>
+          <template v-else>单文件，</template>
           <em :title="FileInfo.Remark.length > 40 ? FileInfo.Remark : ''">
             {{ FileInfo.Remark }}
             <i>）</i>
           </em>
+          <!-- <span class="remark" v-show="fileList.length"> -->
+            <!-- <span>当前已选择{{fileList.length}}个文件</span> -->
+        <!-- </span> -->
         </span>
       </div>
-    </el-upload>
-    <p class="remark" v-show="fileList.length">
-      <span>当前已选择{{fileList.length}}个文件</span>
       <span class="clear" v-show="fileList.length > 0" @click.stop="clearFiles">
-        <i class="el-icon-refresh-right"></i>{{multiple ? '清除所有文件' : '清除文件'}}</span>
-    </p>
+        <img src="@/assets/images/clear.png" alt="" class="n">
+        <img src="@/assets/images/EmptyHover.png" class="h" alt="">
+        {{multiple ? '清空文件' : '清空文件'}}
+      </span>
+    </el-upload>
   </el-form-item>
 </template>
 
@@ -68,6 +74,7 @@ export default {
       timer: null, // 上传定时器，获取状态使用
       uploadResultList: [],
       lastFileList: [],
+      isMouseEnter: false,
     };
   },
   computed: {
@@ -105,9 +112,13 @@ export default {
       // } else {
       //   this.fileList = fileList;
       // }
+      if (file.status !== 'ready') {
+        this.fileList = fileList;
+        return;
+      }
       const lUiDs = this.lastFileList.map(it => it.uid);
       this.fileList = fileList.filter(it => !lUiDs.includes(it.uid));
-      if (this.FileInfo.IsPrintFile && file.status === 'ready') this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
+      if (this.FileInfo.IsPrintFile) this.$emit('fillFileContent', file.name.substring(0, file.name.lastIndexOf('.')));
       this.$nextTick(() => {
         this.lastFileList = this.fileList;
       });
@@ -207,6 +218,12 @@ export default {
       this.fileList = [];
       this.lastFileList = [];
     },
+    handleMouseEnter() {
+      this.isMouseEnter = true;
+    },
+    handleMouseLeave() {
+      this.isMouseEnter = false;
+    },
   },
   watch: {
     fileList(newVal, oldVal) { // 去重及筛选格式不符合的文件
@@ -263,6 +280,18 @@ export default {
   beforeDestroy() {
     clearInterval(this.timer);
     this.timer = null;
+    if (this.oDom) {
+      this.oDom.removeEventListener('mouseenter', this.handleMouseEnter);
+      this.oDom.removeEventListener('mouseleave', this.handleMouseLeave);
+    }
+  },
+  mounted() {
+    if (!this.$refs.upload) return;
+    const oDom = this.$refs.upload.$el.getElementsByClassName('el-upload')[0];
+    if (!oDom) return;
+    this.oDom = oDom;
+    this.oDom.addEventListener('mouseenter', this.handleMouseEnter);
+    this.oDom.addEventListener('mouseleave', this.handleMouseLeave);
   },
 };
 </script>
@@ -271,7 +300,7 @@ export default {
   margin-bottom: 30px;
   .mp-upload {
     width: 850px;
-    border: 1px dashed #eee;
+    border: 1px dashed #d7e5fa;
     border-radius: 5px;
     overflow: hidden;
     display: flex;
@@ -286,6 +315,10 @@ export default {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         transition: border-color 0.08s;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        background-color: #f5f8fa;
         .header {
           text-align: left;
           height: 55px;
@@ -293,10 +326,11 @@ export default {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          display: inline-block;
           display: flex;
           align-items: center;
           width: calc(100% - 100px);
-          > i {
+          > img {
             display: inline-block;
             width: 20px;
             height: 20px;
@@ -314,6 +348,7 @@ export default {
             top: -1px;
           }
           > span {
+            display: inline;
             &.title {
               color: #428dfa;
               margin-right: 4px;
@@ -344,6 +379,32 @@ export default {
             }
           }
         }
+        .clear {
+          display: inline-block;
+          height: 55px;
+          vertical-align: top;
+          padding-top: 6px;
+          box-sizing: border-box;
+          color: #aaa;
+          padding-left: 12px;
+          font-size: 12px;
+          img {
+            vertical-align: -2px;
+            margin-right: 3px;
+          }
+          img.h {
+            display: none;
+          }
+          &:hover {
+            img.n {
+              display: none;
+            }
+            img.h {
+              display: inline-block;
+            }
+            color: #ff3769;
+          }
+        }
         &:hover {
           background-color: rgba(32, 159, 255, 0.06);
           border-color: #428dfa;
@@ -354,7 +415,7 @@ export default {
       }
     }
     > ul.el-upload-list {
-      background-color: #fbfbfb;
+      background-color: #fff;
       padding: 9px 10px;
       overflow: hidden;
       line-height: 16px;
@@ -392,6 +453,10 @@ export default {
         }
       }
     }
+    &.isMouseEnter {
+      border-color: #eff4fc;
+      // border-bottom-color: #d7e5fa;
+    }
     &.em {
       border-color: rgba($color: #000000, $alpha: 0);
       > ul.el-upload-list {
@@ -401,7 +466,7 @@ export default {
         .el-upload-dragger {
           border-bottom-left-radius: 6px;
           border-bottom-right-radius: 6px;
-          border-color: #eee;
+          border-color: #d7e5fa;
         }
       }
     }
@@ -425,30 +490,6 @@ export default {
       }
     }
   }
-  .remark {
-    font-size: 12px;
-    color: #989898;
-    line-height: 24px;
-    padding-left: 8px;
-    // text-align: right;
-    .clear {
-      color: #ff3769;
-      user-select: none;
-      margin-left: 10px;
-      margin-right: 6px;
-      flex: none;
-      i {
-        // font-size: 13px;
-        font-weight: 700;
-      }
-      &:hover {
-        color: #ff5f87;
-      }
-      &:active {
-        color: #f51f55;
-      }
-    }
-  }
   .el-form-item__error {
     padding-left: 6px;
   }
@@ -461,7 +502,7 @@ export default {
     }
     &.em {
       > .el-upload .el-upload-dragger {
-        border-color: #eee !important;
+        border-color: #d7e5fa !important;
       }
     }
   }
