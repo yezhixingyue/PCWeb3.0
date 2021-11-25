@@ -5,7 +5,7 @@
       <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}</div>
     </li>
     <li v-for="(item) in localContentList" :key="item.Label + item.Content">
-      <span class="label">{{item.Label}}：</span>
+      <span class="label">{{item.Label}}{{item.Label ? '：' : ''}}</span>
       <div class="text">
         <span v-if="typeof item.Content === 'string'">{{item.Content}}</span>
         <ul v-else>

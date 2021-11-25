@@ -8,7 +8,7 @@
     class="mp-erp-number-type-element-display-input-comp"
     maxlength="9"
     :style="`width:${DisplayWidth}px`"
-    :disabled='isDisabled'
+    :disabled='isDisabled || !Allow'
   ></el-input>
   <CanFreeCreateSelectComp
     v-else

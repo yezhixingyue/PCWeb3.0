@@ -76,8 +76,9 @@ export const getNumberValueList = (valueList) => {
  */
 export const getValueIsOrNotNumber = (val, isInteger) => {
   const pointStartNumberReg = /^\.\d+$/;
+  const pointEndReg = /\w+\.$/;
   if (!val && val !== 0) return false;
-  if (pointStartNumberReg.test(val)) return false;
+  if (pointStartNumberReg.test(val) || pointEndReg.test(val)) return false;
   const _val = typeof val === 'number' ? val : +val;
   let _bool = !Number.isNaN(_val);
   if (_bool && isInteger) _bool = Number.isInteger(_val);

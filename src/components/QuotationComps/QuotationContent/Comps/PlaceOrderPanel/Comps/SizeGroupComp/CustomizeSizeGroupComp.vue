@@ -14,7 +14,7 @@
       > -->
       <ElementTypeComp :class="{canError: errorElementID === it.ID}" :isDisabled='isDisabled' @interaction="handleInteraction"
        :PropTipsDataList='PropTipsDataList' isSizeUse
-       @focus="onFocus(i)" @blur="onBlur" :SuggesWidth='80' :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" />
+       @focus="onFocus(i)" @blur="onBlur" :Property='it'  :value="ElementValues[i]" @input="onInput($event, it)" />
       <!-- <i v-if="i < ElementList.length - 1">×</i> -->
     </li>
     <li style="margin-left:20px">

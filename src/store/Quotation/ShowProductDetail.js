@@ -223,7 +223,7 @@ const getElementValueContentFromDetail = (target, giveUpUnit) => {
       if (target.Attributes.Unit && !giveUpUnit) Content += target.Attributes.Unit;
     }
   }
-  const Label = target.Attributes.Name;
+  const Label = target.Attributes.IsNameHidden ? '' : target.Attributes.Name;
   return { Label, Content };
 };
 
@@ -232,7 +232,7 @@ const getDisplayContentByElementFromDetailData = (ElementList, item, giveUpUnit)
     const target = ElementList.find(it => it.ElementID === item.Property.ID);
     if (target) {
       const { Label, Content } = getElementValueContentFromDetail(target, giveUpUnit);
-      if (Label && Content) {
+      if (Content) {
         return { Label, Content };
       }
     }
@@ -251,13 +251,14 @@ const getDisplayContentByGroupFromDetailData = (GroupList, item) => {
             const t = getDisplayContentByElementFromDetailData(valList.List, { Property: { ID: _it.ElementID } });
             return t;
           })
-          .filter(_it => _it && _it.Label && _it.Content)
-          .map(({ Label, Content }) => `${Label}：${Content}`);
+          .filter(_it => _it && _it.Content)
+          .map(({ Label, Content }) => `${Label}${Label ? '：' : ''}${Content}`);
         if (groupItemContent) _list.push(groupItemContent);
       });
       if (_list.length > 0) {
         _list = _list.map((Content, i) => {
-          const Label = _list.length > 1 ? `${target.Attributes.Name}-${i + 1}` : target.Attributes.Name;
+          let Label = _list.length > 1 ? `${target.Attributes.Name}-${i + 1}` : target.Attributes.Name;
+          if (target.Attributes.IsNameHidden) Label = '';
           return { Label, Content };
         });
         return _list;
@@ -284,7 +285,7 @@ const getCraftItemContentNameFromDetailData = (Craft) => {
       const _data = getElementValueContentFromDetail(it);
       if (_data) {
         const { Label, Content } = _data;
-        if (Label && Content) ElContent.push(`${Label}：${Content}`);
+        if (Content) ElContent.push(`${Label}${Label ? '：' : ''}${Content}`);
       }
     });
   }
@@ -298,8 +299,8 @@ const getCraftItemContentNameFromDetailData = (Craft) => {
       const _data = getDisplayContentByGroupFromDetailData(GroupList, { Property: { ID: it.GroupID } });
       if (_data.length > 0) {
         const [{ Label, Content }] = _data;
-        if (Label && Content) {
-          if (hiddenGroupName) GroupContent.push(`${Content.join('，')}`);
+        if (Content) {
+          if (hiddenGroupName || !Label) GroupContent.push(`${Content.join('，')}`);
           else GroupContent.push(`${Label}：[ ${Content.join('，')} ]`);
         }
       }
@@ -308,21 +309,24 @@ const getCraftItemContentNameFromDetailData = (Craft) => {
   if (ElContent.length > 0 || GroupContent.length > 0) {
     const temp = {
       Name: Craft.Attributes.DisplayName,
-      Content: `${ElContent.join('，')}${ElContent.length > 0 ? '；' : ''}${GroupContent.join('，')}`,
+      Content: `${ElContent.join('，')}${ElContent.length > 0 && GroupContent.length > 0 ? '；' : ''}${GroupContent.join('，')}`,
     };
     return temp;
   }
   return { Name: Craft.Attributes.DisplayName };
 };
 
-const getDisplayContentByCraftFromDetailData = (CraftList, item) => {
-  if (item && Array.isArray(CraftList) && item.Property && item.Property.ID) {
-    const list = CraftList.filter(it => it.Attributes?.DisplayGroup?.ID === item.Property.ID);
-    if (list.length > 0) {
-      const CraftGroupLabel = list[0].Attributes.DisplayGroup.Name || '工艺';
-      const temp = { Label: CraftGroupLabel, Content: [] };
-      temp.Content = list.map(it => getCraftItemContentNameFromDetailData(it)).filter(it => it);
-      return temp;
+const getDisplayContentByCraftFromDetailData = ({ CraftList, CraftGroupList }, item) => {
+  if (item && Array.isArray(CraftList) && Array.isArray(CraftGroupList) && item.Property && item.Property.ID) {
+    const t = CraftGroupList.find(it => it.ID === item.Property.ID);
+    if (t) {
+      const list = CraftList.filter(it => t.List.includes(it.CraftID));
+      if (list.length > 0) {
+        const CraftGroupLabel = t.Name || '工艺';
+        const temp = { Label: CraftGroupLabel, Content: [] };
+        temp.Content = list.map(it => getCraftItemContentNameFromDetailData(it)).filter(it => it);
+        return temp;
+      }
     }
   }
   return null;
@@ -515,7 +519,7 @@ export default class ProductDetailTypeShowClass {
         switch (t.Name) {
           case '元素':
             target = getDisplayContentByElementFromDetailData(ProductParams.ElementList, itemData);
-            if (target && target.Label && target.Content) {
+            if (target && target.Content) {
               arr.push({ type: 'ElementList', Label: target.Label, Content: target.Content });
             }
             break;
@@ -537,7 +541,7 @@ export default class ProductDetailTypeShowClass {
             }
             break;
           case '工艺':
-            target = getDisplayContentByCraftFromDetailData(ProductParams.CraftList, itemData);
+            target = getDisplayContentByCraftFromDetailData(ProductParams, itemData);
             if (target) {
               arr.push({ type: 'CraftList', Label: target.Label, Content: target.Content });
             }
