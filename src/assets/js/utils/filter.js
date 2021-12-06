@@ -136,3 +136,44 @@ Vue.filter('getCouponList', ({ CouponList }) => {
   }
   return '';
 });
+
+export const formarProductAmountFunc = data => { // 根据数据返回产品数量与款数展示内容
+  if (data) {
+    const {
+      ProductAmount, Unit, KindCount, HaveKind, HaveNumber,
+    } = data;
+    let amount = '';
+    let kindCount = '';
+    if (HaveNumber !== false && ProductAmount) {
+      amount = `${ProductAmount}${Unit || '个'}`;
+    }
+    if (HaveKind !== false && KindCount) {
+      kindCount = `${KindCount}款`;
+    }
+    return `${amount}${kindCount}`;
+  }
+  return '';
+};
+/**
+ * 根据数据返回产品数量与款数展示内容
+ */
+Vue.filter('formarProductAmount', formarProductAmountFunc);
+
+/**
+ * 根据列表数据获取需要展示的产品分类+产品名称
+ */
+export const getFullName = data => {
+  if (!data) return '';
+  const { DisplayName, ProductName, ClassList } = data;
+  const Name = DisplayName || ProductName;
+  if (!Name) return '';
+  if (!ClassList || ClassList.length === 0) return Name;
+  const t = ClassList.find(it => it.Type === 2);
+  return t && t.FirstLevel && t.FirstLevel.Name ? `${t.FirstLevel.Name} - ${Name}` : Name;
+};
+Vue.filter('getFullName', getFullName);
+
+export default {
+  formarProductAmountFunc,
+  getFullName,
+};

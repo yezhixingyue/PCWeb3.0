@@ -5,7 +5,7 @@
       <span class="left is-bold">印刷内容</span>
     </div>
     <div class="content">
-      <ul >
+      <ul v-if="FileList && FileList.length > 0">
         <li class="file-content-box" v-show="!isSpotGoods">
            <el-form :model="{ fileContent: fileContent }" ref="contentValidateForm" label-width="86px"
             size="mini" hide-required-asterisk :disabled='isUploading'>
@@ -146,6 +146,7 @@ export default {
                 title: '存在风险，是否继续下单?',
                 msg: msgArray,
                 confirmButtonText: '继续下单',
+                closeOnClickModal: false,
                 successFunc: async () => {
                   this.visible = true;
                 },
@@ -182,7 +183,7 @@ export default {
       // 下面执行加购提交操作
       const callBack = () => {
         this.fileContent = '';
-        this.$refs.contentValidateForm.resetFields();
+        if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
         this.scrollToTop();
       };
       await this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
@@ -245,6 +246,7 @@ export default {
       return true;
     },
     async FileChecker() { // 获取文件校验结果信息
+      if (!this.$refs.FileForm) return '';
       const [bool, obj] = await this.$refs.FileForm.validate();
       return bool ? '' : Object.values(obj).map(it => it[0].message).reverse();
     },
@@ -277,6 +279,7 @@ export default {
       return true;
     },
     async FileContentChecker() {
+      if (!this.$refs.contentValidateForm) return '';
       const res = await this.$refs.contentValidateForm.validate().catch(() => {});
       if (!res && !this.isSpotGoods) {
         if (!this.fileContent) return '[ 文件内容 ] 中，请输入文件内容';
@@ -355,8 +358,8 @@ export default {
       const cb = () => {
         this.$store.dispatch('common/getCustomerFundBalance');
         this.fileContent = '';
-        this.$refs.contentValidateForm.resetFields();
-        this.$refs.FileForm.clearAllFile();
+        if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
+        if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
         this.$emit('clearAdd');
         this.scrollToTop();
       };
@@ -372,20 +375,26 @@ export default {
         });
       });
     },
-    handleSuccessFunc() {
+    handleSuccessFunc(goToUnPayList) {
       this.fileContent = '';
-      this.$refs.contentValidateForm.resetFields();
-      this.$refs.FileForm.clearAllFile();
+      if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
+      if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
       this.$emit('clearAdd');
       this.scrollToTop();
+      if (goToUnPayList) {
+        this.$router.push('/unpay/list');
+      }
     },
     handleCodeDialogClose(isPaid) {
       if (!isPaid) {
         this.messageBox.warnSingleError({
           title: '订单已生成',
           msg: '请到未付款单中查看',
+          // successFunc: () => { this.handleSuccessFunc(true); },
           successFunc: this.handleSuccessFunc,
           failFunc: this.handleSuccessFunc,
+          // showCancelButton: true,
+          // confirmButtonText: '前往未付款单',
         });
       } else {
         this.handleSuccessFunc();
@@ -398,7 +407,7 @@ export default {
   watch: {
     curProductID() {
       this.fileContent = '';
-      this.$refs.contentValidateForm.resetFields();
+      if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
     },
   },
 };

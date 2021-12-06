@@ -549,3 +549,9 @@ body .el-radio__inner, body .el-checkbox__inner {
     opacity: 1;
   }
 }
+
+@media screen and (max-width: 1230px) {
+  .floating {
+    display: none;
+  }
+}

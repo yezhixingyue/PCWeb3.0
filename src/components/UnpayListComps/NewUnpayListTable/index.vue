@@ -82,6 +82,7 @@
 import { mapState } from 'vuex';
 import RetractableDisplayComp from '@/components/common/RetractableDisplayComp/Index.vue';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
+import { getFullName } from '@/assets/js/utils/filter';
 import ItemListComp from './ItemListComp.vue';
 import CancelDialogBox from './CancelDialogBox.vue';
 
@@ -177,10 +178,10 @@ export default {
         let _Weight = 0;
         if (Array.isArray(it.PackageList) && it.PackageList.length > 0) {
           it.PackageList.forEach(({
-            Address, OrderList, Weight, OutPlat,
+            Address, OrderList, Weight, OutPlate,
           }) => {
             const _list = Array.isArray(OrderList) ? OrderList.map(_it => ({
-              ..._it, Address, OutPlat, _FullName: this.getFullName(_it),
+              ..._it, Address, OutPlate, _FullName: getFullName(_it),
             })) : [];
             _OrderList.push(..._list);
             _Weight += Weight;
@@ -207,12 +208,6 @@ export default {
   methods: {
     onWidthChange(newW, w) {
       this.widthObj[w] = newW;
-    },
-    getFullName({ ProductName, ClassList }) {
-      if (!ProductName) return '';
-      if (!ClassList || ClassList.length === 0) return ProductName;
-      const t = ClassList.find(it => it.Type === 2);
-      return t && t.FirstLevel && t.FirstLevel.Name ? `${t.FirstLevel.Name} - ${ProductName}` : ProductName;
     },
     handleScroll(oEl) {
       if (!oEl) return;

@@ -137,7 +137,7 @@ const api = {
   getCustomerRecharge(data) { // POST /Api/Customer/Recharge 客户充值
     return instance.post('/Api/Customer/Recharge', data);
   },
-  getExpressValidList(data) { // POST /Api/Express/ValidList 查询可用物料列表
+  getExpressValidList(data) { // POST /Api/Express/ValidList 查询可用物流列表
     return instance.post('/Api/Express/ValidList', data, { closeLoading: true });
   },
   getFileTypeList() { // /Api/FileType/List 获取文件对应列表

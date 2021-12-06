@@ -172,7 +172,15 @@
         </section>
       </article>
       <!-- <AddShowChangeComp ref="AddShowChangeComp" /> -->
-      <ConsigneeAddressSetpComp ref="oConsigneeAddressSetpComp" />
+      <ConsigneeAddressSetpComp
+       ref="oConsigneeAddressSetpComp"
+       :disabled="isUploading"
+       :watchClearVal='curProductID'
+       :customerInfo='customerInfo'
+       :ExpressList='ExpressList'
+       @changeAddressInfo="setAddressInfo4PlaceOrder"
+       @changeDefaultSelectAddress='changeSelectedAdd'
+       />
       <OrderSubmitComp
         :asyncInputchecker='asyncInputchecker'
         :isSpotGoods="placeData.IsSpotGoods"
@@ -231,9 +239,10 @@ export default {
       'addressInfo4PlaceOrder',
       'isFetchingPartProductData',
       'successNum',
+      'isUploading',
     ]),
     ...mapGetters('Quotation', ['curProductShowNameInfo']),
-    ...mapState('common', ['customerInfo']),
+    ...mapState('common', ['customerInfo', 'ExpressList']),
     computedCouponCode2Add: {
       get() {
         return this.couponCode2Add;
@@ -434,6 +443,7 @@ export default {
     onHomeDetailClick() {
       window.open(`${productJumpUrl}product/${this.placeData.ID}.html`);
     },
+    // 下面为配送地址相关
     async asyncInputchecker() {
       const resp = await this.$refs.oConsigneeAddressSetpComp.inputChecker();
       return resp;
@@ -441,10 +451,15 @@ export default {
     clearAdd() {
       this.$refs.oConsigneeAddressSetpComp.initCurAddIndex();
     },
+    setAddressInfo4PlaceOrder(data) {
+      this.$store.commit('Quotation/setAddressInfo4PlaceOrder', data);
+    },
+    changeSelectedAdd(data) {
+      this.$store.commit('common/changeSelectedAdd', data);
+    },
   },
-  mounted() {
-    // this.$store.commit('Quotation/setPropertiesAffectedByInteraction');
-    // this.getCraftRelationList();
+  created() {
+    this.$store.dispatch('common/getExpressList');
   },
   watch: {
     obj2GetProductPrice: {

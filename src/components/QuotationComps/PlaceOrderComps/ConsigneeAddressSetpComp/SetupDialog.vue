@@ -163,8 +163,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 export default {
   props: {
     title: {
@@ -196,9 +194,12 @@ export default {
       type: Array,
       default: null,
     },
+    customerInfo: {
+      type: Object,
+      default: null,
+    },
   },
   computed: {
-    ...mapState('common', ['customerInfo']),
     Mobile: {
       get() {
         return this.localNewAddressInfo.Mobile;
@@ -421,7 +422,7 @@ export default {
         isSaved: false,
         isSelected: true,
       };
-      this.$refs.ruleForm.resetFields();
+      if (this.$refs.ruleForm) this.$refs.ruleForm.resetFields();
       this.RegionalList = [];
       this.CityList = [];
       this.CountyList = [];

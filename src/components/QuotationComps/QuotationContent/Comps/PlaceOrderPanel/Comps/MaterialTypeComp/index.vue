@@ -85,7 +85,7 @@ export default {
           const _label = !_it.IsNameHidden ? _it.Name || '' : '';
           const _value = _it.DisplayContent || '';
           const _unit = _it.Unit || '';
-          return `${_label}${_value}${_unit}`;
+          return `${_label}${_label ? ':' : ''}${_value}${_unit}`;
         }).join(' ');
         return _Name || ' ';
       };
@@ -96,12 +96,9 @@ export default {
         const { UnionShowList, Name, ElementList } = Type;
         // 1. 寻找已有相同分类
         let t1 = list.find(it => it.ID === (showRootClass ? Type.ID : 'Type'));
-        // let t1 = list.find(it => it.ID === 'Type');
         if (!t1) { // 2.如果没有则添加
           const temp = {
-            // ID: Type.ID,
             ID: showRootClass ? Type.ID : 'Type',
-            // ID: 'Type',
             Name,
             children: [],
           };
@@ -109,8 +106,6 @@ export default {
         }
         // 3. 重新寻找一遍 此时肯定会找着
         t1 = list.find(it => it.ID === (showRootClass ? Type.ID : 'Type'));
-        // t1 = list.find(it => it.ID === Type.ID);
-        // t1 = list.find(it => it.ID === 'Type');
         if (t1) {
           if (UnionShowList.length === 0) {
             const item = {
@@ -133,10 +128,8 @@ export default {
                   disabled: i === UnionShowList.length - 1 ? this.disabledMatarialList.includes(ID) : false,
                 };
                 if (i < UnionShowList.length - 1) _item.children = [];
-                // console.log(_item);
                 const arr1 = _item.Name.match(/\d+(\.\d+)?/g);
                 if (arr1 && arr1.length > 0 && 0) {
-                  // console.log(tempList);
                   const lastIndex = tempList.findIndex(_it => {
                     const arr2 = _it.Name.match(/\d+(\.\d+)?/g);
                     if (arr2 && arr2.length > 0) {
@@ -149,27 +142,12 @@ export default {
                   } else {
                     tempList.push(_item);
                   }
-                  // console.log(_item, i, _list, arr1[arr1.length - 1]);
-                  // if (i > 0) {
-                  // 寻找位置 加入到指定位置
-                  // }
                 } else {
                   tempList.push(_item);
                 }
               }
               target = tempList.find(_it => _it.ID === _ItemID);
               _list = target.children;
-              if (Array.isArray(_list)) {
-                // _list = _list.sort((a, b) => {
-                //   // 排序 从小到大排序
-                //   const arr1 = a.match(/\d+(\.\d+)?/g);
-                //   const arr2 = b.match(/\d+(\.\d+)?/g);
-                //   if (arr1 && arr1.length > 0 && arr2 && arr2.length > 0) {
-                //     return arr1[arr1.length - 1] - arr1[arr1.length - 2];
-                //   }
-                //   return 1;
-                // });
-              }
             });
           }
         }

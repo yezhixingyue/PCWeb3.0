@@ -13,6 +13,7 @@ import api from '@/api/index';
 import massage from '@/assets/js/utils/message';
 import router from '@/router';
 import QuotationClassType from './QuotationClassType';
+import CommonClassType from '../CommonClassType';
 
 // eslint-disable-next-line no-unused-vars
 // import utils from "@/assets/js/utils";
@@ -613,13 +614,7 @@ export default {
       // 3. 补充平台单号
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
       // 4. 填充收货地址与配送方式
-      _itemObj.Address = {};
-      _itemObj.Address.Express = state.addressInfo4PlaceOrder.Address.Express;
-      if (state.addressInfo4PlaceOrder.Address.AddressID) {
-        _itemObj.Address.AddressID = state.addressInfo4PlaceOrder.Address.AddressID;
-      } else {
-        _itemObj.Address.Address = state.addressInfo4PlaceOrder.Address.Address;
-      }
+      _itemObj.Address = CommonClassType.getAddress4SubmitFromEditObj(state.addressInfo4PlaceOrder);
       // 5. 填充文件内容
       _itemObj.Content = fileContent;
       // 6. 记录文件内容与当前接口请求类型
@@ -681,6 +676,7 @@ export default {
               title: '存在风险，是否继续下单?',
               msg: res.data.Message.split('#'),
               confirmButtonText: '继续下单',
+              closeOnClickModal: false,
               successFunc: async () => {
                 _requestObj.List[0].ProductParams.IsIgnoreRisk = true;
                 const resp = await api.getOrderPreCreate(_requestObj);
@@ -709,13 +705,7 @@ export default {
       }
       _itemObj.FileHaveUpload = true;
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
-      _itemObj.Address = {};
-      _itemObj.Address.Express = state.addressInfo4PlaceOrder.Address.Express;
-      if (state.addressInfo4PlaceOrder.Address.AddressID) {
-        _itemObj.Address.AddressID = state.addressInfo4PlaceOrder.Address.AddressID;
-      } else {
-        _itemObj.Address.Address = state.addressInfo4PlaceOrder.Address.Address;
-      }
+      _itemObj.Address = CommonClassType.getAddress4SubmitFromEditObj(state.addressInfo4PlaceOrder);
       _itemObj.Content = fileContent;
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
 

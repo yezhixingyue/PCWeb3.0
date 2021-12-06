@@ -9,7 +9,7 @@
           <span v-else class="gray is-font-12">暂未生成</span>
         </el-table-column>
         <el-table-column label="数量" width="140">
-          <span class="gray" slot-scope="scope">{{scope.row.ProductAmount + Unit}}</span>
+          <span class="gray" slot-scope="scope">{{scope.row | formarProductAmount}}</span>
         </el-table-column>
         <el-table-column label="配送" width="180">
           <span class="gray" slot-scope="scope">{{ scope.row.Logistics && scope.row.Logistics.ExpressName }}</span>

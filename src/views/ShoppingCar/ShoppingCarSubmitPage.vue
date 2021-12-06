@@ -33,7 +33,7 @@
         <div class="btn-wrap">
           <el-button type="danger" @click="handleSubmit">提交订单</el-button>
         </div>
-        <Dialog2Pay pageType='shoppingCarPage' :needClear='false' />
+        <Dialog2Pay pageType='shoppingCarPage' :needClear='false' @close='handleCodeDialogClose' />
       </footer>
     </section>
   </article>
@@ -101,20 +101,24 @@ export default {
       this.$router.go(-1);
       this.$store.commit('Quotation/setCurPayInfo2Code', null);
     },
+    handleSuccessFunc(toUnpayList) {
+      if (toUnpayList) {
+        this.$router.push('/unpay/list');
+      } else {
+        this.$router.push('/shopping/car');
+      }
+      this.$store.commit('shoppingCar/setCurShoppingCarDetailData', null);
+      this.$store.commit('shoppingCar/setCurShoppingCarDataBeforeFirstPlace', null);
+      this.$store.commit('shoppingCar/setCurShoppingCarData4FirstPlace', null);
+      this.$store.dispatch('common/getCustomerFundBalance');
+    },
     handleSubmit() {
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
-      const cb = () => {
-        this.$router.push('/shopping/car');
-        this.$store.commit('shoppingCar/setCurShoppingCarDetailData', null);
-        this.$store.commit('shoppingCar/setCurShoppingCarDataBeforeFirstPlace', null);
-        this.$store.commit('shoppingCar/setCurShoppingCarData4FirstPlace', null);
-        this.$store.dispatch('common/getCustomerFundBalance');
-      };
       if (!this.curPayInfo2Code) {
         const submitSuccessFunc = () => {
           this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', this.curShoppingCarDataBeforeFirstPlace);
         };
-        const _obj = { PayInFull: this.checked, cb, submitSuccessFunc };
+        const _obj = { PayInFull: this.checked, cb: this.handleSuccessFunc, submitSuccessFunc };
         this.$store.dispatch('Quotation/placeOrderFromPreCreate', _obj).catch((...args) => {
           const error = args[0];
           this.messageBox.handleLoadingError({
@@ -124,6 +128,23 @@ export default {
           });
         });
       }
+    },
+    handleCodeDialogClose(isPaid) {
+      if (!isPaid) {
+        // this.messageBox.warnCancelBox({
+        //   title: '订单已生成',
+        //   msg: '请到未付款单中查看',
+        //   successFunc: () => { this.handleSuccessFunc(true); },
+        //   failFunc: this.handleSuccessFunc,
+        //   showCancelButton: true,
+        //   confirmButtonText: '前往未付款单',
+        //   cancelButtonText: '返回购物车',
+        // });
+        this.handleSuccessFunc();
+      }
+      //  else { // 付款组件已处理
+      //   this.handleSuccessFunc();
+      // }
     },
   },
   created() {

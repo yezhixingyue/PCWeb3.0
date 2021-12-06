@@ -1,6 +1,6 @@
 <template>
   <article class="mp-pc-unpay-list-page-wrap">
-    <section v-if="unpayDataList.length > 0 || unpayDataNumber > 0">
+    <section v-if="(unpayDataList.length > 0 || unpayDataNumber > 0)">
       <NewUnpayListTable />
     </section>
     <div class="show-empty-bg" v-else>
@@ -29,7 +29,10 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       if (from.name !== 'unpayOrderDetail') {
-        vm.$store.dispatch('unpayList/getUnpayList');
+        vm.$store.commit('unpayList/setUnpayDataList', { Data: [], DataNumber: 0 });
+        vm.$nextTick(() => {
+          vm.$store.dispatch('unpayList/getUnpayList');
+        });
       } else {
         const oApp = document.getElementById('app');
         oApp.scrollTop = to.meta.y;

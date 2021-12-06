@@ -56,4 +56,17 @@ export default class ClassType {
     });
     return _tempObj;
   }
+
+  static getAddress4SubmitFromEditObj(addressInfo4PlaceOrder) {
+    const Address = {};
+    if (addressInfo4PlaceOrder && addressInfo4PlaceOrder.Address) {
+      Address.Express = addressInfo4PlaceOrder.Address.Express;
+      if (addressInfo4PlaceOrder.Address.AddressID) {
+        Address.AddressID = addressInfo4PlaceOrder.Address.AddressID;
+      } else {
+        Address.Address = addressInfo4PlaceOrder.Address.Address;
+      }
+    }
+    return Address;
+  }
 }

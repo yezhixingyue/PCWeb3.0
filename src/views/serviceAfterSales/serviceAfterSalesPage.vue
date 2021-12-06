@@ -26,7 +26,7 @@
               <el-table-column prop="Order.OrderID" label="订单号" width="110" show-overflow-tooltip>
               </el-table-column>
               <el-table-column label="产品名称" width="180" show-overflow-tooltip>
-                <span slot-scope="scope">{{ scope.row.Order.SecondLevelName +'-'+ scope.row.Order.ProductName }}</span>
+                <span slot-scope="scope">{{ scope.row.Order | getFullName }}</span>
               </el-table-column>
               <el-table-column label="订单金额" show-overflow-tooltip width="114">
                 <template slot-scope="scope">{{ scope.row.Order.Funds.FinalPrice }}元</template>

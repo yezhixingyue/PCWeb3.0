@@ -38,8 +38,8 @@
           </div>
           <div :style="wStyles[3]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'" placement="top-start">
-              <span>{{item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'}}</span>
+              :content="item | formarProductAmount" placement="top-start">
+              <span>{{item | formarProductAmount}}</span>
             </el-tooltip>
           </div>
           <div :style="wStyles[4]">
@@ -133,7 +133,7 @@ export default {
       return +(this.data.Freight.toFixed(2));
     },
     OutPlatNo() {
-      return this.data.OutPlat && this.data.OutPlat.Second ? this.data.OutPlat.Second : '';
+      return this.data.OutPlate && this.data.OutPlate.Second ? this.data.OutPlate.Second : '';
     },
     localAddressDetail() {
       if (!this.data || !this.data.Address || !this.data.Address.Address) return '';

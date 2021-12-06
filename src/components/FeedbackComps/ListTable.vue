@@ -7,6 +7,7 @@
       <el-table-column label="产品类型" width="120" prop="Order.SecondLevelName" show-overflow-tooltip>
         <!-- <span slot-scope="scope" :class="{'is-pink': scope.row.Type === 21, 'is-success': scope.row.Type === 11}"
          >{{ scope.row.Type | formatTransactionType }}</span> -->
+         <template slot-scope="scope">{{ scope.row.Order.ClassList | getClassName }}</template>
       </el-table-column>
       <el-table-column label="售后原因" width="260" show-overflow-tooltip>
         <template slot-scope="scope">{{getApplyText(scope.row.QuestionList)}}</template>
@@ -49,6 +50,18 @@ export default {
     dataNumber: {
       type: Number,
       default: 0,
+    },
+  },
+  filters: {
+    getClassName(ClassList) {
+      const t = ClassList.find(it => it.Type === 2);
+      if (t) {
+        const f = t.FirstLevel && t.FirstLevel.Name ? `${t.FirstLevel.Name}` : '';
+        const s = t.SecondLevel && t.SecondLevel.Name ? `${t.SecondLevel.Name}` : '';
+        const n = `${f}${f && s ? '-' : ''}${s}`;
+        if (n) return n;
+      }
+      return '';
     },
   },
   methods: {

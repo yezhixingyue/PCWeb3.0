@@ -219,7 +219,8 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
 const getElementValue = CustomerInputValues => { // 返回字符串 或 数组 （可多选且多选时返回的数组）
   if (!Array.isArray(CustomerInputValues) || CustomerInputValues.length === 0) return '';
   const getSingleValue = (item) => {
-    const { ID, Name, Value } = item;
+    const { ID, Name, Value, IsOpen } = item;
+    if (IsOpen === true || IsOpen === false) return IsOpen;
     if (!ID && !Name && !Value) return '';
     return ID || Value || Name;
   };

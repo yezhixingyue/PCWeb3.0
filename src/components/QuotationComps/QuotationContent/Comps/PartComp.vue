@@ -7,7 +7,8 @@
     </li>
     <li v-for="(it, i) in PartData.List" :key="it.key">
       <p>
-        <label>// {{PartName}}{{i > 0 ? ` - ${i + 1}` : ''}}</label>
+        <!-- <label>// {{PartName}}{{i > 0 ? ` - ${i + 1}` : ''}}</label> -->
+        <label>// {{PartName}}{{i > 0 ? `${i + 1}` : ''}}</label>
         <HelpTipsComp :tipsData='tipsData' :title="PartName" />
       </p>
       <PlaceOrderPanel :PartID='PartData.PartID' :PartIndex='i'

@@ -98,7 +98,7 @@ function warnSingleError({
  * @param {*} failFunc
  */
 function warnCancelBox({
-  title = '确定取消此订单吗 ?', msg, successFunc, failFunc, confirmButtonText = '确定', cancelButtonText = '取消',
+  title = '确定取消此订单吗 ?', msg, successFunc, failFunc, confirmButtonText = '确定', cancelButtonText = '取消', closeOnClickModal = true,
 }) {
   let message = msg;
   let dangerouslyUseHTMLString = false;
@@ -120,6 +120,7 @@ function warnCancelBox({
     title,
     customClass: 'mp-order-del-pop-reverse-warn',
     showCancelButton: true,
+    closeOnClickModal,
     cancelButtonText,
   }).then(() => successFunc && successFunc()).catch(() => failFunc && failFunc());
 }
@@ -151,15 +152,21 @@ function warnCancelNullMsg({ title, successFunc, failFunc }) {
  * @param {boolean} [canCloseOnPressEscape=true]
  */
 function successSingle({
-  title, successFunc, failFunc, canCloseOnPressEscape = true, msg = '',
+  title, successFunc, failFunc, canCloseOnPressEscape = true, msg = '', confirmButtonText = '确定', cancelButtonText = '关闭', showCancelButton,
 }) {
+  let customClass = msg ? 'mp-order-del-pop-success hasMsg' : 'mp-order-del-pop-success';
+  if (showCancelButton) {
+    customClass = `${customClass} two-btns`;
+  }
   MessageBox({
     showClose: true,
-    confirmButtonText: '确定',
+    confirmButtonText,
     title,
     message: msg,
     closeOnPressEscape: canCloseOnPressEscape,
-    customClass: 'mp-order-del-pop-success',
+    customClass,
+    showCancelButton,
+    cancelButtonText,
   // eslint-disable-next-line no-nested-ternary
   }).then(() => successFunc && successFunc()).catch(() => (failFunc ? failFunc() : successFunc ? successFunc() : ''));
 }

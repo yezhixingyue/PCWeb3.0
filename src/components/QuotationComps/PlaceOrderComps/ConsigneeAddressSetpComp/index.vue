@@ -53,7 +53,7 @@
           <!-- 配送方式 -->
           <div class="express-box">
             <span class="title">配送：</span>
-            <el-radio-group v-model="Express.First" @change="onRadioChange" :disabled='isUploading'>
+            <el-radio-group v-model="Express.First" @change="onRadioChange" :disabled='disabled'>
               <el-radio
                 :label="1"
                 :disabled="!ExpressTypeDisabled.canMpzj"
@@ -102,7 +102,7 @@
           <IdentifyFormItem
             ref="oIdentifyFormItemOut"
             :OutPlateNo="OutPlateNo"
-            :disabled='isUploading'
+            :disabled='disabled'
             @OutPlateNoResolved="onOutPlateNoResolved"
             @DetailedAddress="onDetailedAddressChange"
           />
@@ -134,19 +134,36 @@
      :PropRegionalList='RegionalList'
      :PropCityList='CityList'
      :PropCountyList='CountyList'
+     :customerInfo='customerInfo'
      @submit="onDialogSubmit"
     />
   </section>
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import AddMapComp from '@/components/MySettingComps/AddMapComp.vue';
 import { amapAppkey } from '@/assets/js/setup';
 import IdentifyFormItem from './IdentifyFormItem.vue';
 import SetupDialog from './SetupDialog.vue';
 
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    watchClearVal: {
+      default: '',
+    },
+    customerInfo: {
+      type: Object,
+      default: null,
+    },
+    ExpressList: {
+      type: Array,
+      default: () => [],
+    },
+  },
   components: {
     AddMapComp,
     SetupDialog,
@@ -195,8 +212,6 @@ export default {
     };
   },
   computed: {
-    ...mapState('common', ['ExpressList', 'customerInfo']),
-    ...mapState('Quotation', ['curProductID', 'addressInfo4PlaceOrder', 'isUploading']),
     secondExpressList() {
       if (this.ExpressList.length === 0) return [];
       return this.ExpressList.find((it) => it.Type === 3).List;
@@ -343,11 +358,7 @@ export default {
       _temp.Address.Address = this.curAddressInfo;
       const OutPlate = { First: 1, Second: this.OutPlateNo };
       _temp.OutPlate = OutPlate;
-      this.$store.commit(
-        'Quotation/setAddressInfo4PlaceOrder',
-        JSON.parse(JSON.stringify(_temp)),
-      );
-      return true;
+      this.$emit('changeAddressInfo', JSON.parse(JSON.stringify(_temp)));
     },
     /** 内容解析相关数据
     ---------------------------------------------------- */
@@ -480,7 +491,7 @@ export default {
       }
     },
     initCurAddIndex() { // 首次加载或切换产品时初始化收货地址
-      const _i = this.customerInfo.Address.findIndex((it) => it.isSelected);
+      const _i = this.customerInfo.Address.findIndex(it => (Object.prototype.hasOwnProperty.call(it, 'isSelected') ? it.isSelected : it.IsDefault));
       if (_i > -1) this.curAddIndex = _i;
       else if (this.customerInfo.Address.length > 0) this.curAddIndex = 0;
       else this.curAddIndex = 'new';
@@ -491,9 +502,6 @@ export default {
     },
   },
   watch: {
-    // curAddressInfo() {
-    //   this.setInfo4ReqObj();
-    // },
     ExpressValidList(newVal) {
       if (newVal.length === 3) return;
       if (newVal.length === 0) {
@@ -510,11 +518,10 @@ export default {
     },
     async curAddIndex(newVal) {
       if (newVal === 'new') return;
-      const _t = this.customerInfo.Address.find(
-        (it, i) => i === this.curAddIndex,
-      );
+      const _t = this.customerInfo.Address.find((it, i) => i === newVal);
       if (!_t) return;
-      this.$store.commit('common/changeSelectedAdd', _t);
+      // this.$store.commit('common/changeSelectedAdd', _t);
+      this.$emit('changeDefaultSelectAddress', _t);
       this.ValidExpressLoading = true;
       const res = await this.api.getExpressValidList(_t);
       this.ValidExpressLoading = false;
@@ -522,7 +529,7 @@ export default {
         this.ExpressValidList = res.data.Data;
       }
     },
-    curProductID() {
+    watchClearVal() {
       this.clearCurProductState();
     },
   },
@@ -530,8 +537,6 @@ export default {
     this.getAmapMount();
   },
   async mounted() {
-    this.$store.dispatch('common/getExpressList');
-    await this.$store.dispatch('common/getCustomerDetail');
     this.initCurAddIndex();
   },
 };

@@ -21,7 +21,7 @@
           :class="i === data.OrderList.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID"
         >
-          <div :style="wStyles[0]" class="is-twelve">{{getProductName(item)}}</div>
+          <div :style="wStyles[0]" class="is-twelve">{{item | getFullName}}</div>
           <div :style="wStyles[1]">{{getProductCount(item.OrderID)}}</div>
           <div :style="wStyles[2]">{{item.Funds.OriginalPrice}}元</div>
           <div :style="wStyles[3]">{{item.Funds.CouponAmount ? `-${item.Funds.CouponAmount}` : item.Funds.CouponAmount}}元</div>
@@ -38,6 +38,7 @@
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
 import { mapState } from 'vuex';
+import { formarProductAmountFunc } from '@/assets/js/utils/filter';
 
 export default {
   props: {
@@ -89,16 +90,11 @@ export default {
     handleCollapse() {
       this.isActive = !this.isActive;
     },
-    getProductName({ FirstLevelName, SecondLevelName, ProductName }) {
-      return `${FirstLevelName}-${SecondLevelName}-${ProductName}`;
-    },
     getProductCount(OrderID) {
       if (!this.curShoppingCarDataBeforeFirstPlace) return '';
       const _t = this.curShoppingCarDataBeforeFirstPlace.find(it => it.OrderID === OrderID);
       if (!_t) return '';
-      const { Attributes } = _t.ProductParams;
-      const { Unit, ProductAmount, KindCount } = Attributes;
-      return `${ProductAmount}${Unit || ''}(${KindCount}款)`;
+      return formarProductAmountFunc(_t.ProductParams.Attributes);
     },
     getContent(OrderID) {
       if (!this.curShoppingCarDataBeforeFirstPlace) return '';

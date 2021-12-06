@@ -44,8 +44,8 @@
           </div>
           <div :style="wStyles[4]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'" placement="top-start">
-              <span>{{item.ProductAmount + (item.Unit || '个') + item.KindCount + '款'}}</span>
+              :content="item | formarProductAmount" placement="top-start">
+              <span>{{item | formarProductAmount}}</span>
             </el-tooltip>
           </div>
           <div :style="wStyles[5]" class="is-font-12 gray">
@@ -132,7 +132,7 @@ export default {
       return +(this.data.Freight.toFixed(2));
     },
     OutPlatNo() {
-      return this.data.OutPlat && this.data.OutPlat.Second ? this.data.OutPlat.Second : '';
+      return this.data.OutPlate && this.data.OutPlate.Second ? this.data.OutPlate.Second : '';
     },
     localAddressDetail() {
       if (!this.data || !this.data.Address || !this.data.Address.Address) return '';
@@ -180,7 +180,7 @@ export default {
       return _obj;
     },
     goToDetailPage(data) {
-      this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlat, Address: this.data.Address });
+      this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
       this.$router.push('/order/detail');
     },
     goToFeedback(item) {

@@ -8,7 +8,7 @@
       <!-- <li class="icon"><i class="el-icon-warning"></i> 温馨提示：</li>
       <li v-for="it in localTipsArr" :key="it">{{it}}</li> -->
       <li ref="detailBox">
-        <span class="info" ref="oDetailContent">{{ProductQuotationResult.Content}}</span>
+        <span class="info" ref="oDetailContent">{{ProductQuotationResult.Content.trim()}}</span>
         <el-popover
           placement="top"
           popper-class='mp-place-order-copy-poper-box'

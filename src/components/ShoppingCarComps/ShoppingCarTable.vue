@@ -13,13 +13,13 @@
       >
         <el-table-column type="selection" class-name="check-row" width="54"></el-table-column>
         <el-table-column label="产品" width="130" show-overflow-tooltip>
-          <template slot-scope="scope">{{getName(scope.row)}}</template>
+          <template slot-scope="scope">{{scope.row.ProductParams.Attributes | getFullName}}</template>
         </el-table-column>
         <el-table-column label="尺寸" width="70" show-overflow-tooltip>
           <template slot-scope="scope">{{getSize(scope.row)}}</template>
         </el-table-column>
         <el-table-column label="数量" width="78" show-overflow-tooltip>
-          <template slot-scope="scope">{{ getNumber(scope.row.ProductParams) }}</template>
+          <template slot-scope="scope">{{ scope.row.ProductParams.Attributes | formarProductAmount }}</template>
         </el-table-column>
         <el-table-column label="工艺" width="70" show-overflow-tooltip>
           <template slot-scope="scope">{{ getCraft(scope.row.ProductParams) }}</template>
@@ -96,6 +96,7 @@
 <script>
 import { mapState } from 'vuex';
 import { throttle } from '@/assets/js/utils/throttle';
+import { getFullName } from '@/assets/js/utils/filter';
 
 export default {
   data() {
@@ -142,27 +143,9 @@ export default {
       const tempHeight = this.getHeight();
       this.h = tempHeight;
     },
-    getName({ ProductParams }) {
-      const { Attributes } = ProductParams;
-      const { DisplayName, ClassList } = Attributes;
-      if (ClassList.length > 0) {
-        const t = ClassList.find(it => it.Type === 2);
-        if (t) {
-          const ClassifyName = t.FirstLevel?.Name || '';
-          if (ClassifyName) return `${ClassifyName}-${DisplayName}`;
-        }
-      }
-      return DisplayName;
-    },
     getSize({ ProductParams }) {
       const { Size } = ProductParams;
       return Size && Size.DisplayContent ? Size.DisplayContent : '';
-    },
-    getNumber({ Attributes }) {
-      const { Unit, ProductAmount, KindCount } = Attributes;
-      const _str = `(${KindCount}款)`;
-      // if (KindCount > 1) _str = `（共${KindCount}款）`;
-      return `${ProductAmount}${Unit || ''}${_str}`;
     },
     getCraftFromItem(First, arr) {
       if (First && First.length > 0) {
@@ -264,11 +247,9 @@ export default {
       let msg = '';
       if (item) {
         if (!item.ProductParams || !item.ProductParams.Attributes) return;
-        const _nameInfo = item.ProductParams.Attributes;
-        const { ClassList, DisplayName } = _nameInfo;
-        if (!ClassList || !DisplayName) return;
-        const t = ClassList.find(it => it.Type === 2);
-        msg = `订单产品：[ ${t && t.FirstLevel.Name ? (`${t.FirstLevel.Name} - `) : ''}${DisplayName} ]`;
+        const _name = getFullName(item.ProductParams.Attributes);
+        if (!_name) return;
+        msg = `订单产品：[ ${_name} ]`;
       } else {
         if (!this.multipleSelection) return;
         msg = `[ 共有 ${this.multipleSelection.length} 条订单被选中 ]`;

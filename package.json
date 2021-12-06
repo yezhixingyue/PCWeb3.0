@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 8055",
-    "serve.test": "vue-cli-service serve --port 8056 --mode testnew ",
+    "serve": "vue-cli-service serve --port 8068",
+    "serve.test": "vue-cli-service serve --port 8078 --mode test8050 ",
+    "serve.pro": "vue-cli-service serve --port 8088 --mode test8030",
     "build.test": "vue-cli-service build --mode alpha",
     "build.pro": "vue-cli-service build",
     "lint": "vue-cli-service lint"

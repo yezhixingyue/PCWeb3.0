@@ -396,7 +396,7 @@ export default {
       }
     },
     resetForm() {
-      this.$refs.oIdentifyForm.resetFields();
+      if (this.$refs.oIdentifyForm) this.$refs.oIdentifyForm.resetFields();
     },
     setValueOnOut(val) {
       this.IdentifyForm.Value = val;

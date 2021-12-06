@@ -117,7 +117,6 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
         const isSize = false;
         const isGroup = true;
         const _itemVal = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList, isSize, isGroup);
-        console.log(_itemVal);
         return _itemVal;
       }).filter(_it => _it || _it === 0 || _it === false);
       if (ElValues.length === 0) {
@@ -192,13 +191,51 @@ const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, 
   return _CraftValue;
 };
 
+const getIsEqualBySizeListAndItemValues = (itemValues, SizeItemValues) => { // 尺寸相关： 判断自定义值与常规尺寸项目值是否相同
+  if (Array.isArray(itemValues) && Array.isArray(SizeItemValues) && itemValues.length > 0 && SizeItemValues.length === itemValues.length) {
+    const notEqualItem = itemValues.find(({ First, Second }) => {
+      const _t = SizeItemValues.find(_it => _it.First === First);
+      if (_t) {
+        return !(isEqual(Second, _t.Second) || (Second === true && _t.Second === 'True') || (Second === false && _t.Second === 'False'));
+      }
+      return true;
+    });
+    return !notEqualItem;
+  }
+  return false;
+};
+
+const getSizeGroupIDByCustomizeSize = (ItemValueList, SizeList) => { // 尺寸相关：在常规尺寸中找到自定义尺寸所对应的常规尺寸的ID值，如果找不到则返回''
+  if (!Array.isArray(ItemValueList) || !Array.isArray(SizeList) || ItemValueList.length === 0 || SizeList.length === 0) return '';
+  const itemValues = ItemValueList.map(it => {
+    const First = it.ElementID;
+    let Second = '';
+    const [{ ID, Name, Value, IsOpen }] = it.CustomerInputValues;
+    Second = ID || Name || IsOpen;
+    if (!Second && Second !== false) Second = Value;
+    return { First, Second };
+  });
+  const t = SizeList.find(it => getIsEqualBySizeListAndItemValues(itemValues, it.List));
+  return t ? t.ID : '';
+};
+
 const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
   if (!Size || !SizeGroup) return null;
   const { ID, List, isCustomize } = Size;
-  if (FixedType === 35) return isCustomize; // 是否自定义
+  if (FixedType === 35 && !isCustomize) { // 求值：是否为自定义 且明确为非自定义则直接返回结果，如不明确则后续继续判断
+    if (isCustomize) {
+      const _id = getSizeGroupIDByCustomizeSize(List, SizeGroup.SizeList);
+      if (!_id) return true;
+    }
+    return false; // 是否自定义
+  }
   if (!isCustomize && !ID) return null;
-  if (FixedType === 7) { // 常规尺寸
-    return isCustomize ? '' : ID; // 如果为自定义则返回空，否则返回ID
+  if (FixedType === 7) { // 求值：常规尺寸ID   明确为非自定义则直接返回常规尺寸ID，如不明确则后续继续判断
+    if (isCustomize) {
+      const _id = getSizeGroupIDByCustomizeSize(List, SizeGroup.SizeList);
+      return _id;
+    }
+    return ID; // 常规尺寸ID
   }
   let _list;
   if (!isCustomize) { // 不是自定义 转换该常规尺寸对应的值为列表
@@ -219,7 +256,10 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
   } else {
     _list = List;
   }
+  console.log(_list, List, SizeGroup.SizeList);
   _list = _list.map(it => ({ ElementID: it.ElementID, Value: getElementTypeValue({ ID: it.ElementID }, null, _list, SizeGroup.GroupInfo.ElementList, true) }));
+  console.log(_list, List, SizeGroup.SizeList);
+
   if (FixedType || FixedType === 0) {
     let num;
     _list = _list.map(it => it.Value).filter(it => it);
