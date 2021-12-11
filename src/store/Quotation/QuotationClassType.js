@@ -151,7 +151,9 @@ export default class QuotationClassType {
               // 此处获取该部件物料列表数据(筛选过后)，如果长度为0 则不生成下面数据 -- 已在上面筛选判断
               // target = PartData.MaterialList.filter(it => !it.HiddenToCustomer);
               if (Array.isArray(PartData.TypeList) && PartData.TypeList.length > 0) {
-                target = PartData.TypeList.find(_it => Array.isArray(_it.List) && _it.List.length > 0);
+                target = PartData.TypeList.map(it => ({ ...it, List: it.List.filter(_it => !_it.HiddenToCustomer) }))
+                  .filter(it => it.List.length > 0)
+                  .find(_it => Array.isArray(_it.List) && _it.List.length > 0);
                 if (target) {
                   temp.MaterialID = target.List[0].ID;
                 }

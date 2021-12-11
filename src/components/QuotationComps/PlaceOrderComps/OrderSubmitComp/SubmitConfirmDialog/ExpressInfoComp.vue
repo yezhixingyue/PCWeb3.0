@@ -4,6 +4,10 @@
       <img src="@/assets/images/express-info.png" alt="">
     </template>
     <ul class="display-box">
+      <li v-if="OutPlateNo">
+        <span class="label">平台单号：</span>
+        <div class="text">{{OutPlateNo}}</div>
+      </li>
       <li>
         <span class="label">配送方式：</span>
         <div class="text">{{ExpressName}}</div>
@@ -35,6 +39,10 @@ export default {
     ExpressList: {
       type: Array,
       default: null,
+    },
+    OutPlateNo: {
+      type: String,
+      default: '',
     },
   },
   components: {

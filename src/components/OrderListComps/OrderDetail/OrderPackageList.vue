@@ -2,50 +2,56 @@
   <section class="mp-pc-order-detail-page-package-list-comp-wrap">
     <header class="section-title">包裹列表</header>
     <div class="content">
-      <el-table :data="packageListData" border style="width: 100%" :span-method="objectSpanMethod">
-        <el-table-column label="运单号" width="180">
+      <el-table :data="localPackageListData" border style="width: 100%" :max-height="OrderID ? '' : 530"
+       :span-method="objectSpanMethod" v-show="localPackageListData.length > 0 || OrderID">
+        <el-table-column label="运单号" :width="OrderID ? 180 : 140" show-overflow-tooltip>
           <span v-if="scope.row && scope.row.Logistics && scope.row.Logistics.BillNo" class="gray" slot-scope="scope"
             >{{scope.row.Logistics.BillNo}}</span>
           <span v-else class="gray is-font-12">暂未生成</span>
         </el-table-column>
-        <el-table-column label="数量" width="140">
+        <el-table-column label="数量" :width="OrderID ? 140 : 92" show-overflow-tooltip>
           <span class="gray" slot-scope="scope">{{scope.row | formarProductAmount}}</span>
         </el-table-column>
-        <el-table-column label="配送" width="180">
+        <el-table-column label="配送" :width="OrderID ? 180 : 92" show-overflow-tooltip>
           <span class="gray" slot-scope="scope">{{ scope.row.Logistics && scope.row.Logistics.ExpressName }}</span>
         </el-table-column>
-        <el-table-column label="配送进度" width="120">
+        <el-table-column label="配送进度" :width="OrderID ? 120 :80" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Status | formatStatus4PackageList}}</template>
         </el-table-column>
-        <el-table-column label="配送代收" width="140">
-          <template slot-scope="scope">{{+(scope.row.UnPaidAmount && scope.row.UnPaidAmount.toFixed(2))}}元</template>
+        <el-table-column label="配送代收" :width="OrderID ? 140 : 80" show-overflow-tooltip>
+          <template slot-scope="scope">{{scope.row.UnPaidAmount | formatNumber}}元</template>
         </el-table-column>
-        <el-table-column label="操作" width="140">
+        <el-table-column label="操作" :width="OrderID ? 140 : 80">
           <template slot-scope="scope">
             <span class="span-title-blue is-font-12"
              v-if="scope.row && scope.row.Logistics && scope.row.Logistics.BillNo" @click="onExpressClick(scope.row)">配送进度</span>
-            <span v-else>暂无进度</span>
+            <span v-else> -- </span>
           </template>
         </el-table-column>
-        <el-table-column label="" width="239" class-name='total-col'>
+        <el-table-column label="" :width="OrderID ? 239 : 158" class-name='total-col' show-overflow-tooltip>
           <template slot-scope="scope">
-            <span>配送共代收：<i class="is-font-16 is-pink">{{ scope.row && totalUnPaidAmount}}元</i></span>
+            <span>配送共代收：<i class="is-pink num">{{ scope.row && totalUnPaidAmount}}</i><i class="is-pink">元</i></span>
           </template>
         </el-table-column>
       </el-table>
+      <p v-show="!(localPackageListData.length > 0 || OrderID) && !isListloading" class="empty">
+        <span>订单</span>
+        <span class="is-bold">发货后</span>
+        <span>此处将会显示发货包裹列表</span>
+      </p>
     </div>
     <el-dialog
       :visible="visible"
       v-if="visible"
       top='18vh'
       title="配送进度"
-      width="750px"
-      v-dialogDrag
+      width="680px"
       destroy-on-close
       :before-close='handleBeforeDiaClose'
-      custom-class="mp-express-detail-wrap"
+      append-to-body
+      custom-class="mp-order-detail-express-detail-list-dialog-comp--wrap"
     >
-      <ul class="order-list-express-progress-wrap" v-loading='loading'>
+      <ul class="order-list-express-progress-wrap" v-loading='loading' element-loading-text="正在加载中...">
         <template v-if="list.length > 0">
           <MiniProgressItem v-for="(item,i) in list" :key='item.Status + "-" + i' :data='item' />
         </template>
@@ -69,13 +75,13 @@ export default {
       type: Number,
       default: 0,
     },
-    Unit: {
-      type: String,
-      default: '',
+    PackageDataList: {
+      type: Array,
+      default: null,
     },
-    Express: {
-      type: String,
-      default: '',
+    isListloading: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -92,9 +98,9 @@ export default {
   },
   computed: {
     totalUnPaidAmount() {
-      if (!this.packageListData || this.packageListData.length === 0) return 0;
+      if (!this.localPackageListData || this.localPackageListData.length === 0) return 0;
       let _amount = 0;
-      this.packageListData.forEach(it => {
+      this.localPackageListData.forEach(it => {
         if (it.UnPaidAmount) _amount += it.UnPaidAmount;
       });
       return +(_amount.toFixed(2));
@@ -123,6 +129,9 @@ export default {
       }).reverse();
       return newArr;
     },
+    localPackageListData() {
+      return this.PackageDataList || this.packageListData || [];
+    },
   },
   methods: {
     // eslint-disable-next-line consistent-return
@@ -130,7 +139,7 @@ export default {
       if (columnIndex === 6) {
         if (rowIndex === 0) {
           return {
-            rowspan: this.packageListData.length,
+            rowspan: this.localPackageListData.length,
             colspan: 1,
           };
         }
@@ -162,7 +171,6 @@ export default {
   },
   async mounted() {
     if (!this.OrderID) return;
-    // this.$emit('setPackDataCompleted', false);
     const res = await this.api.getOrderPackageList(this.OrderID);
     this.$emit('setPackDataCompleted', true);
     if (res.data.Status === 1000) {
@@ -177,6 +185,7 @@ export default {
 .mp-pc-order-detail-page-package-list-comp-wrap {
   > .content {
     padding: 30px 40px 45px 20px;
+    position: relative;
     .el-table {
       .el-table__body-wrapper .el-table__body tbody tr td {
         padding: 10px 0;
@@ -196,65 +205,85 @@ export default {
         }
       }
     }
-  }
-  .mp-express-detail-wrap {
-    color: red;
-    > .el-dialog__header {
-      height: 45px;
-      box-sizing: border-box;
-      padding: 14px 10px;
-      padding-left: 23px;
-      margin: 0 10px;
-      border-bottom: 1px solid #eee;
-      > .el-dialog__title {
-        font-size: 14px;
-        color: #888;
-        line-height: 16px;
-        height: 16px;
-        padding-left: 16px;
-      }
-      > .el-dialog__headerbtn {
-        top: 8px;
-        font-size: 20px;
-      }
-      position: relative;
-      &::before {
-        content: '';
-        position: absolute;
-        height: 20px;
-        width: 18px;
-        // background-color: #428dfa;
-        background: url(../../../assets/images/express.png) no-repeat center center/100% 100%;
-        left: 10px;
-        top: 13px;
+    > .empty {
+      text-align: center;
+      font-size: 14px;
+      position: absolute;
+      top: 48%;
+      width: 100%;
+      .is-bold {
+        margin: 0 3px;
+        font-size: 16px;
       }
     }
-    > .el-dialog__body {
-      // min-height: 340px;
-      .order-list-express-progress-wrap {
-        min-height: 260px;
-        max-height: 420px;
-        overflow: auto;
-        .el-loading-spinner {
-          top: 30%;
-        }
-        .no-info-box {
-          text-align: center;
-          padding-top: 75px;
-          color: #888;
-          font-size: 13px;
-        }
+  }
+}
+.mp-order-detail-express-detail-list-dialog-comp--wrap {
+  color: red;
+  > .el-dialog__header {
+    height: 45px;
+    box-sizing: border-box;
+    padding: 14px 10px;
+    padding-left: 23px;
+    margin: 0 10px;
+    border-bottom: 1px solid #eee;
+    > .el-dialog__title {
+      font-size: 14px;
+      color: #888;
+      line-height: 16px;
+      height: 16px;
+      padding-left: 16px;
+    }
+    > .el-dialog__headerbtn {
+      top: 8px;
+      font-size: 20px;
+    }
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      height: 20px;
+      width: 18px;
+      // background-color: #428dfa;
+      background: url(../../../assets/images/express.png) no-repeat center center/100% 100%;
+      left: 10px;
+      top: 13px;
+    }
+  }
+  > .el-dialog__body {
+    // min-height: 340px;
+    .order-list-express-progress-wrap {
+      min-height: 260px;
+      max-height: 420px;
+      overflow: auto;
+      .el-loading-spinner {
+        top: 30%;
       }
-      .footer {
+      .no-info-box {
         text-align: center;
-        margin-top: 40px;
-        > button {
-          width: 110px;
-          height: 35px;
-          padding: 0;
-          color: #428dfa;
-          border-color: #428dfa;
-        }
+        padding-top: 75px;
+        color: #888;
+        font-size: 13px;
+      }
+      .left-title-wrap {
+        width: 200px;
+      }
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      > button {
+        width: 110px;
+        height: 35px;
+        padding: 0;
+        color: #428dfa;
+        border-color: #428dfa;
+      }
+    }
+    .el-loading-spinner {
+      .circular {
+        width: 30px;
+        height: 30px;
       }
     }
   }

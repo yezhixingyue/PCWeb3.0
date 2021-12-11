@@ -1,6 +1,7 @@
 <template>
   <div :style="widthStyle" class="mp-table-drag-cell"
     @mousedown="onMousedown"
+    :class="{isCheck: isCheck}"
     ref="moveDiv"
   >
     <el-checkbox v-model="checked" v-if="isCheck" :indeterminate="indeterminate" :disabled='checkDisabled'>{{title}}</el-checkbox>

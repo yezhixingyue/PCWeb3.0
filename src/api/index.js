@@ -184,7 +184,7 @@ const api = {
   /* 购物车部分 api
    ----------------------------------------------------------------------------------- */
   getQuotationList() { // GET /Api/Quotation/List 获取购物车数据列表
-    return instance.get('/Api/Quotation/List');
+    return instance.get('/Api/Quotation/List', { params: { terminal: 1 } });
   },
   getQuotationRemove({ preOrderID, closeTip }) { // DELETE /Api/Quotation/Remove
     return instance.delete(`/Api/Quotation/Remove?preOrderID=${preOrderID}`, { closeTip });
@@ -201,14 +201,14 @@ const api = {
   getCustomerOrderList(data) { // POST /Api/Customer/OrderList 获取订单列表
     return instance.post('/Api/Customer/OrderList', data);
   },
-  getOrderProgress(OrderID) { // GET /Api/Order/Progress  订单进度
-    return instance.get(`/Api/Order/Progress?orderID=${OrderID}`);
+  getOrderProgress(OrderID, closeLoading = false) { // GET /Api/Order/Progress  订单进度
+    return instance.get('/Api/Order/Progress', { params: { OrderID }, closeLoading });
   },
-  getOrderPackageList(OrderID) { // GET /Api/Order/PackageList  包裹列表
-    return instance.get(`/Api/Order/PackageList?orderID=${OrderID}`);
+  getOrderPackageList(OrderID, closeLoading = false) { // GET /Api/Order/PackageList  包裹列表
+    return instance.get('/Api/Order/PackageList', { params: { OrderID }, closeLoading });
   },
-  getOrderDetail(OrderID) { // GET /Api/Order/Detail  获取订单详情
-    return instance.get(`/Api/Order/Detail?orderID=${OrderID}`);
+  getOrderDetail(OrderID, closeLoading = false) { // GET /Api/Order/Detail  获取订单详情
+    return instance.get('/Api/Order/Detail', { params: { OrderID }, closeLoading });
   },
   // DELETE /Api/Order/Cancle?orderID=100368895  订单取消
   getOrderCancle(OrderID) {

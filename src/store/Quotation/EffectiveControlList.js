@@ -256,9 +256,7 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
   } else {
     _list = List;
   }
-  console.log(_list, List, SizeGroup.SizeList);
   _list = _list.map(it => ({ ElementID: it.ElementID, Value: getElementTypeValue({ ID: it.ElementID }, null, _list, SizeGroup.GroupInfo.ElementList, true) }));
-  console.log(_list, List, SizeGroup.SizeList);
 
   if (FixedType || FixedType === 0) {
     let num;

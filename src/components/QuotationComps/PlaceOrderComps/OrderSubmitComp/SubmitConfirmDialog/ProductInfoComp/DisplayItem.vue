@@ -4,12 +4,12 @@
       <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称':'部件'}}：</span>
       <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}</div>
     </li>
-    <li v-for="(item) in localContentList" :key="item.Label + item.Content">
+    <li v-for="(item, lv1Index) in localContentList" :key="item.Label + item.Content + lv1Index">
       <span class="label" :class="{'opacity-0': item.Label.includes('-notFirst')}">{{item.Label.replace('-notFirst', '')}}{{item.Label ? '：' : ''}}</span>
       <div class="text">
         <span v-if="typeof item.Content === 'string'">{{item.Content}}</span>
         <ul v-else>
-          <li v-for="it in item.Content" :key="it.Name || it">
+          <li v-for="(it, lv2Index) in item.Content" :key="(it.Name || it) + lv2Index">
             <span v-if="typeof it === 'string'">{{it}}</span>
             <div v-else-if="item.type==='CraftList'" class="craft-wrap">
               <span>{{it.Name}}</span>

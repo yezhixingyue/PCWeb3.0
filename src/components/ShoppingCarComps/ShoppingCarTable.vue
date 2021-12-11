@@ -62,6 +62,7 @@
         </el-table-column>
       </el-table>
     </div>
+    <SubmitConfirmDialog :visible.sync="detailVisible" :OrderDetail='orderDetailData' submitLabel='下单' @submit="onDetailSubmit" isCar />
     <footer class="is-font-14">
       <div class="float">
         <div class="left">
@@ -97,8 +98,12 @@
 import { mapState } from 'vuex';
 import { throttle } from '@/assets/js/utils/throttle';
 import { getFullName } from '@/assets/js/utils/filter';
+import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
 
 export default {
+  components: {
+    SubmitConfirmDialog,
+  },
   data() {
     return {
       multipleSelection: [],
@@ -106,6 +111,8 @@ export default {
       // difference: 0,
       // scrollTop: 0,
       isFootFixed: false,
+      detailVisible: false,
+      orderDetailData: null,
     };
   },
   computed: {
@@ -223,8 +230,10 @@ export default {
       return { text: item.FileErrorMessage, warn, success };
     },
     onDetailClick(row) {
-      this.$store.commit('shoppingCar/setCurShoppingCarDetailData', row);
-      this.$router.push('/shopping/detail');
+      // this.$store.commit('shoppingCar/setCurShoppingCarDetailData', row);
+      // this.$router.push('/shopping/detail');
+      this.orderDetailData = row;
+      this.detailVisible = true;
     },
     async handleSelectedSubmit() {
       if (this.multipleSelection.length === 0) {
@@ -270,6 +279,10 @@ export default {
       if (!oEl) return;
       const { scrollTop, scrollHeight, offsetHeight } = oEl;
       this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
+    },
+    onDetailSubmit() {
+      this.detailVisible = false;
+      this.handleSingleSubmit(this.orderDetailData);
     },
   },
   mounted() {
@@ -359,7 +372,6 @@ export default {
       }
     }
   }
-
   > footer {
     width: 100%;
     > div {

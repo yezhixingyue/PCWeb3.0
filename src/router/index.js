@@ -117,16 +117,16 @@ const routes = [
             },
             component: () => import('../views/OrderPages/OrderListPage.vue'),
           },
-          {
-            path: '/order/detail',
-            name: 'orderDetail',
-            meta: {
-              requiresAuth: true,
-              y: 0,
-              title: '我的订单详情 - 郑州名片之家电子商务有限公司',
-            },
-            component: () => import('../views/OrderPages/OrderDetailPage.vue'),
-          },
+          // {
+          //   path: '/order/detail',
+          //   name: 'orderDetail',
+          //   meta: {
+          //     requiresAuth: true,
+          //     y: 0,
+          //     title: '我的订单详情 - 郑州名片之家电子商务有限公司',
+          //   },
+          //   component: () => import('../views/OrderPages/OrderDetailPage.vue'),
+          // },
         ],
       },
       {
@@ -160,16 +160,16 @@ const routes = [
           //   },
           //   component: () => import('../views/OrderPages/OrderDetailPage.vue'),
           // },
-          {
-            path: '/unpay/detail',
-            name: 'unpayOrderDetail',
-            meta: {
-              requiresAuth: true,
-              y: 0,
-              title: '产品详情 - 郑州名片之家电子商务有限公司',
-            },
-            component: () => import('../views/UnpayList/UnpayOrderDetailPage.vue'),
-          },
+          // {
+          //   path: '/unpay/detail',
+          //   name: 'unpayOrderDetail',
+          //   meta: {
+          //     requiresAuth: true,
+          //     y: 0,
+          //     title: '产品详情 - 郑州名片之家电子商务有限公司',
+          //   },
+          //   component: () => import('../views/UnpayList/UnpayOrderDetailPage.vue'),
+          // },
           // {
           //   path: '/unpay/submit',
           //   name: 'unpayOrderSubmit',

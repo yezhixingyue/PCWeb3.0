@@ -180,6 +180,7 @@ export default {
       flex: none;
       cursor: pointer;
       display: inline-block\0;
+      user-select: none;
       > div {
         height: 12px;
         width: 7px;

@@ -2,17 +2,16 @@
   <section class="mp-pc-order-detail-page-progress-comp-wrap">
     <header class="section-title">订单跟踪</header>
     <ul class="content mp-scroll-wrap">
-      <li v-for="(item, i) in progressData" :key="item.OperateTime + i" :class="item.ShowFocus?'active':''">
+      <li v-for="(item, i) in curProgressData" :key="item.OperateTime + i" :class="item.ShowFocus?'active':''">
         <div class="point-box">
           <span class="point-item"></span>
-          <span class="line" v-if="i < progressData.length - 1"></span>
+          <span class="line" v-if="i < curProgressData.length - 1"></span>
         </div>
         <span class="date">{{item.OperateTime | format2MiddleLangTypeDate}}</span>
         <el-tooltip popper-class="table-item" :content="item.Description" placement="top-start">
           <span class="progress-text">{{item.Description}}</span>
         </el-tooltip>
-        <el-progress
-         :percentage="item.FinishPercent" ></el-progress>
+        <el-progress :percentage="item.FinishPercent" ></el-progress>
       </li>
     </ul>
   </section>
@@ -25,19 +24,28 @@ export default {
       type: Number,
       default: 0,
     },
+    ProgressData: {
+      type: Array,
+      default: null,
+    },
   },
   data() {
     return {
-      progressData: null,
+      localProgressData: null,
     };
+  },
+  computed: {
+    curProgressData() {
+      return this.ProgressData || this.localProgressData;
+    },
   },
   async mounted() {
     if (!this.OrderID) return;
     // this.$emit('setProgressDataCompleted', false);
-    const res = await this.api.getOrderProgress(this.OrderID);
+    const res = await this.api.getOrderProgress(this.OrderID).catch(() => null);
     this.$emit('setProgressDataCompleted', true);
-    if (res.data.Status === 1000) {
-      this.progressData = res.data.Data.filter(it => it.FinishPercent !== 0 || it.ShowFocus).reverse();
+    if (res && res.data.Status === 1000) {
+      this.localProgressData = res.data.Data.filter(it => it.FinishPercent !== 0 || it.ShowFocus).reverse();
     }
   },
 };
@@ -94,11 +102,11 @@ export default {
         &.progress-text {
           font-weight: 700;
           font-size: 14px;
-          width: 100px;
+          width: 125px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          margin-right: 60px;
+          margin-right: 35px;
         }
       }
       > .el-progress {

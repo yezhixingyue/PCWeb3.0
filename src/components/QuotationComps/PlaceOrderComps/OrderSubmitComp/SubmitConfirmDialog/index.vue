@@ -5,60 +5,82 @@
     custom-class="mp-place-order-panel-comp-order-submit-comfirm-dialog-comp-wrap"
     v-dialogDrag
     @open="onOpen"
-    top="4%"
+    :top="top"
+    :close-on-click-modal='false'
+    :before-close='handleBeforeClose'
     @closed="onClosed"
   >
-    <header slot="title">
-      <span>订单信息</span>
+    <header slot="title" v-if="!isFullType">
+      <span>{{!isSubmitType ? '订单详情' : '订单信息'}}</span>
     </header>
-    <main>
-      <div class="left">
-        <ProductInfoComp
-          v-if="ProductParams"
-          :ProductParams="ProductParams"
-          :curProductInfo2Quotation="curProductInfo2Quotation"
-          :OrderPreData="OrderPreData"
-        />
-      </div>
-      <div class="right">
-        <ExpressInfoComp :Address="Address" :ExpressList="ExpressList" />
-        <OrderInfoComp :orderInfo="orderInfo" />
-      </div>
+    <main v-if="isFullType">
+      <el-tabs
+        v-model="activeName"
+        class="order-list-tabs-box"
+        type="card"
+        @tab-click="handleTableClick"
+      >
+        <el-tab-pane label="订单详情" name="detail" :disabled='loading'>
+          <DetailComp class='is-detail' v-loading='loading' element-loading-text="正在加载中..." :OrderDetail='OrderDetailData' hiddenProducePeriod />
+        </el-tab-pane>
+        <el-tab-pane label="包裹列表" name="package" :disabled='loading'>
+          <OrderPackageList :PackageDataList='PackageDataList' :isListloading='loading' v-loading='loading' element-loading-text="正在加载中..." />
+        </el-tab-pane>
+        <el-tab-pane label="查看进度" name="progress" :disabled='loading'>
+          <OrderProgress :ProgressData='ProgressData' v-loading='loading' element-loading-text="正在加载中..." />
+        </el-tab-pane>
+      </el-tabs>
     </main>
+    <DetailComp
+     v-else
+     :class="{'is-detail': !isSubmitType}" v-loading='loading' element-loading-text="正在加载中..."
+     :ProductParams='ProductParams'
+     :orderInfo='orderInfo'
+     :OrderDetail='OrderDetailData'
+     :OrderPreData='OrderPreData'
+     :isSubmitType='isSubmitType'
+     :isCar='isCar'
+     :hiddenProducePeriod='isFullType'
+     />
     <footer>
-      <TipsBox onlyTips />
-      <ul v-if="OrderPreData">
-        <li>
-          <span class="label">在线支付：</span>
-          <span class="content is-bold is-pink">{{onLineAmount}}<i class="is-font-12">元</i></span>
-        </li>
-        <li>
-          <span class="label">货到付款：</span>
-          <span class="content is-pink">{{PayOnDelivery}}<i class="is-font-12">元</i></span>
-        </li>
-        <li>
-          <span class="label">当前可用余额：</span>
-          <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
-        </li>
-        <li>
-          <template v-if="MinimumCost < FullPayout">
-            <span class="label">支付方式：</span>
-            <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
-          </template>
-        </li>
-      </ul>
-      <span class="blue-span" @click="localVisible = false">取消</span>
-      <el-button type="primary" @click="onSubmit">确认提交</el-button>
+      <template  v-if="OrderPreData && isSubmitType">
+        <TipsBox onlyTips />
+        <ul>
+          <li>
+            <span class="label">在线支付：</span>
+            <span class="content is-bold is-pink">{{onLineAmount}}<i class="is-font-12">元</i></span>
+          </li>
+          <li>
+            <span class="label">货到付款：</span>
+            <span class="content is-pink">{{PayOnDelivery}}<i class="is-font-12">元</i></span>
+          </li>
+          <li>
+            <span class="label">当前可用余额：</span>
+            <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
+          </li>
+          <li>
+            <template v-if="MinimumCost < FullPayout">
+              <span class="label">支付方式：</span>
+              <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
+            </template>
+          </li>
+        </ul>
+        <span class="blue-span" @click="localVisible = false">取消</span>
+        <el-button type="primary" @click="onSubmit">确认提交</el-button>
+      </template>
+      <div v-else class="detail-footer-box">
+        <el-button :disabled="loading" class="close" @click="localVisible = false">关闭</el-button>
+        <el-button :disabled="loading" v-if="submitLabel" type="primary" @click="onDetailSubmitClick">{{submitLabel}}</el-button>
+      </div>
     </footer>
   </el-dialog>
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
-import ProductInfoComp from './ProductInfoComp/index.vue';
-import OrderInfoComp from './OrderInfoComp.vue';
-import ExpressInfoComp from './ExpressInfoComp';
+import OrderProgress from '@/components/OrderListComps/OrderDetail/OrderProgress.vue';
+import OrderPackageList from '@/components/OrderListComps/OrderDetail/OrderPackageList.vue';
+import DetailComp from './DetailComp.vue';
 
 export default {
   props: {
@@ -78,16 +100,42 @@ export default {
       type: Number,
       default: 0,
     },
+    OrderDetail: {
+      type: Object,
+      default: null,
+    },
+    top: {
+      type: String,
+      default: '5%',
+    },
+    submitLabel: {
+      type: String,
+      default: '',
+    },
+    isCar: {
+      type: Boolean,
+      default: false,
+    },
+    isSubmitType: {
+      type: Boolean,
+      default: false,
+    },
+    isFullType: { // 全状态弹窗
+      type: Boolean,
+      default: false,
+    },
+    OrderID: {
+      type: Number,
+      default: null,
+    },
   },
   components: {
-    OrderInfoComp,
-    ExpressInfoComp,
-    ProductInfoComp,
     TipsBox,
+    DetailComp,
+    OrderProgress,
+    OrderPackageList,
   },
   computed: {
-    ...mapState('common', ['ExpressList']),
-    ...mapState('Quotation', ['curProductInfo2Quotation']),
     localVisible: {
       get() {
         return this.visible;
@@ -95,59 +143,6 @@ export default {
       set(bool) {
         this.$emit('update:visible', bool);
       },
-    },
-    orderInfo() {
-      if (
-        this.OrderPreData
-        && this.requestObj
-        && this.requestObj.List
-        && this.requestObj.List.length > 0
-      ) {
-        const { Content, OutPlate } = this.requestObj.List[0];
-        let ProducePeriod = null;
-        if (
-          this.OrderPreData
-          && Array.isArray(this.OrderPreData.PackageList)
-          && this.OrderPreData.PackageList.length > 0
-          && this.OrderPreData.PackageList[0].OrderList
-          && this.OrderPreData.PackageList[0].OrderList.length > 0
-        ) {
-          if (this.OrderPreData.PackageList[0].OrderList[0].ProducePeriod) {
-            ProducePeriod = this.OrderPreData.PackageList[0].OrderList[0].ProducePeriod;
-          }
-        }
-        return {
-          FileCount: this.FileCount,
-          FileContent: Content,
-          OutPlateNo: OutPlate && OutPlate.Second ? OutPlate.Second : '',
-          ProducePeriod,
-        };
-      }
-      return null;
-    },
-    Address() {
-      if (
-        this.OrderPreData
-        && Array.isArray(this.OrderPreData.PackageList)
-        && this.OrderPreData.PackageList.length > 0
-        && this.OrderPreData.PackageList[0].Address
-        && this.OrderPreData.PackageList[0].Address.Address
-      ) {
-        return this.OrderPreData.PackageList[0].Address;
-      }
-      return null;
-    },
-    ProductParams() {
-      if (!this.localVisible) return null;
-      if (
-        this.requestObj
-        && this.requestObj.List
-        && this.requestObj.List.length > 0
-      ) {
-        const { ProductParams } = this.requestObj.List[0];
-        if (ProductParams) return ProductParams;
-      }
-      return {};
     },
     MinimumCost() {
       return this.OrderPreData ? +(this.OrderPreData.MinimumCost.toFixed(2)) : '';
@@ -170,20 +165,134 @@ export default {
     FundBalance() {
       return this.OrderPreData ? this.OrderPreData.FundBalance : '';
     },
+    ProductParams() {
+      if (!this.localVisible) return null;
+      if (
+        this.requestObj
+        && this.requestObj.List
+        && this.requestObj.List.length > 0
+      ) {
+        const { ProductParams } = this.requestObj.List[0];
+        if (ProductParams) return ProductParams;
+      }
+      return {};
+    },
+    orderInfo() {
+      if (
+        this.OrderPreData
+        && this.requestObj
+        && this.requestObj.List
+        && this.requestObj.List.length > 0
+      ) {
+        const { Content, OutPlate } = this.requestObj.List[0];
+        let ProducePeriod = null;
+        let Weight = null;
+        if (
+          this.OrderPreData
+          && Array.isArray(this.OrderPreData.PackageList)
+          && this.OrderPreData.PackageList.length > 0
+          && this.OrderPreData.PackageList[0].OrderList
+          && this.OrderPreData.PackageList[0].OrderList.length > 0
+        ) {
+          const t = this.OrderPreData.PackageList[0].OrderList[0];
+          if (t.ProducePeriod) ProducePeriod = t.ProducePeriod;
+          if (t.Weight) Weight = t.Weight;
+        }
+        return {
+          FileCount: this.FileCount,
+          FileContent: Content,
+          OutPlateNo: OutPlate && OutPlate.Second ? OutPlate.Second : '',
+          ProducePeriod,
+          Weight,
+        };
+      }
+      return null;
+    },
+    OrderDetailData() { // 综合详情数据
+      return this.OrderDetail || this.localDetailData;
+    },
+    curOrderID() {
+      return this.OrderID || (this.OrderDetail ? this.OrderDetail.OrderID : '');
+    },
   },
   data() {
     return {
       PayInFull: false,
+      localDetailData: null,
+      loading: false,
+      activeName: '',
+      ProgressData: null,
+      PackageDataList: null,
     };
   },
   methods: {
     onOpen() {
       this.$store.dispatch('common/getExpressList');
+      this.getLocalDetailData();
+      if (this.isFullType) this.activeName = 'detail';
+      console.log(this.OrderDetail);
     },
     onClosed() {
+      this.localDetailData = null;
+      this.ProgressData = null;
+      this.PackageDataList = null;
+    },
+    handleBeforeClose(done) {
+      if (!this.loading) done();
     },
     onSubmit() {
       this.$emit('submit', { ...this.requestObj, PayInFull: this.PayInFull });
+    },
+    onDetailSubmitClick() {
+      this.$emit('submit');
+    },
+    async getLocalDetailData() { // 获取订单数据
+      if (!this.OrderID || this.localDetailData) return;
+      this.localDetailData = null;
+      this.loading = true;
+      const resp = await this.api.getOrderDetail(this.OrderID, true).catch(() => null);
+      this.loading = false;
+      if (resp && resp.data.Status === 1000) {
+        this.localDetailData = resp.data.Data;
+      } else if (!this.isFullType) {
+        this.localVisible = false;
+      }
+    },
+    async getProgressData() { // 获取进度条数据
+      if (!this.curOrderID || this.ProgressData) return;
+      this.ProgressData = null;
+      this.loading = true;
+      const res = await this.api.getOrderProgress(this.curOrderID, true).catch(() => null);
+      this.loading = false;
+      if (res && res.data.Status === 1000) {
+        this.ProgressData = res.data.Data.filter(it => it.FinishPercent !== 0 || it.ShowFocus).reverse();
+      }
+    },
+    async getLocalPackageData() { // 获取包裹列表数据
+      if (!this.curOrderID || this.PackageDataList) return;
+      this.PackageDataList = null;
+      this.loading = true;
+      const res = await this.api.getOrderPackageList(this.curOrderID, true).catch(() => null);
+      this.loading = false;
+      if (res && res.data.Status === 1000) {
+        const _list = [...res.data.Data];
+        this.PackageDataList = _list;
+      }
+    },
+    handleTableClick() {
+      switch (this.activeName) {
+        case 'progress':
+          this.getProgressData();
+          break;
+        case 'detail':
+          this.getLocalDetailData();
+          break;
+        case 'package':
+          this.getLocalPackageData();
+          break;
+        default:
+          break;
+      }
     },
   },
 };
@@ -215,7 +324,7 @@ export default {
       margin-left: 15px\0;
       margin-right: 15px\0;
       padding-top: 20px;
-      > main {
+      main.mp-common-detail-comp-wrap {
         height: 490px;
         text-align: center;
         > div {
@@ -272,6 +381,113 @@ export default {
             }
           }
         }
+        &.is-detail {
+          height: 560px;
+          > div .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap .panel-content > ul.content {
+            height: 435px;
+          }
+          > div.right > div {
+            &.express {
+              height: 235px;
+            }
+            &.order {
+              height: 305px;
+            }
+          }
+        }
+      }
+      > main {
+        .order-list-tabs-box {
+          .el-tabs__header {
+            // margin: 0 20px;
+            margin-right: 20px;
+            user-select: none;
+            margin-bottom: 0;
+            .el-tabs__item {
+              background-color: #f5f5f5;
+              border-color: #e6e6e6;
+              color: #444444;
+              height: 36px;
+              line-height: 36px;
+              width: 120px;
+              text-align: center;
+              box-sizing: border-box;
+              &.is-active {
+                border-bottom: none;
+                background-color: #ffffff;
+                color: #428dfa;
+                position: relative;
+                border-radius: 0%;
+                &::before {
+                  content: "";
+                  display: block;
+                  height: 3px;
+                  width: calc(100% + 2px);
+                  background-color: #428dfa;
+                  position: absolute;
+                  top: -1px;
+                  left: -1px;
+                  border-radius: 1.5px;
+                  z-index: 99;
+                }
+              }
+            }
+          }
+          .el-tabs__content {
+            padding: 28px 0 12px;
+            height: 560px;
+            width: 740px;
+            .mp-common-detail-comp-wrap.is-detail {
+              > .left {
+                width: 396px;
+              }
+              > .right {
+                width: 308px;
+              }
+            }
+            .mp-pc-order-detail-page-progress-comp-wrap {
+              > header {
+                display: none;
+              }
+              > ul.content {
+                padding-left: 80px;
+                max-height: 510px;
+                height: 510px;
+                padding-bottom: 0;
+              }
+            }
+            .mp-pc-order-detail-page-package-list-comp-wrap {
+              width: 740px;
+              > header {
+                display: none;
+              }
+              > .content {
+                padding: 20px 8px;
+                padding-top: 10px;
+                height: 530px;
+                .el-table__header .cell {
+                  font-size: 13px;
+                }
+                .el-table__body .cell {
+                  font-size: 12px;
+                  .num {
+                    font-size: 14px;
+                  }
+                }
+              }
+            }
+          }
+          &::after {
+            width: 20px;
+            height: 1px;
+            content: "";
+            position: absolute;
+            background-color: #e6e6e6;
+            top: 56px;
+            left: 0px;
+            z-index: 99;
+          }
+        }
       }
       > footer {
         text-align: right;
@@ -304,7 +520,7 @@ export default {
             }
           }
         }
-        > button {
+        button {
           height: 35px;
           width: 120px;
           line-height: 33px;
@@ -313,6 +529,38 @@ export default {
           & + button {
             margin-left: 45px;
           }
+        }
+        .detail-footer-box {
+          text-align: right;
+          padding-top: 25px;
+          padding-right: 1px;
+          height: 35px;
+          button{
+            &.close {
+              color: #428dfa;
+              border-color: #428dfa;
+            }
+            margin-left: 30px;
+          }
+        }
+      }
+      .el-loading-spinner {
+        top: 43%;
+        .circular {
+          width: 30px;
+          height: 30px;
+        }
+        p {
+          font-size: 13px;
+          margin-top: 8px;
+        }
+      }
+      .single-row {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        .text {
+          text-overflow: ellipsis;
         }
       }
     }

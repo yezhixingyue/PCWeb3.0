@@ -158,9 +158,8 @@ html, body, #app {
     margin-right: 15px;
   }
 }
-
 .is-origin{
-  color: $--color-text-orgin;
+  color: $--color-text-orgin !important;
 }
 .is-gray{
   color: $--color-text-table-time !important;

@@ -18,7 +18,7 @@
             :key="data.ID"
             :class="i === localUnpayDataList.length - 1 ? 'hide-border' : ''"
           >
-            <ItemListComp :data="data" :widthObj="widthObj" v-model="multipleSelection" />
+            <ItemListComp :data="data" :widthObj="widthObj" v-model="multipleSelection" @detail='handleDetailClick' />
           </li>
         </ul>
       </template>
@@ -75,6 +75,7 @@
     </transition>
     <CancelDialogBox :visible.sync='cancelVisivle' v-model="cancelObj" @submit="submitCancelOrder" />
     <Dialog2Pay pageType='unpayPage' />
+    <SubmitConfirmDialog :visible.sync="detailVisible" :OrderID='curOrderID' />
   </section>
 </template>
 
@@ -82,7 +83,8 @@
 import { mapState } from 'vuex';
 import RetractableDisplayComp from '@/components/common/RetractableDisplayComp/Index.vue';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
-import { getFullName } from '@/assets/js/utils/filter';
+import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
+// import { getFullName } from '@/assets/js/utils/filter';
 import ItemListComp from './ItemListComp.vue';
 import CancelDialogBox from './CancelDialogBox.vue';
 
@@ -92,6 +94,7 @@ export default {
     CancelDialogBox,
     RetractableDisplayComp,
     Dialog2Pay,
+    SubmitConfirmDialog,
   },
   data() {
     return {
@@ -105,12 +108,9 @@ export default {
         w7: 60,
         w8: 80,
         w9: 65,
-        w10: 90,
-        w11: 70,
-        w12: 95,
-        w13: 80,
-        w14: 70,
-        w15: 108,
+        w10: 170,
+        w11: 222,
+        w12: 120,
       },
       titleList: [
         '全选',
@@ -122,11 +122,8 @@ export default {
         '优惠券',
         '成交价',
         '定金',
+        '平台单号',
         '文件内容',
-        '收货人',
-        '收货人手机',
-        '配送方式',
-        '状态',
         '操作',
       ],
       multipleSelection: [],
@@ -134,6 +131,8 @@ export default {
       isFootFixed: false,
       cancelVisivle: false,
       isAddPrepare: true,
+      detailVisible: false,
+      curOrderID: null,
     };
   },
   computed: {
@@ -174,23 +173,14 @@ export default {
     localUnpayDataList() {
       if (!Array.isArray(this.unpayDataList) || this.unpayDataList.length === 0) return [];
       return this.unpayDataList.map(it => {
-        const _OrderList = [];
         let _Weight = 0;
         if (Array.isArray(it.PackageList) && it.PackageList.length > 0) {
-          it.PackageList.forEach(({
-            Address, OrderList, Weight, OutPlate,
-          }) => {
-            const _list = Array.isArray(OrderList) ? OrderList.map(_it => ({
-              ..._it, Address, OutPlate, _FullName: getFullName(_it),
-            })) : [];
-            _OrderList.push(..._list);
+          it.PackageList.forEach(({ Weight }) => {
             _Weight += Weight;
           });
         }
-        const temp = { ...it };
-        delete temp.PackageList;
         _Weight = +_Weight.toFixed(2);
-        return { ...temp, _OrderList, _Weight };
+        return { ...it, _Weight };
       });
     },
     cancelObj: {
@@ -224,6 +214,11 @@ export default {
     },
     submitCancelOrder() {
       this.$store.dispatch('unpayList/getOrderCancle', [this.multipleSelection, this.isAddPrepare]);
+    },
+    async handleDetailClick(OrderID) { // 查看详情
+      if (!OrderID) return;
+      this.curOrderID = OrderID;
+      this.detailVisible = true;
     },
   },
   watch: {
@@ -303,15 +298,49 @@ export default {
   padding-bottom: 15px;
   border: 1px solid #eee;
   position: relative;
+  border-top: none;
   > header {
     height: 40px;
-    background-color: rgb(248, 248, 248);
     box-sizing: border-box;
     border-top: none;
+    background-color: #79ADFA;
+    border: 1px solid #79ADFA;
     > div {
       line-height: 38px;
       height: 100%;
-      background-color: rgb(248, 248, 248);
+      background-color: #79ADFA;
+      color: #fff;
+      text-align: left;
+      .el-checkbox .el-checkbox__label{
+        color: #fff;
+      }
+      .el-checkbox__inner {
+        background-color: #79ADFA !important;
+        border-color: #eee !important;
+      }
+      .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+        // background-color: #fff;
+        border-color: #eee;
+      }
+      // .el-checkbox__input.is-checked .el-checkbox__inner::after {
+      //   border-color: #428dfa;
+      // }
+      // .el-checkbox__input.is-indeterminate .el-checkbox__inner::before {
+      //   background-color: #428dfa;
+      // }
+      &::after {
+        background-color: #79ADFA;
+      }
+      &::after:hover {
+        background-color: #888;
+      }
+      &.isCheck {
+        text-align: center;
+      }
+      &:last-of-type {
+        text-align: center;
+        padding-right: 12px;
+      }
     }
   }
   .no-data-show {
@@ -325,7 +354,8 @@ export default {
   > main {
     min-height: calc(100vh - 135px - 175px - 205px);
     overflow-x: hidden;
-    border-top: 1px solid #eee;
+    // border-top: 1px solid #eee;
+    box-sizing: border-box;
     > div {
       margin-bottom: 0;
     }

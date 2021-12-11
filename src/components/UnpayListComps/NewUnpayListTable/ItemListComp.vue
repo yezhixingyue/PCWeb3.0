@@ -1,77 +1,100 @@
 <template>
-    <div class="mp-pc-new-unpay-list-page-table-item-comp-wrap">
+    <div class="mp-pc-new-unpay-list-page-table-item-comp-wrap" ref="oItemWrap">
       <div class="product-item-header">
         <div class="product-item-header-left">
           <el-checkbox v-model="checked" :disabled='this.data.isCanceled || this.data.isPaid'>
             <span class="product-item-header-amount-box gray is-font-14">付款单号：<i>{{this.data.PayCode}}</i></span>
           </el-checkbox>
-          <span class="freight-box"> <i class="gray">产品金额：</i><em class="is-pink">{{totalOriginalPrice}}元</em></span>
-          <span class="freight-box"> <i class="gray">运费：</i>{{totalFreight}}元</span>
-          <span class="freight-box"> <i class="gray">重量：</i>{{this.data._Weight}}kg</span>
+          <span class="freight-box" style="min-width:150px"> <i class="gray">产品总金额：</i><em class="is-pink">{{totalOriginalPrice}}元</em></span>
+          <span class="freight-box"> <i class="gray">总运费：</i>{{totalFreight}}元</span>
+          <!-- <span class="freight-box"> <i class="gray">总重量：</i>{{this.data._Weight}}kg</span> -->
         </div>
         <div class="product-item-header-right" >
+          <span class="is-gray status" v-if="this.data.isCanceled">已取消</span>
+          <span class="is-success status" v-else-if="this.data.isPaid">已付款</span>
+          <span class="is-pink status" v-else>未付款</span>
           <span class="span-title-blue" @click="handlePayClick" :class="{disabled: this.data.isCanceled || this.data.isPaid}">付款</span>
-          <span class="span-title-blue" @click="handleOrderCancel" :class="{disabled: this.data.isCanceled || this.data.isPaid}">取消</span>
-          <div :class="isActive ? 'active arrow' : 'arrow'" @click="handleCollapse"></div>
+          <span class="span-title-blue cancel" @click="handleOrderCancel" :class="{disabled: this.data.isCanceled || this.data.isPaid}">取消</span>
+          <div @click="handleCollapse" class="arrow-wrap">
+            <span>{{ !isActive ? '展开' : '收起' }}</span>
+            <div :class="isActive ? 'active arrow' : 'arrow'">
+            </div>
+          </div>
         </div>
       </div>
-      <TransitionGroupCollapse4ShopCar tag="ul" class="mp-group-collapse-for-shop"> <!-- 子列表部分 -->
+      <TransitionGroupCollapse4ShopCar tag="ul" :className="{'mp-group-collapse-for-shop': true, isClose: !isActive}"
+       :h='contentHeight' key="mp-group-collapse-for-shop"> <!-- 子列表部分 -->
         <li
           class="product-item-content has-transition"
           v-show="isActive"
-          v-for="(item, i) in data._OrderList"
-          :class="i === data.length - 1 ? 'hide-border-item' : ''"
-          :key="item.OrderID"
+          v-for="(Package, i) in data.PackageList"
+          :key="Package.ID"
+          :class="i === 0 ? 'f' : ''"
         >
-          <div :style="wStyles[0]"></div>
-          <div :style="'width:' + (widthObj.w2 + 20) + 'px' + ';text-align:left;margin-left:-20px;'">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item._FullName" placement="top-start">
-              <span>{{item._FullName}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[2]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="getSize(item.SizeList)" placement="top-start">
-              <span>{{getSize(item.SizeList)}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[3]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item | formarProductAmount" placement="top-start">
-              <span>{{item | formarProductAmount}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[4]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="getCraft(item.CraftList)" placement="top-start">
-              <span>{{getCraft(item.CraftList)}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[5]">{{item.Funds.OriginalPrice}}元</div>
-          <div :style="wStyles[6]" class="is-twelve">
-            <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-          <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
-          <div :style="wStyles[8]">{{item.Funds.Deposit}}元</div>
-          <div :style="wStyles[9]" class="is-font-12 gray">
-            <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
-              :content="item.Content" placement="top-start">
-              <span>{{item.Content}}</span>
-            </el-tooltip>
-            <span v-else>无</span>
-          </div>
-          <div :style="wStyles[10]">{{item.Address.Address.Consignee}}</div>
-          <div :style="wStyles[11]">{{item.Address.Address.Mobile}}</div>
-          <div :style="wStyles[12]">{{item.Address.ExpressText}}</div>
-          <div :style="wStyles[13]" :class="{
-            'is-font-13': 1,
-            'yellow-color': 1,
-            'is-gray': [254, 255, 35].includes(item.Status),
-            'is-success': item.Status === 200,
-          }">{{item.Status | formatStatus}}</div>
-          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap">
-            <span class="span-title-blue" @click="goToDetailPage(item)">详情</span>
-          </div>
+          <ul class="package-header">
+            <li class="price">
+              <label>产品金额：</label>
+              <span class="is-pink">{{Package.ProductPrice | formatNumber}}元</span>
+            </li>
+            <li class="freight">
+              <label>运费：</label>
+              <span>{{Package.Freight | formatNumber}}元</span>
+              <span> ( {{Package.Weight | formatNumber}}kg )</span>
+            </li>
+            <li class="express">
+              <span>{{Package.Address.ExpressText}}</span>
+            </li>
+            <li class="address">
+              <label>配送地址：</label>
+              <span>{{Package.Address.Address.Consignee}}（ {{Package.Address.Address.Mobile}} ） </span>
+              <span :title="getAddressDetail(Package.Address.Address)">{{getAddressDetail(Package.Address.Address)}}</span>
+            </li>
+          </ul>
+          <ul class="package-content">
+            <li v-for="item in Package.OrderList" :key="item.OrderID">
+              <div :style="wStyles[0]"></div>
+              <div :style="'width:' + (widthObj.w2 + 20) + 'px' + ';text-align:left;margin-left:-22px;'">
+                <el-tooltip popper-class="table-item" :enterable='false'
+                  :content="item | getFullName" placement="top-start">
+                  <span>{{item | getFullName}}</span>
+                </el-tooltip>
+              </div>
+              <div :style="wStyles[2]">
+                <el-tooltip popper-class="table-item" :enterable='false'
+                  :content="item.SizeList | formatListItemSize" placement="top-start">
+                  <span>{{item.SizeList | formatListItemSize}}</span>
+                </el-tooltip>
+              </div>
+              <div :style="wStyles[3]">
+                <el-tooltip popper-class="table-item" :enterable='false'
+                  :content="item | formarProductAmount" placement="top-start">
+                  <span>{{item | formarProductAmount}}</span>
+                </el-tooltip>
+              </div>
+              <div :style="wStyles[4]">
+                <el-tooltip popper-class="table-item" :enterable='false'
+                  :content="item.CraftList | formatListItemCraft" placement="top-start">
+                  <span>{{item.CraftList | formatListItemCraft}}</span>
+                </el-tooltip>
+              </div>
+              <div :style="wStyles[5]">{{item.Funds.OriginalPrice}}元</div>
+              <div :style="wStyles[6]" class="is-twelve">
+                <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
+              <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
+              <div :style="wStyles[8]">{{item.Funds.Deposit}}元</div>
+              <div :style="wStyles[9]">{{Package.OutPlate ? Package.OutPlate.Second : ''}}</div>
+              <div :style="wStyles[10]" class="is-font-12 gray" style="text-align:left">
+                <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
+                  :content="item.Content" placement="top-start">
+                  <span>{{item.Content}}</span>
+                </el-tooltip>
+                <span v-else>无</span>
+              </div>
+              <div :style="wStyles[11]" class="is-font-12 gray btn-wrap">
+                <span class="span-title-blue" @click="goToDetailPage(item)">详情</span>
+              </div>
+            </li>
+          </ul>
         </li>
       </TransitionGroupCollapse4ShopCar>
       <CancelDialogBox :visible.sync='cancelVisivle' v-model="cancelObj" @submit="submitCancelOrder" />
@@ -124,7 +147,8 @@ export default {
   computed: {
     ...mapState('shoppingCar', ['curShoppingCarDataBeforeFirstPlace']),
     wStyles() {
-      return Object.values(this.widthObj).map((item) => `width: ${item}px`);
+      const list = Object.values(this.widthObj);
+      return list.map((item, i) => `width: ${item - (i === 0 || i === list.length - 1 ? 16 : 0)}px`);
     },
     totalOriginalPrice() {
       return +(this.data.ProductPrice.toFixed(2));
@@ -156,44 +180,22 @@ export default {
       isActive: true,
       cancelVisivle: false,
       cancelObj: null,
+      contentHeight: 70,
     };
   },
   methods: {
     handleCollapse() {
       this.isActive = !this.isActive;
     },
-    getSize(SizeList) {
-      if (!SizeList) return '无';
-      const _list = [];
-      SizeList.forEach(it => {
-        _list.push(it.Name.replace('毫米', 'mm'));
-      });
-      const _obj = {};
-      _list.forEach(it => {
-        if (!_obj[it]) _obj[it] = 0;
-        else _obj[it] += 1;
-      });
-      return Object.keys(_obj).join('、');
-    },
-    getCraft(CraftList) {
-      if (!CraftList) return '无';
-      const _list = [];
-      CraftList.forEach(it => {
-        _list.push(it.Name.replace('毫米', 'mm'));
-      });
-      return _list.join('、') || '无';
-    },
-    // eslint-disable-next-line object-curly-newline
-    getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {
+    getAddressDetail({ AddressDetail, ExpressArea }) {
       const { RegionalName, CityName, CountyName } = ExpressArea;
-      const _obj = {};
-      _obj.First = `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
-      _obj.Second = `（${Consignee} ${Mobile}）`;
-      return _obj;
+      return `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
     },
-    goToDetailPage(data) {
-      this.$store.commit('unpayList/setCurUnpayListDetailData', { ...data, Weight: this.data._Weight });
-      this.$router.push('/unpay/detail');
+    goToDetailPage(orderItem) {
+      // this.$store.commit('unpayList/setCurUnpayListDetailData', { ...data, Weight: this.data._Weight });
+      // this.$router.push('/unpay/detail');
+      if (!orderItem || !orderItem.OrderID) return;
+      this.$emit('detail', orderItem.OrderID);
     },
     handleOrderCancel() {
       if (!this.data || this.data.isCanceled || this.data.isPaid) return;
@@ -233,6 +235,14 @@ export default {
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
     },
   },
+  mounted() {
+    if (this.$refs.oItemWrap) {
+      const oContent = this.$refs.oItemWrap.getElementsByClassName('mp-group-collapse-for-shop')[0];
+      if (oContent) {
+        this.contentHeight = oContent.offsetHeight;
+      }
+    }
+  },
 };
 </script>
 
@@ -243,11 +253,11 @@ export default {
   box-sizing: border-box;
 
   .product-item-header {
-    background-color: rgb(248, 248, 248);
+    background-color: #F0F6FF;
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid rgba($color: #000000, $alpha: 0);
-    border-bottom: 1px solid #eee;
+    // border-top: 1px solid rgba($color: #000000, $alpha: 0);
+    // border-bottom: 1px solid #eee;
     .product-item-header-left {
       height: 36px;
       line-height: 36px;
@@ -267,47 +277,52 @@ export default {
         > .is-pink {
           font-size: 14px;
         }
-        &.product-item-header-amount-box {
-          margin-right: 35px;
-          > i {
-            display: inline-block;
-            min-width: 60px;
-            text-align: left;
-          }
-        }
         &.freight-box {
           margin-right: 40px;
           font-size: 14px;
+          text-align: left;
         }
       }
       .el-checkbox {
         margin-right: 35px;
         .el-checkbox__label {
           padding-left: 20px;
+          .product-item-header-amount-box {
+            > i {
+              color: #585858;
+            }
+          }
         }
       }
     }
     .product-item-header-right {
       height: 29px;
-      width: 118px;
+      width: 288px;
       margin-right: 12px;
       position: relative;
       flex: none;
       display: inline-block\0;
       cursor: pointer;
       user-select: none;
-      > div.arrow {
-        height: 32px;
-        width: 30px;
-        position: absolute;
-        top: calc(50% + 3px);
-        right: -12px;
-        transition: 0.2s !important;
-        transform: translate(-50%, -50%) rotate(90deg);
-        background: url("../../../assets/images/right-arrow.png") center no-repeat;
-        background-size: 7px 10px;
-        &.active {
-          transform: translate(-50%, -50%) rotate(-90deg);
+      > div.arrow-wrap {
+        padding-left: 15px;
+        display: inline-block;
+        text-align: right;
+        width: 60px;
+        color: #a2a2a2;
+        > div.arrow {
+          height: 32px;
+          width: 30px;
+          position: absolute;
+          top: calc(50% + 3px);
+          right: -12px;
+          transition: 0.05s !important;
+          transform: translate(-50%, -50%) rotate(90deg);
+          background: url("../../../assets/images/right-arrow.png") center no-repeat;
+          background-size: 6px 10px;
+          &.active {
+            transform: translate(-50%, -50%) rotate(-90deg);
+          }
         }
       }
       > span {
@@ -315,6 +330,12 @@ export default {
         line-height: 32px;
         font-size: 14px;
         margin-left: 4px;
+        &.status {
+          width: 88px;
+        }
+        &.cancel {
+          margin-left: 8px;
+        }
       }
     }
     &::before {
@@ -323,47 +344,93 @@ export default {
       height: 36px;
       width: 3px;
       background-color: #428dfa;
+      vertical-align: top;
     }
   }
-  .product-item-content {
-    height: 70px;
-    box-sizing: border-box;
-    vertical-align: middle;
-    white-space: nowrap;
-    display: flex;
-    border-bottom: none;
-    border-bottom: 1px solid #eee;
-    &:hover > div {
-      background-color: #ebf7ff;
-    }
-    > div {
+  > ul {
+    padding: 0px 16px;
+    padding-top: 15px;
+    > li.product-item-content {
+      box-sizing: border-box;
+      vertical-align: middle;
       white-space: nowrap;
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-      padding-right: 6px;
-      box-sizing: border-box;
-      flex: none;
-      font-size: 12px;
-      color: #585858;
-      line-height: 30px;
-      padding-top: 20px;
-      height: 100%;
-      box-sizing: border-box;
-      display: inline-block\0;
-      &.yellow-color {
-        color: #f4a307;
+      border-bottom: none;
+      margin-top: 15px;
+      border: 1px solid #eee;
+      > ul.package-header {
+        height: 24px;
+        padding: 5px 0;
+        line-height: 24px;
+        background-color: #f8f8f8;
+        padding-left: 22px;
+        li {
+          padding-left: 20px;
+          display: inline-block;
+          color: #888;
+          &.price {
+            min-width: 128px;
+          }
+          &.freight {
+            min-width: 120px;
+          }
+          &.address {
+            vertical-align: top;
+            max-width: 600px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          &.express {
+            min-width: 72px;
+          }
+        }
       }
-      .el-tooltip {
-        max-width: 100%;
-        display: inline-block;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      > ul.package-content {
+        > li {
+          height: 70px;
+          border-top: 1px solid #eee;
+          box-sizing: border-box;
+          &:hover > div {
+            background-color: #ebf7ff;
+          }
+          > div {
+            white-space: nowrap;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+            padding-right: 6px;
+            box-sizing: border-box;
+            flex: none;
+            font-size: 12px;
+            color: #585858;
+            line-height: 30px;
+            padding-top: 20px;
+            height: 100%;
+            box-sizing: border-box;
+            display: inline-block;
+            &.yellow-color {
+              color: #f4a307;
+            }
+            .el-tooltip {
+              max-width: 100%;
+              display: inline-block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            &.btn-wrap {
+              padding-right: 0;
+              padding-left: 4px;
+              font-size: 14px !important;
+            }
+            &:last-of-type {
+              text-align: center;
+            }
+          }
+        }
       }
-      &.btn-wrap {
-        padding-right: 16px;
-        font-size: 14px !important;
+      &.f {
+        margin-top: 0;
       }
     }
   }

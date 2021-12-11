@@ -51,7 +51,7 @@
             :DownLoadConfigObj='DownLoadConfigObj'
             class="float"
             >
-            <span class="price-box">
+            <span class="footer-price-box">
               <i class="gray">共计金额：</i>
               <i class="is-pink is-bold is-font-14">￥{{orderTotalAmount}}</i>
               <i class="is-pink is-font-12">元</i>
@@ -70,7 +70,7 @@
               :DownLoadConfigObj='DownLoadConfigObj'
               class="float"
               >
-                <span class="price-box">
+                <span class="footer-price-box">
                   <i class="gray">共计金额：</i>
                   <i class="is-pink is-bold is-font-14">￥{{orderTotalAmount}}</i>
                   <i class="is-pink is-font-12">元</i>
@@ -304,10 +304,8 @@ export default {
       }
     }
   }
-  .price-box {
-    // float: left;
+  .footer-price-box {
     position: absolute;
-    // margin-left: 100px;
     left: 0;
     font-size: 13px;
   }

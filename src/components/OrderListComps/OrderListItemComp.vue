@@ -32,14 +32,14 @@
           </div>
           <div :style="wStyles[2]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="getSize(item.SizeList)" placement="top-start">
-              <span>{{getSize(item.SizeList)}}</span>
+              :content="item.SizeList | formatListItemSize" placement="top-start">
+              <span>{{item.SizeList | formatListItemSize}}</span>
             </el-tooltip>
           </div>
           <div :style="wStyles[3]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="getCraft(item.CraftList)" placement="top-start">
-              <span>{{getCraft(item.CraftList)}}</span>
+              :content="item.CraftList | formatListItemCraft" placement="top-start">
+              <span>{{item.CraftList | formatListItemCraft}}</span>
             </el-tooltip>
           </div>
           <div :style="wStyles[4]">
@@ -79,11 +79,13 @@
           </div>
         </li>
       </TransitionGroupCollapse4ShopCar>
+      <SubmitConfirmDialog :visible.sync="detailVisible" isFullType :OrderID='curOrderID4Detail' />
     </div>
 </template>
 
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
+import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -119,6 +121,7 @@ export default {
   components: {
     // Test,
     TransitionGroupCollapse4ShopCar,
+    SubmitConfirmDialog,
   },
   computed: {
     ...mapState('shoppingCar', ['curShoppingCarDataBeforeFirstPlace']),
@@ -144,32 +147,13 @@ export default {
   data() {
     return {
       isActive: true,
+      detailVisible: false,
+      curOrderID4Detail: null,
     };
   },
   methods: {
     handleCollapse() {
       this.isActive = !this.isActive;
-    },
-    getSize(SizeList) {
-      if (!SizeList) return '未知尺寸';
-      const _list = [];
-      SizeList.forEach(it => {
-        _list.push(it.Name.replace('毫米', 'mm'));
-      });
-      const _obj = {};
-      _list.forEach(it => {
-        if (!_obj[it]) _obj[it] = 0;
-        else _obj[it] += 1;
-      });
-      return Object.keys(_obj).join('、');
-    },
-    getCraft(CraftList) {
-      if (!CraftList) return '无';
-      const _list = [];
-      CraftList.forEach(it => {
-        _list.push(it.Name.replace('毫米', 'mm'));
-      });
-      return _list.join('、') || '无';
     },
     // eslint-disable-next-line object-curly-newline
     getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {
@@ -179,9 +163,12 @@ export default {
       _obj.Second = `（${Consignee} ${Mobile}）`;
       return _obj;
     },
-    goToDetailPage(data) {
-      this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
-      this.$router.push('/order/detail');
+    async goToDetailPage(data) {
+      if (!data) return;
+      // this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
+      // this.$router.push('/order/detail');
+      this.curOrderID4Detail = data.OrderID;
+      this.detailVisible = true;
     },
     goToFeedback(item) {
       const { OrderID, Content } = item;
@@ -276,13 +263,14 @@ export default {
       flex: none;
       display: inline-block\0;
       cursor: pointer;
+      user-select: none;
       > div {
         height: 12px;
         width: 7px;
         position: absolute;
         top: 50%;
         left: 50%;
-        transition: 0.2s !important;
+        transition: 0.05s !important;
         transform: translate(-50%, -50%) rotate(90deg);
         background: url("../../assets/images/right-arrow.png") center
           no-repeat;

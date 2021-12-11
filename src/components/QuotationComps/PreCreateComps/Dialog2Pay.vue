@@ -133,13 +133,13 @@ export default {
     handleClose(isPaid = false) {
       // 关闭前清除img元素src地址
       if (!this.curPayInfo2Code) return;
-      if (this.needClear) this.showImg = false;
-      if (this.needClear) this.setCurPayInfo2Code(null);
       this.setIsShow2PayDialog(false);
       clearTimeout(this.timer);
       this.timer = null;
       this.getImageCodeFail = false;
       this.$emit('close', isPaid === true);
+      if (this.needClear) this.showImg = false;
+      if (this.needClear) this.setCurPayInfo2Code(null);
     },
     onLoad() {
       // 图片下载完成
@@ -173,7 +173,6 @@ export default {
         this.$store.commit('shoppingCar/setCurShoppingCarData4FirstPlace', null);
       }
       this.$store.dispatch('common/getCustomerFundBalance');
-      this.setCurPayInfo2Code(null);
       this.handleClose(true);
     },
     async getPayStatus() {

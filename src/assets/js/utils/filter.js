@@ -68,14 +68,14 @@ Vue.filter('formatStatus4PackageList', status => {
 Vue.filter('getPayTime', ProducePeriod => {
   if (!ProducePeriod) return '';
   const { LatestPayTime } = ProducePeriod;
-  // // console.log(LatestPayTime.split('T')[1].split('+')[0].slice(0, 5));
   return `${LatestPayTime.split('T')[1].split('+')[0].slice(0, 5)}点前支付`;
 });
 
 Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
   if (!ProducePeriod) return '';
   const { IncludeDiliveryTime, TotalTime } = ProducePeriod;
-  const str = IncludeDiliveryTime ? '送达' : '生产完成';
+  if (!TotalTime) return '';
+  const str = IncludeDiliveryTime ? '送达' : '发货';
   const fullDay = TotalTime.split('T')[0];
   const m = fullDay.split('-')[1];
   const d = fullDay.split('-')[2];
@@ -99,9 +99,9 @@ Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
   let timeStr = dayTimeStr || `${m}月${d}日`;
   if (showTime && dayTimeStr) timeStr += ` (${m}月${d}日) `;
   // console.log(showTime, 'showTime', ProducePeriod, `${m}月${d}日`, fullDay);
-  const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
-  // const hour = ''; // 不显示具体时间
-  return `预计${timeStr} ${hour} ${str}`;
+  // const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
+  const hour = ''; // 不显示具体时间
+  return `预计${timeStr}${hour}${str}`;
 });
 
 const { AppealList } = store.state.common;
@@ -172,6 +172,15 @@ export const getFullName = data => {
   return t && t.FirstLevel && t.FirstLevel.Name ? `${t.FirstLevel.Name} - ${Name}` : Name;
 };
 Vue.filter('getFullName', getFullName);
+
+const formatListItemSize = SizeList => {
+  if (!Array.isArray(SizeList) || SizeList.length === 0) return '';
+  return SizeList.join('、');
+};
+Vue.filter('formatListItemSize', formatListItemSize);
+Vue.filter('formatListItemCraft', formatListItemSize); // 暂同上共用同一个方法 后续如有需要再分开
+
+Vue.filter('formatNumber', num => +((+num).toFixed(2)));
 
 export default {
   formarProductAmountFunc,

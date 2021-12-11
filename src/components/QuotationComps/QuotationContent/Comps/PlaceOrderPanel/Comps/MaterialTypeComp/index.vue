@@ -56,9 +56,13 @@ export default {
       }
       return [];
     },
+    localMaterialList() {
+      if (!Array.isArray(this.MaterialList)) return [];
+      return this.MaterialList.map(it => ({ ...it, List: it.List.filter(_it => !_it.HiddenToCustomer) })).filter(it => it.List.length > 0);
+    },
     _MaterialList() {
       const list = [];
-      this.MaterialList.forEach(it => {
+      this.localMaterialList.forEach(it => {
         const _list = it.List.map(m => ({
           ...m,
           Type: {
@@ -89,7 +93,7 @@ export default {
         }).join(' ');
         return _Name || ' ';
       };
-      const _showLenList = this.MaterialList.map(it => it.UnionShowList.length);
+      const _showLenList = this.localMaterialList.map(it => it.UnionShowList.length);
       const showRootClass = [...new Set(_showLenList)].length > 1;
       this._MaterialList.filter(it => !this.hiddenMatarialList.includes(it.ID)).forEach(lv1 => {
         const { Type, ID } = lv1;
