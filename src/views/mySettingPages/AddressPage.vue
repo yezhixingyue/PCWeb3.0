@@ -65,12 +65,11 @@
 
 <script>
 import { mapState } from 'vuex';
-// import AddMapComp from '@/components/MySettingComps/AddMapComp.vue';
 
 export default {
   components: {
     // AddMapComp,
-    AddMapComp: () => import('@/components/MySettingComps/AddMapComp.vue'),
+    AddMapComp: () => import('@/components/QuotationComps/PlaceOrderComps/ConsigneeAddressSetpComp/AddMapComp.vue'),
   },
   computed: {
     ...mapState('common', ['customerInfo']),

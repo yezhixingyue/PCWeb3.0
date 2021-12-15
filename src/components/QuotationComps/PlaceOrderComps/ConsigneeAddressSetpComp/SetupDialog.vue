@@ -52,6 +52,7 @@
                       v-model="localNewAddressInfo.ExpressArea.RegionalID"
                       @change="handleRegionalChange"
                       :disabled="!!localOutPlateNo"
+                      size="mini"
                     >
                       <el-option
                         v-for="item in RegionalList"
@@ -67,6 +68,7 @@
                       v-model="localNewAddressInfo.ExpressArea.CityID"
                       :disabled="CityList.length === 0 || !!localOutPlateNo"
                       @change="handleCityChange"
+                      size="mini"
                     >
                       <el-option
                         v-for="item in CityList"
@@ -82,6 +84,7 @@
                       v-model="localNewAddressInfo.ExpressArea.CountyID"
                       :disabled="CountyList.length === 0 || !!localOutPlateNo"
                       @change="handleCountyChange"
+                      size="mini"
                     >
                       <el-option
                         v-for="item in CountyList"
@@ -129,7 +132,7 @@
                     ></el-input>
                   </el-form-item>
                 </div>
-                <div class="OutPlateNo" @click.stop>
+                <div class="OutPlateNo" @click.stop v-show="localOutPlateNo">
                   <span class="title">平台单号：</span>
                   <div>
                     {{ localOutPlateNo }}
@@ -218,9 +221,20 @@ export default {
     },
   },
   data() {
+    const mobileRegxp = /1[3456789]\d{9}/;
     const validateMobile = (rule, value, callback) => {
       if (this.OutPlateNo) callback();
-      else if (this.validateCheck(value, this.defineRules.Mobile, callback)) callback();
+      else {
+        if (!value) {
+          callback(new Error('请输入手机号'));
+          return;
+        }
+        if (!mobileRegxp.test(value)) {
+          callback(new Error('手机号码格式不正确'));
+          return;
+        }
+        callback();
+      }
     };
     const validateRegional = (rule, value, callback) => {
       if (!this.localNewAddressInfo.ExpressArea.RegionalID) callback(new Error('请选择省份'));

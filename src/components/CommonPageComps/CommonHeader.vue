@@ -108,7 +108,7 @@
                 :class="{active: $route.name === 'mySettingPage'}"
                 command='setup' icon="el-icon-s-tools">我的设置</el-dropdown-item>
               <el-dropdown-item command='loginOut'>
-                <span class="iconfont icon-tuichudenglu"></span>退出登录</el-dropdown-item>
+                <span class="iconfont icon-084tuichu"></span>退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>

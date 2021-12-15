@@ -198,7 +198,6 @@ export default {
         return value;
       },
       set(val) {
-        // console.log('formItem itemValue 触发改变', val);
         const type = this.curTypeName;
         // if (type === '元素组' && !this.target.ElementList && this.target.SizeList) type = '尺寸组';
         this.$store.commit('Quotation/setObj2GetProductPriceProductParams',
@@ -291,6 +290,18 @@ export default {
       }
       return [];
     },
+    curPartName() {
+      if (this.PartID && this.placeData) {
+        const { Name } = this.placeData;
+        if (Name) {
+          if (this.PartIndex > 0) {
+            return `${Name}${this.PartIndex + 1}`;
+          }
+          return Name;
+        }
+      }
+      return '';
+    },
   },
   data() {
     return {
@@ -310,6 +321,7 @@ export default {
     },
     async validateFormItem(rule, value, callback) {
       await this.delay();
+      console.log(this.curPartName);
       this.$nextTick(() => {
         if (this.AffectedHidden) { // 如果该项目隐藏了，则直接通过验证
           callback();
@@ -319,7 +331,7 @@ export default {
         this.errorIndex = '';
         this.errorMsg = '';
         if (this.curTypeName === '元素') {
-          const res = checkElement(this.itemValue, this.target, this.localAffectedPropList);
+          const res = checkElement({ values: this.itemValue, prop: this.target, AffectedPropList: this.localAffectedPropList });
           if (res && typeof res === 'string') {
             callback(new Error(res));
             return;

@@ -133,6 +133,27 @@ html, body, #app {
   }
 }
 
+.tips-box {
+  background: #FFFBF6;
+  border-radius: 3px;
+  height: 28px;
+  color:rgba(244,163,7, 0.8);
+  font-size:12px;
+  padding-left:16px;
+  line-height: 26px;
+  box-sizing: border-box;
+  i {
+    font-size: 15px;
+    position: relative;
+    top: 1px;
+    margin-right: 10px;
+  }
+  &.is-pink {
+    background: rgb(255, 248, 250);
+    color: #ff3769dc !important;
+  }
+}
+
 // 前面带有蓝色竖条的标题样式
 .blue-v-line {
   &::before {

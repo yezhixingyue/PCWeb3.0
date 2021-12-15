@@ -145,8 +145,9 @@ const _elementTypeChecker = (value, element, showPropName = true) => {
  * @param {*}
  * @return {*}
  */
-export const checkElement = (values, prop, AffectedPropList, showPropName = true) => {
+export const checkElement = ({ values, prop, AffectedPropList, showPropName }) => {
   if (!prop || !values) return '';
+  const _showPropName = typeof showPropName === 'boolean' ? showPropName : true;
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
     if (InterAction.getDisabledOrNot(AffectedPropList) || InterAction.getIsHiddenOrNot(AffectedPropList)) return '';
@@ -160,7 +161,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
         const t = arr.find(it => valueIDs.includes(it));
         if (t) {
           const target = prop.OptionAttribute?.OptionList?.find(_it => _it.ID === t);
-          if (target) return `${showPropName ? `[${prop.Name}] ` : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
+          if (target) return `${_showPropName ? `[${prop.Name}] ` : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
         }
       }
       if (requiredList.length > 0) {
@@ -170,7 +171,7 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
           const target = t2.map(it => prop.OptionAttribute?.OptionList?.find(_it => _it.ID === it)).filter(it => it);
           if (target.length > 0) {
             const text = target.map(it => `[ ${it.Name} ]`).join('、');
-            return `${showPropName ? `[${prop.Name}] ` : ''}选项中 ${text} 为必选项`;
+            return `${_showPropName ? `[${prop.Name}] ` : ''}选项中 ${text} 为必选项`;
           }
         }
       }
@@ -198,10 +199,10 @@ export const checkElement = (values, prop, AffectedPropList, showPropName = true
       const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;
       if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
         // 项数不符合
-        if (MinValue === MaxValue) return `${showPropName ? `[${prop.Name}] ` : ''}必须选择${MinValue}项`;
-        if (MaxValue === -1 || len < MinValue) return `${showPropName ? `[${prop.Name}] ` : ''}至少选择${MinValue}项`;
-        if (len > MaxValue) return `${showPropName ? `[${prop.Name}] ` : ''}最多选择${MaxValue}项`;
-        return `${showPropName ? `[${prop.Name}] ` : ''}应选择${MinValue}至${MaxValue}项`;
+        if (MinValue === MaxValue) return `${_showPropName ? `[${prop.Name}] ` : ''}必须选择${MinValue}项`;
+        if (MaxValue === -1 || len < MinValue) return `${_showPropName ? `[${prop.Name}] ` : ''}至少选择${MinValue}项`;
+        if (len > MaxValue) return `${_showPropName ? `[${prop.Name}] ` : ''}最多选择${MaxValue}项`;
+        return `${_showPropName ? `[${prop.Name}] ` : ''}应选择${MinValue}至${MaxValue}项`;
       }
     }
   }
@@ -259,7 +260,7 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
         const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
         const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element
          && _Element && _it.Property.Element.ID === _Element.ID);
-        const msg = checkElement(CustomerInputValues, _Element, ElementAffectedPropList);
+        const msg = checkElement({ values: CustomerInputValues, prop: _Element, AffectedPropList: ElementAffectedPropList });
         if (msg) return { msg: `${groupName}${msg}`, ElementID, index: i };
       }
     }
@@ -316,7 +317,7 @@ export const checkSizeGroup = (value, prop, AffectedPropList) => {
       for (let i = 0; i < List.length; i += 1) {
         const { ElementID, CustomerInputValues } = List[i];
         const _Element = prop.GroupInfo.ElementList.find(it => it.ID === ElementID);
-        const msg = checkElement(CustomerInputValues, _Element);
+        const msg = checkElement({ values: CustomerInputValues, prop: _Element });
         if (msg) return { msg, ElementID, index: 0 };
       }
     }
@@ -335,7 +336,10 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
     const t = requiredCraftIDs.find(it => !selectedCraftIDs.includes(it));
     if (t) {
       const targetCraft = _CraftList.find(it => it.ID === t);
-      if (targetCraft) return `[ ${targetCraft.ShowName} ] 工艺必选`;
+      if (targetCraft) {
+        console.log(AffectedPropList);
+        return `[ ${targetCraft.ShowName} ] 工艺必选`;
+      }
     }
   }
   // 判断是否有必选的单选工艺组，判断其是否已有选择，如果无则报错
@@ -390,7 +394,7 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
               .filter(_it => _it.Property.Craft && _it.Property.Craft.ID === craftDataItem.ID
                  && !_it.Property.Group
                  && _it.Property.Element && _it.Property.Element.ID === elDataItem.ID);
-            const errMsg = checkElement(elValItem.CustomerInputValues || [], elDataItem, _elAffectedPropList);
+            const errMsg = checkElement({ values: elValItem.CustomerInputValues || [], prop: elDataItem, AffectedPropList: _elAffectedPropList });
             // 5. 对工艺设置参数进行校验并返回结果
             if (errMsg) return `[ ${craftDataItem.Name} ] 工艺里面，${errMsg}`;
           }

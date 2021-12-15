@@ -1,3 +1,4 @@
+/* eslint-disable semi */
 /* eslint-disable object-curly-newline */
 import api from '@/api';
 import { Message } from 'element-ui';
@@ -28,11 +29,11 @@ export default {
   mutations: {
     /** 设置购物车信息列表
     ---------------------------------------- */
-    // eslint-disable-next-line no-unused-vars
-    setShoppingDataList(state, { Data, DataNumber }) {
-      state.shoppingDataList = Data.filter(it => it.FileHaveUpload);
-      const list = Data.filter(it => !it.FileHaveUpload);
-      state.shoppingDataNumber = DataNumber - list.length;
+    setShoppingDataList(state, { Data }) {
+      state.shoppingDataList = Data
+        .filter(it => it.FileHaveUpload)
+        .map(it => ({ ...it, _isOrder: false, _isPaid: false, isRemoveError: false, _isRemove: false, _removeErrorText: '' }));
+      state.shoppingDataNumber = state.shoppingDataList.length;
     },
     /** 设置当前购物车订单详情
     ---------------------------------------- */
@@ -56,27 +57,49 @@ export default {
       const failIDList = failList ? failList.map(it => it.OrderID) : [];
       state.shoppingDataList.forEach(it => {
         const item = it;
-        if (allIDList.includes(it.OrderID) && !failIDList.includes(it.OrderID)) item.FileErrorMessage = '已删除';
+        if (allIDList.includes(it.OrderID) && !failIDList.includes(it.OrderID)) {
+          item.FileErrorMessage = '已删除';
+          item._isRemove = true;
+        }
         if (allIDList.includes(it.OrderID) && failIDList.includes(it.OrderID)) {
           item.FileErrorMessage = '删除失败';
+          item._isRemoveError = true;
           const _t = failList.find(sub => sub.OrderID === item.OrderID);
-          if (_t) item.FileErrorMessage = _t.Message;
+          if (_t) item._removeErrorText = _t.Message;
         }
       });
-      const _list = state.shoppingDataList;
-      state.shoppingDataList = _list.filter(it => it.FileErrorMessage !== '已删除');
+      const _removeIDList = state.shoppingDataList.filter(it => it._isRemove).map(it => it.OrderID);
+      _removeIDList.forEach(it => {
+        const i = state.shoppingDataList.findIndex(_it => _it.OrderID === it);
+        if (i > -1) {
+          state.shoppingDataList.splice(i, 1);
+        }
+      });
       state.shoppingDataNumber = state.shoppingDataList.length;
     },
-    setShoppingDataStatusAfterSubmit(state, list) {
-      const submitedIDs = list.map(it => it.OrderID);
-      state.shoppingDataList = state.shoppingDataList.filter(it => !submitedIDs.includes(it.OrderID));
-      state.shoppingDataNumber = state.shoppingDataList.length;
+    setShoppingDataStatusAfterSubmit(state, { List, Msg, _isOrder, _isPaid }) {
+      const submitedIDs = List.map(it => it.OrderID);// FileErrorMessage
+      submitedIDs.forEach(ID => {
+        const i = state.shoppingDataList.findIndex(it => it.OrderID === ID);
+        if (i > -1) {
+          const temp = { ...state.shoppingDataList[i] };
+          temp.FileErrorMessage = Msg;
+          temp._isOrder = _isOrder;
+          temp._isPaid = _isPaid;
+          state.shoppingDataList.splice(i, 1, temp);
+        }
+      });
     },
     /** 清理购物车订单列表，清除已上传订单
     ---------------------------------------- */
-    clearShoppingDataList(state) {
-      const _list = state.shoppingDataList;
-      state.shoppingDataList = _list.filter(it => it.FileErrorMessage !== '订单已提交');
+    clearShoppingDataList(state, list) {
+      const _list = list.map(it => it.OrderID);// FileErrorMessage
+      _list.forEach(it => {
+        const i = state.shoppingDataList.findIndex(_it => _it.OrderID === it);
+        if (i > -1) {
+          state.shoppingDataList.splice(i, 1);
+        }
+      });
       state.shoppingDataNumber = state.shoppingDataList.length;
     },
     /* 注销及登录状态清理
@@ -93,8 +116,8 @@ export default {
     /** 获取购物车信息列表
     ---------------------------------------- */
     async getQuotationList({ commit }) {
-      const res = await api.getQuotationList();
-      if (res.data.Status === 1000) {
+      const res = await api.getQuotationList().catch(() => null);
+      if (res && res.data.Status === 1000) {
         commit('setShoppingDataList', res.data);
       }
     },
@@ -102,16 +125,16 @@ export default {
     ---------------------------------------- */
     async getOrderPreCreateFromShoppingCar({ commit, rootState }, list) {
       const _obj = { OrderType: 2, PayInFull: false, List: list };
-      const res = await api.getOrderPreCreate(_obj);
-      if (res.data.Status === 1000) {
+      const res = await api.getOrderPreCreate(_obj).catch(() => null);
+      if (res && res.data.Status === 1000) {
         commit('setCurShoppingCarData4FirstPlace', res.data.Data);
         commit('setCurShoppingCarDataBeforeFirstPlace', list);
         const _b = rootState.common.customerBalance;
         const { FundBalance } = res.data.Data;
         if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
-        return true;
+        return { PreCreateData: res.data.Data, OriginList: list };
       }
-      return false;
+      return null;
     },
     /** 删除购物车订单
     ---------------------------------------- */
@@ -120,14 +143,14 @@ export default {
 
       const _list = list.map(it => ({ preOrderID: it.OrderID, closeTip: true }));
 
-      // console.log(_list, list);
-
       const res = await asyncNonCurrentFunc(api.getQuotationRemove, _list);
-      // const res = [];
 
-      const _res = res.map((it, i) => ({ ...it, preOrderID: _list[i].preOrderID })); // 非并发方式处理批量取消，获取总结果
+      const _res = res.map((it, i) => {
+        const _it = it || {};
+        return ({ ..._it, preOrderID: _list[i].preOrderID });
+      }); // 非并发方式处理批量取消，获取总结果
 
-      const hasWrongList = _res.filter(it => it.data.Status !== 1000);
+      const hasWrongList = _res.filter(it => !it.data || it.data.Status !== 1000);
 
       if (hasWrongList.length === 0) { // 如果没有取消失败的项则提示成功
         massage.successSingle({ title: '删除成功!' });
@@ -137,13 +160,12 @@ export default {
 
       const _errTextList = hasWrongList.map(it => ({
         OrderID: it.preOrderID,
-        Status: it.data.Status,
-        Message: it.data.Message,
+        Message: it.data ? it.data.Message : '订单删除失败',
       }));
       commit('setMultipleOrderDataStatus', { allList: list, failList: _errTextList }); // 有失败项，把失败项除外的订单进行状态改变
 
       const len = _errTextList.length;
-      massage.failSingleError({ title: `${len}条订单取消失败!`, msg: '请查看列表状态' }); // 弹窗提示出错订单
+      massage.failSingleError({ title: `共有${len}条订单取消失败!`, msg: '具体请查看列表订单状态' }); // 弹窗提示出错订单
     },
   },
 };

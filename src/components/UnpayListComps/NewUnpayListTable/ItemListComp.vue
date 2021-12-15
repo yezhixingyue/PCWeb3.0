@@ -264,16 +264,16 @@ export default {
       padding-left: 14px;
       display: flex;
       overflow: hidden;
-      width: calc(100% - 32px);
-      width: calc(100% - 82px)\0;
-      display: inline-block\0;
-      white-space: nowrap\0;
+      width: calc(100% - 320px);
+      width: calc(100% - 320px)\9;
+      display: inline-block\9;
+      white-space: nowrap\9;
       > span {
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        display: inline-block\0;
+        display: inline-block\9;
         > .is-pink {
           font-size: 14px;
         }
@@ -285,6 +285,7 @@ export default {
       }
       .el-checkbox {
         margin-right: 35px;
+        vertical-align: top;
         .el-checkbox__label {
           padding-left: 20px;
           .product-item-header-amount-box {
@@ -301,9 +302,10 @@ export default {
       margin-right: 12px;
       position: relative;
       flex: none;
-      display: inline-block\0;
+      display: inline-block\9;
       cursor: pointer;
       user-select: none;
+      vertical-align: top\9;
       > div.arrow-wrap {
         padding-left: 15px;
         display: inline-block;
@@ -315,6 +317,7 @@ export default {
           width: 30px;
           position: absolute;
           top: calc(50% + 3px);
+          top: calc(50% + 5px)\9;
           right: -12px;
           transition: 0.05s !important;
           transform: translate(-50%, -50%) rotate(90deg);

@@ -21,7 +21,7 @@
         @tab-click="handleTableClick"
       >
         <el-tab-pane label="订单详情" name="detail" :disabled='loading'>
-          <DetailComp class='is-detail' v-loading='loading' element-loading-text="正在加载中..." :OrderDetail='OrderDetailData' hiddenProducePeriod />
+          <DetailComp class='is-detail' v-loading='loading' element-loading-text="正在加载中..." :OrderDetail='OrderDetailData' />
         </el-tab-pane>
         <el-tab-pane label="包裹列表" name="package" :disabled='loading'>
           <OrderPackageList :PackageDataList='PackageDataList' :isListloading='loading' v-loading='loading' element-loading-text="正在加载中..." />
@@ -40,7 +40,6 @@
      :OrderPreData='OrderPreData'
      :isSubmitType='isSubmitType'
      :isCar='isCar'
-     :hiddenProducePeriod='isFullType'
      />
     <footer>
       <template  v-if="OrderPreData && isSubmitType">
@@ -106,7 +105,7 @@ export default {
     },
     top: {
       type: String,
-      default: '5%',
+      default: '70px',
     },
     submitLabel: {
       type: String,
@@ -230,7 +229,6 @@ export default {
       this.$store.dispatch('common/getExpressList');
       this.getLocalDetailData();
       if (this.isFullType) this.activeName = 'detail';
-      console.log(this.OrderDetail);
     },
     onClosed() {
       this.localDetailData = null;
@@ -327,6 +325,7 @@ export default {
       main.mp-common-detail-comp-wrap {
         height: 490px;
         text-align: center;
+        display: block;
         > div {
           display: inline-block;
           vertical-align: top;

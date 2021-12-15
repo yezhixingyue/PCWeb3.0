@@ -61,7 +61,7 @@ export default class ClassType {
     const Address = {};
     if (addressInfo4PlaceOrder && addressInfo4PlaceOrder.Address) {
       Address.Express = addressInfo4PlaceOrder.Address.Express;
-      if (addressInfo4PlaceOrder.Address.AddressID) {
+      if (addressInfo4PlaceOrder.Address.AddressID && addressInfo4PlaceOrder.Address.AddressID !== '00000000-0000-0000-0000-000000000000') {
         Address.AddressID = addressInfo4PlaceOrder.Address.AddressID;
       } else {
         Address.Address = addressInfo4PlaceOrder.Address.Address;

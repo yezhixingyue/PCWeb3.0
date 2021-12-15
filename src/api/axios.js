@@ -39,7 +39,7 @@ axios.interceptors.request.use(
       curConfig.headers.common.SessionID = Cookie.getCookie('SessionID');
     }
     let key = true;
-    const arr = ['/Api/Order/Create', '/Api/PaymentOrder/PayResult', '/Api/Upload/File', '/Api/FileType/List']; // 不需要展示loading的api地址
+    const arr = ['/Api/PaymentOrder/PayResult', '/Api/Upload/File', '/Api/FileType/List']; // 不需要展示loading的api地址
     for (let i = 0; i < arr.length; i += 1) {
       if (curConfig.url.includes(arr[i]) || store.state.common.isLoading) {
         key = false;
@@ -52,7 +52,9 @@ axios.interceptors.request.use(
       if (url === '/Api/Quotation/Save' || url === '/Api/Order/Create') {
         _color = 'rgba(0, 0, 0, 0.7)';
         _text = '文件上传成功，正在提交...';
-        if (Array.isArray(config.data?.FileList)) {
+        if (url === '/Api/Order/Create') {
+          _text = '正在提交...';
+        } else if (Array.isArray(config.data?.FileList)) {
           const t = config.data.FileList.find(it => it.List && it.List.length > 0);
           if (!t) _text = '正在提交...';
         }
@@ -87,9 +89,7 @@ axios.interceptors.response.use(
   async (response) => {
     if (loadingInstance) loadingInstance.close();
     // eslint-disable-next-line max-len
-    const _list2NotNeed2Toast = ['/Api/Order/Create', '/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
-    // eslint-disable-next-line max-len
-    // const _list2NotNeed2Toast = ['/Api/Calculate/ProductPrice', '/Api/Order/Create', '/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
+    const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
 
     // IE 8-9
     if (response.data == null && response.config.responseType === 'json' && response.request.responseText != null) {

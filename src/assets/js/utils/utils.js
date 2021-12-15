@@ -121,6 +121,18 @@ export const transformNumToChindNum = (num) => {
   return num;
 };
 
+/**
+ * 判断数组中是否存在重复项
+ *
+ * @param {*} list
+ */
+export const getIsOrNotHasRepeatItemInArray = list => {
+  if (!Array.isArray(list) || list.length < 2) return false;
+  const len1 = list.length;
+  const len2 = [...new Set(list)].length;
+  return len1 > len2;
+};
+
 export default {
   isEqual,
   isGreatThen,
@@ -135,4 +147,5 @@ export default {
   getNumberValueList,
   getValueIsOrNotNumber,
   transformNumToChindNum,
+  getIsOrNotHasRepeatItemInArray,
 };

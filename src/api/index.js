@@ -85,8 +85,8 @@ const api = {
   getQuotationSave(data) { // POST /Api/Quotation/Save  保存购物车
     return instance.post('/Api/Quotation/Save', { Terminal: 1, ...data });
   },
-  CreateOrderFromPreCreate(data) { // POST /Api/Order/Create
-    return instance.post('/Api/Order/Create', { Terminal: 1, ...data });
+  CreateOrderFromPreCreate(data, config = { closeLoading: true, closeTip: true }) { // POST /Api/Order/Create
+    return instance.post('/Api/Order/Create', { Terminal: 1, ...data }, config);
   },
   getPayResult(payCode, type) { // GET /Api/PaymentOrder/PayResult 查询付款结果
     if (!type) return instance.get(`/Api/PaymentOrder/PayResult?payCode=${payCode}`);
@@ -219,6 +219,21 @@ const api = {
   },
   getPackageProgress(packageID) { // GET /Api/Package/Progress 通过包裹号查询包裹配送进度
     return instance.get(`/Api/Package/Progress?packageID=${packageID}`, { closeLoading: true });
+  },
+
+  /* 文件批量上传api
+  ----------------------------------------------------------------------------------- */
+  getFileNameAnalysis(data) { // POST /Api/FileName/Analysis 文件名解析
+    return instance.post('/Api/FileName/Analysis', data, { closeLoading: true, closeTip: true });
+  },
+  getFileSuffixList() { // /Api/File/SuffixList 获取批量上传支持的文件格式
+    return instance.get('/Api/File/SuffixList', { closeLoading: true });
+  },
+  getOrderCreate(data, closeLoading = true) { // POST /Api/Order/Create 提交下单
+    return instance.post('/Api/Order/Create', data, { closeLoading });
+  },
+  getFreightCalculate(data) { // POST /Api/Freight/Calculate 有效地址或配送方式发生变化时重新计算解析条目的运费价格
+    return instance.post('/Api/Freight/Calculate', data, { closeLoading: true, closeTip: true });
   },
 
   /* 售后单部分 api

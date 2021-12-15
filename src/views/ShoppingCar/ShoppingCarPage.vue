@@ -21,26 +21,30 @@ export default {
   computed: {
     ...mapState('shoppingCar', ['shoppingDataNumber', 'shoppingDataList']),
   },
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      if (from.name !== 'shoppingCarDetail') {
-        vm.$store.dispatch('shoppingCar/getQuotationList');
-        vm.$store.dispatch('common/getExpressList');
-      } else {
-        const oApp = document.getElementById('app');
-        oApp.scrollTop = to.meta.y;
-      }
-    });
-  },
-  beforeRouteLeave(to, from, next) {
-    const oApp = document.getElementById('app');
-    const self = from;
-    if (to.name === 'shoppingCarDetail') {
-      self.meta.y = oApp.scrollTop;
-    } else {
-      self.meta.y = 0;
-    }
-    next();
+  // beforeRouteEnter(to, from, next) {
+  //   next(vm => {
+  //     if (from.name !== 'shoppingCarDetail') {
+  //       vm.$store.dispatch('shoppingCar/getQuotationList');
+  //       vm.$store.dispatch('common/getExpressList');
+  //     } else {
+  //       const oApp = document.getElementById('app');
+  //       oApp.scrollTop = to.meta.y;
+  //     }
+  //   });
+  // },
+  // beforeRouteLeave(to, from, next) {
+  //   const oApp = document.getElementById('app');
+  //   const self = from;
+  //   if (to.name === 'shoppingCarDetail') {
+  //     self.meta.y = oApp.scrollTop;
+  //   } else {
+  //     self.meta.y = 0;
+  //   }
+  //   next();
+  // },
+  mounted() {
+    this.$store.dispatch('shoppingCar/getQuotationList');
+    this.$store.dispatch('common/getExpressList');
   },
 };
 </script>

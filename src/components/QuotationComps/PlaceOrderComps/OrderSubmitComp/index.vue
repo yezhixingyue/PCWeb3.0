@@ -180,7 +180,23 @@ export default {
       if (!result) return;
       this.uploadType = 'car';
       const FileList = await this.handleFileUpload();
-      if (!FileList) return;
+      if (!FileList || FileList.includes(false)) return;
+      // 完成后 提交
+      // 打开支付弹窗
+      if (FileList.length > 0) {
+        const list = FileList.filter(it => it.List && it.List.length > 1);
+        if (list.length > 0) {
+          for (let i = 0; i < list.length; i += 1) {
+            const _list = list[i].List.map(_it => _it.UniqueName);
+            const len1 = _list.length;
+            const len2 = [...new Set(_list)].length;
+            if (len1 > len2) {
+              this.messageBox.failSingleError({ title: '下单失败', msg: '存在重复文件（名称不同但文件相同），请检查' });
+              return;
+            }
+          }
+        }
+      }
       // 下面执行加购提交操作
       const callBack = () => {
         this.fileContent = '';
@@ -457,6 +473,9 @@ export default {
         }
         &.design-document {
           padding-left: 80px;
+          > span {
+            position: relative;
+          }
         }
         &.file-list-box {
           padding-bottom: 10px;

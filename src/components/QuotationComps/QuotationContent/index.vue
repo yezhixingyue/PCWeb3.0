@@ -301,7 +301,8 @@ export default {
   methods: {
     ...mapActions('Quotation', ['getProductPrice']),
     transformErrorObj(obj) {
-      return Object.values(obj).map(it => `[ 产品 - ${it[0].field} ] 中，${it[0].message}`);
+      // return Object.values(obj).map(it => `[ 产品 - ${it[0].field} ] 中，${it[0].message}`);
+      return Object.values(obj).map(it => `${it[0].message}`);
     },
     async getCheckResult() {
       return new Promise((resolve) => {
@@ -920,6 +921,9 @@ export default {
         }
         > .right {
           float: right;
+          height: 24px;
+          line-height: 24px;
+          margin-top: 6px;
         }
         position: relative;
         &::before {
@@ -932,6 +936,10 @@ export default {
           bottom: 0;
         }
       }
+    }
+
+    .mp-pc-place-order-address-show-and-change-wrap > .content > ul > li > div.express-box .el-input .el-input__inner {
+      height: 28px;
     }
   }
   .el-input.is-disabled .el-input__inner {

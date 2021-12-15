@@ -575,9 +575,10 @@ export default {
       const _data = {};
       _data.ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
       commit('setProductQuotationResult', null);
-      if (state.addressInfo4PlaceOrder && state.addressInfo4PlaceOrder.Address.Address.Consignee && state.addressInfo4PlaceOrder.Address.Address.Latitude) {
-        _data.Address = state.addressInfo4PlaceOrder.Address;
-      }
+      // 补充平台单号
+      if (state.addressInfo4PlaceOrder.OutPlate.Second) _data.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
+      // 填充收货地址与配送方式
+      _data.Address = CommonClassType.getAddress4SubmitFromEditObj(state.addressInfo4PlaceOrder);
       let key = true;
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;

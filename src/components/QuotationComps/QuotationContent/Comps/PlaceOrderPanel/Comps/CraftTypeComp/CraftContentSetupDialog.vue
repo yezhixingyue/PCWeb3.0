@@ -283,7 +283,7 @@ export default {
           const target = this.ElementList.find(it => it.ID === ID);
           if (target) {
             const list = this.getElementAffectedPropList(target);
-            const res = checkElement(Value, target, list);
+            const res = checkElement({ values: Value, prop: target, AffectedPropList: list });
             if (res && typeof res === 'string') {
               callback(new Error(res));
               return;

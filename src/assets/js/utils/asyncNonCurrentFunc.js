@@ -1,6 +1,6 @@
 async function handleAsyncFunc(func, res, index, list) {
   if (index >= list.length) return;
-  const _s = await func(list[index]);
+  const _s = await func(list[index]).catch(() => null);
   res.push(_s);
   const i = index + 1;
   await handleAsyncFunc(func, res, i, list);

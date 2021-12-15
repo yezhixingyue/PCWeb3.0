@@ -122,11 +122,6 @@ export default {
       this.$store.commit('order/setShouldGetNewListData', false);
       this.$router.replace('/order/list');
     },
-    async handleSubmit() {
-      // eslint-disable-next-line max-len
-      const res = await this.$store.dispatch('shoppingCar/getOrderPreCreateFromShoppingCar', [this.curOrderDetailData]);
-      if (res) this.$router.push('/shopping/submit');
-    },
     handleGetDataSuccess() {
       if (this.progressDataCompleted && this.packDataCompleted && this.detailDataCompleted) {
         this.$refs.AsideIndexComp.getElesInfo();

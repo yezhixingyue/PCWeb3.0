@@ -128,7 +128,6 @@ export default {
   > span,
   > div > span {
     margin-right: 12px;
-    float: left;
     &.no-margin {
       margin: 0;
       margin-right: 8px !important;

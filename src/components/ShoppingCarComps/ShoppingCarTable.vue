@@ -9,9 +9,10 @@
         key="mp-pc-shopcar-page-table-comp-wrap"
         border
         style="width: 100%"
+        :checkAllDisabled='handleCheckAllDisabled'
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" class-name="check-row" width="54"></el-table-column>
+        <el-table-column type="selection" class-name="check-row" width="54" :selectable='handleSelectable'></el-table-column>
         <el-table-column label="产品" width="130" show-overflow-tooltip>
           <template slot-scope="scope">{{scope.row.ProductParams.Attributes | getFullName}}</template>
         </el-table-column>
@@ -50,27 +51,62 @@
         <el-table-column label="状态" show-overflow-tooltip width="75">
           <span
           slot-scope="scope"
+          :title="scope.row._removeErrorText || ''"
           :class="{ 'is-pink': getStatus(scope.row).warn, 'is-success': getStatus(scope.row).success }"
           >{{ getStatus(scope.row).text }}</span>
         </el-table-column>
         <el-table-column label="操作" width="150" >
           <div class="menu-list" slot-scope="scope">
-            <span class="span-title-blue" @click="handleSingleSubmit(scope.row)">下单</span>
+            <span class="span-title-blue" @click="handleSingleSubmit(scope.row)" :class="{disabled: scope.row._isOrder}">下单</span>
             <span @click="onDetailClick(scope.row)" class="span-title-blue detail">详情</span>
             <span class="span-title-pink" @click="handleDel(scope.row)">删除</span>
           </div>
         </el-table-column>
       </el-table>
     </div>
-    <SubmitConfirmDialog :visible.sync="detailVisible" :OrderDetail='orderDetailData' submitLabel='下单' @submit="onDetailSubmit" isCar />
+    <!-- 详情弹窗 -->
+    <SubmitConfirmDialog :visible.sync="detailVisible" :OrderDetail='orderDetailData'
+     :submitLabel='orderDetailData && !orderDetailData._isOrder ? "下单" : ""' @submit="onDetailSubmit" isCar />
+    <!-- 预下单弹窗 -->
+    <PreCreateDialog :visible.sync="preCreateVisible" :PreCreateData="PreCreateData" :OriginList='preCreateOriginDataList' @submit="onOrderSubmit" />
+    <!-- 付款二维码弹窗 -->
+    <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21'>
+      <div class="page-pay-info-box" v-if="payInfoData">
+        <div class="customer">
+          <!-- <p>
+            <span>客户：</span>
+            <span class="is-bold">{{customer.CustomerName}}<template v-if="customer.CustomerSN">（{{customer.CustomerSN}}）</template></span>
+          </p> -->
+          <p>
+            <span class="is-gray">[ 请使用微信或支付宝扫码支付 ]</span>
+          </p>
+        </div>
+        <div class="amount item">
+          <span class="k">扫码支付：</span>
+          <span class="v is-origin is-bold">￥{{payInfoData.Amount | formatNumber}}元</span>
+        </div>
+        <div class="item">
+          <span class="k">已扣余额：</span>
+          <span class="v">￥{{payInfoData.BalanceAmount | formatNumber}}元</span>
+        </div>
+        <div class="item">
+          <span class="k">货到付款：</span>
+          <span class="v">￥{{payInfoData.PayOnDelivery | formatNumber}}元</span>
+        </div>
+        <div class="item">
+          <span class="k">订单总金额：</span>
+          <span class="v">￥{{payInfoData.TotalAmount | formatNumber}}元</span>
+        </div>
+      </div>
+    </QrCodeForPayDialogComp>
     <footer class="is-font-14">
       <div class="float">
         <div class="left">
-          <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll">全选</el-checkbox>
+          <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll" :disabled='handleCheckAllDisabled()'>全选</el-checkbox>
           <span class="gray">共检测出 <i class="is-pink">{{shoppingDataNumber}}</i> 个订单</span>
         </div>
         <div class="right">
-          <!-- <span class="span-title-blue" @click="handleClearList">清除已上传订单</span> -->
+          <span class="span-title-blue" @click="handleClearList">清除已上传订单</span>
           <span class="span-title-pink" @click="handleDel(null)">删除选中订单</span>
           <el-button type="primary" @click="handleSelectedSubmit">上传选中订单</el-button>
         </div>
@@ -80,11 +116,11 @@
       <footer class="is-font-14 floating" v-show="isFootFixed">
         <div class="float">
           <div class="left">
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll">全选</el-checkbox>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkedAll" :disabled='handleCheckAllDisabled()'>全选</el-checkbox>
             <span class="gray">共检测出 <i class="is-pink">{{shoppingDataNumber}}</i> 个订单</span>
           </div>
           <div class="right">
-            <!-- <span class="span-title-blue" @click="handleClearList">清除已上传订单</span> -->
+            <span class="span-title-blue" @click="handleClearList">清除已上传订单</span>
             <span class="span-title-pink" @click="handleDel(null)">删除选中订单</span>
             <el-button type="primary" @click="handleSelectedSubmit">上传选中订单</el-button>
           </div>
@@ -95,14 +131,19 @@
 </template>
 
 <script>
+/* eslint-disable object-curly-newline */
 import { mapState } from 'vuex';
 import { throttle } from '@/assets/js/utils/throttle';
 import { getFullName } from '@/assets/js/utils/filter';
-import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
+import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue'; // 详情弹窗
+import PreCreateDialog from '@/components/BatchUploadComps/PreCreateDialog/index.vue';
+import QrCodeForPayDialogComp from '@/components/common/QrCodeForPayDialogComp';
 
 export default {
   components: {
     SubmitConfirmDialog,
+    PreCreateDialog,
+    QrCodeForPayDialogComp,
   },
   data() {
     return {
@@ -113,17 +154,27 @@ export default {
       isFootFixed: false,
       detailVisible: false,
       orderDetailData: null,
+      preCreateVisible: false,
+      preCreateOriginDataList: [], // 预下单原始列表数据，预下单确认后使用该列表数据生成订单
+      PreCreateData: null, // 预下单数据（服务器返回数据）
+      QrCodeVisible: false,
+      payInfoData: null,
     };
   },
   computed: {
     ...mapState('shoppingCar', ['shoppingDataList', 'shoppingDataNumber']),
-    ...mapState('common', ['ExpressList', 'ScrollInfo']),
+    ...mapState('common', ['ExpressList', 'ScrollInfo', 'customerBalance']),
+    ...mapState('Quotation', ['RiskWarningTipsTypes']),
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },
+    canSelectList() {
+      const list = this.shoppingDataList.filter(it => !this.getStatus(it).success);
+      return list;
+    },
     checkedAll: {
       get() {
-        return this.multipleSelection.length === this.shoppingDataNumber && this.multipleSelection.length > 0;
+        return this.multipleSelection.length === this.canSelectList.length && this.multipleSelection.length > 0;
       },
       set(newVal) {
         if (newVal) {
@@ -134,7 +185,7 @@ export default {
       },
     },
     isIndeterminate() {
-      return this.multipleSelection.length < this.shoppingDataNumber && this.multipleSelection.length > 0;
+      return this.multipleSelection.length < this.canSelectList.length && this.multipleSelection.length > 0;
     },
     // isFootFixed() {
     //   // 140
@@ -208,22 +259,23 @@ export default {
       this.multipleSelection = val;
     },
     getStatus(item) {
+      if (!item) return {};
       if (!item.FileErrorMessage) {
-        let text = '无订单文件';
-        if (Array.isArray(item.FileList)) {
-          const t = item.FileList.find(it => it.List && it.List.length > 0);
-          if (t) text = '文件已上传';
-        }
-        if (item.FileHaveUpload) return { text, warn: false, success: false };
-        return { text: '文件未上传', warn: true, success: false };
+        // let text = '无订单文件';
+        // if (Array.isArray(item.FileList)) {
+        //   const t = item.FileList.find(it => it.List && it.List.length > 0);
+        //   if (t) text = '文件已上传';
+        // }
+        // if (item.FileHaveUpload) return { text, warn: false, success: false };
+        return { text: '', warn: false, success: false };
       }
       let warn = false;
       let success = false;
-      if (['删除失败'].includes(item.FileErrorMessage)) {
+      if (item._isRemoveError) {
         warn = true;
         success = false;
       }
-      if (['订单已提交'].includes(item.FileErrorMessage)) {
+      if (item._isOrder) {
         warn = false;
         success = true;
       }
@@ -235,19 +287,67 @@ export default {
       this.orderDetailData = row;
       this.detailVisible = true;
     },
-    async handleSelectedSubmit() {
+    handleSelectedSubmit() {
       if (this.multipleSelection.length === 0) {
         this.$message.error('请选择订单');
         return;
       }
-      const res = await this.$store.dispatch('shoppingCar/getOrderPreCreateFromShoppingCar', this.multipleSelection);
-      if (res) this.$router.push('/shopping/submit');
+      this.handlePreCreateSubmit(this.multipleSelection);
     },
-    async handleSingleSubmit(row) {
-      const res = await this.$store.dispatch('shoppingCar/getOrderPreCreateFromShoppingCar', [row]);
-      if (res) this.$router.push('/shopping/submit');
+    handleSingleSubmit(row) {
+      if (row._isOrder || row._isPaid) return;
+      this.handlePreCreateSubmit([row]);
+    },
+    async handlePreCreateSubmit(list) {
+      const res = await this.$store.dispatch('shoppingCar/getOrderPreCreateFromShoppingCar', list);
+      if (res) {
+        const { PreCreateData, OriginList } = res;
+        this.PreCreateData = PreCreateData;
+        this.preCreateOriginDataList = OriginList;
+        this.preCreateVisible = true;
+      }
+    },
+    async onOrderSubmit({ OriginList, PayInFull }) {
+      this.preCreateVisible = false;
+      const List = OriginList.map(it => ({ ...it, Position: 255, IgnoreRiskLevel: this.RiskWarningTipsTypes.All }));
+      const _requestObj = { List, OrderType: 2, PayInFull };
+      const resp = await this.api.CreateOrderFromPreCreate(_requestObj, { closeLoading: false, closeTip: false }).catch(() => null);
+      if (resp && resp.data.Status === 1000) { // 下单成功
+        // 修改列表数据状态
+        this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', { List, Msg: '已下单', _isOrder: true, _isPaid: false });
+        this.multipleSelection = this.multipleSelection.filter(it => !it._isOrder);
+        if (resp.data.Data) {
+          const { FundBalance } = resp.data.Data;
+          if (FundBalance !== +this.customerBalance) {
+            this.$store.commit('common/setCustomerBalance', FundBalance);
+          }
+          this.payInfoData = resp.data.Data;
+          this.QrCodeVisible = true;
+        } else {
+          this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
+          this.messageBox.successSingle({
+            title: '下单成功!',
+            successFunc: () => {
+              this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', { List, Msg: '已付款', _isOrder: true, _isPaid: true });
+            },
+          });
+        }
+      }
+    },
+    handlePaidSuccess() {
+      this.messageBox.successSingle({ title: '下单并支付成功' });
+      this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
+      this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', { List: this.preCreateOriginDataList, Msg: '已付款', _isOrder: true, _isPaid: true });
     },
     handleDel(item) {
+      if (item && item._isOrder) {
+        this.$store.commit('shoppingCar/clearShoppingDataList', [item]);
+        this.$message({
+          message: '已删除',
+          type: 'success',
+        });
+        return;
+      }
       if (!item && this.multipleSelection.length === 0) {
         this.$message.error('请选择订单');
         return;
@@ -273,7 +373,8 @@ export default {
       });
     },
     handleClearList() {
-      this.$store.commit('shoppingCar/clearShoppingDataList');
+      const list = this.shoppingDataList.filter(it => it._isOrder);
+      this.$store.commit('shoppingCar/clearShoppingDataList', list);
     },
     handleScroll(oEl) {
       if (!oEl) return;
@@ -283,6 +384,13 @@ export default {
     onDetailSubmit() {
       this.detailVisible = false;
       this.handleSingleSubmit(this.orderDetailData);
+    },
+    handleSelectable(data) { // 判断当前行是否可以被勾选
+      return !data._isOrder;
+    },
+    handleCheckAllDisabled() {
+      const list = this.shoppingDataList.filter(it => !it._isOrder);
+      return list.length === 0;
     },
   },
   mounted() {
@@ -409,6 +517,33 @@ export default {
       > div {
         position: relative;
         left: -8px;
+      }
+    }
+  }
+  .page-pay-info-box {
+    .customer {
+      padding-bottom: 15px;
+      > p {
+        padding-bottom: 16px;
+      }
+    }
+    .item {
+      font-size: 14px;
+      padding-bottom: 15px;
+      > span {
+        display: inline-block;
+        width: 50%;
+        &.k {
+          text-align: right;
+        }
+        &.v {
+          text-align: left;
+        }
+      }
+      &.amount {
+        .is-origin {
+          font-size: 15px;
+        }
       }
     }
   }

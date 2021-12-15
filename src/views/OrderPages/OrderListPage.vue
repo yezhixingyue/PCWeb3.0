@@ -4,7 +4,7 @@
       <ul class="header-content">
         <li>
           <SingleSelector v-model="OrderStatus" :optionList='OrderStatusList' title="订单状态" />
-          <product-selector
+          <ProductSelector
           :changePropsFunc='setCondition4OrderList'
           :requestFunc='getOrderList'
           :ClassID='condition4OrderList.ProductClass.First'

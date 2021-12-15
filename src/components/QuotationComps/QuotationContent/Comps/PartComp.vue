@@ -104,7 +104,8 @@ export default {
       this.$store.commit('Quotation/setObj2GetProductPriceProductParamsPartChange', [this.PartData.PartID, i, item]);
     },
     transformErrorObj(obj) {
-      return Object.values(obj).map(it => `[ 部件${this.PartName} - ${it[0].field} ] 中，${it[0].message}`);
+      // return Object.values(obj).map(it => `[ 部件${this.PartName} - ${it[0].field} ] 中，${it[0].message}`);
+      return Object.values(obj).map(it => `${it[0].message}`);
     },
     async onSubmitCheck() { // 部件提交校验
       const checkItem = (ruleForm) => new Promise((resolve) => {

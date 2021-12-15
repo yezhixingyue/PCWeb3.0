@@ -3,39 +3,59 @@
     class="mp-pc-place-order-address-show-and-change-wrap"
     v-if="customerInfo"
   >
-    <header class="bg-gray"></header>
-    <div class="comp-title float">
-      <span class="left is-bold">收货信息</span>
-      <span class="right span-title-blue" @click="onAddressChangeClick">{{
-        addCompTitle
-      }}</span>
-    </div>
-    <div class="content" v-loading="ValidExpressLoading">
+    <template v-if="!isBatchUploadUse">
+      <header class="bg-gray"></header>
+      <div class="comp-title float">
+        <span class="left is-bold">收货信息</span>
+        <span class="right span-title-blue" @click="onAddressChangeClick">{{
+          addCompTitle
+        }}</span>
+      </div>
+    </template>
+    <div class="content" v-loading="ValidExpressLoading" :class="{isBatchUploadUse:isBatchUploadUse}">
       <ul>
         <!-- 收货地址展示 与 修改按钮 -->
         <li
           class="consignee-wrap"
           v-if="customerInfo.Address.length > 0 || NewAddressInfo.isSaved"
         >
-          <div class="consignee-box">
-            <span class="title">收货人：</span>
-            <span class="consignee">{{ curAddressInfo.Consignee }}</span>
-            <span>{{ curAddressInfo.Mobile }}</span>
-          </div>
-          <div class="address">
-            <span class="title">收货地址：</span>
-            <span class="title-content">
-              <i>{{ curAddressInfo.address }}</i>
-            </span>
-          </div>
+          <template v-if="!isBatchUploadUse">
+            <div class="consignee-box">
+              <span class="title">收货人：</span>
+              <span class="consignee">{{ curAddressInfo.Consignee }}</span>
+              <span>{{ curAddressInfo.Mobile }}</span>
+            </div>
+            <div class="address">
+              <span class="title">收货地址：</span>
+              <span class="title-content">
+                <i>{{ curAddressInfo.address }}</i>
+              </span>
+            </div>
+          </template>
+          <template v-else>
+            <label for="">
+              <img src="@/assets/images/position.png" alt="">
+              <span>收货地址：</span>
+            </label>
+            <div class="is-font-size-13">
+              <span class="address" :title="curAddressInfo && curAddressInfo.address.length>50?curAddressInfo.address:''">{{ curAddressInfo.address }}</span>
+              <span class="is-bold">{{ curAddressInfo.Consignee }}</span>
+              <span v-if="curAddressInfo.Mobile" class="is-gray">（ {{ curAddressInfo.Mobile }} ）</span>
+            </div>
+            <span class="blue-span is-font-size-13" @click="onAddressChangeClick">更改地址</span>
+          </template>
         </li>
         <!-- 收货地址为空的处理 -->
         <li v-else class="has-none-consignee">
-          <span class="is-pink">尚未设置收货地址， </span>
-          <span class="right span-title-blue" @click="onAddressChangeClick">
+          <label for="" v-if="isBatchUploadUse">
+            <img src="@/assets/images/position.png" alt="">
+            <span>收货地址：</span>
+          </label>
+          <span class="is-pink">{{isBatchUploadUse ? '该客户' : '' }}尚未设置收货地址， </span>
+          <span class="right span-title-blue is-font-size-13" @click="onAddressChangeClick">
             点击此处{{ addCompTitle }}</span
           >
-          <span class="is-primary">
+          <span class="is-primary" v-if="!isBatchUploadUse">
             ， 或前往
             <router-link to="/mySetting/address" tag="i" class="span-title-blue"
               >个人设置 - 收货地址</router-link
@@ -46,13 +66,13 @@
         <!-- 当前平台单号展示 与 配送方式选择 -->
         <li>
           <!-- 平台单号 -->
-          <div class="platform-code-box">
+          <div class="platform-code-box" v-if="!isBatchUploadUse">
             <span class="title">平台单号：</span>
             <div class="content">{{OutPlateNo}}</div>
           </div>
           <!-- 配送方式 -->
           <div class="express-box">
-            <span class="title">配送：</span>
+            <span class="title">{{isBatchUploadUse?'配送方式': '配送'}}：</span>
             <el-radio-group v-model="Express.First" @change="onRadioChange" :disabled='disabled'>
               <el-radio
                 :label="1"
@@ -70,6 +90,7 @@
                   v-model="secondExValFor3"
                   @visible-change="onVisibleChangeFor3"
                   :disabled="!ExpressTypeDisabled.canExpress"
+                  size="mini"
                 >
                   <el-option
                     v-for="item in secondExpressList"
@@ -85,6 +106,7 @@
                   v-model="thirdExValFor2"
                   @visible-change="onVisibleChangeFor2"
                   :disabled="!ExpressTypeDisabled.canLogistic"
+                  size="mini"
                 >
                   <el-option
                     v-for="item in thirdExpressList"
@@ -98,7 +120,7 @@
             </el-radio-group>
           </div>
         </li>
-        <li>
+        <li v-if="!isBatchUploadUse">
           <IdentifyFormItem
             ref="oIdentifyFormItemOut"
             :OutPlateNo="OutPlateNo"
@@ -141,8 +163,8 @@
 </template>
 
 <script>
-import AddMapComp from '@/components/MySettingComps/AddMapComp.vue';
 import { amapAppkey } from '@/assets/js/setup';
+import AddMapComp from './AddMapComp.vue';
 import IdentifyFormItem from './IdentifyFormItem.vue';
 import SetupDialog from './SetupDialog.vue';
 
@@ -162,6 +184,11 @@ export default {
     ExpressList: {
       type: Array,
       default: () => [],
+    },
+    // 是否为批量上传组件使用，为其单独设置样式
+    isBatchUploadUse: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -242,6 +269,7 @@ export default {
         this.secondExVal = newVal;
         this.Express.Second = newVal;
         this.setInfo4ReqObj();
+        this.handleValidAddressChange();
       },
     },
     thirdExValFor2: {
@@ -252,6 +280,7 @@ export default {
         this.thirdExVal = newVal;
         this.Express.Second = newVal;
         this.setInfo4ReqObj();
+        this.handleValidAddressChange();
       },
     },
     ExpressTypeDisabled() {
@@ -276,6 +305,7 @@ export default {
       this.Express.First = 2;
       this.Express.Second = this.thirdExVal;
       this.setInfo4ReqObj();
+      this.handleValidAddressChange();
     },
     onVisibleChangeFor3(bool) {
       if (!bool || !this.ExpressTypeDisabled.canExpress) return;
@@ -283,6 +313,7 @@ export default {
       this.Express.First = 3;
       this.Express.Second = this.secondExVal;
       this.setInfo4ReqObj();
+      this.handleValidAddressChange();
     },
     onRadioChange(num) { // 配送方式选择切换
       switch (num) {
@@ -300,6 +331,7 @@ export default {
       }
       if (this.Express.First !== num) this.Express.First = num;
       this.setInfo4ReqObj();
+      this.handleValidAddressChange();
     },
     /** 地图定位相关方法
     ---------------------------------------------------- */
@@ -314,6 +346,7 @@ export default {
         Latitude, Longitude, AddressDetail, Consignee, Mobile, ExpressArea, RegionalList, CityList, CountyList,
       } = data;
       if (!this.tempDataForMapPosition || !Latitude || !Longitude) return;
+      const oldExpressArea = this.NewAddressInfo.ExpressArea;
       const { curAddIndex, OutPlateNo, NewAddressInfo } = this.tempDataForMapPosition;
       if (this.openType === 'edit') {
         NewAddressInfo.AddressDetail = AddressDetail;
@@ -330,7 +363,7 @@ export default {
       this.curAddIndex = curAddIndex;
       this.OutPlateNo = OutPlateNo;
       this.NewAddressInfo = NewAddressInfo;
-      this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
+      if (this.$refs.oIdentifyFormItemOut) this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
       this.setInfo4ReqObj();
       this.SetAddressVisible = false;
       if (this.setMapVisible) this.setMapVisible = false;
@@ -339,11 +372,8 @@ export default {
       this.ValidExpressLoading = false;
       if (resp.data.Status === 1000) {
         this.ExpressValidList = resp.data.Data;
-        if (this.ExpressValidList.length === 0) {
-          this.messageBox.failSingleError({
-            title: '地址添加失败',
-            msg: '当前地址没有可用配送方式，请更换地址',
-          });
+        if (resp.data.Data.includes(this.Express.First)) {
+          this.judgeValidEventEmit(ExpressArea, oldExpressArea);
         }
       }
     },
@@ -420,7 +450,7 @@ export default {
           this.curAddIndex = curAddIndex;
           this.OutPlateNo = OutPlateNo;
           this.NewAddressInfo = JSON.parse(JSON.stringify(NewAddressInfo));
-          this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
+          if (this.$refs.oIdentifyFormItemOut) this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
           this.setInfo4ReqObj();
           this.SetAddressVisible = false;
         } else {
@@ -433,7 +463,7 @@ export default {
         this.curAddIndex = curAddIndex;
         this.OutPlateNo = OutPlateNo;
         this.NewAddressInfo = JSON.parse(JSON.stringify(NewAddressInfo));
-        this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
+        if (this.$refs.oIdentifyFormItemOut) this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
         this.setInfo4ReqObj();
         this.SetAddressVisible = false;
       }
@@ -485,12 +515,13 @@ export default {
         isSaved: false,
         isSelected: true,
       };
-      this.$refs.oIdentifyFormItemOut.setValueOnOut('');
+      if (this.$refs.oIdentifyFormItemOut) this.$refs.oIdentifyFormItemOut.setValueOnOut('');
       if (this.curAddIndex === 'new') {
         this.initCurAddIndex();
       }
     },
     initCurAddIndex() { // 首次加载或切换产品时初始化收货地址
+      if (!this.customerInfo) return;
       const _i = this.customerInfo.Address.findIndex(it => (Object.prototype.hasOwnProperty.call(it, 'isSelected') ? it.isSelected : it.IsDefault));
       if (_i > -1) this.curAddIndex = _i;
       else if (this.customerInfo.Address.length > 0) this.curAddIndex = 0;
@@ -499,6 +530,25 @@ export default {
     },
     inputChecker() {
       return this.$refs.oIdentifyFormItemOut.formCheckerOnOut();
+    },
+    judgeValidEventEmit(curAddExpressArea, oldAddExpressArea) {
+      if (!curAddExpressArea) return;
+      if (!oldAddExpressArea) {
+        // 此处触发一次
+        this.handleValidAddressChange(true);
+        return;
+      }
+      const { RegionalID, CityID, CountyID } = curAddExpressArea;
+      if (RegionalID !== 'undefined'
+       && (oldAddExpressArea.RegionalID !== RegionalID || oldAddExpressArea.CityID !== CityID || oldAddExpressArea.CountyID !== CountyID)) {
+        // 触发
+        this.handleValidAddressChange(true);
+      }
+    },
+    handleValidAddressChange(e) {
+      this.$nextTick(() => {
+        this.$emit('validChange', e);
+      });
     },
   },
   watch: {
@@ -516,7 +566,7 @@ export default {
         this.onRadioChange(_t);
       }
     },
-    async curAddIndex(newVal) {
+    async curAddIndex(newVal, oldVal) {
       if (newVal === 'new') return;
       const _t = this.customerInfo.Address.find((it, i) => i === newVal);
       if (!_t) return;
@@ -527,10 +577,29 @@ export default {
       this.ValidExpressLoading = false;
       if (res.data.Status === 1000) {
         this.ExpressValidList = res.data.Data;
+        if (res.data.Data.includes(this.Express.First)) {
+          const curAddExpressArea = this.customerInfo.Address[newVal] ? this.customerInfo.Address[newVal].ExpressArea : null;
+          let oldAddExpressArea = typeof oldVal === 'number' ? this.customerInfo.Address[oldVal]?.ExpressArea : null;
+          if (!oldAddExpressArea && oldVal === 'new') oldAddExpressArea = this.NewAddressInfo.ExpressArea;
+          this.judgeValidEventEmit(curAddExpressArea, oldAddExpressArea);
+        }
       }
     },
     watchClearVal() {
       this.clearCurProductState();
+    },
+    customerInfo(val) {
+      if (val) {
+        this.curAddIndex = '';
+        this.ExpressValidList = [1, 2, 3];
+        this.Express = {
+          First: 1,
+          Second: 1,
+        };
+        this.$nextTick(() => {
+          this.initCurAddIndex();
+        });
+      }
     },
   },
   created() {
@@ -593,11 +662,11 @@ export default {
             .el-input {
               width: 118px;
               .el-input__inner {
-                height: 30px;
-                line-height: 26px\0;
+                height: 26px;
+                line-height: 22px\0;
                 padding-right: 25px;
                 padding-left: 12px;
-                font-size: 13px;
+                font-size: 12px;
               }
             }
             .el-radio {
@@ -675,11 +744,64 @@ export default {
           text-align: left;
           color: #cbcbcb;
         }
-        // &.add-title {
-        //   position: absolute;
-        //   left: 765px;
-        //   top: 55px
-        // }
+      }
+    }
+    &.isBatchUploadUse {
+      > ul {
+        margin: 0px;
+        > li {
+            display: flex;
+            align-items: center;
+            color: #888E99;
+            width: 90%;
+            overflow: hidden;
+            height: 30px;
+            margin-top: 0;
+            margin-bottom: 2px;
+            > label {
+              flex: none;
+              display: flex;
+              align-items: center;
+              margin-right: 3px;
+              font-size: 14px;
+              line-height: 16px;
+              img {
+                margin-right: 8px;
+              }
+            }
+            > div {
+              flex: 0 1 auto;
+              overflow: hidden;
+              margin-right: 20px;
+              display: flex;
+              span {
+                flex: none;
+                line-height: 16px;
+                &.address {
+                  flex: 1;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  margin-right: 15px;
+                }
+              }
+            }
+            .express-box {
+              display: flex;
+              line-height: 28px;
+              > .title {
+                width: 96px;
+                margin-right: 2px;
+                line-height: 25px;
+              }
+              > div {
+                .el-radio__label, .el-input .el-input__inner {
+                  font-size: 12px;
+                  line-height: 28px;
+                }
+              }
+            }
+        }
       }
     }
   }
@@ -698,11 +820,35 @@ export default {
     .title {
       min-width: 4em;
     }
+    .el-dialog__header {
+      padding:  10px;
+      margin: 0 10px;
+      line-height: 30px;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+      color: #888E99;
+      .el-dialog__headerbtn {
+        top: 15px;
+      }
+      // > header {
+      //   &::before {
+      //     content: '';
+      //     height: 16px;
+      //     width: 3px;
+      //     background-color: #26bcf9;
+      //     display: inline-block;
+      //     position: relative;
+      //     top: 2px;
+      //     margin-right: 10px;
+      //   }
+      // }
+    }
     .el-dialog__body {
       padding-left: 22px;
       padding-right: 22px;
       // height: 635px;
       min-height: 188px;
+      font-size: 12px;
       > .change-add-dia-content {
         > li {
           > section {
@@ -711,6 +857,7 @@ export default {
               display: block;
               > .el-radio__label {
                 display: inline-block;
+                font-size: 12px;
                 .address {
                   max-width: 380px;
                   display: inline-block;
@@ -731,6 +878,7 @@ export default {
                             width: 120px;
                             > input {
                               height: 25px;
+                              line-height: 23px;
                               line-height: 22px\0;
                               font-size: 12px;
                               &::placeholder {
@@ -763,6 +911,7 @@ export default {
                                 height: 25px;
                                 line-height: 22px\0;
                                 font-size: 12px;
+                                line-height: 23px;
                                 &::placeholder {
                                   color: #cbcbcb;
                                 }

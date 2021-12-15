@@ -8,7 +8,7 @@
           <span class="line" v-if="i < curProgressData.length - 1"></span>
         </div>
         <span class="date">{{item.OperateTime | format2MiddleLangTypeDate}}</span>
-        <el-tooltip popper-class="table-item" :content="item.Description" placement="top-start">
+        <el-tooltip popper-class="table-item" :content="item.Description" placement="top-start" :visible-arrow='false'>
           <span class="progress-text">{{item.Description}}</span>
         </el-tooltip>
         <el-progress :percentage="item.FinishPercent" ></el-progress>

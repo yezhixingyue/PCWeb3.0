@@ -12,7 +12,7 @@
     </div>
     <div class="right">
       <ExpressInfoComp :Address="Address" :ExpressList="ExpressList" :OutPlateNo='OutPlateNo' />
-      <OrderInfoComp :orderInfo="orderInfo" :OrderDetail='OrderDetail' :isCar='isCar' :hiddenProducePeriod='hiddenProducePeriod' />
+      <OrderInfoComp :orderInfo="orderInfo" :OrderDetail='OrderDetail' :isCar='isCar' />
     </div>
   </main>
 </template>
@@ -34,10 +34,6 @@ export default {
       default: null,
     },
     isCar: {
-      type: Boolean,
-      default: false,
-    },
-    hiddenProducePeriod: {
       type: Boolean,
       default: false,
     },
@@ -64,10 +60,10 @@ export default {
     ...mapState('Quotation', ['curProductInfo2Quotation']),
     OutPlateNo() { // 平台单号
       if (this.orderInfo) {
-        return this.orderInfo.OutPlateNo ? `${this.orderInfo.OutPlateNo}` : '无';
+        return this.orderInfo.OutPlate ? `${this.orderInfo.OutPlate}` : '无';
       }
-      if (this.OrderDetail && this.OrderDetail.OutPlateNo && this.OrderDetail.OutPlateNo.Second) {
-        return `${this.OrderDetail.OutPlateNo.Second}`;
+      if (this.OrderDetail && this.OrderDetail.OutPlate && this.OrderDetail.OutPlate.Second) {
+        return `${this.OrderDetail.OutPlate.Second}`;
       }
       return '无';
     },

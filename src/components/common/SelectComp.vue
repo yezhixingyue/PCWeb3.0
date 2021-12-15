@@ -1,9 +1,11 @@
 <template>
   <el-select
    v-model="value"
-   class="mp-pc-common-select-comp-wrap"
-   :class="mini?'font-12':''"
+   :size="size"
+   :class="{'font-12': mini, 'mp-pc-common-select-comp-wrap': !useOrigin}"
    :filterable='filterable'
+   :disabled='disabled'
+   :placeholder='placeholder'
    >
     <el-option
       v-for="item in options"
@@ -42,6 +44,22 @@ export default {
       type: Boolean,
       default: false,
     },
+    size: {
+      type: String,
+      default: 'mini',
+    },
+    useOrigin: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    placeholder: {
+      type: String,
+      default: '请选择',
+    },
   },
   computed: {
     value: {
@@ -49,7 +67,6 @@ export default {
         return this.title;
       },
       set(newVal) {
-        // // console.log(newVal, this.title);
         if (newVal === this.title) return;
         this.$emit('handleChange', newVal);
       },

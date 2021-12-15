@@ -5,6 +5,7 @@
     :widthObj="widthObj"
     :onWidthChange="onWidthChange"
     :titleList="titleList"
+    :class="{'is-mini': isMini}"
   >
     <template v-if="orderData">
       <ul>
@@ -33,18 +34,22 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    isMini: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       widthObj: {
-        w1: 230,
-        w2: 100,
-        w3: 80,
-        w4: 70,
-        w5: 80,
-        w6: 80,
-        w7: 235,
-        w8: 322,
+        w1: this.isMini ? 180 : 230,
+        w2: this.isMini ? 100 : 100,
+        w3: this.isMini ? 70 : 80,
+        w4: this.isMini ? 60 : 70,
+        w5: this.isMini ? 70 : 80,
+        w6: this.isMini ? 65 : 80,
+        w7: this.isMini ? 170 : 235,
+        w8: this.isMini ? 140 : 322,
       },
       titleList: [
         '产品',
@@ -78,30 +83,18 @@ export default {
 <style lang='scss'>
 .mp-pc-shopping-car-create-order-list-wrap {
   height: 100%;
-  // padding-top: 8px;
   box-sizing: border-box;
-  // min-height: 360px;
   padding-bottom: 15px;
-  // border: 1px solid #eee;
   > header {
     height: 40px;
     border: 1px solid #eee;
-    // border-bottom: 1px solid #eee;
     background-color: rgb(248, 248, 248);
     box-sizing: border-box;
     border-bottom: none;
-    // border-top: none;
     > div {
       line-height: 38px;
       height: 100%;
       background-color: rgb(248, 248, 248);
-      // &:first-of-type {
-      //   text-align: left;
-      //   padding-left: 118px;
-      //   box-sizing: border-box;
-      // }
-      // border-top: 1px solid #eee;
-      // border-bottom: 1px solid #eee;
     }
   }
   .no-data-show {
@@ -112,10 +105,7 @@ export default {
   }
   > main {
     height: calc(100% - 36px);
-    // border-left: 1px solid #eee;
-    // border-right: 1px solid #eee;
     overflow-x: hidden;
-    // border-bottom: 1px solid #eee;
     border-top: 1px solid #eee;
     min-height: calc(100vh - 135px - 144px - 346px - 25px);
     margin-bottom: 20px;
@@ -125,6 +115,64 @@ export default {
     .hide-border {
       .hide-border-item {
         border-bottom: none;
+      }
+    }
+  }
+  &.is-mini {
+    padding: 0;
+    > header {
+      height: 32px;
+      border: none;
+      padding: 0 14px;
+      background-color: #79adfa;
+      border: 1px solid #79adfa;
+      box-sizing: border-box;
+      border-top: none;
+      border-bottom: none;
+      > div {
+        line-height: 32px;
+        color: #fff;
+        background-color: #79adfa;
+      }
+    }
+    > main {
+      border: none;
+      padding: 0 14px;
+      height: auto;
+      margin: 0;
+      overflow: hidden;
+      > ul {
+        > li {
+          > .mp-pc-pre-create-order-list-item-wrap {
+            border: none;
+            padding-top: 14px;
+            > .product-item-header {
+              &::before {
+                display: none;
+              }
+              > .product-item-header-left {
+                height: 30px;
+                line-height: 30px;
+                .product-item-header-amount-box, .freight-box {
+                  font-size: 12px !important;
+                }
+              }
+              border: 1px solid #eee;
+            }
+            > ul {
+              .product-item-content {
+                border: 1px solid #eee;
+                box-sizing: border-box;
+                border-top: none;
+                height: 50px;
+                > div {
+                  font-size: 12px;
+                  padding: 10px 0;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

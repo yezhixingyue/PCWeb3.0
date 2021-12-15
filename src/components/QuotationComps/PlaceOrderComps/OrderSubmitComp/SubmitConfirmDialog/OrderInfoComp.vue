@@ -17,7 +17,7 @@
               'is-pink': OrderDetail.Status === 10,
               'is-success': OrderDetail.Status === 200,
               'is-cancel': [254, 255].includes(OrderDetail.Status),
-              'is-origin': [10, 200, 254, 255].includes(OrderDetail.Status),
+              'is-origin': ![10, 200, 254, 255].includes(OrderDetail.Status),
             }"
           >
             {{ OrderDetail.Status | formatStatus }}
@@ -49,7 +49,7 @@
         <span class="label">文件内容：</span>
         <div
           class="text"
-          :style="`min-height:${isCar || orderInfo ? '80' : '40'}px;color:#888`"
+          :style="`min-height:${isCar || orderInfo ? '80' : '40'}px;color:#888;`"
         >
           {{ FileContent }}
         </div>
@@ -64,10 +64,17 @@
           {{ OrderDetail.CreateTime | format2MiddleLangTypeDate }}
         </div>
       </li>
-      <li v-if="!hiddenProducePeriod">
+      <li v-if="!isCar && OrderDetail && OrderDetail.PayTime">
+        <span class="label">付款时间：</span>
+        <div class="text">
+          {{ OrderDetail.PayTime | format2MiddleLangTypeDate }}
+        </div>
+      </li>
+      <li v-if="showProducePeriod">
         <span class="label">交货工期：</span>
-        <div class="text is-pink" v-if="ProducePeriod">
-          {{ ProducePeriod | getPayTime }} {{ ProducePeriod | getDoneTime }}
+        <div class="text" v-if="ProducePeriod" :class="{'is-pink': !hiddenPayTime}">
+          <template v-if="!hiddenPayTime">{{ ProducePeriod | getPayTime }} </template>
+          <template>{{ ProducePeriod | getDoneTime }}</template>
         </div>
         <div class="text is-gray" v-else>{{ "暂无工期" }}</div>
       </li>
@@ -89,10 +96,6 @@ export default {
       default: null,
     },
     isCar: {
-      type: Boolean,
-      default: false,
-    },
-    hiddenProducePeriod: {
       type: Boolean,
       default: false,
     },
@@ -137,6 +140,12 @@ export default {
           }));
       }
       return [];
+    },
+    hiddenPayTime() { // 是否隐藏支付时间，在订单未支付时需显示出来
+      return this.OrderDetail && !this.isCar && this.OrderDetail.Status !== 10;
+    },
+    showProducePeriod() {
+      return !(this.OrderDetail && !this.isCar && [200, 254, 255].includes(this.OrderDetail.Status)) && this.ProducePeriod;
     },
   },
 };

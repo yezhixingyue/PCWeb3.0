@@ -5,6 +5,30 @@
 
 import api from '@/api';
 
+import { extname } from '@/assets/js/utils/utils';
+
+const sha1 = require('js-sha1');
+
+/**
+   * @description: 解析文件，获取文件唯一标识名称
+   * @param {*} file
+   * @return {*}
+   */
+export const getUniqueFileName = (file, TypeID) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  reader.onerror = () => {
+    reject(new Error('文件解析失败'));
+  };
+  reader.onloadend = async () => {
+    if (!(reader.result)) return;
+    const ext = extname(file.name);
+    let _name = `${sha1(reader.result)}.${ext}`; // 文件名称, 文件唯一标识
+    if (TypeID || TypeID === 0) _name = `${TypeID}_${_name}`;
+    resolve(_name);
+  };
+});
+
 const chunkSize = 1024 * 1024 * 20;
 
 /**

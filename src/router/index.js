@@ -58,6 +58,16 @@ const routes = [
         component: () => import('../views/PlaceOrder/PlaceOrderPage.vue'),
       },
       {
+        path: '/BatchUpload',
+        name: 'BatchUpload',
+        meta: {
+          requiresAuth: true,
+          y: 0,
+          title: '批量上传 - 郑州名片之家电子商务有限公司',
+        },
+        component: () => import('../views/BatchUpload/BatchUploadPage.vue'),
+      },
+      {
         path: '/shopping',
         name: 'shopping',
         component: CommonViewPage,
@@ -73,26 +83,16 @@ const routes = [
             },
             component: () => import('../views/ShoppingCar/ShoppingCarPage.vue'),
           },
-          {
-            path: '/shopping/detail',
-            name: 'shoppingCarDetail',
-            meta: {
-              requiresAuth: true,
-              y: 0,
-              title: '购物车产品详情 - 郑州名片之家电子商务有限公司',
-            },
-            component: () => import('../views/ShoppingCar/ShoppingCarDetailPage.vue'),
-          },
-          {
-            path: '/shopping/submit',
-            name: 'shoppingCar/submit',
-            meta: {
-              requiresAuth: true,
-              y: 0,
-              title: '购物车订单提交 - 郑州名片之家电子商务有限公司',
-            },
-            component: () => import('../views/ShoppingCar/ShoppingCarSubmitPage.vue'),
-          },
+          // {
+          //   path: '/shopping/submit',
+          //   name: 'shoppingCar/submit',
+          //   meta: {
+          //     requiresAuth: true,
+          //     y: 0,
+          //     title: '购物车订单提交 - 郑州名片之家电子商务有限公司',
+          //   },
+          //   component: () => import('../views/ShoppingCar/ShoppingCarSubmitPage.vue'),
+          // },
         ],
       },
       {

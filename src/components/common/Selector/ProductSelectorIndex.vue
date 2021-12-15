@@ -1,27 +1,39 @@
 <template>
   <ul class="mp-pc-order-product-select-wrap">
-    <li class="text">
+    <li class="text" v-if="!hiddenLabel">
       <span>产品：</span>
     </li>
     <li class="first-select-box">
       <select-comp
         :title="first"
+        :size='size'
+        :useOrigin='useOrigin'
         :options='largeProduct'
+        :disabled='disabled'
+        :placeholder='!hasAll ? level1EmptyLabel : "请选择"'
         :defaultProps='{label: "ClassName",value: "ID"}'
         @handleChange="handleSwitch1" />
     </li>
     <li>
       <select-comp
         :title="second"
+        :size='size'
+        :useOrigin='useOrigin'
         :options='midProduct'
+        :disabled='disabled'
         :defaultProps='{label: "ClassName",value: "ID"}'
+        :placeholder='!hasAll ? level2EmptyLabel : "请选择"'
         @handleChange="handleSwitch2" />
     </li>
     <li>
       <select-comp
         :title="third"
+        :size='size'
+        :useOrigin='useOrigin'
         :options='productThirdList'
+        :disabled='disabled'
         :defaultProps='{label: "ProductName",value: "ProductID"}'
+        :placeholder='!hasAll ? level3EmptyLabel : "请选择"'
         @handleChange="handleSwitch3" />
     </li>
   </ul>
@@ -63,11 +75,43 @@ export default {
       type: Function,
       default: () => {},
     },
+    hiddenLabel: {
+      type: Boolean,
+      default: false,
+    },
+    size: {
+      type: String,
+      default: 'mini',
+    },
+    useOrigin: {
+      type: Boolean,
+      default: false,
+    },
+    level1EmptyLabel: {
+      type: String,
+      default: '不限',
+    },
+    level2EmptyLabel: {
+      type: String,
+      default: '不限',
+    },
+    level3EmptyLabel: {
+      type: String,
+      default: '不限',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    hasAll: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     ...mapState('Quotation', ['productClassify', 'productNames']),
     largeProduct() {
-      const arr = [{ ID: '', ClassName: '不限' }];
+      const arr = this.hasAll ? [{ ID: '', ClassName: this.level1EmptyLabel }] : [];
       if (this.productClassify.length > 0) {
         const tempArr = this.productClassify.filter((item) => item.Level === 1);
         return [...arr, ...tempArr];
@@ -75,7 +119,7 @@ export default {
       return arr;
     },
     midProduct() {
-      const arr = [{ ID: '', ClassName: '不限' }];
+      const arr = this.hasAll ? [{ ID: '', ClassName: this.level2EmptyLabel }] : [];
       const id = this.first;
       if (id) {
         const tempArr = this.productClassify.filter((item) => item.ParentID === id);
@@ -121,7 +165,7 @@ export default {
         }
         return false;
       }).filter(it => it).map(it => ({ ProductID: it.ID, ProductName: it.ShowName }));
-      return [{ ProductID: '', ProductName: '不限' }, ..._arr];
+      return this.hasAll ? [{ ProductID: '', ProductName: this.level3EmptyLabel }, ..._arr] : [..._arr];
     },
   },
   methods: {
@@ -138,7 +182,7 @@ export default {
       this.first = e;
       // this.TypeID = '';
       // this.ProductID = '';
-      this.products = [{ ProductID: '', ProductName: '不限' }];
+      this.products = [{ ProductID: '', ProductName: this.level3EmptyLabel }];
     },
     handleSwitch2(e) {
       if (e === this.second) return;

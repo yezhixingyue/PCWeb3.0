@@ -1,6 +1,6 @@
 <template>
   <section class="mp-pc-place-order-product-classify-comp-wrap">
-    <header>
+    <header @mouseleave="onMouseLeave" @mouseenter="onMouseEnter(-1)">
       <div class="product-menu-box float">
         <ul class="header">
           <li v-if="allProductClassify.length === 0" class="loading-box">
@@ -10,9 +10,9 @@
             <li
               v-for="(it,i) in allProductClassify"
               :key="it.ID"
-              @mouseenter="onMouseEnter(i)"
-              @mouseleave="onMouseLeave"
+              @mouseenter.stop="onMouseEnter(i)"
               :class="{
+                item: true,
                 active: i === index && isOpen,
                 selected: curProductClass && it.ID === curProductClass.FirstLevel.ID
               }"
@@ -21,6 +21,10 @@
             </li>
           </template>
         </ul>
+        <div class="upload-batch">
+          <span class="blue-span" @click="onBatchUploadClick">
+            <img src="@/assets/images/batch-upload.png" alt="">批量上传</span>
+        </div>
       </div>
     </header>
     <el-popover
@@ -51,7 +55,7 @@
     </el-popover>
 
     <transition name="el-fade-in-linear">
-      <div  v-show="isOpen || showClassify" class="mark transition-box" :class="isComHeader?'isComHeader':''"></div>
+      <div  v-show="(curMenus || !isComHeader) && (isOpen || showClassify)" class="mark transition-box" :class="isComHeader?'isComHeader':''"></div>
     </transition>
   </section>
 </template>
@@ -92,7 +96,8 @@ export default {
   },
   methods: {
     onMouseEnter(i) {
-      if (i || i === 0) this.index = i;
+      if (i === -1 && !this.isComHeader && !this.isOpen) return;
+      if ((i || i === 0) && i !== -1) this.index = i;
       if (this.isComHeader) {
         this.$emit('handleMouseEnter');
       }
@@ -107,13 +112,14 @@ export default {
         this.timer = null;
       }
     },
-    onMouseLeave() {
+    onMouseLeave(type) {
+      if (type === -1 && !this.isComHeader) return;
       if (this.isComHeader) {
         this.$emit('handleMouseLeave');
       }
       this.timer = setTimeout(() => {
         if (this.isOpen) this.isOpen = false;
-      }, 50);
+      }, 100);
       if (this.timer2) {
         clearTimeout(this.timer2);
         this.timer2 = null;
@@ -132,6 +138,10 @@ export default {
       this.$store.commit('Quotation/setCurProductInfo', sub);
       this.$store.dispatch('Quotation/getProductDetail');
       this.$store.commit('Quotation/setSelectedCoupon', null);
+    },
+    onBatchUploadClick() { // 跳转至批量上传页面
+      this.$router.push('/BatchUpload');
+      this.onMouseLeave();
     },
   },
   watch: {
@@ -160,6 +170,7 @@ export default {
       height: 60px;
       width: 1200px;
       margin: 0 auto;
+      border-top: 1px dashed #eee;
       > .header {
         height: 60px;
         // width: 1200px;
@@ -174,7 +185,7 @@ export default {
           height: 59px;
           line-height: 59px;
           text-align: center;
-          width: 80px;
+          min-width: 80px;
           font-size: 14px;
           position: relative;
           color: #333;
@@ -233,7 +244,19 @@ export default {
           }
         }
         // border-bottom: 1px dashed #eee;
-        border-top: 1px dashed #eee;
+        // border-top: 1px dashed #eee;
+      }
+      > .upload-batch {
+        font-size: 14px;
+        float: right;
+        height: 30px;
+        padding: 15px 5px;
+        padding-right: 10px;
+        line-height: 30px;
+        img {
+          vertical-align: -1px;
+          margin-right: 8px;
+        }
       }
     }
   }
