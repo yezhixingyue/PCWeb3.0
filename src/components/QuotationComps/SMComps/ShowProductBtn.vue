@@ -2,6 +2,7 @@
   <span
     class="mp-show-product-btn-wrap van-ellipsis"
     :class="{ active: isActive, disabled: disabled }"
+    :title="tips"
   >
     {{ title }}
   </span>
@@ -21,6 +22,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    tips: {
+      type: String,
+      default: '',
     },
   },
 };

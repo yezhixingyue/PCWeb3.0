@@ -2,6 +2,7 @@
 import api from '@/api';
 import { Message } from 'element-ui';
 import massage from '@/assets/js/utils/message';
+import store from '@/store';
 import asyncNonCurrentFunc from '../assets/js/utils/asyncNonCurrentFunc';
 
 export default {
@@ -159,9 +160,13 @@ export default {
       const _res = res.map((it, i) => ({ ...it, PayCode: _list[i] })); // 非并发方式处理批量取消，获取总结果
 
       const hasWrongList = _res.filter(it => it.data.Status !== 1000);
-
+      const handleCancleAfter = () => {
+        store.dispatch('common/getCustomerFundBalance');
+      };
       if (hasWrongList.length === 0) { // 如果没有取消失败的项则提示成功
-        massage.successSingle({ title: '取消成功!' });
+        massage.successSingle({ title: '取消成功!',
+          successFunc: handleCancleAfter,
+        });
         commit('setMultipleOrderDataStatus', { allList: list, failList: [] });
         return true;
       }
@@ -178,6 +183,8 @@ export default {
       massage.failSingleError({
         title: '部分付款单取消失败!',
         msg: `${_successLen} 条成功， ${_failLen} 条失败，具体请查看列表订单状态`,
+        successFunc: handleCancleAfter,
+        failFunc: handleCancleAfter,
       }); // 弹窗提示出错订单
       return true;
     },

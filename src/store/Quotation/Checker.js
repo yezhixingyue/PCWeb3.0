@@ -103,14 +103,14 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
  * @param {*} element 所赋值的元素
  * @return {*}
  */
-const _elementTypeChecker = (value, element, showPropName = true) => {
+const _elementTypeChecker = (value, element, showPropName, PartName) => {
   if (!value && value !== 0) return { msg: '值未设置', result: false };
   const { Type, NumbericAttribute, OptionAttribute, HiddenToCustomer, Name, Unit } = element; // 开关类型暂未判断 或可不需要
   if (Type === 1) { // 数值类型元素
     const { AllowDecimal, SectionList, InputContent, Allow, AllowCustomer } = NumbericAttribute;
     const isConformNumberType = getValueIsOrNotNumber(value, !AllowDecimal);
     if (!isConformNumberType) {
-      const msg = `${showPropName ? `[${Name}] ` : ''}不正确，请输入正确的数字类型（${AllowDecimal ? '允许小数' : '不允许小数'}）`;
+      const msg = `${showPropName ? `[${PartName || ''}${Name}] ` : ''}不正确，请输入正确的数字类型（${AllowDecimal ? '允许小数' : '不允许小数'}）`;
       return { msg, result: false };
     }
     if (SectionList && Array.isArray(SectionList) && SectionList.length > 0) {
@@ -119,10 +119,10 @@ const _elementTypeChecker = (value, element, showPropName = true) => {
         return { msg: '', result: true };
       }
       if (!Allow && !valueList.includes(`${value}`)) {
-        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，请从${valueList}中取值`, result: false };
+        return { msg: `${showPropName ? `[${PartName || ''}${Name}] ` : ''}值不正确，请从${valueList}中取值`, result: false };
       }
       if (!AllowCustomer && !HiddenToCustomer && !valueList.includes(`${value}`)) {
-        return { msg: `${showPropName ? `[${Name}] ` : ''}值不正确，请从${valueList}中取值`, result: false };
+        return { msg: `${showPropName ? `[${PartName || ''}${Name}] ` : ''}值不正确，请从${valueList}中取值`, result: false };
       }
       const msg = checkNumberSectionList(value, SectionList, valueList, { propName: showPropName ? Name : '', Unit });
       if (msg) return { msg, result: false };
@@ -133,7 +133,7 @@ const _elementTypeChecker = (value, element, showPropName = true) => {
     const { Allow, OptionList } = OptionAttribute;
     const optionIDs = OptionList.map(it => it.ID);
     if (!Allow && !optionIDs.includes(value)) {
-      return { msg: `${showPropName ? `[${Name}] ` : ''}不允许自定义`, result: false };
+      return { msg: `${showPropName ? `[${PartName || ''}${Name}] ` : ''}不允许自定义`, result: false };
     }
     return { msg: '', result: true };
   }
@@ -145,7 +145,7 @@ const _elementTypeChecker = (value, element, showPropName = true) => {
  * @param {*}
  * @return {*}
  */
-export const checkElement = ({ values, prop, AffectedPropList, showPropName }) => {
+export const checkElement = ({ values, prop, AffectedPropList, showPropName, PartName }) => {
   if (!prop || !values) return '';
   const _showPropName = typeof showPropName === 'boolean' ? showPropName : true;
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
@@ -161,7 +161,7 @@ export const checkElement = ({ values, prop, AffectedPropList, showPropName }) =
         const t = arr.find(it => valueIDs.includes(it));
         if (t) {
           const target = prop.OptionAttribute?.OptionList?.find(_it => _it.ID === t);
-          if (target) return `${_showPropName ? `[${prop.Name}] ` : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
+          if (target) return `${_showPropName ? `[${PartName || ''}${prop.Name}] ` : ''}选项 [ ${target.Name} ]不可用，请删除或更换`;
         }
       }
       if (requiredList.length > 0) {
@@ -171,20 +171,20 @@ export const checkElement = ({ values, prop, AffectedPropList, showPropName }) =
           const target = t2.map(it => prop.OptionAttribute?.OptionList?.find(_it => _it.ID === it)).filter(it => it);
           if (target.length > 0) {
             const text = target.map(it => `[ ${it.Name} ]`).join('、');
-            return `${_showPropName ? `[${prop.Name}] ` : ''}选项中 ${text} 为必选项`;
+            return `${_showPropName ? `[${PartName || ''}${prop.Name}] ` : ''}选项中 ${text} 为必选项`;
           }
         }
       }
     }
   }
   let IsRequired = false;
-  let operation = '输入';
+  let operation = '填写';
   if (prop.Type === 2 && (prop.OptionAttribute?.OptionList?.length > 0 || prop.OptionAttribute?.AllowCustomer === false)) {
     operation = '选择';
   }
   if (prop.NumbericAttribute && prop.NumbericAttribute.IsRequired) IsRequired = true;
   if (prop.OptionAttribute && prop.OptionAttribute.IsRequired) IsRequired = true;
-  if (IsRequired && values && values.length === 0) return `请${operation}${prop.Name}`;
+  if (IsRequired && values && values.length === 0) return `请${operation}${PartName || ''}${prop.Name}`;
   // 判断是否为多选选项元素
   // let isMultiple = false;
   if (prop.Type === 2 && !prop.OptionAttribute.IsRadio) {
@@ -192,25 +192,25 @@ export const checkElement = ({ values, prop, AffectedPropList, showPropName }) =
     const len = values.length;
     // 需要判断 1. 必选情况下 未选值 (长度为0)
     if (len === 0 && IsRequired) {
-      return `请选择${prop.Name}`;
+      return `请选择${PartName || ''}${prop.Name}`;
     }
     // 2. 在已选择的情况下(长度大于0)，选项的数量与限制数量不符合
     if (prop.OptionAttribute.UseTimes) {
       const { MinValue, MaxValue } = prop.OptionAttribute.UseTimes;
       if (((MinValue || MinValue === 0) && len < MinValue) || ((MaxValue || MaxValue === 0) && len > MaxValue)) {
         // 项数不符合
-        if (MinValue === MaxValue) return `${_showPropName ? `[${prop.Name}] ` : ''}必须选择${MinValue}项`;
-        if (MaxValue === -1 || len < MinValue) return `${_showPropName ? `[${prop.Name}] ` : ''}至少选择${MinValue}项`;
-        if (len > MaxValue) return `${_showPropName ? `[${prop.Name}] ` : ''}最多选择${MaxValue}项`;
-        return `${_showPropName ? `[${prop.Name}] ` : ''}应选择${MinValue}至${MaxValue}项`;
+        if (MinValue === MaxValue) return `${_showPropName ? `${PartName || ''}${prop.Name}` : ''}必须选择${MinValue}项`;
+        if (MaxValue === -1 || len < MinValue) return `${_showPropName ? `${PartName || ''}${prop.Name}` : ''}至少选择${MinValue}项`;
+        if (len > MaxValue) return `${_showPropName ? `${PartName || ''}${prop.Name}` : ''}最多选择${MaxValue}项`;
+        return `${_showPropName ? `${PartName || ''}${prop.Name}` : ''}应选择${MinValue}至${MaxValue}项`;
       }
     }
   }
   if (values && values.length === 1) {
     const [{ ID, Name, Value }] = values;
-    if (!ID && !Name && !Value && IsRequired) return `请${operation}${prop.Name}`;
+    if (!ID && !Name && !Value && IsRequired) return `请${operation}${PartName || ''}${prop.Name}`;
     if (Name || Value) {
-      const res = _elementTypeChecker(Name || Value, prop);
+      const res = _elementTypeChecker(Name || Value, prop, _showPropName, PartName);
       if (res) return res.msg;
     }
   }
@@ -241,27 +241,29 @@ const getStrArrIsRepeat = arr => { // 判断字符串组成的数组是否有重
   return Object.keys(obj).length < arr.length;
 };
 
-export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAffectedPropList = []) => {
+export const checkElementGroup = ({ valueList, prop, AffectedPropList, subGroupAffectedPropList, PartName }) => {
   // if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
   //   // 如果已经被禁用，则直接返回空字符串，不再进行验证
   //   if (InterAction.getDisabledOrNot(AffectedPropList)) return ''; // 使用该方法验证有问题--没有判断被禁用的是否为元素组本身 -- 由于元素组禁用和隐藏功能本身被废弃，故不再修改
   // }
-  let groupName = prop && !prop.IsNameHidden ? `${prop.Name}中` : '当前组中';
-  groupName = '';
+  const groupName = prop && prop.Name && !prop.IsNameHidden ? `${PartName || ''}${prop.Name}` : '';
+  // groupName = '';
   if (valueList && valueList.length > 0 && prop && prop.ElementList && prop.ElementList.length > 0) {
     const CustomerCanUseElementList = prop.ElementList.filter(it => !it.HiddenToCustomer);
     for (let i = 0; i < valueList.length; i += 1) {
       const itemValues = valueList[i]; // 单行所有元素组成的值列表
       const _AffectedPropList = AffectedPropList || [];
-      const _subGroupAffectedPropList = subGroupAffectedPropList[i] || [];
+      const _subGroupAffectedPropList = subGroupAffectedPropList ? (subGroupAffectedPropList[i] || []) : [];
       const combineList = getCombineAffectedPropList(_AffectedPropList, _subGroupAffectedPropList); // 合并交互与子交互
       for (let index = 0; index < itemValues.List.length; index += 1) {
         const { ElementID, CustomerInputValues } = itemValues.List[index];
         const _Element = CustomerCanUseElementList.find(it => it.ID === ElementID);
         const ElementAffectedPropList = combineList.filter((_it) => _it.Property && _it.Property.Element
          && _Element && _it.Property.Element.ID === _Element.ID);
-        const msg = checkElement({ values: CustomerInputValues, prop: _Element, AffectedPropList: ElementAffectedPropList });
-        if (msg) return { msg: `${groupName}${msg}`, ElementID, index: i };
+        const msg = checkElement({
+          values: CustomerInputValues, prop: _Element, AffectedPropList: ElementAffectedPropList, PartName: groupName,
+        });
+        if (msg) return { msg, ElementID, index: i };
       }
     }
     for (let i = 0; i < CustomerCanUseElementList.length; i += 1) {
@@ -284,7 +286,7 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
         }).filter(it => it !== '');
         if (getStrArrIsRepeat(values)) {
           return {
-            msg: `${groupName}${Element.Name}值不允许重复，请检查重复值`,
+            msg: `${groupName}${groupName ? '' : (PartName || '')}${Element.Name}值不允许重复，请检查重复值`,
             ElementID: Element.ID,
             index: 'all',
           };
@@ -295,9 +297,15 @@ export const checkElementGroup = (valueList, prop, AffectedPropList, subGroupAff
   return '';
 };
 
-export const checkSizeGroup = (value, prop, AffectedPropList) => {
+export const checkSizeGroup = ({ value, prop, AffectedPropList, PartName }) => {
+  const _sizeName = prop
+    ? `${prop && prop.GroupInfo && prop.GroupInfo.Name && !prop.GroupInfo.IsNameHidden ? prop.GroupInfo.Name : ''}`
+    : '';
   if (value && prop && !value.isCustomize && !value.ID) {
-    return { msg: `请选择${prop && prop.GroupInfo && prop.GroupInfo.Name && !prop.GroupInfo.IsNameHidden ? prop.GroupInfo.Name : '尺寸'}`, index: 0 };
+    return {
+      msg: `请选择${PartName || ''}${_sizeName || '尺寸'}`,
+      index: 0,
+    };
   }
   if (Array.isArray(AffectedPropList) && AffectedPropList.length > 0) {
     // 如果已经被禁用，则直接返回空字符串，不再进行验证
@@ -307,7 +315,7 @@ export const checkSizeGroup = (value, prop, AffectedPropList) => {
       const hiddenList = InterAction.getHiddenedOptionList(AffectedPropList);
       const arr = [...disabledList, ...hiddenList];
       if (arr.length > 0 && arr.includes(value.ID)) {
-        return { msg: '当前选中尺寸不可用，请更改', index: 0 };
+        return { msg: `${PartName || ''}${_sizeName || '尺寸'}不可用，请更改`, index: 0 };
       }
     }
   }
@@ -317,7 +325,8 @@ export const checkSizeGroup = (value, prop, AffectedPropList) => {
       for (let i = 0; i < List.length; i += 1) {
         const { ElementID, CustomerInputValues } = List[i];
         const _Element = prop.GroupInfo.ElementList.find(it => it.ID === ElementID);
-        const msg = checkElement({ values: CustomerInputValues, prop: _Element });
+        const msg = checkElement({ values: CustomerInputValues, prop: _Element, PartName: `${PartName || ''}${_sizeName || '尺寸'}` });
+        // if (_sizeName && msg) msg = `${PartName || ''}${_sizeName}中，${msg}`;
         if (msg) return { msg, ElementID, index: 0 };
       }
     }
@@ -325,20 +334,24 @@ export const checkSizeGroup = (value, prop, AffectedPropList) => {
   return '';
 };
 
-export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedPropList, CraftAffectedPropList, curProductInfo2Quotation) => {
+export const checkCraft = ({ value, prop, CraftConditionList, CraftList, AffectedPropList, curProductInfo2Quotation, PartName }) => {
   // 1. 找到应禁用或必选的工艺本身， 如果已被禁用则从列表中去除然后进行后面判断，如果是必选而没有选中则报错处理
   const _CraftList = CraftList.filter(it => !it.HiddenToCustomer);
   const diabledCraftIDs = InterAction.getDisabledCraftIDList(AffectedPropList);
   const _value = value.filter(_it => !diabledCraftIDs.includes(_it.CraftID));
-  const requiredCraftIDs = InterAction.getRequiredCraftIDList(AffectedPropList);
-  if (requiredCraftIDs.length > 0) {
+  const requiredCraft = InterAction.getRequiredCraftIDList(AffectedPropList);
+  if (requiredCraft.length > 0) {
     const selectedCraftIDs = _value.map(it => it.CraftID);
-    const t = requiredCraftIDs.find(it => !selectedCraftIDs.includes(it));
+    const t = requiredCraft.find(it => !selectedCraftIDs.includes(it.CraftID));
     if (t) {
-      const targetCraft = _CraftList.find(it => it.ID === t);
+      const targetCraft = _CraftList.find(it => it.ID === t.CraftID);
       if (targetCraft) {
-        console.log(AffectedPropList);
-        return `[ ${targetCraft.ShowName} ] 工艺必选`;
+        let condition = '';
+        if (Array.isArray(t._ConditionTextList)) {
+          condition = t._ConditionTextList.join(' 并且 ');
+          if (condition) condition = `当${condition}时，`;
+        }
+        return `${condition}${PartName || ''}[ ${targetCraft.ShowName} ] 工艺必选`;
       }
     }
   }
@@ -366,8 +379,8 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
             if (!target) {
               const craftNames = List.map(_craftID => _CraftList.find(_it => _it.ID === _craftID))
                 .filter(_it => _it && !_it.HiddenToCustomer).map(_it => _it.ShowName);
-              if (craftNames.length === 1) return `${craftNames[0]}为必选工艺`;
-              return `${craftNames.join('、')}至少选择一种`;
+              if (craftNames.length === 1) return `${PartName || ''} [ ${craftNames[0]} ]为必选工艺`;
+              return `${PartName ? `${PartName}中` : ''} [ ${craftNames.join('、')} ] 至少选择一种`;
             }
           }
         }
@@ -396,7 +409,7 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
                  && _it.Property.Element && _it.Property.Element.ID === elDataItem.ID);
             const errMsg = checkElement({ values: elValItem.CustomerInputValues || [], prop: elDataItem, AffectedPropList: _elAffectedPropList });
             // 5. 对工艺设置参数进行校验并返回结果
-            if (errMsg) return `[ ${craftDataItem.Name} ] 工艺里面，${errMsg}`;
+            if (errMsg) return `${PartName ? `${PartName}` : ''}[ ${craftDataItem.Name} ] 工艺里面，${errMsg}`;
           }
         }
       }
@@ -418,9 +431,14 @@ export const checkCraft = (value, prop, CraftConditionList, CraftList, AffectedP
                 .map(_item => ({ _CraftList: [{ GroupList: [{ GroupID: groupValItem.GroupID, List: [_item] }], CraftID: craftValItem.CraftID }] }))
                 .map(_item => getPropertiesAffectedByInteraction({ ProductParams: _item, curProductInfo2Quotation, SubControlList }));
             }
-            const errMsg = checkElementGroup(groupValItem.List || [], groupDataItem, _groupAffectedPropList, _subGroupAffectedPropList);
+            const errMsg = checkElementGroup({
+              valueList: groupValItem.List || [],
+              prop: groupDataItem,
+              AffectedPropList: _groupAffectedPropList,
+              subGroupAffectedPropList: _subGroupAffectedPropList,
+            });
             // 5. 对工艺设置参数进行校验并返回结果
-            if (errMsg.msg) return `[ ${craftDataItem.Name} ] 工艺中，${errMsg.msg}`;
+            if (errMsg.msg) return `${PartName ? `${PartName}` : ''}[ ${craftDataItem.Name} ] 工艺中，${errMsg.msg}`;
           }
         }
       }

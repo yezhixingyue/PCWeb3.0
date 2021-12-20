@@ -157,6 +157,7 @@ export default {
   },
   computed: {
     ...mapState('common', ['customerInfo', 'ScrollInfo', 'customerBalance']),
+    ...mapState('Quotation', ['RiskWarningTipsTypes']),
     customer() {
       return this.customerInfo;
     },
@@ -201,6 +202,7 @@ export default {
         OrderType: this.OrderType, // 2 是自助
         Position: this.Position, // 255 是自助上传
         IsBatchUpload: this.IsBatchUpload,
+        IgnoreRiskLevel: this.RiskWarningTipsTypes.All,
       };
       return temp;
     },
@@ -248,6 +250,7 @@ export default {
      */
     handleFileChange(fileList) { // 选中文件 并对其后续进行处理 （注：每次选中文件都清空掉上次选中文件）
       if (!this.canSelectFile) return;
+      console.log(fileList);
       this.handleFileParing(fileList);
     },
     async handleFileParing(fileList) { // 处理文件解析 并生成处理成功列表 及 处理失败列表
@@ -261,7 +264,7 @@ export default {
       this.failedList = failedList;
       this.successedList = successedList;
       if (failedList.length > 0) {
-        this.messageBox.warnSingleError({ title: `共有${failedList.length}个文件报价失败`, msg: '可在左下角查看具体错误信息' });
+        this.messageBox.warnSingleError({ title: `共有${failedList.length}个文件报价失败`, msg: '可在下方查看具体错误信息' });
       }
     },
     /**

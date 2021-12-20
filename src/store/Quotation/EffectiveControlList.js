@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable object-curly-newline */
 import { isEqual, isGreatThen, isLessThen } from '@/assets/js/utils/utils';
+import { getConditionTextByControlItemData } from './TraceConditionalText';
 
 export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
   // if (!DefaultOrDisabledValue && DefaultOrDisabledValue !== 0) return '';
@@ -33,22 +34,36 @@ export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
  * @return {*}
  */
 const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize, isGroup) => {
-  if (!Element || !ElementValList || !ElementList) return null;
+  const temp = {
+    ElName: '',
+    ElValue: null,
+    ElOriginData: {
+      FixedType,
+      Element: null,
+      HiddenToCustomer: false,
+    },
+  };
+  if (!Element || !ElementValList || !ElementList) return temp;
   let t = ElementValList.find(it => it.ElementID === Element.ID);
   const _El = ElementList.find(it => it.ID === Element.ID);
-  if (!_El) return null;
+  if (!_El) return temp;
+  temp.ElName = _El.Name;
+  temp.ElOriginData.Element = _El;
+  temp.ElOriginData.HiddenToCustomer = _El.HiddenToCustomer;
   if (_El.HiddenToCustomer && (_El.DefaultValue || _El.DefaultValue === 0)) {
     // 对客户隐藏 但设置有隐藏值
     t = creatNewTargetValue(_El.DefaultValue, _El);
   }
-  if (!t) return null;
+  if (!t) return temp;
   if (!_El.HiddenToCustomer && (t.hiddenByInteraction || t.disabledByInteraction)) {
     t = creatNewTargetValue(t.DisabledValue, _El);
   }
   // }
   if (!t.CustomerInputValues || t.CustomerInputValues.length === 0) {
-    if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) return [];
-    return null;
+    if (_El.Type === 2 && _El.OptionAttribute && !_El.OptionAttribute.IsRadio) {
+      temp.ElValue = [];
+    }
+    return temp;
   }
   // 获取元素值
   let _Value = '';
@@ -61,7 +76,8 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
     if (!_Value && _Value !== false) _Value = Value;
     if (isSize && ID) {
       const _t = _El.OptionAttribute.OptionList.find(it => it.ID === ID);
-      return _t ? _t.Value : '';
+      temp.ElValue = _t ? _t.Value : '';
+      return temp;
     }
   }
   // 如果 FixedType 有值 存在4种情况： 已选项数、和、最大值、最小值
@@ -70,25 +86,32 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
     let _Vals;
     switch (FixedType) {
       case 0: // 已选项数
+        temp.ElName = temp.ElName ? `${temp.ElName}已选项数` : '';
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
         FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
         // return (it ? it.ID : _El.OptionAttribute.CustomizeValue);
         FixedTypeValue = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.ID : Math.random().toString(16).slice(-8)));
-        if (!isGroup) return FixedTypeValue.length;
+        if (!isGroup) {
+          temp.ElValue = FixedTypeValue.length;
+          return temp;
+        }
         break;
       case 1: // 和
+        temp.ElName = temp.ElName ? `${temp.ElName}和` : '';
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
         FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
         _Vals = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
         if (_Vals.length > 0) FixedTypeValue = _Vals.reduce((prev, next) => prev + next, 0);
         break;
       case 2: // 最小值
+        temp.ElName = temp.ElName ? `${temp.ElName}最小值` : '';
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
         FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
         _Vals = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
         if (_Vals.length > 0) FixedTypeValue = Math.min(..._Vals);
         break;
       case 3: // 最大值
+        temp.ElName = temp.ElName ? `${temp.ElName}最大值` : '';
         FixedTypeValue = Array.isArray(_Value) ? _Value : [_Value];
         FixedTypeValue = FixedTypeValue.filter(it => it || it === 0);
         _Vals = FixedTypeValue.map(_ID => _El.OptionAttribute.OptionList.find(it => it.ID === _ID)).map(it => (it ? it.Value : _El.OptionAttribute.CustomizeValue));
@@ -97,9 +120,11 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
       default:
         break;
     }
-    return FixedTypeValue;
+    temp.ElValue = FixedTypeValue;
+    return temp;
   }
-  return _Value;
+  temp.ElValue = _Value;
+  return temp;
 };
 
 /**
@@ -107,55 +132,75 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
  * @param {*}
  * @return {*}
  */
-const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, isSubControl, ControlItem) => {
-  let _GroupValue;
+const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, isSubControl, ControlItem, GroupName) => {
+  const temp = {
+    GpName: GroupName,
+    GpValue: null,
+    ElOriginData: null,
+    GroupOriginData: {
+      FixedType,
+      Group: null,
+    },
+  };
   if (target && targetOriginData) {
+    temp.GroupOriginData.Group = targetOriginData;
     if (!Element) { // 元素组本身
-      if (FixedType === 4) _GroupValue = target.List.length; // 元素组使用次数
+      if (FixedType === 4) {
+        // _GroupValue = target.List.length; // 元素组使用次数
+        temp.GpName = `${temp.GpName}使用次数`;
+        temp.GpValue = target.List.length;
+      }
     } else {
       const ElValues = target.List.map(({ List }) => {
         const isSize = false;
         const isGroup = true;
-        const _itemVal = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList, isSize, isGroup);
-        return _itemVal;
+        const { ElName, ElValue, ElOriginData } = getElementTypeValue(Element, FixedType, List, targetOriginData.ElementList, isSize, isGroup);
+        temp.GpName = `${temp.GpName ? `${temp.GpName}-` : ''}${ElName}`;
+        temp.ElOriginData = ElOriginData;
+        return ElValue;
       }).filter(_it => _it || _it === 0 || _it === false);
       if (ElValues.length === 0) {
         if (FixedType === 0) {
-          return 0;
+          temp.GpName = `${temp.GpName}已选项数`;
+          temp.GpValue = 0;
         }
-        return null;
+        return temp;
       }
       switch (FixedType) {
         case 0: // 已选项数 -- 此时ElValues中为目标元素已选项数的值，对其进行相加得出总已选项数
-          _GroupValue = [...new Set(ElValues.reduce((prev, next) => [...prev, ...next], []))].length;
+          temp.GpName = `${temp.GpName}已选项数`;
+          temp.GpValue = [...new Set(ElValues.reduce((prev, next) => [...prev, ...next], []))].length;
           break;
         case 1: // 和
-          _GroupValue = ElValues.reduce((prev, next) => prev + next, 0);
+          temp.GpName = `${temp.GpName}和`;
+          temp.GpValue = ElValues.reduce((prev, next) => prev + next, 0);
           break;
         case 2: // 最小值
-          _GroupValue = Math.min(...ElValues);
+          temp.GpName = `${temp.GpName}最小值`;
+          temp.GpValue = Math.min(...ElValues);
           break;
         case 3: // 最大值
-          _GroupValue = Math.max(...ElValues);
+          temp.GpName = `${temp.GpName}最大值`;
+          temp.GpValue = Math.max(...ElValues);
           break;
         default:
           break;
       }
       if (!FixedType && FixedType !== 0) {
         if (Array.isArray(ElValues[0])) {
-          _GroupValue = [...ElValues]; // 多选选项元素时
+          temp.GpValue = [...ElValues]; // 多选选项元素时
         } else { // 单选时
           // 此处需要判断所在元素组的使用次数
           const { UseTimes, ID } = targetOriginData;
           const { GroupID } = ControlItem;
           if ((UseTimes && UseTimes.MinValue === 1 && UseTimes.MaxValue === 1) || (isSubControl && GroupID && GroupID === ID)) { // 单次使用元素组的单选元素 - 直接返回值 -> 同普通元素（非元素组元素）
             const [_val] = ElValues;
-            _GroupValue = _val;
+            temp.GpValue = _val;
           } else { // 多次使用元素组的单选元素
-            _GroupValue = [...ElValues];
-            if (_GroupValue.length < target.List.length) {
-              const d = target.List.length - _GroupValue.length;
-              _GroupValue = [..._GroupValue, ...new Array(d)];
+            temp.GpValue = [...ElValues];
+            if (temp.GpValue.length < target.List.length) {
+              const d = target.List.length - temp.GpValue.length;
+              temp.GpValue = [...temp.GpValue, ...new Array(d)];
             }
           }
         }
@@ -167,7 +212,7 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
 
   //   }
   // }
-  return _GroupValue;
+  return temp;
 };
 
 /**
@@ -175,20 +220,48 @@ const getElementGroupTypeValue = (Element, FixedType, target, targetOriginData, 
  * @param {*} Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem
  * @return {*}
  */
-const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem) => {
+const getCraftTypeValue = (Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem, CraftName) => {
+  const temp = {
+    CrName: CraftName,
+    CrValue: null,
+    ElOriginData: null,
+    GroupOriginData: null,
+    CraftOriginData: null,
+  };
   let _CraftValue;
-  if (target && target.disabledByInteraction) _CraftValue = false;
-  else if (!Element && !Group && !FixedType) _CraftValue = !!target && !target.disabledByInteraction; // 工艺是否选中 返回布尔值
-  else if (target) {
+  if (target && target.disabledByInteraction) {
+    _CraftValue = false;
+  } else if (!Element && !Group && !FixedType) {
+    _CraftValue = !!target && !target.disabledByInteraction; // 工艺是否选中 返回布尔值
+    temp.CraftOriginData = {
+      FixedType,
+      Craft: targetOriginData,
+      CraftConditionText: _CraftValue ? '选中' : '未选中',
+    };
+  } else if (target) {
+    temp.CraftOriginData = {
+      FixedType,
+      Craft: targetOriginData,
+    };
     if (Group) { // 工艺上属性组
       const targetGroup = target.GroupList.find(_it => _it.GroupID === Group.ID);
       const targetGroupOriginData = targetOriginData.GroupList.find(_it => _it.ID === Group.ID);
-      _CraftValue = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData, isSubControl, ControlItem);
+      // eslint-disable-next-line no-nested-ternary
+      const GroupName = targetOriginData ? (targetOriginData.IsNameHidden ? '' : targetOriginData.Name) : '';
+      const { GpName, GpValue, GroupOriginData, ElOriginData } = getElementGroupTypeValue(Element, FixedType, targetGroup, targetGroupOriginData, isSubControl, ControlItem, GroupName);
+      if (temp.CrName) temp.CrName = `${temp.CrName}-${GpName}`;
+      temp.GroupOriginData = GroupOriginData;
+      temp.ElOriginData = ElOriginData;
+      _CraftValue = GpValue;
     } else {
-      _CraftValue = getElementTypeValue(Element, FixedType, target.ElementList, targetOriginData.ElementList);
+      const { ElName, ElValue, ElOriginData } = getElementTypeValue(Element, FixedType, target.ElementList, targetOriginData.ElementList);
+      if (temp.CrName) temp.CrName = `${temp.CrName}-${ElName}`;
+      temp.ElOriginData = ElOriginData;
+      _CraftValue = ElValue;
     }
   }
-  return _CraftValue;
+  temp.CrValue = _CraftValue;
+  return temp;
 };
 
 const getIsEqualBySizeListAndItemValues = (itemValues, SizeItemValues) => { // 尺寸相关： 判断自定义值与常规尺寸项目值是否相同
@@ -219,23 +292,37 @@ const getSizeGroupIDByCustomizeSize = (ItemValueList, SizeList) => { // 尺寸�
   return t ? t.ID : '';
 };
 
-const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
-  if (!Size || !SizeGroup) return null;
+const getSiztTypeValue = (Size, SizeGroup, Element, FixedType, SizeName) => {
+  const temp = {
+    SzName: SizeName,
+    SzValue: null,
+    // OriginOptionList: SizeGroup ? (SizeGroup.GroupInfo || null) : null,
+    ElOriginData: null,
+    SizeGroupOriginData: { ...(SizeGroup || {}), FixedType },
+  };
+  if (!Size || !SizeGroup) return temp;
   const { ID, List, isCustomize } = Size;
-  if (FixedType === 35 && !isCustomize) { // 求值：是否为自定义 且明确为非自定义则直接返回结果，如不明确则后续继续判断
+  if (FixedType === 35) { // 求值：是否为自定义 且明确为非自定义则直接返回结果，如不明确则后续继续判断
+    temp.SzName = `${SizeName}`;
     if (isCustomize) {
       const _id = getSizeGroupIDByCustomizeSize(List, SizeGroup.SizeList);
-      if (!_id) return true;
+      if (!_id) {
+        temp.SzValue = true;
+        return temp;
+      }
     }
-    return false; // 是否自定义
+    temp.SzValue = false;
+    return temp; // 是否自定义
   }
-  if (!isCustomize && !ID) return null;
+  if (!isCustomize && !ID) return temp;
   if (FixedType === 7) { // 求值：常规尺寸ID   明确为非自定义则直接返回常规尺寸ID，如不明确则后续继续判断
     if (isCustomize) {
       const _id = getSizeGroupIDByCustomizeSize(List, SizeGroup.SizeList);
-      return _id;
+      temp.SzValue = _id;
+      return temp;
     }
-    return ID; // 常规尺寸ID
+    temp.SzValue = ID;
+    return temp; // 常规尺寸ID ----------------------- !!! 到此处
   }
   let _list;
   if (!isCustomize) { // 不是自定义 转换该常规尺寸对应的值为列表
@@ -256,28 +343,33 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
   } else {
     _list = List;
   }
-  _list = _list.map(it => ({ ElementID: it.ElementID, Value: getElementTypeValue({ ID: it.ElementID }, null, _list, SizeGroup.GroupInfo.ElementList, true) }));
+  _list = _list.map(it => ({ ElementID: it.ElementID, Value: getElementTypeValue({ ID: it.ElementID }, null, _list, SizeGroup.GroupInfo.ElementList, true).ElValue }));
 
   if (FixedType || FixedType === 0) {
-    let num;
     _list = _list.map(it => it.Value).filter(it => it);
     switch (FixedType) {
       case 5: // 最短边
-        num = Math.min(..._list);
+        temp.SzName = `${temp.SzName}最短边`;
+        temp.SzValue = Math.min(..._list);
         break;
       case 6: // 最长边
-        num = Math.max(..._list);
+        temp.SzName = `${temp.SzName}最长边`;
+        temp.SzValue = Math.max(..._list);
         break;
       default:
         break;
     }
-    return num;
+    return temp;
   }
   if (Element) {
     const t = _list.find(it => it.ElementID === Element.ID);
-    return t ? t.Value : null;
+    const _El = SizeGroup.GroupInfo.ElementList.find(_it => _it.ID === Element.ID);
+    temp.SzName = `${temp.SzName}${_El ? (_El.Name || '') : ''}`;
+    temp.ElOriginData = _El;
+    temp.SzValue = t ? t.Value : null;
+    return temp;
   }
-  return null;
+  return temp;
 };
 
 /**
@@ -285,7 +377,7 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType) => {
  * @param {*} isSubControl 是否是子交互
  * @return {*}
  */
-export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
+const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
   /**
   * 寻找目标步骤：
   * 1. 寻找到目标部件（产品或部件）： 通过Part来确定；如果部件使用次数大于1则返回null
@@ -302,6 +394,15 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
   if (!targetPart || !targetPartData) return null;
   if (targetPart.List.length !== 1) return null; // 只判断单次使用， 多次使用直接返回null
   const [targetPartItem] = targetPart.List;
+  const _ValueObj = {
+    label: '',
+    value: null,
+    ElOriginData: null,
+    GroupOriginData: null,
+    CraftOriginData: null,
+    SizeGroupOriginData: null,
+    MaterialOriginData: null,
+  };
   let temp;
   let target;
   let targetOriginData;
@@ -309,30 +410,58 @@ export const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Q
     case 2: // 元素组 --- 1 元素组本身（Element为null）  2 元素组上的元素
       target = targetPartItem.GroupList.find(_it => _it.GroupID === Group.ID);
       targetOriginData = targetPartData.GroupList.find(_it => _it.ID === Group.ID);
-      temp = getElementGroupTypeValue(Element, FixedType, target, targetOriginData, isSubControl, ControlItem);
+      if (targetOriginData) {
+        temp = targetOriginData.IsNameHidden ? '' : targetOriginData.Name;
+        temp = getElementGroupTypeValue(Element, FixedType, target, targetOriginData, isSubControl, ControlItem, temp);
+        _ValueObj.label = temp.GpName;
+        _ValueObj.value = temp.GpValue;
+        _ValueObj.GroupOriginData = temp.GroupOriginData;
+        _ValueObj.ElOriginData = temp.ElOriginData;
+      }
       break;
     case 3: // 独立元素
       temp = getElementTypeValue(Element, FixedType, targetPartItem.ElementList, targetPartData.ElementList);
+      _ValueObj.label = temp.ElName;
+      _ValueObj.value = temp.ElValue;
+      _ValueObj.ElOriginData = temp.ElOriginData;
       break;
     case 4: // 工艺
       if (targetPartItem && targetPartItem.CraftList) {
         target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
         targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
-        temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem);
+        if (targetOriginData) {
+          _ValueObj.label = targetOriginData.HiddenToCustomer ? '' : targetOriginData.ShowName;
+        }
+        temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem, _ValueObj.label);
       }
-      if (!temp && temp !== false) temp = 'craftIsNotExist';
+      if (!temp.CrValue && temp.CrValue !== false) temp.CrValue = 'craftIsNotExist';
+      _ValueObj.label = temp.CrName;
+      _ValueObj.value = temp.CrValue;
+      _ValueObj.ElOriginData = temp.ElOriginData;
+      _ValueObj.GroupOriginData = temp.GroupOriginData;
+      _ValueObj.CraftOriginData = temp.CraftOriginData;
       break;
     case 5: // 物料
-      temp = targetPartItem.MaterialID;
+      _ValueObj.label = '物料';
+      _ValueObj.value = targetPartItem.MaterialID;
+      _ValueObj.MaterialOriginData = { Name: '物料', TypeList: targetPartData.TypeList };
       break;
     case 6: // 尺寸组
-      temp = getSiztTypeValue(targetPartItem.Size, targetPartData.SizeGroup, Element, FixedType);
+      _ValueObj.label = '尺寸';
+      if (targetPartData.SizeGroup && targetPartData.SizeGroup.GroupInfo && !targetPartData.SizeGroup.GroupInfo.IsNameHidden) {
+        _ValueObj.label = targetPartData.SizeGroup.GroupInfo.Name || '尺寸';
+      }
+      temp = getSiztTypeValue(targetPartItem.Size, targetPartData.SizeGroup, Element, FixedType, _ValueObj.label);
+      _ValueObj.value = temp.SzValue;
+      _ValueObj.label = temp.SzName;
+      _ValueObj.ElOriginData = temp.ElOriginData;
+      _ValueObj.SizeGroupOriginData = temp.SizeGroupOriginData;
       break;
     default:
       break;
   }
-
-  return temp;
+  // 最后加上部件前缀（如果有部件的话）
+  return _ValueObj;
 };
 
 const getArrayIsEqual = (arr1, arr2) => { // 都为字符串或数字组成的数组
@@ -455,21 +584,68 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
   return bool;
 };
 
+const AllOperatorList = [ // 运算符号列表
+  { ID: 1, Name: '等于' },
+  { ID: 2, Name: '不等于' },
+  { ID: 3, Name: '大于', label: '＞' },
+  { ID: 4, Name: '大于等于', label: '≥' },
+  { ID: 5, Name: '小于', label: '＜' },
+  { ID: 6, Name: '小于等于', label: '≤' },
+  { ID: 7, Name: '包含' },
+  { ID: 8, Name: '不包含' },
+  { ID: 9, Name: '选中' },
+  { ID: 10, Name: '不选中' },
+  { ID: 11, Name: '≥值≤' },
+  { ID: 12, Name: '＞值≤' },
+  { ID: 13, Name: '≥值＜' },
+  { ID: 14, Name: '＞值＜' },
+  { ID: 21, Name: '禁用' },
+  { ID: 22, Name: '隐藏' },
+  { ID: 23, Name: '必选' },
+];
+
 /**
  * @description: 判断交互中的单个条件是否满足和匹配
  * @param {*}
  * @return {*}  boolean
  */
-export const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
-  if (!item || !ProductParams) return false;
+const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
+  const temp = {
+    PropValueData: null,
+    result: false,
+    OperatoText: '',
+  };
+  if (!item || !ProductParams) return temp;
   const { Property, Operator, ValueList } = item;
-  if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return false;
-  const targetValue = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
-  if (!targetValue && targetValue !== 0 && targetValue !== false && typeof targetValue !== 'boolean' && Operator !== 2) return false;
-  if (targetValue === 'craftIsNotExist') return false;
-  return matchValueWithValueList(targetValue, Operator, ValueList, Property);
+  if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return temp;
+  temp.PropValueData = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
+  const { value } = temp.PropValueData;
+  if (!value && value !== 0 && value !== false && typeof value !== 'boolean' && Operator !== 2) return temp;
+  if (value === 'craftIsNotExist') return temp;
+  const bool = matchValueWithValueList(value, Operator, ValueList);
+  if (bool) {
+    const t = AllOperatorList.find(it => it.ID === Operator);
+    if (t) {
+      temp.OperatoText = t.Name || '';
+    }
+  }
+  temp.result = bool;
+  return temp;
 };
 
+const getControlItemMatchText = (it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem) => {
+  const obj = getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
+  const temp = {
+    result: obj.result,
+    conditionText: '',
+  };
+  if (obj.result) {
+    temp.conditionText = getConditionTextByControlItemData(obj); // 获取当前条件显示内容
+  }
+  return temp;
+};
+
+// eslint-disable-next-line no-unused-vars
 const getTargetIsMatchedOrNot = (target, ItemList) => {
   // let bool = true;
   let targetProp;
@@ -503,7 +679,7 @@ const getTargetIsMatchedOrNot = (target, ItemList) => {
  * @param {*}
  * @return {*} 返回匹配结果: bool值
  */
-export const judgeWhetherItWork = ({ ControlItem, ProductParams, curProductInfo2Quotation, isSubControl, target }) => {
+const judgeWhetherItWork = ({ ControlItem, ProductParams, curProductInfo2Quotation, isSubControl, target }) => {
   if (!ControlItem) return false;
   const { Constraint } = ControlItem;
   if (!Constraint) return false;
@@ -513,16 +689,39 @@ export const judgeWhetherItWork = ({ ControlItem, ProductParams, curProductInfo2
       // 判断当前正在匹配的交互条目是否能和目标对应上，如果可以对应上，则继续向下进行继续重新判断；如果对应不上则沿用上次判断的结果
       const bool = getTargetIsMatchedOrNot(target, ItemList);
       if (!bool) {
-        return target.lastIDList.includes(ControlItem.ID);
+        const _bool = target.lastIDList.includes(ControlItem.ID);
+        if (!_bool && !Array.isArray(target.lastEffectiveList)) return _bool;
+        const t = target.lastEffectiveList.find(_it => _it.ID === ControlItem.ID);
+        return t ? t._ConditionTextList : _bool;
       }
     }
     if (FilterType === 1) { // 满足所有
-      const inconformityItem = ItemList.find(it => !getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem)); // 找到不符合的项目
-      return !inconformityItem;
+      const conditionArr = [];
+      const inconformityItem = ItemList.find(it => {
+        const temp = getControlItemMatchText(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
+        if (temp.result) {
+          if (temp.conditionText) conditionArr.push(temp.conditionText);
+        } else {
+          conditionArr.splice(0, conditionArr.length);
+        }
+        return !temp.result;
+      }); // 找到不符合的项目
+      if (inconformityItem) return false;
+      return conditionArr;
     }
     // 满足任一
-    const conformityItem = ItemList.find(it => getSingleItemListIsMatched(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem)); // 找到符合的项目
-    return !!conformityItem;
+    const conditionArr = [];
+    const conformityItem = ItemList.find(it => {
+      const temp = getControlItemMatchText(it, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
+      if (temp.result) {
+        if (temp.conditionText) conditionArr.push(temp.conditionText);
+      } else {
+        conditionArr.splice(0, conditionArr.length);
+      }
+      return temp.result;
+    }); // 找到符合的项目
+    if (!conformityItem) return false;
+    return conditionArr;
   }
   return true;
 };
@@ -532,7 +731,7 @@ export const judgeWhetherItWork = ({ ControlItem, ProductParams, curProductInfo2
  * @param {*}
  * @return {*}
  */
-export const getEffectiveControlList = ({ ProductParams, curProductInfo2Quotation, SubControlList, target }) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
+const getEffectiveControlList = ({ ProductParams, curProductInfo2Quotation, SubControlList, target }) => { // 获取当前生效的交互列表 --- 后面调整至按照优先级从小到大排序
   if (!ProductParams || !curProductInfo2Quotation) return null;
   let InteractionControlList;
   let isSubControl = false;
@@ -545,12 +744,20 @@ export const getEffectiveControlList = ({ ProductParams, curProductInfo2Quotatio
     InteractionControlList = ControlList.filter(it => it.ControlType === 0); // 筛选出交互列表 另外还有子交互列表未处理
   }
   const curTarget = target ? { ...target, lastIDList: target.lastEffectiveList.map(it => it.ID) } : undefined;
-  const list = InteractionControlList.filter(it => judgeWhetherItWork({ ControlItem: it, ProductParams, curProductInfo2Quotation, isSubControl, target: curTarget }))
+  const list = InteractionControlList.map(it => {
+    let result = judgeWhetherItWork({ ControlItem: it, ProductParams, curProductInfo2Quotation, isSubControl, target: curTarget });
+    let _ConditionTextList = [];
+    if (Array.isArray(result)) {
+      _ConditionTextList = result;
+      result = true;
+    }
+    return { ...it, result, _ConditionTextList };
+  }).filter(it => it.result)
     .sort((f, s) => f.Priority - s.Priority); // 按照优先级进行排序
   return list;
 };
 
-export const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyList, Operator) => {
+const getPerfectPropertyByImperfectProperty = (imperfectProp, PropertyList, Operator) => {
   if (!imperfectProp || !PropertyList || !Array.isArray(PropertyList) || PropertyList.length === 0) return false;
   const i = PropertyList.findIndex(it => {
     const { Product, Part, Craft, Material, Group, Element, FixedType, Type, TableData, Cost, Constraint, Formula } = it.Property;
@@ -617,21 +824,21 @@ export const getPropertiesAffectedByInteraction = ({ ProductParams, curProductIn
     return [];
   }
   const arr = [];
-  EffectiveControlList.forEach(({ List }) => {
+  EffectiveControlList.forEach(({ List, _ConditionTextList }) => {
     if (Array.isArray(List)) {
       List.forEach(it => {
         const t = getPerfectPropertyByImperfectProperty(it, arr, it.Operator);
-        if (!t) arr.push(it);
+        if (!t) arr.push({ ...it, _ConditionTextList });
         else if (Array.isArray(t)) {
           t.forEach(_it => {
             const { index, item } = _it;
-            if (index === -1) arr.push(item);
-            else arr.splice(index, 1, item);
+            if (index === -1) arr.push({ ...item, _ConditionTextList });
+            else arr.splice(index, 1, { ...item, _ConditionTextList });
           });
         } else if (typeof t === 'object') {
           const { index, item } = t;
-          if (index === -1) arr.push(item);
-          else arr.splice(index, 1, item);
+          if (index === -1) arr.push({ ...item, _ConditionTextList });
+          else arr.splice(index, 1, { ...item, _ConditionTextList });
         }
       });
     }

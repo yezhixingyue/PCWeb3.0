@@ -133,6 +133,18 @@ export const getIsOrNotHasRepeatItemInArray = list => {
   return len1 > len2;
 };
 
+export const getNameFromListByIDs = (ids, list, defaultKeys = { label: 'Name', value: 'ID' }) => {
+  if (typeof ids === 'string' || typeof ids === 'number') { // 单个Name模式， 返回单个ID
+    const t = list.find(it => it[defaultKeys.value] === ids);
+    return t ? t[defaultKeys.label] : '';
+  }
+  if (Array.isArray(ids)) { // 传递进来的是Name列表模式，同样返回ID组成的列表
+    const arr = ids.map(ID => list.find(it => it[defaultKeys.value] === ID)).filter(it => it).map(it => it[defaultKeys.label]);
+    return arr.length > 0 ? arr : '';
+  }
+  return '';
+};
+
 export default {
   isEqual,
   isGreatThen,
@@ -148,4 +160,5 @@ export default {
   getValueIsOrNotNumber,
   transformNumToChindNum,
   getIsOrNotHasRepeatItemInArray,
+  getNameFromListByIDs,
 };

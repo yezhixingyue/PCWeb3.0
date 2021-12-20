@@ -3,7 +3,7 @@ import api from '@/api';
 import { Loading, Message } from 'element-ui';
 import { getIsOrNotHasRepeatItemInArray } from '@/assets/js/utils/utils';
 import messageBox from '@/assets/js/utils/message';
-import breakPointUpload, { getUniqueFileName } from './FileTypeClass/UploadFileByBreakPoint';
+import FileTypeClass from '@/assets/js/ClassType/FileTypeClass';
 
 /**
  * 文件批量上传使用类
@@ -141,7 +141,7 @@ export default class BatchUpload {
         _item.percentage = +percentage;
       }
     };
-    const uploadResult = await breakPointUpload(item.file, item.uniqueName, onUploadProgressFunc);
+    const uploadResult = await FileTypeClass.UploadFileByBreakPoint(item.file, item.uniqueName, onUploadProgressFunc);
     if (uploadResult && uploadResult.status === true) {
       _item.uploadStatus = 'success'; // 上传成功 继续向后面进行
     } else {
@@ -158,7 +158,7 @@ export default class BatchUpload {
       if (_it.uniqueName) return _it.uniqueName;
       // 判断一下该产品文件是否需要上传，如果不需要则直接设置为空串
       _it.parseStatus = 'parsing';
-      const uniqueName = it.PrintFileID || it.PrintFileID === 0 ? await getUniqueFileName(_it.file) : '';
+      const uniqueName = it.PrintFileID || it.PrintFileID === 0 ? await FileTypeClass.getUniqueFileName(_it.file) : '';
       _it.uniqueName = uniqueName;
       _it.parseStatus = 'success';
       return uniqueName;
@@ -168,7 +168,7 @@ export default class BatchUpload {
   }
 
   static generateCommitData(list, basicObj, isFromPreCreate) { // 生成下单提交数据
-    const { CustomerID, Address, Terminal, PayInFull, OrderType, Position, IsBatchUpload } = basicObj;
+    const { CustomerID, Address, Terminal, PayInFull, OrderType, Position, IsBatchUpload, IgnoreRiskLevel } = basicObj;
     const List = list.map(it => {
       const { ProductParams, Content, OutPlate, PrintFileID } = it.result;
       const FileList = !isFromPreCreate && (PrintFileID || PrintFileID === 0) ? [{
@@ -191,6 +191,7 @@ export default class BatchUpload {
         Customer,
         Position,
         key: it.key,
+        IgnoreRiskLevel,
       };
       return temp;
     });

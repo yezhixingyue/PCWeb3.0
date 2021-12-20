@@ -61,7 +61,9 @@
 </template>
 
 <script>
-
+/**
+ * 该组件废弃不再使用 （获取文件唯一标识方式有变动 在文件类中统一提供）
+ */
 import UploadFileByBreakPoint from '@/assets/js/ClassType/FileTypeClass/UploadFileByBreakPoint';
 import massage from '@/assets/js/utils/message';
 

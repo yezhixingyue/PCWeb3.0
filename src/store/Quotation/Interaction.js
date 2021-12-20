@@ -86,7 +86,7 @@ export default class InterAction {
         return true;
       }
       return false;
-    }).map(it => it.Property.Craft.ID);
+    }).map(it => ({ CraftID: it.Property.Craft.ID, _ConditionTextList: it._ConditionTextList }));
   }
 
   // static setElementListClear4Craft(ElementList, ElementAffectedPropList) {

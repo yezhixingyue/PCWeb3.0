@@ -22,7 +22,7 @@
           :key="item.OrderID + i"
         >
           <div :style="wStyles[0]" class="is-twelve" :title="item | getFullName">{{item | getFullName}}</div>
-          <div :style="wStyles[1]" :title="getProductCount(item.OrderID)">{{getProductCount(item.OrderID)}}</div>
+          <div :style="wStyles[1]" :title="item | formarProductAmount">{{item | formarProductAmount}}</div>
           <div :style="wStyles[2]">{{item.Funds.OriginalPrice | formatNumber}}元</div>
           <div :style="wStyles[3]">{{item.Funds.CouponAmount ? `-${item.Funds.CouponAmount}` : item.Funds.CouponAmount}}元</div>
           <div :style="wStyles[4]">{{item.Funds.FinalPrice | formatNumber}}元</div> <!-- 成交价 -->
@@ -30,7 +30,7 @@
           <div :style="wStyles[6]" class="is-font-12 is-pink"
            >{{item.ProducePeriod | getPayTime}}{{item.ProducePeriod | getDoneTime}}</div> <!-- 工期 -->
           <div :style="wStyles[7]" class="is-font-12 gray">
-            <span :title="getContent(item.OrderID) || ''">{{getContent(item.OrderID) || '无'}}</span>
+            <span :title="item.Content || ''">{{item.Content || '无'}}</span>
           </div>
         </li>
       </TransitionGroupCollapse4ShopCar>
@@ -40,7 +40,6 @@
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
 import { mapState } from 'vuex';
-import { formarProductAmountFunc } from '@/assets/js/utils/filter';
 
 export default {
   props: {
@@ -91,20 +90,6 @@ export default {
   methods: {
     handleCollapse() {
       this.isActive = !this.isActive;
-    },
-    getProductCount(OrderID) {
-      if (!this.curShoppingCarDataBeforeFirstPlace) return '';
-      const _t = this.curShoppingCarDataBeforeFirstPlace.find(it => it.OrderID === OrderID);
-      if (!_t) return '';
-      return formarProductAmountFunc(_t.ProductParams.Attributes);
-    },
-    getContent(OrderID) {
-      if (!this.curShoppingCarDataBeforeFirstPlace) return '';
-      const _t = this.curShoppingCarDataBeforeFirstPlace.find(it => it.OrderID === OrderID);
-      if (!_t) return '';
-      const { Content } = _t;
-      if (Content) return Content;
-      return '';
     },
     // eslint-disable-next-line object-curly-newline
     getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {

@@ -5,6 +5,7 @@
       :title="craftTitle"
       :disabled="disabled"
       :isActive="!!value"
+      :tips='disabled ? ConditionTextForCraftDisabled : ""'
     />
     <template v-if="value && !withoutContent">
       <i class="iconfont icon-bianji is-cyan" @click="handleEditClick"></i>
@@ -80,6 +81,7 @@ export default {
       disabled: false,
       required: false,
       recordInfo: null,
+      ConditionTextForCraftDisabled: '', // 当工艺被禁用时的文字提示
     };
   },
   computed: {
@@ -104,11 +106,14 @@ export default {
         && this.filteredGroupShowList.length === 0
       );
     },
-    craftTitle() {
+    craftTitleObj() {
       const list = this.ChildUseAffectedPropList;
       const titleObj = ShowProductDetail.getCraftContentName(this.value, this.Craft, list, this.disabled);
-      if (titleObj) {
-        const { Name, Content } = titleObj;
+      return titleObj;
+    },
+    craftTitle() {
+      if (this.craftTitleObj) {
+        const { Name, Content } = this.craftTitleObj;
         return Content ? `${Name} ${Content}` : Name;
       }
       return '';
@@ -213,12 +218,17 @@ export default {
   watch: {
     OwnUseAffectedPropList: {
       handler(newVal) {
+        this.ConditionTextForCraftDisabled = '';
         if (newVal.length === 1) {
         // 目前只考虑长度为1的情况，因为目前对一个工艺只允许设置一条交互，必选或者禁用
           const { Operator } = newVal[0]; // Operator 21 禁用    22 隐藏    23 必选
           if (Operator === 21) {
             this.disabled = true;
             this.required = false;
+            const list = newVal[0]._ConditionTextList || [];
+            this.ConditionTextForCraftDisabled = list.length > 0
+              ? `当 ${list.join('\r\n并且 ')} 时，\r\n禁用${this.craftTitleObj && this.craftTitleObj.Name ? this.craftTitleObj.Name : '该工艺'}`
+              : '';
             if (this.value && !(this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
             // this.$emit('change', { ...this.value, disabledByInteraction: true, requiredByInteraction: false });
               this.$emit('change', null);

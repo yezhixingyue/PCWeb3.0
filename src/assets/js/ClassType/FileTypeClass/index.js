@@ -15,6 +15,8 @@ export default class FileTypeClass {
    * @return {*}
    */
   static getUniqueFileName(file, TypeID) {
+    const Terminal = 1;
+    console.log(file, Terminal, '组合哈希');
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);

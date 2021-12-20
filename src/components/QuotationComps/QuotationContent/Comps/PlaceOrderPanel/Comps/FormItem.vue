@@ -321,7 +321,7 @@ export default {
     },
     async validateFormItem(rule, value, callback) {
       await this.delay();
-      console.log(this.curPartName);
+      // console.log(this.curPartName);
       this.$nextTick(() => {
         if (this.AffectedHidden) { // 如果该项目隐藏了，则直接通过验证
           callback();
@@ -331,14 +331,22 @@ export default {
         this.errorIndex = '';
         this.errorMsg = '';
         if (this.curTypeName === '元素') {
-          const res = checkElement({ values: this.itemValue, prop: this.target, AffectedPropList: this.localAffectedPropList });
+          const res = checkElement({
+            values: this.itemValue, prop: this.target, AffectedPropList: this.localAffectedPropList, PartName: this.curPartName,
+          });
           if (res && typeof res === 'string') {
             callback(new Error(res));
             return;
           }
         }
         if (this.curTypeName === '元素组' && this.isNormalGroup) {
-          const res = checkElementGroup(this.itemValue, this.target, this.localAffectedPropList, this.subGroupAffectedPropList);
+          const res = checkElementGroup({
+            valueList: this.itemValue,
+            prop: this.target,
+            AffectedPropList: this.localAffectedPropList,
+            subGroupAffectedPropList: this.subGroupAffectedPropList,
+            PartName: this.curPartName,
+          });
           if (res && typeof res === 'object' && res.msg) {
             this.errorElementID = res.ElementID;
             this.errorIndex = res.index;
@@ -348,7 +356,9 @@ export default {
           }
         }
         if (this.curTypeName === '尺寸组') { // 尺寸组
-          const res = checkSizeGroup(this.itemValue, this.target, this.localAffectedPropList);
+          const res = checkSizeGroup({
+            value: this.itemValue, prop: this.target, AffectedPropList: this.localAffectedPropList, PartName: this.curPartName,
+          });
           if (res && typeof res === 'object' && res.msg) {
             this.errorElementID = res.ElementID;
             callback(new Error(res.msg));
@@ -356,8 +366,16 @@ export default {
           }
         }
         if (this.curTypeName === '工艺') { // 工艺
-          const res = checkCraft(this.itemValue, this.target, this.placeData.CraftConditionList, this.placeData.CraftList,
-            this.localAffectedPropList, this.CraftAffectedPropList, this.curProductInfo2Quotation);
+          const res = checkCraft({
+            value: this.itemValue,
+            prop: this.target,
+            CraftConditionList: this.placeData.CraftConditionList,
+            CraftList: this.placeData.CraftList,
+            AffectedPropList: this.localAffectedPropList,
+            CraftAffectedPropList: this.CraftAffectedPropList,
+            curProductInfo2Quotation: this.curProductInfo2Quotation,
+            PartName: this.curPartName,
+          });
           if (res && typeof res === 'string') {
             callback(new Error(res));
             return;
@@ -365,7 +383,7 @@ export default {
         }
         if (this.curTypeName === '物料') {
           if (!this.itemValue) {
-            callback(new Error('请选择物料'));
+            callback(new Error(`请选择${this.curPartName || ''}物料`));
             return;
           }
         }

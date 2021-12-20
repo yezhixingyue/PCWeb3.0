@@ -293,7 +293,12 @@ export default {
         if (Type === 'Group') {
           const index = this.GroupList.findIndex(it => it.ID === ID);
           if (index >= 0) {
-            const res = checkElementGroup(Value, this.GroupList[index], this.AffectedPropLists[index], this.subGroupAffectedPropLists[index]); // 此处需要修改为合并后的
+            const res = checkElementGroup({
+              valueList: Value,
+              prop: this.GroupList[index],
+              AffectedPropList: this.AffectedPropLists[index],
+              subGroupAffectedPropList: this.subGroupAffectedPropLists[index],
+            }); // 此处需要修改为合并后的
             if (res && typeof res === 'object' && res.msg) {
               this.errorElementID = res.ElementID;
               this.errorIndex = res.index;
