@@ -49,7 +49,7 @@ export function extname(filename) {
   }
   const a = filename.split('').reverse().join('');
   const b = a.substring(0, a.search(/\./)).split('').reverse().join('');
-  return b;
+  return b.toLowerCase();
 }
 /**
  * 转换时间格式

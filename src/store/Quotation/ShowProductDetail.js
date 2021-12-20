@@ -532,7 +532,6 @@ export default class ProductDetailTypeShowClass {
               const { List } = originPartData.TypeList[i];
               target = List.find(it => it.ID === partData.MaterialID);
               if (target) {
-                console.log(target);
                 arr.push({ type: 'MaterialID', Label: originPartData.MaterialDisplayName, Content: target.Name });
                 break;
               }

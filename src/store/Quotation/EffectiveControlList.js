@@ -514,9 +514,12 @@ const getValueIsNotContainList = (value, ValueList) => { // 获取是否不包�
  * @return {*} 返回匹配结果：布尔值
  */
 const matchValueWithValueList = (value, Operator, ValueList) => {
-  const getIsEqual = () => { // 判断是否相等
+  let compareValue;
+  const getIsEqual = (changeCompareValue) => { // 判断是否相等
     if (!ValueList || ValueList.length === 0) return true;
     const Values = ValueList.map(it => it.Value);
+    if (changeCompareValue && ValueList.length === 1) compareValue = ValueList[0].Value;
+    else if (changeCompareValue && ValueList.length > 1) compareValue = ValueList;
     if (!Array.isArray(value) && ValueList.length > 0) {
       if (ValueList.length === 1) {
         return isEqual(value, ValueList[0].Value) || (value === true && ValueList[0].Value === 'True') || (value === false && ValueList[0].Value === 'False'); // 完全相等
@@ -548,28 +551,34 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
       break;
 
     case 2: // 不等于
-      bool = !getIsEqual();
+      bool = !getIsEqual(true);
       break;
     case 3: // 大于
       bool = isGreatThen(value, ValueList[0].Value);
+      compareValue = ValueList[0].Value;
       break;
     case 4: // 大于等于
       bool = isGreatThen(value, ValueList[0].Value) || isEqual(value, ValueList[0].Value);
+      compareValue = ValueList[0].Value;
       break;
     case 5: // 小于
       bool = isLessThen(value, ValueList[0].Value);
+      compareValue = ValueList[0].Value;
       break;
     case 6: // 小于等于
       bool = isLessThen(value, ValueList[0].Value) || isEqual(value, ValueList[0].Value);
+      compareValue = ValueList[0].Value;
       break;
     case 7: // 包含...
       if (Array.isArray(value)) {
         bool = getValueIsContainList(value, ValueList);
+        compareValue = ValueList.map(it => it.Value);
       }
       break;
     case 8: // 不包含...
       if (Array.isArray(value)) {
         bool = getValueIsNotContainList(value, ValueList);
+        compareValue = ValueList.map(it => it.Value);
       }
       break;
     case 9: // 选中...
@@ -581,7 +590,7 @@ const matchValueWithValueList = (value, Operator, ValueList) => {
     default:
       break;
   }
-  return bool;
+  return { bool, compareValue };
 };
 
 const AllOperatorList = [ // 运算符号列表
@@ -622,7 +631,7 @@ const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotatio
   const { value } = temp.PropValueData;
   if (!value && value !== 0 && value !== false && typeof value !== 'boolean' && Operator !== 2) return temp;
   if (value === 'craftIsNotExist') return temp;
-  const bool = matchValueWithValueList(value, Operator, ValueList);
+  const { bool, compareValue } = matchValueWithValueList(value, Operator, ValueList);
   if (bool) {
     const t = AllOperatorList.find(it => it.ID === Operator);
     if (t) {
@@ -630,6 +639,7 @@ const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotatio
     }
   }
   temp.result = bool;
+  temp.compareValue = compareValue;
   return temp;
 };
 

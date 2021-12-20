@@ -47,16 +47,16 @@ const PropertyFixedType = [ // FixedType对应列表
  * @param {*} { ElOriginData, OperatoText, value, PRLabel }  PRLabel： 前缀名称
  * @returns
  */
-const getElementConditionTextByElOriginData = ({ ElOriginData, OperatoText, value, PRLabel }) => {
+const getElementConditionTextByElOriginData = ({ ElOriginData, OperatoText, value, PRLabel, compareValue }) => {
   if (ElOriginData.Element && !ElOriginData.HiddenToCustomer) {
     const { Name, Type, Unit, OptionAttribute, SwitchAttribute } = ElOriginData.Element;
     let label = `${PRLabel || ''}${Name}`;
     if (ElOriginData.FixedType || ElOriginData.FixedType === 0) {
       const t = PropertyFixedType.find(it => it.ID === ElOriginData.FixedType);
       if (t) label = `${label}${t.Name || ''}`;
-      return `${label}${OperatoText}${value}`;
+      return `${label}${OperatoText}${compareValue || compareValue === 0 ? compareValue : value}`;
     }
-    let _value = value;
+    let _value = compareValue || compareValue === 0 ? compareValue : value;
     let _OperatoText = OperatoText;
     switch (Type) {
       case 1:
@@ -92,32 +92,32 @@ const getElementConditionTextByElOriginData = ({ ElOriginData, OperatoText, valu
  * @param {*} { ElOriginData, GroupOriginData, OperatoText, value }
  * @returns
  */
-const getGroupConditionTextByGroupOriginData = ({ ElOriginData, GroupOriginData, OperatoText, value, PRLabel }) => {
+const getGroupConditionTextByGroupOriginData = ({ ElOriginData, GroupOriginData, OperatoText, value, PRLabel, compareValue }) => {
   const { Name, IsNameHidden } = GroupOriginData.Group;
   const _PRLabel = PRLabel || '';
   const groupName = IsNameHidden ? _PRLabel : `${_PRLabel}${Name || ''}`;
   if (!ElOriginData) { // 元素组本身 目前只有元素组使用次数
     if (GroupOriginData.FixedType || GroupOriginData.FixedType === 0) {
       const _n = getNameFromListByIDs(GroupOriginData.FixedType, PropertyFixedType);
-      return `${groupName}${_n || ''}${OperatoText}${value}`;
+      return `${groupName}${_n || ''}${OperatoText}${compareValue}`;
     }
     return '';
   }
   if (ElOriginData && ElOriginData.Element) {
-    return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, PRLabel: groupName });
+    return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, PRLabel: groupName, compareValue });
   }
   return '';
 };
 
-const getCraftaConditionTextByCraftOriginData = ({ ElOriginData, GroupOriginData, CraftOriginData, OperatoText, value }) => { // 获取工艺条件展示文字
+const getCraftaConditionTextByCraftOriginData = ({ ElOriginData, GroupOriginData, CraftOriginData, OperatoText, value, compareValue }) => { // 获取工艺条件展示文字
   const PRLabel = CraftOriginData.Craft.ShowName ? `工艺${CraftOriginData.Craft.ShowName}中` : '';
-  if (GroupOriginData) return getGroupConditionTextByGroupOriginData({ ElOriginData, GroupOriginData, OperatoText, value, PRLabel });
-  if (ElOriginData && ElOriginData.Element) return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, PRLabel });
+  if (GroupOriginData) return getGroupConditionTextByGroupOriginData({ ElOriginData, GroupOriginData, OperatoText, value, PRLabel, compareValue });
+  if (ElOriginData && ElOriginData.Element) return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, PRLabel, compareValue });
   if (PRLabel && CraftOriginData.CraftConditionText) return `${CraftOriginData.CraftConditionText}${CraftOriginData.Craft.ShowName}`;
   return '';
 };
 
-const getSizeConditionTextBySizeGroupOriginData = ({ SizeGroupOriginData, ElOriginData, OperatoText, value }) => { // 获取尺寸条件展示文字
+const getSizeConditionTextBySizeGroupOriginData = ({ SizeGroupOriginData, ElOriginData, OperatoText, value, compareValue }) => { // 获取尺寸条件展示文字
   const { FixedType, SizeList, GroupInfo } = SizeGroupOriginData;
   if (!GroupInfo) return '';
   const { Name, IsNameHidden } = GroupInfo;
@@ -135,19 +135,27 @@ const getSizeConditionTextBySizeGroupOriginData = ({ SizeGroupOriginData, ElOrig
         }
         return '';
       }
-      return `${SizeName}${FixedLabel}${OperatoText}${value}`;
+      return `${SizeName}${FixedLabel}${OperatoText}${compareValue || compareValue === 0 ? compareValue : value}`;
     }
   }
   if (ElOriginData && ElOriginData.Element) {
-    return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, PRLabel: SizeName });
+    return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, PRLabel: SizeName, compareValue });
   }
   return '';
 };
 
-const getMaterialConditionTextByMaterialOriginData = ({ MaterialOriginData, OperatoText, value }) => { // 获取物料文字展示
+const getMaterialConditionTextByMaterialOriginData = ({ MaterialOriginData, OperatoText, value, compareValue }) => { // 获取物料文字展示
   if (MaterialOriginData && Array.isArray(MaterialOriginData.TypeList)) {
     const list = MaterialOriginData.TypeList.map(it => it.List).reduce((prev, next) => [...prev, ...next], []).filter(it => !it.HiddenToCustomer);
-    const optionLabel = getNameFromListByIDs(value, list);
+    let _value = value;
+    let _join = false;
+    if (compareValue) _value = compareValue;
+    if (Array.isArray(compareValue) && compareValue.length > 0) {
+      _value = compareValue.map(it => it.Value);
+      _join = true;
+    }
+    let optionLabel = getNameFromListByIDs(_value, list);
+    if (_join) optionLabel = ` ${optionLabel.join('、')}等其中一种`;
     if (optionLabel) {
       return `${MaterialOriginData.Name}${OperatoText}${optionLabel}`;
     }
@@ -163,25 +171,25 @@ const getMaterialConditionTextByMaterialOriginData = ({ MaterialOriginData, Oper
  */
 export const getConditionTextByControlItemData = (obj) => {
   if (!obj) return '';
-  const { OperatoText, PropValueData, result } = obj;
+  const { OperatoText, PropValueData, result, compareValue } = obj;
   if (!OperatoText || !PropValueData || !result) return '';
   const { CraftOriginData, GroupOriginData, ElOriginData, SizeGroupOriginData, MaterialOriginData, value } = PropValueData;
   if (!CraftOriginData && !GroupOriginData && !ElOriginData && !SizeGroupOriginData && !MaterialOriginData) return '';
   if (ElOriginData && ElOriginData.Element && ElOriginData && !CraftOriginData && !GroupOriginData && !SizeGroupOriginData) { // 元素
-    return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value });
+    return getElementConditionTextByElOriginData({ ElOriginData, OperatoText, value, compareValue });
   }
   if (!CraftOriginData && GroupOriginData && GroupOriginData.Group && !SizeGroupOriginData) { // 元素组
-    return getGroupConditionTextByGroupOriginData({ ElOriginData, GroupOriginData, OperatoText, value });
+    return getGroupConditionTextByGroupOriginData({ ElOriginData, GroupOriginData, OperatoText, value, compareValue });
   }
   if (CraftOriginData && CraftOriginData.Craft && CraftOriginData.Craft.HiddenToCustomer === false && !SizeGroupOriginData) { // 工艺
-    return getCraftaConditionTextByCraftOriginData({ ElOriginData, GroupOriginData, CraftOriginData, OperatoText, value });
+    return getCraftaConditionTextByCraftOriginData({ ElOriginData, GroupOriginData, CraftOriginData, OperatoText, value, compareValue });
   }
   if (SizeGroupOriginData && !CraftOriginData && !GroupOriginData) { // 尺寸
-    const temp = getSizeConditionTextBySizeGroupOriginData({ SizeGroupOriginData, ElOriginData, OperatoText, value });
+    const temp = getSizeConditionTextBySizeGroupOriginData({ SizeGroupOriginData, ElOriginData, OperatoText, value, compareValue });
     return temp;
   }
   if (MaterialOriginData) { // 物料
-    return getMaterialConditionTextByMaterialOriginData({ MaterialOriginData, OperatoText, value });
+    return getMaterialConditionTextByMaterialOriginData({ MaterialOriginData, OperatoText, value, compareValue });
   }
   return '';
 };

@@ -132,7 +132,7 @@ const _elementTypeChecker = (value, element, showPropName, PartName) => {
   if (Type === 2) { // 选项元素
     const { Allow, OptionList } = OptionAttribute;
     const optionIDs = OptionList.map(it => it.ID);
-    if (!Allow && !optionIDs.includes(value)) {
+    if (!Allow && !optionIDs.includes(value) && !HiddenToCustomer) {
       return { msg: `${showPropName ? `[${PartName || ''}${Name}] ` : ''}不允许自定义`, result: false };
     }
     return { msg: '', result: true };

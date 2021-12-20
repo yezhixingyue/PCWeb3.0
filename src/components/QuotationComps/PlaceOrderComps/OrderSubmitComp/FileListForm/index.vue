@@ -8,6 +8,7 @@
       :maxSize='it.MaxSize'
       :FileInfo="it"
       :disabled='disabled'
+      :CustomerID='CustomerID'
       ref="UploadItem"
       @validateField="handleValidateField"
       @fillFileContent='fillFileContent'
@@ -27,6 +28,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    CustomerID: {
+      type: String,
+      default: '',
     },
   },
   components: {

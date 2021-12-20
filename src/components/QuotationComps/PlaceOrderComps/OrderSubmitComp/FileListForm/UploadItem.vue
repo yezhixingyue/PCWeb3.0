@@ -66,6 +66,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    CustomerID: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -85,16 +89,17 @@ export default {
     accept() {
       if (this.FileInfo) {
         if (this.FileInfo.FormatString) {
-          return this.FileInfo.FormatString.split(',').map(it => (it ? `.${it}` : '')).filter(it => it).join(',');
+          return this.FileInfo.FormatString.split(',').map(it => (it ? `.${it}` : '')).filter(it => it).join(',')
+            .toLowerCase();
         }
         const str = this.FileInfo.TypeList.map(({ Name }) => Name.split('/')
           .map(it => (it === '*' ? it : `.${it}`))
           .join(','))
           .filter((it) => it)
           .join(',');
-        return str.includes('*') ? '*' : str;
+        return str.includes('*') ? '*' : str.toLowerCase();
       }
-      return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z';
+      return '.cdr,.jpg,.jpeg,.tiff,.tif,.rar,.zip,.pdf, .7z'.toLowerCase();
     },
     operationText() {
       if (this.fileList.length > 0) return '重新选择';
@@ -145,18 +150,9 @@ export default {
       onProgress({ percent: 1 }); //   进度条起始
 
       // 1. 解析文件名称
-      let err;
-      const name = await FileTypeClass.getUniqueFileName(file, this.FileInfo.ID).catch((error) => {
-        err = error;
+      const name = FileTypeClass.getUniqueFileName({
+        file, Terminal: 1, CustomerID: this.CustomerID, TypeID: this.FileInfo.ID,
       });
-      if (err) { // 解析失败
-        this.$notify.error({
-          title: `${file.name}上传失败`,
-          message: err,
-        });
-        onError(new Error(err));
-        return;
-      }
       onProgress({ percent: 2 }); //   进度条起始
 
       // 2. 获取到文件及唯一文件名称后，开始执行上传

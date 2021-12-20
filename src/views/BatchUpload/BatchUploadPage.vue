@@ -57,7 +57,7 @@
       </div>
     </main>
     <footer>
-      <div class="content" v-show="!isFootFixed">
+      <div class="content" v-if="!isFootFixed">
         <BatchUploadFooterComp
           :productCost='productCost'
           :expressCost='expressCost'
@@ -74,7 +74,7 @@
       </div>
     </footer>
     <transition name="el-fade-in-linear">
-      <footer  v-show="isFootFixed" class="floating">
+      <footer  v-if="isFootFixed" class="floating">
         <div class="content">
           <BatchUploadFooterComp
             :productCost='productCost'
@@ -250,7 +250,6 @@ export default {
      */
     handleFileChange(fileList) { // 选中文件 并对其后续进行处理 （注：每次选中文件都清空掉上次选中文件）
       if (!this.canSelectFile) return;
-      console.log(fileList);
       this.handleFileParing(fileList);
     },
     async handleFileParing(fileList) { // 处理文件解析 并生成处理成功列表 及 处理失败列表

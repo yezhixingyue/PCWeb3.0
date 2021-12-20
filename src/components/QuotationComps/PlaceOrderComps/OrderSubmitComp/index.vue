@@ -29,7 +29,7 @@
           <DesignDocumentPopoverComp :disabled='isUploading' />
         </li>
         <li class="file-list-box">
-          <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' :disabled='isUploading' />
+          <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' :disabled='isUploading' :CustomerID='CustomerID' />
         </li>
       </ul>
       <div class="submit-btn-wrap">
@@ -88,6 +88,7 @@ export default {
     ...mapState('Quotation', [
       'selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading', 'curProductID', 'RiskWarningTipsTypes',
     ]),
+    ...mapState('common', ['customerInfo']),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -109,6 +110,9 @@ export default {
       if (!Array.isArray(this.FileList) || this.FileList.length === 0) return true;
       const t = this.FileList.find(it => it.IsPrintFile);
       return !t;
+    },
+    CustomerID() {
+      return this.customerInfo && this.customerInfo.CustomerID ? this.customerInfo.CustomerID : '';
     },
   },
   data() {

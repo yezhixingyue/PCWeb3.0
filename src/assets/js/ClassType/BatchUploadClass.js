@@ -152,18 +152,18 @@ export default class BatchUpload {
     return uploadResult;
   }
 
-  static async setUniqueNameForItemList(list) {
-    const getUniqueName = async it => {
+  static setUniqueNameForItemList(list, { CustomerID }) {
+    const getUniqueName = it => {
       const _it = it;
       if (_it.uniqueName) return _it.uniqueName;
       // 判断一下该产品文件是否需要上传，如果不需要则直接设置为空串
       _it.parseStatus = 'parsing';
-      const uniqueName = it.PrintFileID || it.PrintFileID === 0 ? await FileTypeClass.getUniqueFileName(_it.file) : '';
+      const uniqueName = FileTypeClass.getUniqueFileName({ file: _it.file, Terminal: 1, CustomerID });
       _it.uniqueName = uniqueName;
       _it.parseStatus = 'success';
       return uniqueName;
     };
-    const uniqueNameList = await Promise.all(list.map(it => getUniqueName(it)));
+    const uniqueNameList = list.map(it => getUniqueName(it));
     return uniqueNameList;
   }
 
@@ -231,7 +231,7 @@ export default class BatchUpload {
       const _it = it;
       _it.isParsing = true;
     });
-    const uniqueNameList = await this.setUniqueNameForItemList(list);
+    const uniqueNameList = this.setUniqueNameForItemList(list, basicObj);
     list.forEach(it => {
       const _it = it;
       _it.isParsing = false;
