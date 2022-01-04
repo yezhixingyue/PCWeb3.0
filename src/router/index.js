@@ -338,6 +338,19 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  if (to.path === '/pathFromClient') {
+    const { url, token } = to.query;
+    if (url && token) {
+      sessionStorage.removeItem('couponCenterData');
+      const oneDay = 24 * 60 * 60;
+      Cookie.setCookie('token', token, 30 * oneDay);
+      next({
+        path: url,
+        query: {},
+      });
+      return;
+    }
+  }
   let _auth;
   if (useCookie) _auth = Cookie.getCookie('token');
   else _auth = sessionStorage.getItem('token');

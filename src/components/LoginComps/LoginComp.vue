@@ -12,6 +12,7 @@
        type="password"
        clearable
        v-model.trim="Password"
+       @submit.native.prevent
        @focus="onPwdFocus"
        @keyup.enter.native="submitForm('ruleForm')"
        >

@@ -321,7 +321,6 @@ export default {
     },
     async validateFormItem(rule, value, callback) {
       await this.delay();
-      // console.log(this.curPartName);
       this.$nextTick(() => {
         if (this.AffectedHidden) { // 如果该项目隐藏了，则直接通过验证
           callback();

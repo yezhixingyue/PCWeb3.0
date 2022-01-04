@@ -14,13 +14,13 @@ export default class FileTypeClass {
    * 生成规则： 生成文件唯一名：账户ID+设备类型+文件名+修改时间+文件大小 通过这些组合成字符串，经过哈希运算
    * @description: 解析文件，获取文件唯一标识名称
    * @static
-   * @param {*} { file, TypeID, Terminal, CustomerID }  Terminal：设备类型  CustomerID:用户ID
+   * @param {*} { file, Terminal, CustomerID }  Terminal：设备类型  CustomerID:用户ID
    * @returns
    * @memberof FileTypeClass
    */
-  static getUniqueFileName({ file, Terminal, TypeID, CustomerID }) {
+  static getUniqueFileName({ file, Terminal, CustomerID }) {
     const ext = extname(file.name);
-    const combineName = `${CustomerID}${Terminal}${TypeID || ''}${file.name}${file.lastModified}${file.size}`; // 按照规则进行组合
+    const combineName = `${CustomerID}${Terminal}${file.name}${file.lastModified}${file.size}`; // 按照规则进行组合
     return `${sha1(combineName)}.${ext}`;
   }
 

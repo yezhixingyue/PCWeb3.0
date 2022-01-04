@@ -118,7 +118,8 @@ export default { // 上传图片按钮
     background-color: #cbcbcb;
     cursor: not-allowed;
     > input {
-      width: 0;
+      width: 0 !important;
+      display: none;
     }
   }
 }

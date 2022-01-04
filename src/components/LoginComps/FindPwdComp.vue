@@ -11,6 +11,7 @@
         :model="codeForm"
         status-icon
         :rules="codeRules"
+        @submit.native.prevent
         ref="codeForm"
         label-width="100px"
         key="find-pwd-form-0001"

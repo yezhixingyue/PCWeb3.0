@@ -42,7 +42,7 @@
       </el-table-column>
       <div slot="empty">
         <p class="content">请点击右上角 <i class="is-bold is-font-14">[ 选择文件 ]</i> 按钮选择文件进行解析并上传</p>
-        <p class="remark">注：1、文件名称需携带订单信息且符合指定格式（ 下单页面计算价格后会生成符合格式的订单信息 ）；</p>
+        <p class="remark">注：1、文件名称需携带订单信息且符合指定格式（ 下单页面计算价格后会生成符合格式的订单信息 ）</p>
         <p class="remark two">2、选择文件后会覆盖上次已选择文件，请在当次选择完全部需要上传的订单文件</p>
         <p class="remark two is-pink">3、IE9及IE9以下版本浏览器不支持使用，请升级浏览器</p>
       </div>

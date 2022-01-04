@@ -93,8 +93,9 @@ export default {
         }).join(' ');
         return _Name || ' ';
       };
-      const _showLenList = this.localMaterialList.map(it => it.UnionShowList.length);
-      const showRootClass = [...new Set(_showLenList)].length > 1;
+      // const _showLenList = this.localMaterialList.map(it => it.UnionShowList.length);
+      // const showRootClass = [...new Set(_showLenList)].length > 1;
+      const showRootClass = this.localMaterialList.length > 1;
       this._MaterialList.filter(it => !this.hiddenMatarialList.includes(it.ID)).forEach(lv1 => {
         const { Type, ID } = lv1;
         const { UnionShowList, Name, ElementList } = Type;
@@ -121,7 +122,12 @@ export default {
           } else {
             let _list;
             UnionShowList.forEach((_unionShowArr, i) => {
-              const _Name = getNameByElementList(ElementList.filter(_it => _unionShowArr.includes(_it.ID)));
+              const _ElementList = [];
+              _unionShowArr.forEach(_id => {
+                const t = ElementList.find(_E => _E.ID === _id);
+                if (t) _ElementList.push(t);
+              });
+              const _Name = getNameByElementList(_ElementList);
               const _ItemID = i < UnionShowList.length - 1 ? `${JSON.stringify(_unionShowArr)}${_Name}` : ID;
               const tempList = _list || t1.children;
               let target = tempList.find(_it => _it.ID === _ItemID);

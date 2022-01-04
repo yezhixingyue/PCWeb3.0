@@ -70,6 +70,9 @@ export default {
       type: String,
       default: '',
     },
+    getAllFileList: {
+      type: Function,
+    },
   },
   data() {
     return {
@@ -150,10 +153,8 @@ export default {
       onProgress({ percent: 1 }); //   进度条起始
 
       // 1. 解析文件名称
-      const name = FileTypeClass.getUniqueFileName({
-        file, Terminal: 1, CustomerID: this.CustomerID, TypeID: this.FileInfo.ID,
-      });
-      onProgress({ percent: 2 }); //   进度条起始
+      const name = FileTypeClass.getUniqueFileName({ file, Terminal: 1, CustomerID: this.CustomerID });
+      onProgress({ percent: 0 }); //   进度条起始
 
       // 2. 获取到文件及唯一文件名称后，开始执行上传
       const onUploadProgressFunc = progress => {
@@ -220,10 +221,22 @@ export default {
     handleMouseLeave() {
       this.isMouseEnter = false;
     },
+    getSelectedFileList() {
+      return {
+        fileList: this.fileList,
+        ID: this.FileInfo.ID,
+      };
+    },
   },
   watch: {
     fileList(newVal, oldVal) { // 去重及筛选格式不符合的文件
       this.$emit('validateField', `${this.FileInfo.ID}`); // 发生变动时进行重新校验
+      const allFileList = this.getAllFileList();
+      const allOtherItemFileUniqueNameList = allFileList
+        .filter(it => it.ID !== this.FileInfo.ID)
+        .map(it => it.fileList || [])
+        .reduce((arr1, arr2) => [...arr1, ...arr2], [])
+        .map(it => FileTypeClass.getUniqueFileName({ file: it.raw, Terminal: 1, CustomerID: this.CustomerID }));
       // uploadResultList 跟随其一起变动
       if (this.uploadResultList.length > 0) {
         const list = newVal.filter(it => it.status === 'success').map(it => it.uid);
@@ -234,7 +247,11 @@ export default {
       const arr = [];
       this.fileList.forEach(_file => {
         const i = arr.findIndex(_it => _it.size === _file.size && _it.name === _file.name && _it.raw.type === _file.raw.type);
-        if (i === -1) arr.push(_file);
+        if (i === -1) {
+          // 下面判断多类目下文件不能重复问题
+          const _uniqueName = FileTypeClass.getUniqueFileName({ file: _file.raw, Terminal: 1, CustomerID: this.CustomerID });
+          if (!allOtherItemFileUniqueNameList.includes(_uniqueName)) arr.push(_file);
+        }
       });
       let isRepeat = false;
       let isNotMatch = false;
@@ -253,7 +270,7 @@ export default {
         let message;
         let title;
         if (isRepeat) {
-          message = '已去除重复文件';
+          message = '已去除重复文件（多文件类目下文件不能重复）';
           title = '文件重复';
         }
         if (isNotMatch) {
@@ -264,9 +281,13 @@ export default {
           message = '已去除重复及格式不符合文件';
           title = '部分文件重复且格式不符';
         }
-        this.$notify.error({
+        // this.$notify.error({
+        //   title,
+        //   message,
+        // });
+        this.messageBox.warnSingleError({
           title,
-          message,
+          msg: message,
         });
         this.fileList = list;
         this.lastFileList = list;

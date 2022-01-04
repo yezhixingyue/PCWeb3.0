@@ -12,6 +12,7 @@
       ref="UploadItem"
       @validateField="handleValidateField"
       @fillFileContent='fillFileContent'
+      :getAllFileList='getAllFileList'
     />
   </el-form>
 </template>
@@ -80,6 +81,11 @@ export default {
           it.clearFiles();
         });
       }
+    },
+    getAllFileList() {
+      if (!this.$refs.UploadItem) return [];
+      const list = this.$refs.UploadItem.map(it => it.getSelectedFileList());
+      return list;
     },
   },
   watch: {

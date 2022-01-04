@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="regForm" :rules="rules" ref="regForm" label-width="0px">
+  <el-form :model="regForm" :rules="rules" ref="regForm" label-width="0px" @submit.native.prevent>
     <el-form-item prop="Name">
       <el-input placeholder="请输入企业简称" clearable v-model.trim="regForm.Name">
           <i slot="prefix" class="iconfont icon-yonghu"></i>

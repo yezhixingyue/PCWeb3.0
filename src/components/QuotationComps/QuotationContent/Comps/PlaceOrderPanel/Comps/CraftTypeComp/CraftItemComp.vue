@@ -307,5 +307,8 @@ export default {
     font-size: 14px;
     font-weight: 700;
   }
+  .mp-place-order-help-tip-comp-wrap {
+    margin-right: -8px;
+  }
 }
 </style>
