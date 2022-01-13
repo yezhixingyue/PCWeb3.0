@@ -1,5 +1,6 @@
 <template>
-  <el-popover placement="top-start" width="564" :offset="108" trigger="click" :appendToBody='false'>
+  <el-popover placement="top-start" width="564" :offset="108" trigger="click">
+    <!--  :appendToBody='false' -->
     <section class="mp-file-upload-tips-popover-wrap">
       <header><i></i>文档设计标准</header>
       <ul>

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import axios from 'axios';
 import { Loading, Message } from 'element-ui';
 import router from '@/router';
@@ -88,7 +89,6 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   async (response) => {
     if (loadingInstance) loadingInstance.close();
-    // eslint-disable-next-line max-len
     const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
 
     // IE 8-9
@@ -105,21 +105,13 @@ axios.interceptors.response.use(
 
     const _statusList2NotNeed2Toast = [1000, 9062, 6225];
     // 包含以上的状态码 或 以上的请求路径  不会弹窗报错  其余以外都会报错出来
-    // eslint-disable-next-line max-len
     const oneCondition4NotNeedToast = !([9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(response.data.Status) && ['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url));
-    //  || !['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url))
 
     if ([7025, 8037].includes(response.data.Status)) {
-      // Message({
-      //   showClose: true,
-      //   message: `${response.data.Message}`,
-      //   type: 'error',
-      // });
       clearToken();
       router.replace('/login');
       return response;
     }
-    // eslint-disable-next-line max-len
     if ((!_statusList2NotNeed2Toast.includes(response.data.Status) && !_list2NotNeed2Toast.includes(_url) && (!closeTip) && oneCondition4NotNeedToast) || [7025, 8037].includes(response.data.Status)) {
       const _obj = { msg: `[ ${response.data.Message} ]` };
       if ([7025, 8037].includes(response.data.Status)) {
@@ -179,7 +171,6 @@ axios.interceptors.response.use(
             key = true;
             break;
           default:
-            // eslint-disable-next-line max-len
             messageBox.failSingleError({ title: '操作失败', msg: `${error.response.data && error.response.data.Message ? error.response.data.Message : error.response.statusText}` });
             key = true;
             break;

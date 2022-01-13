@@ -2,25 +2,6 @@
   <div class="mp-c-batch-upload-page-footer-comp-wrap">
     <div class="l" >
       <el-checkbox v-model="checked" :disabled='checkDisabled' :indeterminate="isIndeterminate">全选</el-checkbox>
-      <span v-show="failedList.length > 0" slot="reference" class="is-font-size-12 is-gray"
-          >共有 <i class="is-pink is-bold is-font-size-13">{{failedList.length}}</i> 个文件报价失败</span>
-      <el-popover
-        placement="top-start"
-        title="报价失败列表"
-        width="528"
-        offset='200'
-        popper-class='mp-c-batch-upload-page-footer-failed-list-popper-comp-wrap'
-        :appendToBody='false'
-        trigger="click">
-        <ul class="content mp-scroll-wrap">
-          <li v-for="(it,i) in failedList" :key="it.error + i">
-            <p>文件：<span class="">{{it.file.name}}</span></p>
-            <p class="is-pink">失败原因：{{it.error}}</p>
-          </li>
-        </ul>
-        <span v-show="failedList.length > 0" slot="reference" class="is-font-size-12 is-pink error span-title-pink red-span"
-          >查看错误信息</span>
-      </el-popover>
     </div>
     <div class="r">
       <template v-if="showPrice">

@@ -185,6 +185,7 @@
         :asyncInputchecker='asyncInputchecker'
         :isSpotGoods="placeData.IsSpotGoods"
         :getCheckResult='getCheckResult'
+        ref="oSubmitBox"
         @clearAdd='clearAdd'
       />
     </section>
@@ -354,7 +355,9 @@ export default {
       this.priceGetErrMsg = '';
       this.isGettingPrice = true;
       this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
-      const msg = await this.getProductPrice();
+      console.log(this.$refs.oSubmitBox.fileContent);
+      const fileContent = this.$refs.oSubmitBox ? this.$refs.oSubmitBox.fileContent : '';
+      const msg = await this.getProductPrice(fileContent);
       this.isGettingPrice = false;
       if (msg === true) {
         // this.$router.push('/offerResult');

@@ -60,16 +60,6 @@ export function getDateFormat2Date(date) {
 }
 
 /**
- * @description: 把数字组成的数组字符串拆分开为数组
- * @param {*} valueList
- * @return {*}
- */
-export const getNumberValueList = (valueList) => {
-  const reg = /\s|,|，/;
-  return valueList.split(reg).filter(it => it);
-};
-
-/**
  * @description: 给一个值，判断该值是否为数字类型，返回布尔值结果 但isInteger值为true时则判断是否为整数类型 为true则为数字类型
  * @param {*} val
  * @return {*}
@@ -83,6 +73,16 @@ export const getValueIsOrNotNumber = (val, isInteger) => {
   let _bool = !Number.isNaN(_val);
   if (_bool && isInteger) _bool = Number.isInteger(_val);
   return _bool;
+};
+
+/**
+ * @description: 把数字组成的数组字符串拆分开为数组
+ * @param {*} valueList
+ * @return {*}
+ */
+export const getNumberValueList = (valueList) => {
+  const reg = /\s|,|，/;
+  return valueList.split(reg).filter(it => it && getValueIsOrNotNumber(it)).map(it => `${+it}`);
 };
 
 /**

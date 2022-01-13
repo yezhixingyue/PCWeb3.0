@@ -4,7 +4,7 @@
     :model="IdentifyForm"
     :rules="rules"
     ref="oIdentifyForm"
-    label-width="82px"
+    label-width="86px"
     class="mp-place-order-address-set-comp-identify-ruleForm-containner"
   >
     <el-form-item label="识别内容：" prop="Value" size="small">
@@ -424,11 +424,11 @@ export default {
     .el-form-item__label {
       font-size: 14px;
       padding-right: 2px;
-      width: 72px !important;
+      // width: 72px !important;
       color: #888;
     }
     .el-form-item__content {
-      margin-left: 80px !important;
+      // margin-left: 86px !important;
       width: 772px;
       input {
         line-height: 28px;

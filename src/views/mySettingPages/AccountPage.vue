@@ -49,27 +49,7 @@
         </div>
       </div>
     </div>
-    <div class="img-info">
-      <p class="blue-v-line is-bold is-black">营业执照照片</p>
-      <div class="img-box">
-        <div class="pic is-font-18" :class="AuthenInfo4Submit.AuthenInfo.LicensePath?'':'show-bg'">
-          <input type="file" class="upload" @change="onChange" accept='.png,.jpeg,.jpg,.bmp'>
-          <div class="empty" v-if="!AuthenInfo4Submit.AuthenInfo.LicensePath">
-            <div class="remark">
-              <p class="remoark-text1">照片支持 .png, .jpg,.bmp 格式；</p>
-              <p>请上传完整清晰的营业执照图片</p>
-            </div>
-          </div>
-          <el-image v-else fit='contain' :src="imgSrc" class="upload-img" :preview-src-list="srcList">
-          </el-image>
-          <div class="img-mask" @click="onImgClick"></div>
-        </div>
-        <div class="text gray">
-          <p class="is-bold">操作说明：</p>
-          <p class="is-font-12">单击营业执照可查看图片；双击营业执照更换图片。<template v-if="!AllowEdit">（ 本月暂不可双击更改 ）</template></p>
-        </div>
-      </div>
-    </div>
+    <LicensePathPhotoComp v-model="LicensePath" :AllowEdit='AllowEdit' />
     <footer>
       <span class="is-pink" v-if="customerInfo&&customerInfo.RefuseTips&&!AllowEdit">{{customerInfo.RefuseTips}}</span>
       <el-button type="primary" :disabled='!AllowEdit' @click="handleSubmit">保存</el-button>
@@ -81,22 +61,27 @@
 import InputComp from '@/components/common/InputComp.vue';
 import { mapState } from 'vuex';
 import { imgUrl } from '@/assets/js/setup';
+import LicensePathPhotoComp from '@/components/MySettingComps/LicensePathPhotoComp';
 
 export default {
   // 修改账户信息后要重新获取账户信息数据和账号数据 (2个接口  需在获取前设置旧数据为null) 其它情况, 如充值后也需要重新获取账号信息
   components: {
     InputComp,
+    LicensePathPhotoComp,
   },
   computed: {
     ...mapState('common', ['customerInfo']),
     imgSrc() {
-      // if (process.env.NODE_ENV === 'development') {
-      //   return `${imgUrl}${this.AuthenInfo4Submit.AuthenInfo.LicensePath}`;
-      // }
+      if (!this.AuthenInfo4Submit || !this.AuthenInfo4Submit.AuthenInfo.LicensePath) return '';
       return `${imgUrl}${this.AuthenInfo4Submit.AuthenInfo.LicensePath}`;
     },
-    srcList() {
-      return [this.imgSrc];
+    LicensePath: {
+      get() {
+        return this.imgSrc;
+      },
+      set(url) {
+        this.AuthenInfo4Submit.AuthenInfo.LicensePath = url;
+      },
     },
     AllowEdit() {
       return this.AuthenInfo4Submit.AllowEdit;
@@ -148,9 +133,6 @@ export default {
         AllowEdit: true,
         QQ: '',
       },
-      firstClickTime: '',
-      secondClickTime: '',
-      timer: null,
       simpNameRules: [
         { strategy: 'isNotEmpty', errorMsg: '请输入企业简称' },
         { strategy: 'maxLength:20', errorMsg: '企业简称长度不能超过20个字' },
@@ -225,92 +207,6 @@ export default {
       const _t = this.CountyList.find(it => it.ID === e);
       // console.log(_t);
       this.AuthenInfo4Submit.AuthenInfo.SellArea.CountyName = _t.Name;
-    },
-    onChange(e) {
-      const file = e.target.files[0];
-      if (!file) {
-        return;
-      }
-      if (
-        file.type !== 'image/jpeg'
-        && file.type !== 'image/png'
-        && file.type !== 'image/bmp'
-      ) {
-        this.messageBox.warnSingleError({
-          title: '图片格式错误',
-          msg: '请上传 jpg/png/bmp 格式图片',
-        });
-        e.target.value = '';
-        return;
-      }
-      if (file.size > 4 * 1024 * 1024) {
-        this.messageBox.warnSingleError({
-          title: '图片过大',
-          msg: '请上传不超过4M大小的图片',
-        });
-        e.target.value = '';
-        return;
-      }
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file); // 根据图片路径读取图片
-      fileReader.onload = (ie) => {
-        const base64 = ie.currentTarget.result;
-        const img = new Image();
-        img.src = base64;
-        img.onload = async () => {
-          const imgInfo = {
-            width: img.naturalWidth,
-            height: img.naturalHeight,
-          };
-          if (imgInfo.width < 600 || imgInfo.height < 600) {
-            this.messageBox.warnSingleError({
-              title: '图片尺寸太小',
-              msg: '请上传大于等于600×600像素的图片',
-            });
-            e.target.value = '';
-            return;
-          }
-          const res = await this.api.uploadImage(file).catch(() => null);
-          if (res && res.data.Status === 1000) {
-            this.AuthenInfo4Submit.AuthenInfo.LicensePath = res.data.Data.Url;
-          }
-        };
-      };
-    },
-    handleSingleClick() {
-      const oImg = document.querySelector('div.upload-img.el-image > img');
-      if (!oImg) return;
-      const oMask = document.querySelector('div.img-mask');
-      oMask.style.cursor = 'progress';
-      this.timer = setTimeout(() => {
-        oImg.click();
-        this.timer = null;
-        oMask.style.cursor = 'default';
-      }, 300);
-    },
-    onImgClick() {
-      if (!this.AllowEdit) {
-        // const oImg = document.querySelector('div.upload-img.el-image > img');
-        // if (oImg) oImg.click();
-        this.handleSingleClick();
-        return;
-      }
-      this.firstClickTime = this.secondClickTime;
-      this.secondClickTime = Date.now();
-      if (!this.firstClickTime) {
-        this.handleSingleClick();
-        return;
-      }
-      if (this.secondClickTime - this.firstClickTime >= 300) {
-        this.handleSingleClick();
-      } else {
-        clearTimeout(this.timer);
-        this.timer = null;
-        const oMask = document.querySelector('div.img-mask');
-        const oInp = document.querySelector('input.upload');
-        oMask.style.cursor = 'default';
-        oInp.click();
-      }
     },
     reportError(msg) {
       this.messageBox.warnSingleError({
@@ -500,86 +396,86 @@ export default {
       }
     }
   }
-  > .img-info {
-    margin-top: 40px;
-    > .img-box {
-      margin-top: 32px;
-      > div {
-        // display: inline-block;
-        &.pic {
-          width: 360px;
-          height: 360px;
-          overflow: hidden;
-          text-align: center;
-          // padding-top: 175px;
-          user-select: none;
-          position: relative;
-          &.show-bg {
-            background: url(../../assets/images/license-empty.jpg) no-repeat center/100% 100%;
-          }
-          color: #aaa;
-          > .el-image {
-            width: 100%;
-            height: 100%;
-          }
-          > span {
-            position: absolute;
-            top: 175px;
-            left: 96px;
-          }
-          > input.upload {
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-            position: absolute;
-          }
-          > .img-mask {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 9;
-          }
-          > .upload-img {
-            background-color: rgba($color: #000000, $alpha: 0.4);
-          }
-          > div.empty {
-            width: 100%;
-            height: 100%;
-            > .remark {
-              width: 100%;
-              height: 60px;
-              position: absolute;
-              left: 0;
-              bottom: 0;
-              font-size: 14px;
-              background-color: rgba($color: #428dfa, $alpha: 0.5);
-              color: #fff;
-              > p.remoark-text1 {
-                margin: 12px 0;
-                margin-left: 12px;
-              }
-            }
-          }
-        }
-        &.text {
-          line-height: 20px;
-          padding-left: 4px;
-          padding-top: 10px;
-          vertical-align: bottom;
-          &.cancel {
-            color: #aaa !important;
-          }
-          > p {
-            // display: inline-block;
-            letter-spacing: 1px;
-            width: 360px;
-          }
-        }
-      }
-    }
-  }
+  // > .img-info {
+  //   margin-top: 40px;
+  //   > .img-box {
+  //     margin-top: 32px;
+  //     > div {
+  //       // display: inline-block;
+  //       &.pic {
+  //         width: 360px;
+  //         height: 360px;
+  //         overflow: hidden;
+  //         text-align: center;
+  //         // padding-top: 175px;
+  //         user-select: none;
+  //         position: relative;
+  //         &.show-bg {
+  //           background: url(../../assets/images/license-empty.jpg) no-repeat center/100% 100%;
+  //         }
+  //         color: #aaa;
+  //         > .el-image {
+  //           width: 100%;
+  //           height: 100%;
+  //         }
+  //         > span {
+  //           position: absolute;
+  //           top: 175px;
+  //           left: 96px;
+  //         }
+  //         > input.upload {
+  //           opacity: 0;
+  //           width: 1px;
+  //           height: 1px;
+  //           position: absolute;
+  //         }
+  //         > .img-mask {
+  //           position: absolute;
+  //           top: 0;
+  //           left: 0;
+  //           right: 0;
+  //           bottom: 0;
+  //           z-index: 9;
+  //         }
+  //         > .upload-img {
+  //           background-color: rgba($color: #000000, $alpha: 0.4);
+  //         }
+  //         > div.empty {
+  //           width: 100%;
+  //           height: 100%;
+  //           > .remark {
+  //             width: 100%;
+  //             height: 60px;
+  //             position: absolute;
+  //             left: 0;
+  //             bottom: 0;
+  //             font-size: 14px;
+  //             background-color: rgba($color: #428dfa, $alpha: 0.5);
+  //             color: #fff;
+  //             > p.remoark-text1 {
+  //               margin: 12px 0;
+  //               margin-left: 12px;
+  //             }
+  //           }
+  //         }
+  //       }
+  //       &.text {
+  //         line-height: 20px;
+  //         padding-left: 4px;
+  //         padding-top: 10px;
+  //         vertical-align: bottom;
+  //         &.cancel {
+  //           color: #aaa !important;
+  //         }
+  //         > p {
+  //           // display: inline-block;
+  //           letter-spacing: 1px;
+  //           width: 360px;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
   > footer {
     margin-top: 50px;
     margin-bottom: 80px;

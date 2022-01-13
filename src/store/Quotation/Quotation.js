@@ -569,10 +569,10 @@ export default {
     },
     /* 获取产品报价信息
     -------------------------------*/
-    async getProductPrice({ state, commit }) {
+    async getProductPrice({ state, commit }, fileContent) {
       const productData = state.obj2GetProductPrice.ProductParams;
       commit('setCurSelectStatus', '报价');
-      const _data = {};
+      const _data = { Content: fileContent ? fileContent.trim() : '' };
       _data.ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
       commit('setProductQuotationResult', null);
       // 补充平台单号
@@ -605,7 +605,7 @@ export default {
     },
     /* 下单 - 预下单
     -------------------------------*/
-    async getOrderPreCreate({ state, commit, rootState }, { compiledName, fileContent, callBack }) {
+    async getOrderPreCreate({ state, commit, rootState }, { compiledName, fileContent, FileAuthorMobile, callBack }) {
       // 1. 配置组合生成请求对象
       const _requestObj = { List: [], OrderType: 2, PayInFull: false };
       const _itemObj = {};
@@ -617,9 +617,10 @@ export default {
       // 4. 填充收货地址与配送方式
       _itemObj.Address = CommonClassType.getAddress4SubmitFromEditObj(state.addressInfo4PlaceOrder);
       // 5. 填充文件内容
-      _itemObj.Content = fileContent;
+      _itemObj.Content = fileContent.trim();
+      if (FileAuthorMobile) _itemObj.FileAuthorMobile = FileAuthorMobile;
       // 6. 记录文件内容与当前接口请求类型
-      commit('setCurFileContent', fileContent);
+      commit('setCurFileContent', fileContent.trim());
       commit('setCurSelectStatus', '下单');
       // 7. 填充优惠券信息
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
@@ -697,7 +698,7 @@ export default {
     },
     /* 下单 - 保存购物车
     -------------------------------*/
-    async getQuotationSave2Car({ state, commit, dispatch }, { FileList, fileContent, callBack }) {
+    async getQuotationSave2Car({ state, commit, dispatch }, { FileList, fileContent, FileAuthorMobile, callBack }) {
       const _itemObj = { IgnoreRiskLevel: state.RiskWarningTipsTypes.PageTips };
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
       if (FileList) {
@@ -707,7 +708,8 @@ export default {
       _itemObj.FileHaveUpload = true;
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _itemObj.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
       _itemObj.Address = CommonClassType.getAddress4SubmitFromEditObj(state.addressInfo4PlaceOrder);
-      _itemObj.Content = fileContent;
+      _itemObj.Content = fileContent.trim();
+      if (FileAuthorMobile) _itemObj.FileAuthorMobile = FileAuthorMobile;
       if (state.selectedCoupon) _itemObj.Coupon = { CouponCode: state.selectedCoupon.CouponCode };
 
       const productData = state.obj2GetProductPrice.ProductParams;

@@ -28,7 +28,6 @@
           <div :style="wStyles[4]">{{item.Funds.FinalPrice | formatNumber}}元</div> <!-- 成交价 -->
           <div :style="wStyles[5]">{{item.Funds.Deposit | formatNumber}}元</div> <!-- 定金 -->
           <div :style="wStyles[6]" class="is-font-12 is-pink" style="text-align:left"
-           :title="`${item.ProducePeriod | getPayTime}${item.ProducePeriod | getDoneTime}`"
            >{{item.ProducePeriod | getPayTime}}{{item.ProducePeriod | getDoneTime}}</div> <!-- 工期 -->
           <div :style="wStyles[7]" class="is-font-12 gray">
             <span :title="item.Content || ''">{{item.Content || '无'}}</span>

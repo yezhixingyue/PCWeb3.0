@@ -627,6 +627,10 @@ export default {
           display: inline-block;
           &.platform-code-box {
             position: relative;
+            .title {
+              width: 84px;
+              margin-right: 2px;
+            }
             // > div {
             //   .el-input {
             //     width: 220px;
@@ -649,11 +653,11 @@ export default {
             // }
             > div {
               display: inline-block;
-              min-width: 256px;
+              min-width: 261px;
               margin-right: 19px;
               padding-left: 4px;
             }
-            margin-right: 12px;
+            margin-right: 4px;
           }
           &.express-box {
             > .title {
@@ -684,17 +688,18 @@ export default {
           white-space: nowrap;
           margin-bottom: 12px;
           > .consignee-box {
-            width: 317px;
-            margin-right: 52px;
+            width: 334px;
+            margin-right: 40px;
             vertical-align: top;
             padding-top: 2px;
             > .consignee {
               margin-right: 30px;
               padding-left: 4px;
             }
-            // .title {
-            //   min-width: 4em;
-            // }
+            .title {
+              width: 84px;
+              margin-right: 2px;
+            }
           }
           > .address {
             width: 400px;
@@ -811,6 +816,7 @@ export default {
     text-align: right;
     display: inline-block;
     margin-right: 7px;
+    // width: 79px;
   }
   .set-craft-dia {
     // height: 400px;
