@@ -7,7 +7,7 @@
     <div class="content">
       <ul v-if="FileList && FileList.length > 0">
         <li class="file-content-box" v-show="!isSpotGoods">
-           <el-form :model="{ fileContent: fileContent }" ref="contentValidateForm" label-width="86px"
+           <el-form :model="{ fileContent: fileContent, FileAuthorMobile: FileAuthorMobile }" ref="contentValidateForm" label-width="86px"
             size="mini" hide-required-asterisk :disabled='isUploading'>
             <el-form-item
               label="文件内容："
@@ -15,19 +15,36 @@
               :rules="[
                 { required: true, message: '请输入文件内容'},
                 { max: 130, message: '文件内容不能超过130个字'},
+                { pattern: /\S+/, message: '文件内容不能全部为空格'},
               ]"
             >
               <el-input
-                v-model.trim="fileContent"
+                v-model="fileContent"
                 maxlength="130"
                 show-word-limit
                 placeholder="1.请填写文件中“具有明显特征”的名称；2.此名称不作为最终制作要求，请正确点选制作要求；"></el-input>
+              <div class="design-document" v-show="!isSpotGoods">
+                <DesignDocumentPopoverComp :disabled='isUploading' />
+              </div>
+            </el-form-item>
+            <el-form-item
+              label="传稿人电话："
+              prop="FileAuthorMobile"
+              :disabled='isUploading'
+              :rules="[
+                { pattern: phoneRegxp, message: '传稿人电话格式不正确'},
+              ]"
+            >
+              <el-input
+                v-model.trim="FileAuthorMobile"
+                maxlength="20"
+                placeholder="请输入传稿人电话，方便核对问题订单"></el-input>
             </el-form-item>
           </el-form>
         </li>
-        <li class="design-document" v-show="!isSpotGoods">
+        <!-- <li class="design-document" v-show="!isSpotGoods">
           <DesignDocumentPopoverComp :disabled='isUploading' />
-        </li>
+        </li> -->
         <li class="file-list-box">
           <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' :disabled='isUploading' :CustomerID='CustomerID' />
         </li>
@@ -118,6 +135,7 @@ export default {
   data() {
     return {
       fileContent: '',
+      FileAuthorMobile: '',
       title: '', // 用于弹窗标题显示   下单 | 添加购物车   后面自动添加失败2字
       visible: false,
       OrderPreData: null,
@@ -126,6 +144,7 @@ export default {
       submitText: '直接下单',
       loadingInstance: null,
       uploadType: '',
+      phoneRegxp: /^\d{11}$|^\d{7,12}$|^\d{3,4}-\d{6,8}$/,
     };
   },
   methods: {
@@ -135,7 +154,8 @@ export default {
       this.requestObj = null;
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
-      const resp = await this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent: this.fileContent });
+      const { fileContent, FileAuthorMobile } = this;
+      const resp = await this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent, FileAuthorMobile });
       if (resp) {
         if (Array.isArray(resp)) {
           const [PreCreateData, requestObj] = resp;
@@ -204,10 +224,14 @@ export default {
       // 下面执行加购提交操作
       const callBack = () => {
         this.fileContent = '';
+        this.FileAuthorMobile = '';
         if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
         this.scrollToTop();
       };
-      await this.$store.dispatch('Quotation/getQuotationSave2Car', { FileList, fileContent: this.fileContent, callBack });
+      const { fileContent, FileAuthorMobile } = this;
+      await this.$store.dispatch('Quotation/getQuotationSave2Car', {
+        FileList, fileContent, FileAuthorMobile, callBack,
+      });
     },
     scrollToTop() {
       this.$nextTick(() => {
@@ -254,7 +278,8 @@ export default {
     async getProductPriceLocal() { // 校验函数  用来判断是否可以进行下单
       const res = await this.OrderPanelChecker();
       if (!res) return false;
-      if (!this.fileContent && !this.isSpotGoods) return '[ 文件内容 ] 中，请输入文件内容';
+      if (!this.fileContent && !this.isSpotGoods) return '请输入文件内容';
+      if (this.FileAuthorMobile && !this.phoneRegxp.test(this.FileAuthorMobile)) return '传稿人电话格式不正确';
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
       const asyncInputchecker = await this.asyncInputchecker();
       if (!asyncInputchecker) return '有内容未识别，请先识别或清除';
@@ -303,8 +328,11 @@ export default {
       if (!this.$refs.contentValidateForm) return '';
       const res = await this.$refs.contentValidateForm.validate().catch(() => {});
       if (!res && !this.isSpotGoods) {
-        if (!this.fileContent) return '[ 文件内容 ] 中，请输入文件内容';
+        if (!this.fileContent) return '请输入文件内容';
         if (this.fileContent && this.fileContent.length > 130) return '[ 文件内容 ] 字数不能超过130个字';
+        if (this.FileAuthorMobile && !this.phoneRegxp.test(this.FileAuthorMobile)) return '传稿人电话格式不正确';
+        if (!/\S+/.test(this.fileContent)) return '文件内容不能全部为空格';
+        return '文件内容输入有误，请检查';
       }
       return '';
     },
@@ -379,6 +407,7 @@ export default {
       const cb = () => {
         this.$store.dispatch('common/getCustomerFundBalance');
         this.fileContent = '';
+        this.FileAuthorMobile = '';
         if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
         if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
         this.$emit('clearAdd');
@@ -398,6 +427,7 @@ export default {
     },
     handleSuccessFunc(goToUnPayList) {
       this.fileContent = '';
+      this.FileAuthorMobile = '';
       if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
       if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
       this.$emit('clearAdd');
@@ -428,6 +458,7 @@ export default {
   watch: {
     curProductID() {
       this.fileContent = '';
+      this.FileAuthorMobile = '';
       if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
     },
   },
@@ -462,7 +493,7 @@ export default {
           .el-form-item__label {
             font-size: 14px;
             padding-right: 2px;
-            width: 72px !important;
+            // width: 72px !important;
             color: #888;
           }
           .el-form-item__content {
@@ -471,12 +502,16 @@ export default {
           .el-form-item--mini.el-form-item {
             margin-bottom: 18px;
           }
+          .el-form-item__error {
+            padding-left: 8px;
+          }
         }
         &.upload-box {
           text-align: right;
         }
-        &.design-document {
-          padding-left: 80px;
+        .design-document {
+          padding-left: 15px;
+          height: 22px;
           > span {
             position: relative;
           }

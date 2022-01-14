@@ -13,6 +13,7 @@
       <div class="content">
         <div class="workbench">
           <AddressChangeComp :customer='customer' @change="handleAddressChange" @validAddChange='handleValidAddChange' />
+          <FailListComp :failedList='failedList' />
           <FileSelectComp @change="handleFileChange" :disabled='!canSelectFile' :accept='accept' :selectTitle='selectTitle' />
         </div>
         <MainTableComp
@@ -100,6 +101,7 @@
 import AddressChangeComp from '@/components/BatchUploadComps/Header/AddressChangeComp.vue';
 import ProductFilterComp from '@/components/BatchUploadComps/Main/ProductFilterComp.vue';
 import FileSelectComp from '@/components/BatchUploadComps/Main/FileSelectComp.vue';
+import FailListComp from '@/components/BatchUploadComps/Main/FailListComp.vue';
 import MainTableComp from '@/components/BatchUploadComps/Main/MainTableComp/index.vue';
 import BatchUploadFooterComp from '@/components/BatchUploadComps/Footer/BatchUploadFooterComp.vue';
 import BatchUploadClass from '@/assets/js/ClassType/BatchUploadClass';
@@ -119,6 +121,7 @@ export default {
      * 页面主体组件
      */
     ProductFilterComp, // 产品筛选组件
+    FailListComp, // 错误列表弹窗
     FileSelectComp, // 文件上传选择组件
     MainTableComp, // 主体表格组件
     /**
@@ -263,7 +266,7 @@ export default {
       this.failedList = failedList;
       this.successedList = successedList;
       if (failedList.length > 0) {
-        this.messageBox.warnSingleError({ title: `共有${failedList.length}个文件报价失败`, msg: '可在下方查看具体错误信息' });
+        this.messageBox.warnSingleError({ title: `共有${failedList.length}个文件报价失败`, msg: '请在按钮左侧查看具体错误信息' });
       }
     },
     /**
@@ -451,13 +454,13 @@ export default {
       margin: 0 auto;
       > div.workbench {
         position: relative;
-        padding: 18px 0;
+        padding: 15px 0;
         height: 100px;
         box-sizing: border-box;
         .upload-btn.mp-c-batch-upload-page-file-select-comp-wrap {
           position: absolute;
           right: 0;
-          bottom: 25px;
+          bottom: 22px;
           border-radius: 3px;
         }
         .mp-pc-place-order-address-show-and-change-wrap > .content > ul > li {
@@ -465,6 +468,11 @@ export default {
           .express-box .title{
             color: #999;
           }
+        }
+        .mp-c-batch-upload-page-failed-list-comp-wrap {
+          position: absolute;
+          right: 140px;
+          bottom: 30px;
         }
       }
       > .table {

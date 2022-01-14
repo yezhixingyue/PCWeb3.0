@@ -46,5 +46,13 @@ export default {
 <style lang='scss'>
 .mp-batch-upload-page-header-comps-address-setup-comp-wrap {
   font-size: 14px;
+  height: 65px;
+  > section {
+    > .content {
+      > ul {
+        height: 65px;
+      }
+    }
+  }
 }
 </style>

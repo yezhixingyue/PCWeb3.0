@@ -71,12 +71,17 @@ export default {
       type: Boolean,
       default: true,
     },
+    GeneralValues: {
+      type: Array,
+      default: null,
+    },
   },
   components: {
     CanFreeCreateSelectComp,
   },
   computed: {
     options() {
+      if (this.GeneralValues && Array.isArray(this.GeneralValues)) return this.GeneralValues.map(it => it.toString());
       if (!this.InputContent) return [];
       const valueList = this.utils.getNumberValueList(this.InputContent);
       return valueList;

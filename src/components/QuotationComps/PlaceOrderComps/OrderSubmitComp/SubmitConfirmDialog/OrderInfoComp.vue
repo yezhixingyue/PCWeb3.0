@@ -54,6 +54,10 @@
           {{ FileContent }}
         </div>
       </li>
+      <li v-if="FileAuthorMobile">
+        <span class="label">传稿人电话：</span>
+        <div class="text">{{ FileAuthorMobile }}</div>
+      </li>
       <li v-if="Weight">
         <span class="label">货品重量：</span>
         <div class="text">{{ Weight }}kg</div>
@@ -72,7 +76,7 @@
       </li>
       <li v-if="showProducePeriod">
         <span class="label">交货工期：</span>
-        <div class="text" v-if="ProducePeriod" :class="{'is-pink': !hiddenPayTime}">
+        <div class="text" v-if="ProducePeriod" :class="{'is-pink': !hiddenPayTime, 'is-success': hiddenPayTime}">
           <template v-if="!hiddenPayTime">{{ ProducePeriod | getPayTime }} </template>
           <template>{{ ProducePeriod | getDoneTime }}</template>
         </div>
@@ -118,6 +122,13 @@ export default {
       if (this.orderInfo) return this.orderInfo.FileContent || '无';
       if (this.OrderDetail && this.OrderDetail.Content) { return this.OrderDetail.Content; }
       return '无';
+    },
+    FileAuthorMobile() {
+      if (this.orderInfo) return this.orderInfo.FileAuthorMobile.trim() || '';
+      if (this.OrderDetail && this.OrderDetail.FileAuthorMobile) {
+        return this.OrderDetail.FileAuthorMobile.trim();
+      }
+      return '';
     },
     ProducePeriod() {
       return this.orderInfo

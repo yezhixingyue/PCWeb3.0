@@ -2,7 +2,7 @@
   <div class="mp-place-order-content-element-type-show-item-comp-wrap" v-if="!Property.HiddenToCustomer" v-show="!hidden"
    :class="{isshow: !hidden, isNameHide: hiddenLabel || Property.IsNameHidden}">
     <label v-if="!hiddenLabel && !Property.IsNameHidden" class="el-title">
-      <i :class="{'opacity-0': !showError}" class="is-bold is-pink is-font-13">!</i>
+      <i :class="{'opacity-0': !showError}" class="is-bold is-pink is-font-12">X</i>
       {{Property.Name}}：</label>
       <!-- <i v-show="isError" class="is-pink is-bold is-font-14"></i> {{Property.Name}}：</label> -->
     <!-- 数字类型 -->
@@ -13,6 +13,7 @@
      v-if="Property.Type === 1"
      v-model.lazy="PropValue"
      :InputContent='Property.NumbericAttribute.InputContent'
+     :GeneralValues='Property.NumbericAttribute.GeneralValues'
      @focus="onFocus"
      @blur="onBlur"
      :isNumberic='isNumberic'
