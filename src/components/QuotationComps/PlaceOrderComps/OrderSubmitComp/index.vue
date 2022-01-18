@@ -338,6 +338,7 @@ export default {
     },
     AddressInfoChecker() {
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
+      if (!this.addressInfo4PlaceOrder.Address.Express.First || !this.addressInfo4PlaceOrder.Address.Express.Second) return '未选中配送方式';
       return '';
     },
     async OutPlateChecker() {
@@ -555,7 +556,7 @@ export default {
       }
     }
     > .submit-btn-wrap {
-      margin-top: 60px;
+      margin-top: 48px;
       position: relative;
       > button {
         width: 140px;
@@ -563,15 +564,14 @@ export default {
         padding: 0;
         line-height: 38px;
         font-size: 15px;
+        margin-right: 25px;
+        margin-left: 0;
         > span > i {
           font-size: 19px;
           vertical-align: middle;
           margin-right: 14px;
           position: relative;
           top: -3px;
-        }
-        & + button {
-          margin-left: 25px;
         }
         .el-icon-loading {
           font-size: 17px;
@@ -586,17 +586,20 @@ export default {
           }
           font-size: 14px;
         }
+        &:last-of-type {
+          margin-right: 32px;
+        }
       }
-      > div {
-       position: absolute;
-       top: 0;
-       left: 335px;
-       width: 525px;
-      }
+      // > div {
+      //  position: absolute;
+      //  top: 0;
+      //  left: 335px;
+      //  width: 525px;
+      // }
     }
     > .tips-box-wrap {
-      padding-top: 42px;
-      padding-bottom: 80px;
+      padding-top: 20px;
+      padding-bottom: 60px;
     }
   }
 }

@@ -140,7 +140,7 @@ export default {
     },
     onVisibleChange(e) {
       if (this.CtrlZIndex) return;
-      this.$store.commit('common/setIsPopperVisible', e);
+      this.$store.dispatch('common/setIsPopperVisibleAsync', e);
     },
     onNativeChange(e) {
       this.handleBlur(e);

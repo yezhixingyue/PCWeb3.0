@@ -47,7 +47,7 @@
             :watchPage='condition4OrderList.Page'
             :handlePageChange='handlePageChange'
             :count='OrderListNumber'
-            :pageSize='12'
+            :pageSize='10'
             :DownLoadConfigObj='DownLoadConfigObj'
             class="float"
             >
@@ -66,7 +66,7 @@
               :watchPage='condition4OrderList.Page'
               :handlePageChange='handlePageChange'
               :count='OrderListNumber'
-              :pageSize='12'
+              :pageSize='10'
               :DownLoadConfigObj='DownLoadConfigObj'
               class="float"
               >
@@ -113,7 +113,7 @@ export default {
     return {
       isFootFixed: false,
       // eslint-disable-next-line max-len
-      dateList: [{ label: '全部', value: 'all' }, { label: '今日', value: 'today' }, { label: '昨日', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '今日', value: 'today' }, { label: '昨日', value: 'yesterday' }, { label: '前日', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
     };
   },
   computed: {

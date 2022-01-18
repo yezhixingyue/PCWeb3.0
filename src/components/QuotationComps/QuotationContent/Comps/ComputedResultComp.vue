@@ -1,61 +1,66 @@
 <template>
-  <div :class="{'place-price-result': true, showExpressCost: showExpressCost}" v-if="ProductQuotationResult">
-    <div class="no-margin">
-      <template v-if="!showExpressCost">
-        {{
-          ProductQuotationResult.OriginalCost > Cost ? "官网上传优惠价： " : "成交价： "
-        }}
-      </template>
-      <template v-else> 总价： </template>
-      <i class="is-pink is-bold is-font-20">{{ +Cost.toFixed(2) }}</i>
-      <i class="is-pink is-font-15" style="margin-right: 10px;"> 元</i>
-      <span
-        class="is-font-12 is-gray"
-        style="margin-right:5px"
-        v-if="
-          (ProductQuotationResult.ExpressCost || ProductQuotationResult.ExpressCost === 0)
-          && showExpressCost
-        "
-        >（含运费：<i>{{ ProductQuotationResult.ExpressCost }}元</i>）</span
-      >
-    </div>
-    <div
-      class="show-info"
-      v-if="
-        ProductQuotationResult.OriginalCost > Cost ||
-        selectedCoupon ||
-        ProductQuotationResult.ProducePeriod ||
-        showExpressCost ||
-        ProductQuotationResult.Weight
-      "
-    >
-      <span style="margin-right: 6px">( </span>
-      <span>
-        原价：<i>{{ ProductQuotationResult.OriginalCost }}元</i></span
-      >
-      <span v-if="promotePrice > 0"
-        >活动：<i class="is-pink">{{ "-" + promotePrice }}元</i></span
-      >
-      <span v-if="coupon >= 0"
-        >优惠券：<i v-if="selectedCoupon && coupon" class="is-pink"
-          >{{`${coupon > 0 ? '-' : ''}${Math.abs(coupon)}`}}元</i
+  <ul :class="{'place-price-result': true, showExpressCost: showExpressCost, noPeriod: !ProducePeriod}" v-if="ProductQuotationResult">
+    <!-- 价格信息 -->
+    <li class="price">
+      <!-- 价格 -->
+      <div>
+        <template v-if="!showExpressCost">{{ ProductQuotationResult.OriginalCost > Cost ? "官网上传优惠价：" : "成交价："}}</template>
+        <template v-else> 总价：</template>
+        <i class="is-pink is-bold is-font-20">{{ +Cost.toFixed(2) }}</i>
+        <i class="is-pink is-font-13" style="margin-right: 8px; margin-left:3px">元</i>
+        <span
+          class="is-font-13 is-gray"
+          style="margin-right:5px"
+          v-if="
+            (ProductQuotationResult.ExpressCost || ProductQuotationResult.ExpressCost === 0)
+            && showExpressCost
+          "
+          >(<i class="is-font-12">含运费：{{ ProductQuotationResult.ExpressCost }}元</i>)</span
         >
-        <i v-else-if="!selectedCoupon || coupon === 0">{{ coupon }}元</i></span
+      </div>
+      <!-- 其余详情信息 -->
+      <div
+        class="show-info"
+        v-if="
+          ProductQuotationResult.OriginalCost > Cost ||
+          selectedCoupon ||
+          ProducePeriod ||
+          showExpressCost ||
+          ProductQuotationResult.Weight
+        "
       >
-      <span v-if="ProductQuotationResult.Weight > 0">
-        重量：<i>{{ ProductQuotationResult.Weight }}kg</i></span
-      >
-      <span class="mg-left"> )</span>
-    </div>
-    <div v-if="ProductQuotationResult.ProducePeriod">
-      <span class="is-pink is-font-13" > {{ ProductQuotationResult.ProducePeriod | getPayTime }}</span>
-      <span class="is-pink is-font-13 is-bold" style="margin-right:5px"
-        >{{ ProductQuotationResult.ProducePeriod | getDoneTime }}</span>
-      <span class="is-pink is-font-12" style="margin-right:0"
-        v-if="!ProductQuotationResult.ProducePeriod.IncludeDiliveryTime"
-        >( 配送时间视快递物流速度 )</span>
-    </div>
-  </div>
+        <span style="margin-right: 2px">(</span>
+        <span>原价：<i>{{ ProductQuotationResult.OriginalCost }}元</i></span>
+        <span v-if="promotePrice > 0">活动：<i class="is-pink">{{ "-" + promotePrice }}元</i></span>
+        <span v-if="coupon >= 0">
+          <template>优惠券：</template>
+          <i v-if="selectedCoupon && coupon" class="is-pink">{{`${coupon > 0 ? '-' : ''}${Math.abs(coupon)}`}}元</i>
+          <i v-else-if="!selectedCoupon || coupon === 0">{{ coupon }}元</i>
+        </span>
+        <span v-if="ProductQuotationResult.Weight > 0">
+          <template>重量：</template>
+          <i>{{ ProductQuotationResult.Weight }}kg</i>
+        </span>
+        <span class="mg-left"> )</span>
+      </div>
+    </li>
+    <!-- 工期信息 -->
+    <li class="ProducePeriod" v-if="ProducePeriod">
+      <div class="is-pink is-font-13 is-bold">
+        <span style="margin-right:0px">{{ ProducePeriod | getPayTime }}，</span>
+        <span>{{ ProducePeriod | getDoneTime }}</span>
+      </div>
+      <div v-if="!ProducePeriod.IncludeDiliveryTime || ProducePeriod.Tips" class="tip">
+        <span class="is-pink is-font-12 perod-tip" style="margin-right:0;" :title="ProducePeriod.Tips || ''">
+          <template>(</template>
+          <template v-if="!ProducePeriod.IncludeDiliveryTime">配送时间视快递物流速度</template>
+          <template v-if="!ProducePeriod.IncludeDiliveryTime && ProducePeriod.Tips">，</template>
+          <template v-if="ProducePeriod.Tips" >{{ProducePeriod.Tips}}</template>
+          <template>)</template>
+        </span>
+      </div>
+    </li>
+  </ul>
 </template>
 
 <script>
@@ -105,60 +110,84 @@ export default {
       if (!this.coupon) return '(尚未满足使用条件)';
       return '';
     },
+    ProducePeriod() {
+      if (this.ProductQuotationResult) return this.ProductQuotationResult.ProducePeriod;
+      return null;
+    },
   },
 };
 </script>
 
 <style lang='scss' scoped>
-.place-price-result {
+ul.place-price-result {
   display: inline-block;
-  margin-right: 6px;
-  line-height: 29px;
+  // margin-right: 6px;
+  line-height: 0;
   white-space: normal;
-  position: absolute;
-  left: 160px;
-  top: -18px !important;
-  height: 72px;
-  width: 538px;
-  display: flex;
-  flex-wrap: wrap;
+  // height: 72px;
+  width: 555px;
+  vertical-align: top;
   &.showExpressCost {
-    width: 500px;
+    width: 520px;
   }
-  > span,
-  > div > span {
-    margin-right: 12px;
-    &.no-margin {
-      margin: 0;
-      margin-right: 8px !important;
-    }
-    &.mg-left {
-      margin-left: -8px;
-    }
-  }
-  align-items: center;
-  > div {
-    white-space: normal;
-    display: flex;
-    flex-wrap: wrap;
+  // &.noPeriod {
+  //   > li {
+  //     min-height: 40px;
+  //   }
+  // }
+  > li {
+    width: 100%;
     overflow: hidden;
-    &.show-info {
-      font-size: 13px;
-      flex-wrap: nowrap !important;
+    text-overflow: ellipsis;
+    > div {
+      display: inline-block;
+      white-space: normal;
+      line-height: 24px;
+      color: #888;
       > span {
-        white-space: nowrap;
+        margin-right: 10px;
+        &.mg-left {
+          margin-left: -8px;
+          margin-right: 2px;
+        }
+      }
+      &.show-info {
+        font-size: 13px;
+        flex-wrap: nowrap !important;
+        > span {
+          white-space: nowrap;
+        }
       }
     }
+    &.ProducePeriod {
+      > div {
+        line-height: 20px;
+        color: #ff3769;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        > span {
+          // display: inline-block;
+          // text-overflow: ellipsis;
+          // overflow: hidden;
+          // vertical-align: middle;
+          // max-width: 100%;
+          line-height: 18px;
+          white-space: normal;
+        }
+      }
+    }
+    &.price {
+      // min-height: 36px;
+      padding-top: 5px;
+      padding-bottom: 8px;
+    }
   }
-  > em {
-    margin-right: 18px;
-  }
-  &.center::before {
-    content: "";
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-    margin-right: -0.25em; /* Adjusts for spacing */
+  .perod-tip {
+    white-space: nowrap;
+    max-width: 568px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 14px;
   }
 }
 </style>

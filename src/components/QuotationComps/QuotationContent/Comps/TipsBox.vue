@@ -5,8 +5,6 @@
       <li class="tips-content" v-for="it in localTipsArr" :key="it">{{it}}</li>
     </ul>
     <ul v-if="ProductQuotationResult && ProductQuotationResult.Content && !onlyTips" class="detail">
-      <!-- <li class="icon"><i class="el-icon-warning"></i> 温馨提示：</li>
-      <li v-for="it in localTipsArr" :key="it">{{it}}</li> -->
       <li ref="detailBox">
         <span class="info" ref="oDetailContent">{{ProductQuotationResult.Content.trim()}}</span>
         <el-popover
@@ -17,7 +15,8 @@
           <span>{{copySuccess ? '复制成功' : '复制失败，请手动复制'}}</span>
           <span class="blue-span" slot="reference" @click="handleCopyClick">
             <img src="@/assets/images/copy.png" alt="">
-            复制订单信息</span>
+            复制订单信息
+          </span>
         </el-popover>
       </li>
     </ul>
@@ -47,7 +46,7 @@ export default {
     };
   },
   methods: {
-    handleCopyClick() {
+    handleCopyClick() { // 复制
       if (this.$refs.oDetailContent) {
         const content = this.$refs.oDetailContent.innerText;
         const textarea = document.createElement('textarea');
@@ -93,7 +92,6 @@ export default {
     padding: 3px 0 5px;
     margin-bottom: 10px;
     > li {
-      // padding-left: 96px;
       font-size: 12px;
       color: #F4A307;
       padding: 2px 0 2px 96px;

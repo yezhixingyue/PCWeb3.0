@@ -482,5 +482,16 @@ export default {
         commit('setCustomerAccountList', res.data.Data);
       }
     },
+    /** 当下拉框展示时修改该状态，用以触发顶部zindex的值以适应对下拉框的覆盖
+    ---------------------------------------- */
+    setIsPopperVisibleAsync({ commit }, bool) {
+      if (bool) {
+        setTimeout(() => {
+          commit('setIsPopperVisible', bool);
+        }, 200);
+      } else {
+        commit('setIsPopperVisible', bool);
+      }
+    },
   },
 };

@@ -124,7 +124,7 @@ export default {
       return '无';
     },
     FileAuthorMobile() {
-      if (this.orderInfo) return this.orderInfo.FileAuthorMobile.trim() || '';
+      if (this.orderInfo) return this.orderInfo.FileAuthorMobile ? this.orderInfo.FileAuthorMobile.trim() : '';
       if (this.OrderDetail && this.OrderDetail.FileAuthorMobile) {
         return this.OrderDetail.FileAuthorMobile.trim();
       }

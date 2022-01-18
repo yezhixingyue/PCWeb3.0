@@ -32,83 +32,47 @@
         </div>
 
         <section class="coupon-calculate-price-wrap">
-          <header>
-            <el-button
-              type="primary"
-              @click.native="go2GetProductPrice"
-              :loading="isGettingPrice"
-              class="get-price-btn"
-              :disabled='isSetupError'
-            >
-              <template v-if="isGettingPrice"> 计算中</template>
-              <template v-else>计算价格</template>
-            </el-button>
-            <ComputedResultComp
-              :ProductQuotationResult="ProductQuotationResult"
-              :selectedCoupon="selectedCoupon"
-              v-if="!priceGetErrMsg"
-            />
-            <div class="result center" v-if="priceGetErrMsg">
-              <span class="is-pink error-msg">{{ priceGetErrMsg }}</span>
-            </div>
-            <div
-              class="result center"
-              v-if="
-                !priceGetErrMsg && !ProductQuotationResult && !isGettingPrice
-              "
-            >
-              <span
-                class="gray no-cursor is-font-12"
-                v-if="selectedCoupon"
-                @click.stop
-                >已选择满 {{ selectedCoupon.MinPayAmount }}元减{{
-                  selectedCoupon.Amount
-                }}元
-                <i class="is-pink"> {{ couponConditionText }}</i>
-              </span>
-            </div>
-          </header>
-          <footer>
             <el-collapse :value="activeNames">
               <el-collapse-item name="1" disabled>
-                <template slot="title">
-                  <el-button
-                    class="button-title-pink is-font-13"
-                    @click="onBtnClick"
-                  >
-                    使用优惠券<i class="el-icon-arrow-down el-icon--right"></i>
-                  </el-button>
-                  <TipsBox />
-                </template>
+                  <!-- 按钮区域 -->
+                  <header slot="title" class="btns-box">
+                    <el-button class="button-title-pink is-font-13" @click="onCouponUseClick">
+                      <template>使用优惠券</template>
+                      <i class="el-icon-arrow-down el-icon--right"></i>
+                    </el-button>
+                    <el-button type="primary" @click.native="go2GetProductPrice" :loading="isGettingPrice" class="get-price-btn" :disabled='isSetupError'>
+                      <template v-if="isGettingPrice"> 计算中</template>
+                      <template v-else>计算价格</template>
+                    </el-button>
+                    <!-- 价格展示区域 -->
+                    <ComputedResultComp :ProductQuotationResult="ProductQuotationResult" :selectedCoupon="selectedCoupon" v-if="!priceGetErrMsg" />
+                    <!-- 错误 或 优惠券选择信息显示区域 -->
+                    <div class="err-or-selected-coupon-info-box">
+                      <span class="is-pink error-msg"  v-if="priceGetErrMsg"
+                       :title="priceGetErrMsg.length > 41 ? priceGetErrMsg : ''">{{ priceGetErrMsg }}</span>
+                      <span class="gray no-cursor is-font-12"
+                        v-if="selectedCoupon && !priceGetErrMsg && !ProductQuotationResult && !isGettingPrice"
+                        @click.stop
+                        >已选择满 {{ selectedCoupon.MinPayAmount }}元减{{ selectedCoupon.Amount }}元
+                        <i class="is-pink"> {{ couponConditionText }}</i>
+                      </span>
+                    </div>
+                    <TipsBox />
+                  </header>
+                <!-- 优惠展示与激活、选择区域 -->
                 <section class="coupon-wrap">
                   <header>
                     <span>激活优惠券：</span>
-                    <el-input
-                      v-model.trim="computedCouponCode2Add"
-                      placeholder="请输入优惠券激活码"
-                    ></el-input>
-                    <el-button
-                      type="primary"
-                      :disabled="!computedCouponCode2Add"
-                      @click="getCouponActivate"
-                      >激活</el-button
+                    <el-input v-model.trim="computedCouponCode2Add" placeholder="请输入优惠券激活码"></el-input>
+                    <el-button type="primary" :disabled="!computedCouponCode2Add" @click="getCouponActivate">激活</el-button
                     >
-                    <!-- <i class="span-title-blue">不使用优惠券</i> -->
                   </header>
-                  <ul
-                    class="coupon-list mp-scroll-wrap"
-                    v-if="couponList.length > 0"
-                  >
+                  <ul class="coupon-list mp-scroll-wrap" v-if="couponList.length > 0">
                     <li
-                      class="float"
-                      v-for="item in couponList"
-                      :key="item.CouponCode"
-                      @click="addCouponCode(item)"
-                      :class="{
-                        selected:
-                          selectedCoupon &&
-                          item.CouponCode === selectedCoupon.CouponCode,
-                      }"
+                     v-for="item in couponList"
+                     :key="item.CouponCode"
+                     @click="addCouponCode(item)"
+                     :class="{ selected: selectedCoupon && item.CouponCode === selectedCoupon.CouponCode }"
                     >
                       <div class="header">
                         <span>
@@ -116,45 +80,26 @@
                           <i class="is-bold is-font-30">{{ item.Amount }}</i>
                         </span>
                         <span class="is-font-12">
-                          满<i class="is-font-14">{{ item.MinPayAmount }}</i
-                          >元可用
+                          满<i class="is-font-14">{{ item.MinPayAmount }}</i>元可用
                         </span>
                       </div>
                       <div class="content is-font-12">
                         <p>
                           <span>限产品：</span>
-                          <el-tooltip
-                            class="item"
-                            effect="dark"
-                            :enterable="false"
-                            placement="top-start"
-                          >
+                          <el-tooltip class="item" :enterable="false" placement="top-start">
                             <ul slot="content">
-                              <li
-                                v-for="(it, i) in item.ProductString.split(
-                                  '\n'
-                                )"
-                                :key="i"
-                              >
-                                {{ it }}
-                              </li>
+                              <li v-for="(it, i) in item.ProductString.split('\n')" :key="i">{{it}}</li>
                             </ul>
-                            <span class="product">{{
-                              item.ProductString
-                            }}</span>
+                            <span class="product">{{item.ProductString}}</span>
                           </el-tooltip>
                         </p>
                         <p>
                           <span>有效期至：</span>
-                          <span>{{
-                            item.ValidEndTime | format2MiddleLangTypeDate
-                          }}</span>
+                          <span>{{ item.ValidEndTime | format2MiddleLangTypeDate }}</span>
                         </p>
                       </div>
                       <div class="aside">点击选择</div>
-                      <!-- <el-tooltip class="item" effect="dark" content="点击取消" placement="top"> -->
                       <div class="icon-box"></div>
-                      <!-- </el-tooltip> -->
                     </li>
                   </ul>
                   <footer v-else>
@@ -168,10 +113,8 @@
                 </section>
               </el-collapse-item>
             </el-collapse>
-          </footer>
         </section>
       </article>
-      <!-- <AddShowChangeComp ref="AddShowChangeComp" /> -->
       <ConsigneeAddressSetpComp
        ref="oConsigneeAddressSetpComp"
        :disabled="isUploading"
@@ -355,7 +298,6 @@ export default {
       this.priceGetErrMsg = '';
       this.isGettingPrice = true;
       this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
-      console.log(this.$refs.oSubmitBox.fileContent);
       const fileContent = this.$refs.oSubmitBox ? this.$refs.oSubmitBox.fileContent : '';
       const msg = await this.getProductPrice(fileContent);
       this.isGettingPrice = false;
@@ -374,14 +316,15 @@ export default {
         TypeID: this.curProductClass.Second,
         ProductID: this.curProductID,
       };
+      this.couponList = [];
       setTimeout(async () => {
-        const res = await this.api.getCouponList(_obj);
-        if (res.data.Status !== 1000) return;
+        const res = await this.api.getCouponList(_obj).catch(() => null);
+        if (!res || res.data.Status !== 1000) return;
         this.couponList = res.data.Data;
         this.isCouponGet = true;
       }, 200);
     },
-    onBtnClick(evt) {
+    onCouponUseClick(evt) { // 使用优惠券按钮点击事件
       let { target } = evt;
       if (target.nodeName === 'SPAN') {
         target = evt.target.parentNode;
@@ -632,268 +575,206 @@ export default {
     }
     > article {
       > .coupon-calculate-price-wrap {
-        position: relative;
-        > header {
-          text-align: left;
-          position: absolute;
-          top: 0px;
-          left: 165px;
-          > button {
-            position: absolute;
-            width: 120px;
-            padding: 0;
-            height: 40px;
-            line-height: 38px;
-            margin-right: 28px;
-            padding-right: 4px;
-            vertical-align: top;
-            top: 0;
-            left: -18px;
-            > i {
-              font-size: 16px;
-              vertical-align: -1px;
-            }
-          }
-          .ml-0 {
-            margin-left: -12px;
-            margin-right: 12px !important;
-          }
-          .place-price-result {
-            left: 130px;
-            width: 568px;
-          }
-          > .result {
-            display: inline-block;
-            margin-right: 6px;
-            line-height: 33px;
-            white-space: normal;
-            position: absolute;
-            left: 160px;
-            top: 2px;
-            width: 538px;
-            display: flex;
-            align-items: center;
-            max-height: 80px;
-            min-height: 34px;
-            > span,
-            > div > span {
-              margin-right: 20px;
-              float: left;
-              &.no-margin {
-                margin: 0;
-              }
-              &.mg-left {
-                margin-left: -10px;
-              }
-            }
+        > .el-collapse {
+          border: none;
+          > .el-collapse-item {
             > div {
-              white-space: normal;
-              display: flex;
-              flex-wrap: wrap;
-              overflow: hidden;
-            }
-            > em {
-              margin-right: 18px;
-            }
-            &.center::before {
-              content: "";
-              display: inline-block;
-              height: 100%;
-              vertical-align: middle;
-              margin-right: -0.25em; /* Adjusts for spacing */
-            }
-            .error-msg {
-              line-height: 24px;
-            }
-          }
-        }
-        > footer {
-          > .el-collapse {
-            border: none;
-            > .el-collapse-item {
-              > div {
-                &::after {
-                  content: "";
-                  display: block;
-                  clear: both;
-                }
-                > .el-collapse-item__header {
-                  text-align: left;
-                  // justify-content: flex-end;
-                  display: inline-block;
-                  border: none;
-                  float: left;
-                  cursor: unset;
-                  margin-bottom: 10px;
-                  height: auto;
-                  min-height: 66px;
-                  line-height: 66px;
-                  > span {
-                    display: inline;
-                    color: #888;
-                    cursor: unset;
-                  }
+              > .el-collapse-item__header {
+                text-align: left;
+                display: inline-block;
+                border: none;
+                cursor: unset;
+                margin-bottom: 10px;
+                min-height: 66px;
+                height: auto;
+                .btns-box {
                   > button {
                     display: inline-block;
                     border-radius: 5px;
                     height: 40px;
                     width: 120px;
-                    line-height: 28px;
                     padding: 0;
                     vertical-align: top;
-                    padding-left: 8px;
+                    margin-right: 32px;
+                    margin-left: 0;
                     > span > i {
                       transition: 0.2s;
+                      margin-left: 8px;
+                    }
+                    > i {
+                      font-size: 16px;
+                      vertical-align: -1px;
+                    }
+                    &:first-of-type {
+                      padding-left: 4px;
                     }
                   }
-                  > i {
-                    display: none;
-                  }
-                  &.is-active > button > span > i {
-                    transform: rotate(180deg);
+                  .err-or-selected-coupon-info-box {
+                    display: inline-block;
+                    vertical-align: top;
+                    line-height: 26px;
+                    white-space: nowrap;
+                    height: 28px;
+                    padding: 6px 0;
+                    > span {
+                      vertical-align: middle;
+                      max-width: 540px;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      display: inline-block;
+                    }
                   }
                 }
+                &.is-active > header > button > span > i {
+                  transform: rotate(180deg);
+                }
+                .el-icon-arrow-right {
+                  display: none;
+                }
+                .mp-quotation-content-tips-box-comp-wrap {
+                  margin-top: 15px;
+                }
               }
-              .el-collapse-item__wrap {
-                border: none;
-                > .el-collapse-item__content {
-                  padding: 0;
-                  > .coupon-wrap {
-                    > header {
-                      margin-bottom: 50px;
-                      margin-top: 35px;
-                      text-align: center;
-                      > .el-input {
-                        width: 300px;
-                        > input {
-                          height: 30px;
-                          line-height: 26px\0;
-                        }
-                      }
-                      > span {
-                        color: #888;
-                        margin-right: 6px;
-                      }
-                      > button {
+            }
+            .el-collapse-item__wrap {
+              border: none;
+              > .el-collapse-item__content {
+                padding: 0;
+                > .coupon-wrap {
+                  > header {
+                    margin-bottom: 50px;
+                    margin-top: 35px;
+                    text-align: center;
+                    > .el-input {
+                      width: 300px;
+                      > input {
                         height: 30px;
-                        width: 70px;
-                        line-height: 28px;
-                        padding: 0;
-                        margin-left: 20px;
+                        line-height: 26px\0;
                       }
                     }
-                    > .coupon-list {
-                      padding: 0 8px;
-                      max-height: 322px;
-                      overflow-y: auto;
-                      > li {
-                        width: 240px;
-                        height: 135px;
-                        box-shadow: 0px 5px 7px 1px rgba(238, 238, 238, 0.7);
-                        border-radius: 5px;
+                    > span {
+                      color: #888;
+                      margin-right: 6px;
+                    }
+                    > button {
+                      height: 30px;
+                      width: 70px;
+                      line-height: 28px;
+                      padding: 0;
+                      margin-left: 20px;
+                    }
+                  }
+                  > .coupon-list {
+                    padding: 0 8px;
+                    max-height: 322px;
+                    overflow-y: auto;
+                    > li {
+                      width: 240px;
+                      height: 135px;
+                      box-shadow: 0px 5px 7px 1px rgba(238, 238, 238, 0.7);
+                      border-radius: 5px;
+                      overflow: hidden;
+                      position: relative;
+                      display: inline-block;
+                      margin: 0 18px 20px;
+                      user-select: none;
+                      cursor: pointer;
+                      > .header {
+                        width: 100%;
+                        height: 60px;
+                        background-color: #9399ff;
+                        padding: 5px 20px 0;
+                        box-sizing: border-box;
+                        color: #fff;
+                        float: left;
+                        span.is-font-12 {
+                          vertical-align: 28%;
+                          margin-left: 23px;
+                        }
+                      }
+                      > .content {
+                        padding: 10px 20px 0;
                         overflow: hidden;
-                        position: relative;
-                        display: inline-block;
-                        margin: 0 18px 20px;
-                        user-select: none;
-                        cursor: pointer;
-                        > .header {
-                          width: 100%;
-                          height: 60px;
-                          background-color: #9399ff;
-                          padding: 5px 20px 0;
-                          box-sizing: border-box;
-                          color: #fff;
-                          float: left;
-                          span.is-font-12 {
-                            vertical-align: 28%;
-                            margin-left: 23px;
-                          }
-                        }
-                        > .content {
-                          padding: 10px 20px 0;
-                          overflow: hidden;
-                          > p {
-                            > span {
-                              color: #888;
-                              vertical-align: top;
-                              &.product {
-                                color: #585858;
-                                max-width: 160px;
-                                display: inline-block;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                              }
+                        > p {
+                          > span {
+                            color: #888;
+                            vertical-align: top;
+                            &.product {
+                              color: #585858;
+                              max-width: 160px;
+                              display: inline-block;
+                              white-space: nowrap;
+                              overflow: hidden;
+                              text-overflow: ellipsis;
                             }
-                            white-space: nowrap;
-                            line-height: 27px;
                           }
+                          white-space: nowrap;
+                          line-height: 27px;
                         }
-                        > .aside {
-                          position: absolute;
-                          top: 0;
-                          right: 0;
-                          bottom: 0;
-                          width: 40px;
-                          writing-mode: vertical-rl;
-                          padding: 28px 8px 12px 0;
-                          box-sizing: border-box;
-                          font-size: 14px;
-                          color: #fff;
-                          background-color: rgba($color: #428dfa, $alpha: 0.6);
-                          text-align: justify;
-                          text-justify: distribute-all-lines;
-                          text-align-last: justify;
-                          cursor: pointer;
-                          display: none;
-                          user-select: none;
-                          z-index: 9;
-                          transition: 2s;
-                          &:hover {
-                            background-color: rgba($color: #428dfa, $alpha: 0.72);
-                          }
-                          &:active {
-                            background-color: rgba($color: #428dfa, $alpha: 0.88);
-                          }
+                      }
+                      > .aside {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        bottom: 0;
+                        width: 40px;
+                        writing-mode: vertical-rl;
+                        padding: 28px 8px 12px 0;
+                        box-sizing: border-box;
+                        font-size: 14px;
+                        color: #fff;
+                        background-color: rgba($color: #428dfa, $alpha: 0.6);
+                        text-align: justify;
+                        text-justify: distribute-all-lines;
+                        text-align-last: justify;
+                        cursor: pointer;
+                        display: none;
+                        user-select: none;
+                        z-index: 9;
+                        transition: 2s;
+                        &:hover {
+                          background-color: rgba($color: #428dfa, $alpha: 0.72);
                         }
+                        &:active {
+                          background-color: rgba($color: #428dfa, $alpha: 0.88);
+                        }
+                      }
+                      > .icon-box {
+                        width: 40px;
+                        height: 42px;
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                        display: none;
+                        cursor: pointer;
+                        background: url("../../../assets/images/coupon-selected.png")
+                          no-repeat right bottom / 100% 100%;
+                        &:hover {
+                          opacity: 0.75;
+                        }
+                      }
+                      &:hover > .aside {
+                        display: block;
+                      }
+                      &.selected {
                         > .icon-box {
-                          width: 40px;
-                          height: 42px;
-                          position: absolute;
-                          right: 0;
-                          bottom: 0;
-                          display: none;
-                          cursor: pointer;
-                          background: url("../../../assets/images/coupon-selected.png")
-                            no-repeat right bottom / 100% 100%;
-                          &:hover {
-                            opacity: 0.75;
-                          }
-                        }
-                        &:hover > .aside {
                           display: block;
                         }
-                        &.selected {
-                          > .icon-box {
-                            display: block;
-                          }
-                          &:hover > .aside {
-                            display: none;
-                          }
+                        &:hover > .aside {
+                          display: none;
                         }
                       }
                     }
-                    > footer {
-                      text-align: center;
-                      color: #989898;
-                      font-size: 12px;
-                      padding: 30px;
-                      padding-top: 10px;
-                      line-height: 20px;
-                      > .span-title-blue {
-                        margin-left: 6px;
-                      }
+                  }
+                  > footer {
+                    text-align: center;
+                    color: #989898;
+                    font-size: 12px;
+                    padding: 30px;
+                    padding-top: 10px;
+                    line-height: 20px;
+                    > .span-title-blue {
+                      margin-left: 6px;
                     }
                   }
                 }
