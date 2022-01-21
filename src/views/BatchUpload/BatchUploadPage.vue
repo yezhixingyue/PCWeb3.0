@@ -71,6 +71,7 @@
           @removeSelected='handleRemoveSelected'
           @checkAll='handleCheckAll'
           @clearSuccess='handleClearSuccess'
+          :address='address'
           />
       </div>
     </footer>
@@ -89,6 +90,7 @@
             @removeSelected='handleRemoveSelected'
             @checkAll='handleCheckAll'
             @clearSuccess='handleClearSuccess'
+            :address='address'
             />
         </div>
       </footer>

@@ -247,6 +247,7 @@ export default {
       { label: '已拒绝', value: 3 },
       { label: '已取消', value: 255 },
     ],
+    NoticeList: [], // 公告列表
     // initLoading: false, // 初始下单页面 加载初始化信息loading展示
   },
   getters: {
@@ -396,7 +397,9 @@ export default {
       state.customerInfo.AuthenInfo.SellArea = { ...SellArea };
       state.customerInfo.AuthStatus = 2;
     },
-
+    setNoticeList(state, list) {
+      state.NoticeList = list;
+    },
   },
   actions: {
     async getCustomerDetail({ state, commit }, key = false) { // 获取账号基本信息
@@ -464,6 +467,14 @@ export default {
       if (res.data.Status === 1000) {
         commit('setExpressList', res.data.Data);
         sessionStorage.setItem('expressList', JSON.stringify(res.data.Data));
+        return true;
+      }
+      return false;
+    },
+    async getNoticeList({ commit }) {
+      const resp = await api.getNoticeList().catch(() => null);
+      if (resp && resp.data.Status === 1000) {
+        commit('setNoticeList', resp.data.Data);
         return true;
       }
       return false;

@@ -58,7 +58,7 @@
             <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
           </li>
           <li>
-            <template v-if="MinimumCost < FullPayout">
+            <template v-if="MinimumCost <= FullPayout">
               <span class="label">支付方式：</span>
               <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
             </template>
@@ -300,6 +300,7 @@ export default {
   > .mp-place-order-panel-comp-order-submit-comfirm-dialog-comp-wrap {
     display: table;
     border-radius: 5px;
+    margin-bottom: 10px;
     > .el-dialog__header {
       padding: 0;
       > header {

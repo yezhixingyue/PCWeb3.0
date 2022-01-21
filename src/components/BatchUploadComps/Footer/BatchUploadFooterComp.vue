@@ -14,7 +14,7 @@
       </template>
       <span class="blue-span" @click="onClearClick" >清除已上传订单</span>
       <span class="span-title-pink" @click="onRemoveClick" :class="{disabled: multipleSelection.length === 0}">删除选中订单</span>
-      <el-button type="primary" @click="onUploadClick" :disabled='multipleSelection.length === 0'>上传选中订单</el-button>
+      <el-button type="primary" @click="onUploadClick" :disabled='disabled'>上传选中订单</el-button>
     </div>
   </div>
 </template>
@@ -51,6 +51,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    address: {
+      type: Object,
+      default: null,
+    },
   },
   computed: {
     checked: {
@@ -67,9 +71,21 @@ export default {
     isIndeterminate() {
       return this.multipleSelection.length > 0 && this.multipleSelection.length < this.canSelectList.length;
     },
+    disabled() {
+      return this.multipleSelection.length === 0;
+    },
+    expressDisabled() {
+      return !this.address
+       || (!this.address.Address.Express.First && this.address.Address.Express.First !== 0)
+       || (!this.address.Address.Express.Second && this.address.Address.Express.Second !== 0);
+    },
   },
   methods: {
     onUploadClick() {
+      if (this.expressDisabled) {
+        this.messageBox.failSingleError({ title: '上传失败', msg: '未设置配送方式' });
+        return;
+      }
       this.$emit('uploadSelected');
     },
     onRemoveClick() {

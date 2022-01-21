@@ -155,9 +155,11 @@ const getMaterialConditionTextByMaterialOriginData = ({ MaterialOriginData, Oper
       _join = true;
     }
     let optionLabel = getNameFromListByIDs(_value, list);
-    if (_join) optionLabel = ` ${optionLabel.join('、')}等其中一种`;
+    if (_join) optionLabel = ` ${optionLabel.join('、')}其中一种`;
     if (optionLabel) {
-      return `${MaterialOriginData.Name}${OperatoText}${optionLabel}`;
+      const _OperatoText = OperatoText === '不等于' ? '不是' : OperatoText;
+      // _OperatoText = _OperatoText === '等于' ? '是' : _OperatoText;
+      return `${MaterialOriginData.Name}${_OperatoText}${optionLabel}`;
     }
   }
   return '';

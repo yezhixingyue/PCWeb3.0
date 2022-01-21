@@ -63,7 +63,7 @@
       <div class="tips-box-wrap">
         <TipsBox />
       </div>
-      <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' top="4%"
+      <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' top="2%"
        isSubmitType :requestObj='requestObj' :FileCount='FileCount' @submit="handleSubmit" />
       <Dialog2Pay @close='handleCodeDialogClose' />
     </div>

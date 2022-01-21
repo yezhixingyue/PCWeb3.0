@@ -579,6 +579,9 @@ export default {
       if (state.addressInfo4PlaceOrder.OutPlate.Second) _data.OutPlate = state.addressInfo4PlaceOrder.OutPlate;
       // 填充收货地址与配送方式
       _data.Address = CommonClassType.getAddress4SubmitFromEditObj(state.addressInfo4PlaceOrder);
+      if (_data.Address?.Express?.First === '' && _data.Address?.Express?.Second === '') {
+        delete _data.Address;
+      }
       let key = true;
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;

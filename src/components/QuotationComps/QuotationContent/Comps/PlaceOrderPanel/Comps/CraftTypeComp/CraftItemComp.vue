@@ -227,7 +227,7 @@ export default {
             this.required = false;
             const list = newVal[0]._ConditionTextList || [];
             this.ConditionTextForCraftDisabled = list.length > 0
-              ? `当 ${list.join('\r\n并且 ')} 时，\r\n禁用${this.craftTitleObj && this.craftTitleObj.Name ? this.craftTitleObj.Name : '该工艺'}`
+              ? `当 ${list.join('\r\n并且 ')} 时，\r\n不能做${this.craftTitleObj && this.craftTitleObj.Name ? `${this.craftTitleObj.Name}工艺` : '该工艺'}`
               : '';
             if (this.value && !(this.value.disabledByInteraction && !this.value.requiredByInteraction)) {
             // this.$emit('change', { ...this.value, disabledByInteraction: true, requiredByInteraction: false });

@@ -125,6 +125,9 @@ const api = {
   getExpressList() { // 获取配送方式
     return instance.get('/Api/Express/List', { closeLoading: true });
   },
+  getNoticeList() { // GET /Api/Notice/List  获取公告列表   showNumber 默认10条
+    return instance.get('/Api/Notice/List', { closeLoading: true, params: { showNumber: 3 } });
+  },
   getAddressIDList(data) { // 查询地址ID
     return instance.get(`/Api/District/List?parentID=${data}`, { closeLoading: true });
   },

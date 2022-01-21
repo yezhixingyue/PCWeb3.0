@@ -331,6 +331,7 @@ export default {
           this.$store.dispatch('Quotation/getProductClassify'),
           this.$store.dispatch('common/getCustomerDetail'),
           this.$store.dispatch('common/getExpressList'),
+          this.$store.dispatch('common/getNoticeList'),
         ]);
       }
       if (showLoading) loadingInstance.close();

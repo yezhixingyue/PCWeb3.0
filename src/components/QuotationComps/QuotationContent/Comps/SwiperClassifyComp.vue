@@ -154,6 +154,10 @@ export default {
           background-color: #428dfa;
         }
       }
+      &:focus.is-active.is-focus:not(:active) {
+        outline: none;
+        box-shadow: none;
+      }
     }
   }
   .el-tabs--card > .el-tabs__header .el-tabs__item:first-child {

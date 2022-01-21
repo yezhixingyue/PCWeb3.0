@@ -452,6 +452,7 @@ export default {
 .mp-quotation-product-quotation-content-wrap {
   width: 1200px;
   margin: 25px auto 30px;
+  margin-top: 0;
   font-size: 14px;
   color: #585858;
   overflow: hidden;

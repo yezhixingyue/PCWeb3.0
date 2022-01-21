@@ -3,6 +3,12 @@
     <header>
       <PlaceOrderProductClassifyComp />
     </header>
+    <div class="notice-box" :class="{hasContent: NoticeList.length > 0}">
+      <template v-if="NoticeList.length > 0">
+        <i></i>
+        <a :href="it.Url" target="_blank" v-for="(it, i) in NoticeList" :key="i">{{it.Title}}</a>
+      </template>
+    </div>
     <div class="content">
       <div v-if='initPageText' class="empty">
         <div>
@@ -38,7 +44,7 @@ export default {
   },
   computed: {
     ...mapState('Quotation', ['curProductInfo2Quotation', 'initPageText', 'productNames']),
-    ...mapState('common', ['customerInfo']),
+    ...mapState('common', ['customerInfo', 'NoticeList']),
   },
   data() {
     return {
@@ -141,6 +147,47 @@ export default {
         width: 545px;
         user-select: none;
       }
+    }
+  }
+  > .notice-box {
+    padding: 15px 0;
+    width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+    line-height: 22px;
+    display: flex;
+    > a {
+      display: inline-block;
+      flex: 0 1 auto;
+      height: 22px;
+      font-size: 12px;
+      vertical-align: top;
+      margin-right: 10px;
+      color: #f4a307;
+      background-color: rgba($color: #f4a307, $alpha: 0.08);
+      border-radius: 11px;
+      padding: 0 16px;
+      cursor: pointer;
+      max-width: 500px;
+      max-width: 380px\9\0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    > i {
+      display: inline-block;
+      flex: none;
+      margin: 0 6px;
+      height: 22px;
+      width: 16px;
+      vertical-align: top;
+      background: url('../../assets/images/horn2.png') no-repeat center center/100% 13px;
+    }
+    &.hasContent {
+      padding: 9px 0;
     }
   }
 }
