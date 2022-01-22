@@ -17,21 +17,32 @@
     <div class="footer price-box">
       <div>
         <span class="label">原价：</span>
-        <span class="text">{{OriginalPrice}}元</span>
+        <span class="text">{{OriginalPrice | formatNumber}}元</span>
       </div>
-      <div v-if="!PromoteAmount || PromoteAmount > 0">
+      <div>
+        <span class="label w">成交价：</span>
+        <span class="text is-origin is-font-15 is-bold">{{FinalPrice | formatNumber}}<i class="is-font-14">元</i></span>
+      </div>
+      <div>
+        <span class="label">已付：</span>
+        <span class="text">{{havePaid | formatNumber}}元</span>
+        <!-- <span class="remark">（ <i class="freight">印豆：{{Freight | formatNumber}}元</i> ）</span> -->
+      </div>
+      <div>
+        <span class="label">退款：</span>
+        <span class="text">{{Refund | formatNumber}}元</span>
+      </div>
+      <!-- <div v-if="PromoteAmount || PromoteAmount > 0">
         <span class="label">活动：</span>
         <span class="text" :class="{'is-pink': !!PromoteAmount}">{{ PromoteAmount ? `${PromoteAmount > 0 ? '-' : ''}${Math.abs(PromoteAmount)}` : 0}}元</span>
-      </div>
+      </div> -->
       <div v-if="!CouponAmount || CouponAmount > 0">
-        <span class="label">优惠券：</span>
+        <span class="label w">优惠券：</span>
         <span class="text" :class="{'is-pink': !!CouponAmount}">{{ CouponAmount ? `${CouponAmount > 0 ? '-' : ''}${Math.abs(CouponAmount)}` : 0}}元</span>
       </div>
       <div>
-        <span class="label">成交价：</span>
-        <span class="text is-pink is-font-14">{{FinalPrice}}元</span>
-        <span class="remark">（ <i class="freight">运费：{{Freight | formatNumber}}元</i>
-        <i>重量：{{Weight}}kg</i> ）</span>
+        <span class="label">未付：</span>
+        <span class="text">{{Unpaid | formatNumber}}元</span>
       </div>
     </div>
   </PanelItemComp>
@@ -99,12 +110,21 @@ export default {
     FinalPrice() {
       return this.OrderData ? this.OrderData.Funds.FinalPrice : 0;
     },
+    havePaid() {
+      return this.OrderData ? this.OrderData.Funds.HavePaid : 0;
+    },
+    Refund() {
+      return this.OrderData ? this.OrderData.Funds.Refund : 0;
+    },
+    Unpaid() {
+      return this.OrderData ? this.OrderData.Funds.Unpaid : 0;
+    },
     CouponAmount() {
       return this.OrderData ? this.OrderData.Funds.CouponAmount : 0;
     },
-    PromoteAmount() {
-      return +(this.OriginalPrice - this.FinalPrice - this.CouponAmount).toFixed(2);
-    },
+    // PromoteAmount() {
+    //   return +(this.OriginalPrice - this.FinalPrice - this.CouponAmount).toFixed(2);
+    // },
     Freight() {
       if (!this.OrderDetail) return this.OrderPreData.Freight;
       return this.OrderDetail.Funds.Freight;
@@ -173,24 +193,36 @@ export default {
     overflow: hidden;
     > .footer.price-box {
       padding-top: 5px;
+      padding-top: 15px \9\0;
+      box-sizing: border-box;
       display: flex;
       align-items: flex-end;
       flex-wrap: wrap;
       align-content: center;
+      height: 100px !important;
+      border-top: 1px dashed #eee;
       > div {
         display: inline-block;
         line-height: 24px;
-        margin-right: 28px;
+        margin-right: 12px;
         > span.label {
-          color: #888;
+          color: #585858;
           float: left;
           margin-right: 2px;
+          font-size: 12px;
+          min-width: 3em;
+          text-align: right;
+          &.w {
+            width: 56px;
+            text-align: center;
+          }
         }
         > span.text {
           color: #585858;
-          font-size: 12px;
           overflow: hidden;
           min-height: 22px;
+          min-width: 60px;
+          display: inline-block;
         }
         > span.remark {
           font-size: 12px;

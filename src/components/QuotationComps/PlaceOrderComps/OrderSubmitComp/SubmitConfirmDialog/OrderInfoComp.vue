@@ -59,7 +59,7 @@
         <div class="text">{{ FileAuthorMobile }}</div>
       </li>
       <li v-if="Weight">
-        <span class="label">货品重量：</span>
+        <span class="label">印品重量：</span>
         <div class="text">{{ Weight }}kg</div>
       </li>
       <li v-if="!isCar && OrderDetail">

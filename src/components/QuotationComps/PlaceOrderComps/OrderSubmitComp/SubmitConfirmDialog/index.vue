@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="localVisible"
-    width="760px"
+    width="850px"
     custom-class="mp-place-order-panel-comp-order-submit-comfirm-dialog-comp-wrap"
     v-dialogDrag
     @open="onOpen"
@@ -58,7 +58,7 @@
             <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
           </li>
           <li>
-            <template v-if="MinimumCost <= FullPayout">
+            <template v-if="MinimumCost < FullPayout">
               <span class="label">支付方式：</span>
               <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
             </template>
@@ -332,7 +332,7 @@ export default {
           vertical-align: top;
           text-align: left;
           &.left {
-            width: 380px;
+            width: 480px;
             height: 100%;
           }
           &.right {
@@ -372,7 +372,7 @@ export default {
                 }
               }
               > ul.content {
-                height: 365px;
+                height: 350px;
                 overflow-y: auto;
               }
               > div.footer {
@@ -384,7 +384,8 @@ export default {
         &.is-detail {
           height: 560px;
           > div .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap .panel-content > ul.content {
-            height: 435px;
+            height: 410px;
+            margin-bottom: 10px;
           }
           > div.right > div {
             &.express {
@@ -436,13 +437,13 @@ export default {
           .el-tabs__content {
             padding: 28px 0 12px;
             height: 560px;
-            width: 740px;
+            width: 810px;
             .mp-common-detail-comp-wrap.is-detail {
               > .left {
-                width: 396px;
+                width: 480px;
               }
               > .right {
-                width: 308px;
+                width: 300px;
               }
             }
             .mp-pc-order-detail-page-progress-comp-wrap {
@@ -491,22 +492,27 @@ export default {
       }
       > footer {
         text-align: right;
-        margin-top: 13px;
+        margin-top: 8px;
         padding-right: 10px;
         > .mp-quotation-content-tips-box-comp-wrap {
-          width: 702px;
+          width: 790px;
           margin-left: 8px;
           max-height: 60px;
           overflow-y: auto;
+          padding-top: 0px;
+          padding-bottom: 13px;
           > .tips {
             margin: 0;
+            > li {
+              color: #f4a107;
+            }
           }
         }
         > ul {
           padding-right: 2px;
-          padding-bottom: 12px;
+          padding-bottom: 13px;
           > li {
-            padding: 5px 0;
+            padding: 3px 0;
             line-height: 20px;
             > .content {
               min-width: 120px;

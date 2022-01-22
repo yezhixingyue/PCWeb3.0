@@ -84,7 +84,7 @@ export default {
   text-align: left;
   width: 850px;
   > ul.tips {
-    background-color: rgba($color: #F4A307, $alpha: 0.04);
+    // background-color: rgba($color: #ff3769, $alpha: 0.04);
     border-radius: 5px;
     position: relative;
     padding-bottom: 3px;
@@ -93,7 +93,8 @@ export default {
     margin-bottom: 10px;
     > li {
       font-size: 12px;
-      color: #F4A307;
+      // color: #F4A307;
+      color: #ff3769;
       padding: 2px 0 2px 96px;
       &.icon {
         position: absolute;
