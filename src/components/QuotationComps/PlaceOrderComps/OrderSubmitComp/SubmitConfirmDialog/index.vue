@@ -346,7 +346,7 @@ export default {
               &.order {
                 height: 270px;
                 margin-top: 20px;
-                margin-top: 15px\0;
+                // margin-top: 15px\0;
               }
             }
           }
@@ -382,7 +382,7 @@ export default {
           }
         }
         &.is-detail {
-          height: 560px;
+          height: 590px;
           > div .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap .panel-content > ul.content {
             height: 410px;
             margin-bottom: 10px;
@@ -392,7 +392,7 @@ export default {
               height: 235px;
             }
             &.order {
-              height: 305px;
+              height: 335px;
             }
           }
         }
@@ -436,7 +436,7 @@ export default {
           }
           .el-tabs__content {
             padding: 28px 0 12px;
-            height: 560px;
+            height: 590px;
             width: 810px;
             .mp-common-detail-comp-wrap.is-detail {
               > .left {

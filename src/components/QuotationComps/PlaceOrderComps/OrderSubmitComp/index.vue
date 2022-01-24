@@ -173,6 +173,7 @@ export default {
                 confirmButtonText: '继续下单',
                 closeOnClickModal: false,
                 successFunc: async () => {
+                  this.$store.dispatch('common/setIsPopperVisibleAsync', false);
                   this.visible = true;
                 },
                 failFunc: () => {
@@ -181,9 +182,11 @@ export default {
                 },
               });
             } else {
+              this.$store.dispatch('common/setIsPopperVisibleAsync', false);
               this.visible = true;
             }
           } else {
+            this.$store.dispatch('common/setIsPopperVisibleAsync', false);
             this.visible = true;
           }
         } else {
