@@ -8,10 +8,11 @@
     :top="top"
     :close-on-click-modal='false'
     :before-close='handleBeforeClose'
+     :class="{e: isFullType}"
     @closed="onClosed"
   >
-    <header slot="title" v-if="!isFullType">
-      <span>{{!isSubmitType ? '订单详情' : '订单信息'}}</span>
+    <header slot="title">
+      <span v-if="!isFullType">{{!isSubmitType ? '订单详情' : '订单信息'}}</span>
     </header>
     <main v-if="isFullType">
       <el-tabs
@@ -568,6 +569,18 @@ export default {
         .text {
           text-overflow: ellipsis;
         }
+      }
+    }
+  }
+  &.e {
+    > .el-dialog {
+      > .el-dialog__header > header {
+        height: 20px;
+        padding: 0;
+        border: none;
+      }
+      > .el-dialog__body {
+        padding-top: 0;
       }
     }
   }
