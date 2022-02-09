@@ -9,6 +9,7 @@ module.exports = {
   productionSourceMap: process.env.NODE_ENV === 'development', // 是否打包sourcemap
   outputDir: 'myDist',
   publicPath: process.env.NODE_ENV === 'development' ? '' : '/pc/',
+  // publicPath: '',
   devServer: {
     proxy: {
       '/Api': {

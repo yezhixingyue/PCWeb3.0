@@ -475,7 +475,6 @@ export default class ProductDetailTypeShowClass {
         temp.Content = t.List
           .map(it => ProductDetailTypeShowClass.getCraftItemContentName(it, CraftValList, originPartData.CraftList, isDetail))
           .filter(it => it);
-        console.log(temp);
         return temp;
       }
     }

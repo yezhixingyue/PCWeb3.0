@@ -22,15 +22,25 @@ let _rightOpenUrl = '';
 /**
  * 生产 ---- 正式环境
  */
+// if (mode === 'production') {
+//   _homeUrl = 'https://www.mpzj.cn/';
+//   _domain = 'mpzj.cn';
+//   _imgUrl = 'https://order.mpzj.cn:8157/';
+//   _productJumpUrl = 'https://www.mpzj.cn/';
+//   _agreementID = '4';
+//   _statementID = '3';
+//   _baseUrl = '/';
+//   _rightOpenUrl = 'https://order.mpzj.cn/'; // 正确打开地址 如果不是将会自动跳转至该地址
+// }
 if (mode === 'production') {
-  _homeUrl = 'https://www.mpzj.cn/';
-  _domain = 'mpzj.cn';
-  _imgUrl = 'https://order.mpzj.cn:8157/';
-  _productJumpUrl = 'https://www.mpzj.cn/';
+  _homeUrl = 'http://www.ybz888.com/';
+  _domain = 'ybz888.com';
+  _imgUrl = 'http://api.ybz888.com/';
+  _productJumpUrl = 'http://www.ybz888.com/';
   _agreementID = '4';
   _statementID = '3';
   _baseUrl = '/';
-  _rightOpenUrl = 'https://order.mpzj.cn/'; // 正确打开地址 如果不是将会自动跳转至该地址
+  _rightOpenUrl = 'http://order.ybz888.com/'; // 正确打开地址 如果不是将会自动跳转至该地址
 }
 
 /**

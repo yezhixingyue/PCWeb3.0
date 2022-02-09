@@ -289,7 +289,7 @@ export default {
     handleUploadSelected() { // 上传选中文件
       if (this.successedList.length === 0 || this.multipleSelection.length === 0) return;
       // 需要筛选掉已上传成功的文件（已失败文件待定）
-      this.handleBatchUploadFils(this.multipleSelection);
+      this.handleBatchUploadFiles(this.multipleSelection);
     },
     handleClearSuccess() { // 清除已上传订单
       const list = this.successedList.filter(it => it.orderStatus === 'success').map(it => it.key);
@@ -330,7 +330,7 @@ export default {
       });
     },
     handleItemUpload(item) { // 单个文件上传 this.basicObj
-      this.handleBatchUploadFils([item]);
+      this.handleBatchUploadFiles([item]);
     },
     cbToClearSuccessItem(list) { // 上传成功后从已选列表中删除上传成功选项
       if (this.$refs.oTableWrap && this.$refs.oTableWrap.$refs.multipleTable && this.multipleSelection.length > 0) {
@@ -358,7 +358,7 @@ export default {
       this.messageBox.successSingle({ title: '下单并支付成功' });
       this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
     },
-    async handleBatchUploadFils(list) { // 执行单个文件上传或批量上传 （使用同一个方法） -- 在最终下单前 在客户界面 需进行预下单弹窗确认
+    async handleBatchUploadFiles(list) { // 执行单个文件上传或批量上传 （使用同一个方法） -- 在最终下单前 在客户界面 需进行预下单弹窗确认
       // 预下单
       this.preCreateOriginDataList = [];
       const _PreData = await BatchUploadClass.getPreOrderCreate(list, this.basicObj);
@@ -377,7 +377,7 @@ export default {
         ...this.basicObj,
         PayInFull,
       };
-      BatchUploadClass.BatchUploadFils(OriginList, temp, this.handleSubmitSuccess);
+      BatchUploadClass.BatchUploadFiles(OriginList, temp, this.handleSubmitSuccess);
     },
     /**
      * 辅助函数

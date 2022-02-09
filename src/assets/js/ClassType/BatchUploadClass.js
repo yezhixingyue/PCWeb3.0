@@ -219,7 +219,7 @@ export default class BatchUpload {
    * @static
    * @memberof BatchUpload
    */
-  static async BatchUploadFils(list, basicObj, handleSuccessFunc) {
+  static async BatchUploadFiles(list, basicObj, handleSuccessFunc) {
     const loadingInstance = Loading.service({
       lock: true,
       text: '正在读取文件（文件大小会影响读取时间）...',
@@ -279,6 +279,16 @@ export default class BatchUpload {
     loadingInstance.close();
   }
 
+  /**
+   * 批量上传地址发生变化时，重新计算运费，并更新至页面
+   *
+   * @static
+   * @param {*} list 已经解析成功的文件列表数据
+   * @param {*} basicObj
+   * @param {*} onlyAddChange
+   * @returns
+   * @memberof BatchUpload
+   */
   static async getFreightCalculateAfterValidAddressChange(list, basicObj, onlyAddChange) {
     if (!Array.isArray(list) || list.length === 0 || !basicObj) return;
     const { CustomerID, Address } = basicObj;

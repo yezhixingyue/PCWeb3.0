@@ -77,7 +77,6 @@ export default {
         return this.visible;
       },
       set(bool) {
-        console.log(bool);
         this.$emit('update:visible', bool);
       },
     },
