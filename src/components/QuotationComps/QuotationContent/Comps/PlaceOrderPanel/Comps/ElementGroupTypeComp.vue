@@ -2,8 +2,9 @@
   <section class="mp-place-order-panel-element-group-setup-comp-wrap">
     <div v-show="minLength !== maxLength || showTop">
       <span class="blue-span is-font-13" v-show="!hideCtrl" @click="onAddClick" :class="{disabled:List.length >= maxLength || disabled}">
-        <template v-if="List.length >= maxLength">已达次数上限</template>
-        <template v-else>+ 添加{{Property.Name || ''}}</template>
+        <!-- <template v-if="List.length >= maxLength">已达次数上限</template>
+        <template v-else>+ 添加{{Property.Name || ''}}</template> -->
+        <template>+ 添加{{Property.Name || ''}}</template>
       </span>
     </div>
     <ul :class="{'y-display': !IsHorizontalDisplay, hideCtrl: hideCtrl}" ref="groupContent">
