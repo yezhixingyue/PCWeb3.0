@@ -2,8 +2,7 @@
   <section class="mp-place-order-panel-form-item-size-group-comp-wrap">
     <CanFreeCreateSelectComp
       v-show="
-        !isCustomize &&
-        (CustomerSizeList.length > 0 || !Property.AllowCustomer)
+        !isCustomize && CustomerSizeList.length > 0
       "
       v-model="ID"
       :options="CustomerSizeList"

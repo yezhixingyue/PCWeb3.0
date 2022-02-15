@@ -12,8 +12,9 @@
             <el-form-item
               label="文件内容："
               prop="fileContent"
+              class="file-content"
               :rules="[
-                { required: true, message: '请输入文件内容'},
+                { validator: handleFileContentvalidator },
                 { max: 130, message: '文件内容不能超过130个字'},
                 { pattern: /\S+/, message: '文件内容不能全部为空格'},
               ]"
@@ -267,6 +268,26 @@ export default {
       }
       return FileList;
     },
+    handleFileContentvalidator(rule, value, callback) { // 文件内容验证，如果没有上传印刷文件则允许为空，否则为必填
+      if (value) {
+        callback();
+        return;
+      }
+      if (!this.isSpotGoods) {
+        const printFile = this.FileList.find(it => it.IsPrintFile);
+        if (printFile) {
+          const list = this.$refs.FileForm.getAllFileList();
+          if (Array.isArray(list)) {
+            const t = list.find(it => it.ID === printFile.ID);
+            if (t && t.fileList.length > 0) {
+              callback(new Error('请输入文件内容'));
+              return;
+            }
+          }
+        }
+      }
+      callback();
+    },
     getFileCount() {
       let count = 0;
       if (this.FileList.length > 0) {
@@ -508,6 +529,19 @@ export default {
           }
           .el-form-item__error {
             padding-left: 8px;
+          }
+          .file-content {
+            padding-bottom: 20px;
+            .el-form-item__content {
+              position: relative;
+              .design-document {
+                position: absolute;
+              }
+              .el-form-item__error {
+                padding-left: 120px;
+                padding-top: 8px;
+              }
+            }
           }
         }
         &.upload-box {

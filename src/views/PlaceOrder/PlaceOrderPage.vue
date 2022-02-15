@@ -6,7 +6,7 @@
     <div class="notice-box" :class="{hasContent: NoticeList.length > 0}">
       <template v-if="NoticeList.length > 0">
         <i></i>
-        <a :href="it.Url" target="_blank" v-for="(it, i) in NoticeList" :key="i">{{it.Title}}</a>
+        <a :href="it.Url" target="_blank" v-for="(it, i) in NoticeList" :key="i" :style="`max-width:${NoticeList.length > 1 ? '' : 1180}px`">{{it.Title}}</a>
       </template>
     </div>
     <div class="content">
