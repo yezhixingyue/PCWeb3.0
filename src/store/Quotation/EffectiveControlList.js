@@ -23,6 +23,8 @@ export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
     const o = _El.OptionAttribute.OptionList.find(_it => _it.Value === DefaultOrDisabledValue);
     if (o) {
       _t.CustomerInputValues[0].ID = o.ID;
+    } else if (_El.OptionAttribute.CustomizeValue === DefaultOrDisabledValue) {
+      _t.CustomerInputValues[0].ID = '00000000-0000-0000-0000-000000000000';
     }
   }
   return _t;
