@@ -72,15 +72,21 @@
           </router-link>
         </ul>
         <div class="customer-box" v-if="customerInfo">
-          <span>
-            <span @click="handleCustomerNameDetail">{{customerInfo.CustomerName}} </span>
-            <i class="title"><i class="r-5">/ </i> 余额：</i>
-            <i class="price">￥{{customerBalance?customerBalance:0}}</i>
+          <span class="price-box">
+            <label>余额：</label>
+            <span class="price is-pink"><i>￥</i>{{customerBalance?+customerBalance:0}}</span>
+            <i>/</i>
+            <label>印豆：</label>
+            <span class="is-pink">{{BeanNumberBalance?+BeanNumberBalance:0}}个</span>
           </span>
           <el-button round @click.stop="setShowRechange">在线充值</el-button>
           <el-dropdown trigger="click" @command='onCommand'>
+            <!-- <span @click="handleCustomerNameDetail">{{customerInfo.CustomerName}} </span> -->
             <span class="el-dropdown-link">
-              {{formatMobile(customerInfo.Account.Mobile)}}<i class="el-icon-arrow-down el-icon--right"></i>
+              <span class="customer">{{customerInfo.CustomerName}}</span>
+              <i>/</i>
+              <span class="m">{{formatMobile(customerInfo.Account.Mobile)}}</span>
+              <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="mp-pc-my-set-drop-down-wrap">
               <el-dropdown-item
@@ -158,7 +164,7 @@ export default {
     PlaceOrderProductClassifyComp,
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible']),
+    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance']),
     ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
@@ -488,7 +494,7 @@ export default {
           margin-top: 16px;
           margin-bottom: 16px;
           box-sizing: border-box;
-          margin-right: 20px;
+          margin-right: 15px;
           cursor: pointer;
           > i {
             font-size: 19px;
@@ -565,62 +571,32 @@ export default {
         float: right;
         color: #888;
         line-height: 65px;
-        max-width: 470px;
+        max-width: 500px;
         text-align: right;
         white-space: nowrap;
-        > span {
+        > span.price-box {
           font-size: 12px;
           display: inline-block;
-          // max-width: 360px;
           overflow: hidden;
           height: 55px;
           vertical-align: top;
           text-align: end;
-          overflow-x: auto;
-          > span {
-            display: inline-block;
-            margin-right: 4px;
-            max-width: 92px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            vertical-align: -44%;
-            cursor: pointer;
-            &:hover {
-              text-decoration: underline;
-            }
-          }
-          &::-webkit-scrollbar {
-            height: 6px;
-            // background: #fff;
-          }
-          &::-webkit-scrollbar-thumb {
-            height: 4px;
-            background-color: rgba($color: #000000, $alpha: 0.2);
-            border-radius: 2px;
-            cursor: pointer;
-            margin-bottom: 2px;
-          }
+          text-align: right;
           > i {
-            font-size: 14px;
-            height: 55px;
-            display: inline-block;
-            vertical-align: top;
-            &.price {
-              // font-weight: 600;
-              color: #ff3769;
-              font-size: 16px;
-            }
-            &.title {
-              > .r-5 {
-                margin-right: 5px;
-              }
+            font-size: 13px;
+            margin: 0 3px;
+            color: #888;
+          }
+          > .price {
+            font-size: 15px;
+            > i {
+              font-size: 14px;
             }
           }
         }
         > button {
           height: 35px;
-          margin: 0 20px 1px;
+          margin: 0 16px 1px 19px;
           padding: 9px 14px;
           background-color: #fff;
           color: #ff3769;
@@ -628,8 +604,6 @@ export default {
           border-color: #ff3769;
           transition: 0.2s;
           &:hover {
-            // box-shadow: 0 0 3px #fff;
-            // text-shadow: 0 0 1px #fff;
             background-color: #ff3769;
             color: #fff;
           }
@@ -637,13 +611,6 @@ export default {
             background-color: #e62152;
           }
         }
-        // .customer-btn {
-        //   font-size: 14px;
-        //   > i {
-        //     font-size: 15px;
-        //     margin-left: 8px;
-        //   }
-        // }
         > div {
           color: #585858;
           > span {
@@ -655,18 +622,30 @@ export default {
             outline: none;
             z-index: 3;
             transition: 0.2s;
-            // border: 1px solid #428dfa;
+            > .customer {
+              font-size: 12px;
+              color: #888;
+              display: inline-block;
+              max-width: 6em;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              vertical-align: top;
+            }
+            > i {
+              font-size: 13px;
+              font-size: 12px;
+              color: #888;
+              margin: 0 2px;
+            }
             &:hover {
-              // background-color: rgba($color: #428dfa, $alpha: 0.3) !important;
-              // border-color: #000;
-              // background-color:  mix(#428dfa, #000, 90%);;
               color: #333;
-              // background-color: #eee;
               box-shadow: 0 0px 2px 1px rgba(66, 141, 250, 0.8);
-              // color: mix(#f4a307, #fff, 40%);
-              // color: #428dfa;
               > i {
                 color: #428dfa;
+                &:first-of-type {
+                  color: #585858;
+                }
               }
             }
             &:active {

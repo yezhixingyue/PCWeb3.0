@@ -3,8 +3,8 @@
     <el-table stripe border :data="dataList" style="width: 100%" class="ft-14-table">
       <!--  :max-height="h" :height="h" -->
       <el-table-column prop="BillID" label="流水号" width="220" show-overflow-tooltip></el-table-column>
-      <el-table-column label="金额" width="150" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.Amount }}元</template>
+      <el-table-column :label="BillTypeTitle" width="150" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.Amount }}{{BillTypeUnit}}</template>
       </el-table-column>
       <el-table-column label="交易类型" width="130" show-overflow-tooltip>
         <span slot-scope="scope" :class="{'is-pink': scope.row.Type === 21, 'is-success': scope.row.Type === 11}"
@@ -25,17 +25,33 @@
 </template>
 
 <script>
+import { BillTypeEnums } from '@/assets/js/ClassType/Summary/ConditionForBillList';
+
 export default {
   props: {
     dataList: {
       type: Array,
       default: () => [],
     },
+    curBillType: {
+      type: Number,
+      default: BillTypeEnums.FundCash.ID,
+    },
   },
   data() {
     return {
       h: 0,
     };
+  },
+  computed: {
+    BillTypeTitle() {
+      if (this.curBillType === BillTypeEnums.FundCash.ID) return '金额';
+      return '数量';
+    },
+    BillTypeUnit() {
+      if (this.curBillType === BillTypeEnums.FundCash.ID) return '元';
+      return '个';
+    },
   },
   methods: {
     getHeight() {

@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { imgUrl, productJumpUrl } from '@/assets/js/setup';
+import { imgUrl, homeUrl } from '@/assets/js/setup';
 
 export default {
   props: ['asideAboutData', 'asideIntroData', 'productName', 'isError'],
@@ -51,14 +51,14 @@ export default {
   methods: {
     onHomeDetailClick() {
       if (!this.asideIntroData) return;
-      window.open(`${productJumpUrl}product/${this.asideIntroData.Product.ID}.html`);
+      window.open(`${homeUrl}product/${this.asideIntroData.Product.ID}.html`);
     },
     onNewGetClick() {
       this.$emit('getProductAsideIntroData');
     },
     onJumpProductOrder(id) {
       // window.open(`/#/placeOrder?id=${id}`);id
-      window.open(`${productJumpUrl}product/${id}.html`);
+      window.open(`${homeUrl}product/${id}.html`);
     },
   },
 };

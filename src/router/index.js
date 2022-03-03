@@ -18,6 +18,11 @@ const routes = [
     name: 'home',
     redirect: '/placeOrder',
   },
+  {
+    path: '/toPrintBeanHelp',
+    name: 'toPrintBeanHelp',
+    component: () => import('../views/RedirectPage.vue'),
+  },
   // {
   //   path: '/about',
   //   name: 'About',
@@ -309,6 +314,26 @@ const routes = [
           title: '问题反馈列表 - 郑州名片之家电子商务有限公司',
         },
         component: () => import('../views/FeedbackPages/FeedbackList.vue'),
+      },
+      {
+        path: '/beanList',
+        name: 'beanList',
+        meta: {
+          requiresAuth: true,
+          y: 0,
+          title: '购买印豆 - 郑州名片之家电子商务有限公司',
+        },
+        component: () => import('../views/Bean/BeanBuyListPage.vue'),
+      },
+      {
+        path: '/beanPurchaseHistory',
+        name: 'beanPurchaseHistory',
+        meta: {
+          requiresAuth: true,
+          y: 0,
+          title: '印豆购买记录 - 郑州名片之家电子商务有限公司',
+        },
+        component: () => import('../views/Bean/BeanPurchaseHistoryPage.vue'),
       },
     ],
   },

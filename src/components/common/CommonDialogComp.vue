@@ -10,9 +10,11 @@
   @opened='onOpened'
   @close='onClose'
   @closed='onClosed'
-
   class="mp-img-style-header mp-erp-common-dialog-comp-wrap"
   :before-close="onCancleClick">
+  <template slot="title">
+    <slot name="title"></slot>
+  </template>
   <slot></slot>
   <span slot="footer" class="dialog-footer">
     <div v-if="$slots['foot-tip']">
@@ -20,7 +22,7 @@
     </div>
     <p>
       <el-button type="primary" :loading='loading' @click="onSubmitClick" v-if="showSubmit" :disabled='disabled'>{{loading?'加载中':submitText}}</el-button>
-      <el-button type="danger"  @click="onDangerClick" v-if="showDanger">{{dangerText}}</el-button>
+      <el-button type="danger"  @click="onDangerClick" v-if="showDanger" :disabled='disabled'>{{dangerText}}</el-button>
       <el-button @click="onCancleClick">{{cancelText}}</el-button>
     </p>
   </span>
@@ -209,6 +211,10 @@ export default {
             &:active {
               border-color: #e4083f;
               background: #e4083f;
+            }
+            &.is-disabled {
+              background: #FF3769 !important;
+              opacity: 0.6 !important;
             }
           }
           &.is-disabled {

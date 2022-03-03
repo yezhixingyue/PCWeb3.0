@@ -163,7 +163,7 @@ export default {
   },
   computed: {
     ...mapState('shoppingCar', ['shoppingDataList', 'shoppingDataNumber']),
-    ...mapState('common', ['ExpressList', 'ScrollInfo', 'customerBalance']),
+    ...mapState('common', ['ExpressList', 'ScrollInfo']),
     ...mapState('Quotation', ['RiskWarningTipsTypes']),
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
@@ -301,26 +301,32 @@ export default {
     async handlePreCreateSubmit(list) {
       const res = await this.$store.dispatch('shoppingCar/getOrderPreCreateFromShoppingCar', list);
       if (res) {
+        console.log(res);
         const { PreCreateData, OriginList } = res;
         this.PreCreateData = PreCreateData;
         this.preCreateOriginDataList = OriginList;
         this.preCreateVisible = true;
       }
     },
-    async onOrderSubmit({ OriginList, PayInFull }) {
+    async onOrderSubmit({ OriginList, PayInFull, UsePrintBean }) {
       this.preCreateVisible = false;
       const List = OriginList.map(it => ({ ...it, Position: 255, IgnoreRiskLevel: this.RiskWarningTipsTypes.All }));
-      const _requestObj = { List, OrderType: 2, PayInFull };
+      const _requestObj = { List, OrderType: 2, PayInFull, UsePrintBean };
       const resp = await this.api.CreateOrderFromPreCreate(_requestObj, { closeLoading: false, closeTip: false }).catch(() => null);
       if (resp && resp.data.Status === 1000) { // 下单成功
         // 修改列表数据状态
         this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', { List, Msg: '已下单', _isOrder: true, _isPaid: false });
         this.multipleSelection = this.multipleSelection.filter(it => !it._isOrder);
         if (resp.data.Data) {
-          const { FundBalance } = resp.data.Data;
-          if (FundBalance !== +this.customerBalance) {
-            this.$store.commit('common/setCustomerBalance', FundBalance);
+          const { FundBalance, FundBeanNumber } = resp.data.Data;
+          const temp = {};
+          if (typeof FundBalance === 'number') {
+            temp.FundBalance = FundBalance;
           }
+          if (typeof FundBeanNumber === 'number') {
+            temp.FundBeanNumber = FundBeanNumber;
+          }
+          this.$store.commit('common/setCustomerBalance', temp);
           this.payInfoData = resp.data.Data;
           this.QrCodeVisible = true;
         } else {

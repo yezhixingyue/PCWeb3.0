@@ -608,7 +608,7 @@ export default {
     },
     /* 下单 - 预下单
     -------------------------------*/
-    async getOrderPreCreate({ state, commit, rootState }, { compiledName, fileContent, FileAuthorMobile, callBack }) {
+    async getOrderPreCreate({ state, commit }, { compiledName, fileContent, FileAuthorMobile, callBack }) {
       // 1. 配置组合生成请求对象
       const _requestObj = { List: [], OrderType: 2, PayInFull: false };
       const _itemObj = {};
@@ -646,9 +646,15 @@ export default {
       const successHandler = (PreCreateData, requestObj) => {
         commit('setCurReqObj4PreCreate', _itemObj);
         commit('setPreCreateData', PreCreateData);
-        const _b = rootState.common.customerBalance;
-        const { FundBalance } = PreCreateData;
-        if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
+        const { FundBalance, FundBeanNumber } = res.data.Data;
+        const temp = {};
+        if (typeof FundBalance === 'number') {
+          temp.FundBalance = FundBalance;
+        }
+        if (typeof FundBeanNumber === 'number') {
+          temp.FundBeanNumber = FundBeanNumber;
+        }
+        commit('common/setCustomerBalance', temp, { root: true });
         if (callBack) callBack();
         return [PreCreateData, requestObj];
       };
@@ -678,9 +684,10 @@ export default {
         if (res.data.DisplayMode !== 3) {
           return new Promise((resolve) => {
             massage.warnCancelBox({
-              title: '存在风险，是否继续下单?',
-              msg: res.data.Message.split('#'),
-              confirmButtonText: '继续下单',
+              title: '注意',
+              msg: [...res.data.Message.split('#'), '继续下单吗？'],
+              confirmButtonText: '是',
+              cancelButtonText: '否',
               closeOnClickModal: false,
               successFunc: async () => {
                 _requestObj.List[0].ProductParams.IsIgnoreRisk = true;
@@ -741,9 +748,10 @@ export default {
           const msgArray = res.data.Data.RiskList.filter(it => it.First === 2).map(it => it.Second);
           if (msgArray.length > 0) {
             massage.warnCancelBox({
-              title: '存在风险，是否继续加入购物车?',
-              msg: msgArray,
-              confirmButtonText: '继续加入',
+              title: '注意',
+              msg: [...msgArray, '继续加入购物车吗？'],
+              confirmButtonText: '是',
+              cancelButtonText: '否',
               successFunc: async () => {
                 _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
                 const resp = await api.getQuotationSave(_itemObj).catch(() => {});
@@ -792,9 +800,15 @@ export default {
       }
       if (submitSuccessFunc) submitSuccessFunc();
       if (res.data.Data) {
-        const _b = rootState.common.customerBalance;
-        const { FundBalance } = res.data.Data;
-        if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
+        const { FundBalance, FundBeanNumber } = res.data.Data;
+        const _temp = {};
+        if (typeof FundBalance === 'number') {
+          _temp.FundBalance = FundBalance;
+        }
+        if (typeof FundBeanNumber === 'number') {
+          _temp.FundBeanNumber = FundBeanNumber;
+        }
+        commit('common/setCustomerBalance', _temp, { root: true });
       }
       commit('setCurPayInfo2Code', res.data.Data);
       commit('clearStateAfterPlaceOrderSuccess');
@@ -822,9 +836,15 @@ export default {
         throw new Error(res.data.Message);
       }
       if (res.data.Data) {
-        const _b = rootState.common.customerBalance;
-        const { FundBalance } = res.data.Data;
-        if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
+        const { FundBalance, FundBeanNumber } = res.data.Data;
+        const temp = {};
+        if (typeof FundBalance === 'number') {
+          temp.FundBalance = FundBalance;
+        }
+        if (typeof FundBeanNumber === 'number') {
+          temp.FundBeanNumber = FundBeanNumber;
+        }
+        commit('common/setCustomerBalance', temp, { root: true });
       }
       commit('setCurPayInfo2Code', res.data.Data);
       commit('clearStateAfterPlaceOrderSuccess');

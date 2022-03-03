@@ -133,7 +133,7 @@ export default {
     },
     /** 未付款单提交第一步
     ---------------------------------------- */
-    async getOrderPreCreateFromUnpayList({ commit, rootState }, list) {
+    async getOrderPreCreateFromUnpayList({ commit }, list) {
       // console.log(list);
       const List = list.map(it => ({ ID: it.OrderID }));
       const _obj = { OrderType: 2, PayInFull: false, List };
@@ -141,9 +141,15 @@ export default {
       if (res.data.Status === 1000) {
         commit('setCurUnpayListData4FirstPlace', res.data.Data);
         commit('setCurUnpayListDataBeforeFirstPlace', list);
-        const _b = rootState.common.customerBalance;
-        const { FundBalance } = res.data.Data;
-        if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
+        const { FundBalance, FundBeanNumber } = res.data.Data;
+        const temp = {};
+        if (typeof FundBalance === 'number') {
+          temp.FundBalance = FundBalance;
+        }
+        if (typeof FundBeanNumber === 'number') {
+          temp.FundBeanNumber = FundBeanNumber;
+        }
+        commit('common/setCustomerBalance', temp, { root: true });
         return true;
       }
       return false;

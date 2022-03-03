@@ -107,7 +107,12 @@ function warnCancelBox({
     if (msg.length === 1) message = msg[0];
     if (msg.length > 1) {
       dangerouslyUseHTMLString = true;
-      const content = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
+      const content = msg
+        .map(it => {
+          const alignDirection = /^继续([\d|\D]+)?吗？$/.test(it) ? 'center' : 'left';
+          return `<li style='text-align:${alignDirection};line-height:18px;margin-bottom:8px'>${it}</li>`;
+        })
+        .join('');
       message = `<ul style='display: inline-block'>${content}</ul>`;
     }
   }

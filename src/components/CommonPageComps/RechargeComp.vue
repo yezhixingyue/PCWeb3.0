@@ -20,16 +20,40 @@
     <ul class="content">
       <li class="step-one" v-if="curStep===0">
         <div class="left">
-          <p>
+          <!-- <p>
             <i class="iconfont icon-yue"></i>
             <span>当前余额：</span>
-          </p>
-          <p class="is-pink"><i class="is-bold is-pink is-font-22">{{customerBalance}}</i>元</p>
+          </p> -->
+          <!-- <p class="is-pink"><i class="is-bold is-pink is-font-22">{{customerBalance}}</i>元</p> -->
+          <ul class="f">
+            <li class="c">
+              <img src="@/assets/images/bean.png" alt="">
+              <span>当前印豆：</span>
+            </li>
+            <li>
+              <span class="is-bold">{{BeanNumberBalance || 0}}</span>
+              <span>个</span>
+            </li>
+          </ul>
+          <ul class="s">
+            <li class="t">
+              <img src="@/assets/images/wen.png" alt="">
+              <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a>
+            </li>
+            <li>
+              <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">购买印豆</span>
+            </li>
+          </ul>
         </div>
         <div class="right">
+          <div>
+            <i class="iconfont icon-yue"></i>
+            <span>当前余额：</span>
+          </div>
+          <span class="is-pink"><i class="is-bold is-pink is-font-22">{{customerBalance || 0}}</i>元</span>
           <span>充值金额：</span>
-          <el-input placeholder="请输入充值金额" v-model="reChargeVal" @keyup.enter.native="handleRecharge" /><i>元</i>
-          <el-button type="danger" @click="handleRecharge">立即充值</el-button>
+          <el-input placeholder="请输入充值金额" :disabled='loading' v-model="reChargeVal" @keyup.enter.native="handleRecharge" /><i>元</i>
+          <el-button type="danger" @click="handleRecharge" :disabled='loading'>立即充值</el-button>
           <!-- <p v-show="errInfo" class="is-pink">{{errInfo}}</p> -->
         </div>
       </li>
@@ -66,7 +90,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('common', ['customerBalance']),
+    ...mapState('common', ['customerBalance', 'BeanNumberBalance']),
     reChargeVal: {
       get() {
         return this.reCharge;
@@ -99,6 +123,7 @@ export default {
       timer: null,
       Amount: 0,
       isShowTips: false, // 是否在弹框显示错误信息
+      loading: false,
     };
   },
   methods: {
@@ -133,8 +158,10 @@ export default {
         });
         return;
       }
-      const res = await this.api.getCustomerRecharge({ Amount: this.Amount });
-      if (res.data.Status === 1000) {
+      this.loading = true;
+      const res = await this.api.getCustomerRecharge({ Amount: this.Amount }).catch(() => null);
+      this.loading = false;
+      if (res && res.data.Status === 1000) {
         this.curStep = 1;
         this.codeSrc = res.data.Data.PayWay.AllinPay;
         this.curPayInfo2Code = res.data.Data;
@@ -189,6 +216,10 @@ export default {
     },
     handleBodyClick() {
       // // console.log('handleBodyClick', e.target);
+      this.handleCloseClick();
+    },
+    onBeanBuyClick() {
+      this.$router.push('/beanList');
       this.handleCloseClick();
     },
   },
@@ -271,28 +302,80 @@ export default {
         > .left {
           margin-top: 30px;
           display: inline-block;
-          width: 310px;
+          width: 300px;
           height: 127px;
           border-right: 1px dashed #eee;
-          padding-top: 75px;
+          padding-top: 72px;
           padding-right: 50px;
-          > p {
-            text-align: right;
+          text-align: right;
+          > ul {
+            display: inline-block;
+            > li {
+              > .is-bold {
+                font-size: 22px;
+              }
+              &.c {
+                line-height: 22px;
+                img {
+                  vertical-align: -5px;
+                  margin-right: 8px;
+                }
+                margin-bottom: 16px;
+                margin-left: -30px;
+              }
+              &.t {
+                img {
+                  vertical-align: -3px;
+                  margin-right: 8px;
+                }
+                margin-bottom: 22px;
+                font-size: 12px;
+                a {
+                  color: #888;
+                  &:hover {
+                    color: #585858;
+                  }
+                }
+              }
+            }
+            &.f {
+              min-width: 140px;
+              text-align: left;
+            }
+            &.s {
+              position: relative;
+              top: -1px;
+            }
+          }
+          .is-disabled {
+            pointer-events: none;
+          }
+          // > p {
+          //   text-align: right;
+          //   > i.iconfont {
+          //     color: rgb(210, 210, 210);
+          //     margin-right: 10px;
+          //     font-size: 18px;
+          //   }
+          //   &.is-pink {
+          //     margin-top: 20px;
+          //   }
+          // }
+        }
+        > .right {
+          display: inline-block;
+          width: 848px;
+          vertical-align: top;
+          margin-top: 104px;
+          > div {
+            margin-bottom: 13px;
+            margin-left: 18px;
             > i.iconfont {
               color: rgb(210, 210, 210);
               margin-right: 10px;
               font-size: 18px;
             }
-            &.is-pink {
-              margin-top: 20px;
-            }
           }
-        }
-        > .right {
-          display: inline-block;
-          width: 820px;
-          vertical-align: top;
-          margin-top: 116px;
           > span {
             margin-left: 48px;
             margin-right: 5px;
@@ -306,10 +389,11 @@ export default {
           }
           > i {
             color: #aaa;
-            margin: 0 48px 0 8px;
+            margin-left: 8px;
           }
           > button {
             width: 130px;
+            margin-left: 48px;
           }
         }
       }

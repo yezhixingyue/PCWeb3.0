@@ -5,7 +5,7 @@ import router from '@/router';
 import store from '../store';
 import messageBox from '../assets/js/utils/message';
 import Cookie from '../assets/js/Cookie';
-import { useCookie, baseUrl } from '../assets/js/setup';
+import { useCookie } from '../assets/js/setup';
 import { delay } from '../assets/js/utils/utils';
 
 let loadingInstance;
@@ -213,6 +213,6 @@ axios.interceptors.response.use(
   },
 );
 
-axios.defaults.baseURL = baseUrl;
+// axios.defaults.baseURL = baseUrl;
 
 export default axios;

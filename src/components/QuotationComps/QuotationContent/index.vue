@@ -148,7 +148,7 @@ import {
   mapState, mapGetters, mapActions,
 } from 'vuex';
 import tipEnums from '@/assets/js/utils/tipEnums';
-import { productJumpUrl } from '@/assets/js/setup';
+import { homeUrl } from '@/assets/js/setup';
 import ComputedResultComp from './Comps/ComputedResultComp.vue';
 // import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
 import ConsigneeAddressSetpComp from '../PlaceOrderComps/ConsigneeAddressSetpComp/index.vue';
@@ -388,7 +388,7 @@ export default {
       }
     },
     onHomeDetailClick() {
-      window.open(`${productJumpUrl}product/${this.placeData.ID}.html`);
+      window.open(`${homeUrl}product/${this.placeData.ID}.html`);
     },
     // 下面为配送地址相关
     async asyncInputchecker() {

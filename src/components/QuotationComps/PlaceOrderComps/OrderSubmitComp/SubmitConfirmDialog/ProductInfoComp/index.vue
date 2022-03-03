@@ -25,8 +25,8 @@
       </div>
       <div>
         <span class="label">已付：</span>
-        <span class="text">{{havePaid | formatNumber}}元</span>
-        <!-- <span class="remark">（ <i class="freight">印豆：{{Freight | formatNumber}}元</i> ）</span> -->
+        <span class="text" :class="{paid: PaidBeanAmount > 0}">{{havePaid | formatNumber}}元</span>
+        <span class="remark" v-if="PaidBeanAmount > 0">（ <i class="freight">印豆抵扣{{PaidBeanAmount | formatNumber}}元</i> ）</span>
       </div>
       <div>
         <span class="label">退款：</span>
@@ -113,6 +113,9 @@ export default {
     havePaid() {
       return this.OrderData ? this.OrderData.Funds.HavePaid : 0;
     },
+    PaidBeanAmount() {
+      return this.OrderData ? this.OrderData.Funds.PaidBeanAmount : 0;
+    },
     Refund() {
       return this.OrderData ? this.OrderData.Funds.Refund : 0;
     },
@@ -192,14 +195,13 @@ export default {
   > .panel-content {
     overflow: hidden;
     > .footer.price-box {
-      padding-top: 5px;
-      padding-top: 15px \9\0;
+      padding-top: 18px;
       box-sizing: border-box;
       display: flex;
       align-items: flex-end;
       flex-wrap: wrap;
       align-content: center;
-      height: 100px !important;
+      height: 90px !important;
       border-top: 1px dashed #eee;
       > div {
         display: inline-block;
@@ -214,7 +216,7 @@ export default {
           text-align: right;
           &.w {
             width: 56px;
-            text-align: center;
+            text-align: left;
           }
         }
         > span.text {
@@ -223,11 +225,17 @@ export default {
           min-height: 22px;
           min-width: 60px;
           display: inline-block;
+          &.paid {
+            min-width: 24px;
+          }
         }
         > span.remark {
           font-size: 12px;
+          display: inline;
+          vertical-align: top;
           > i.freight {
-            margin-right: 15px;
+            margin-right: 0px;
+            color: #989898;
           }
         }
       }

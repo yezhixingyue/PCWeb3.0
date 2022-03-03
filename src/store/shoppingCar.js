@@ -123,15 +123,21 @@ export default {
     },
     /** 购物车提交第一步
     ---------------------------------------- */
-    async getOrderPreCreateFromShoppingCar({ commit, rootState }, list) {
+    async getOrderPreCreateFromShoppingCar({ commit }, list) {
       const _obj = { OrderType: 2, PayInFull: false, List: list };
       const res = await api.getOrderPreCreate(_obj).catch(() => null);
       if (res && res.data.Status === 1000) {
         commit('setCurShoppingCarData4FirstPlace', res.data.Data);
         commit('setCurShoppingCarDataBeforeFirstPlace', list);
-        const _b = rootState.common.customerBalance;
-        const { FundBalance } = res.data.Data;
-        if (FundBalance !== +_b) commit('common/setCustomerBalance', FundBalance, { root: true });
+        const { FundBalance, FundBeanNumber } = res.data.Data;
+        const temp = {};
+        if (typeof FundBalance === 'number') {
+          temp.FundBalance = FundBalance;
+        }
+        if (typeof FundBeanNumber === 'number') {
+          temp.FundBeanNumber = FundBeanNumber;
+        }
+        commit('common/setCustomerBalance', temp, { root: true });
         return { PreCreateData: res.data.Data, OriginList: list };
       }
       return null;

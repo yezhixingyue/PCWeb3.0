@@ -1,5 +1,6 @@
 /* eslint-disable object-curly-newline */
 import api from '@/api';
+import ConditionForBillList from '../assets/js/ClassType/Summary/ConditionForBillList';
 import ClassType from './CommonClassType';
 // import { Message } from 'element-ui';
 // import massage from '@/assets/js/utils/message';
@@ -12,16 +13,7 @@ export default {
     ---------------------------------------- */
     FundBillList: [], // --------- 账单信息列表
     FundBillListNumber: 0,
-    condition4FundBillList: {
-      Date: {
-        First: '',
-        Second: '',
-      },
-      DateType: 'today',
-      Page: 1,
-      PageSize: 12,
-      Type: '',
-    },
+    condition4FundBillList: new ConditionForBillList(),
     /** 售后单页面相关
     ---------------------------------------- */
     ServiceAfterSaleList: [], // --------- 售后信息列表
@@ -107,16 +99,7 @@ export default {
     clearStateForNewCustomer(state) {
       state.FundBillList = [];
       state.FundBillListNumber = 0;
-      state.condition4FundBillList = {
-        Date: {
-          First: '',
-          Second: '',
-        },
-        DateType: 'today',
-        Page: 1,
-        PageSize: 12,
-        Type: '',
-      };
+      state.condition4FundBillList = new ConditionForBillList();
       state.ServiceAfterSaleList = [];
       state.ServiceAfterSaleListNumber = 0;
       state.condition4ServiceAfterSaleList = {
@@ -185,7 +168,7 @@ export default {
       commit('setCondition4FundBillList', [['Page', ''], page]);
       commit('setFundBillList', [[], undefined]);
       commit('setDate4ConditionDate', 'condition4FundBillList');
-      const _obj = ClassType.filter(state.condition4FundBillList);
+      const _obj = ClassType.filter(state.condition4FundBillList, true);
       const res = await api.getCustomerFundBill(_obj);
       if (res.data.Status === 1000) {
         commit('setFundBillList', [res.data.Data, res.data.DataNumber]);

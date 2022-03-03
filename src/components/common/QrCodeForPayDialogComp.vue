@@ -1,13 +1,17 @@
 <template>
   <CommonDialogComp
-    width="600px"
-    top='13vh'
+    :width="width"
+    :top='top'
     title="扫码支付"
     :visible.sync="visible"
     @cancle="visible = false"
     @open='onOpen'
     @closed='onClosed'
+    :class="{'hidden-header': hiddenHeader}"
     class="mp-erp-common-comps-qr-code-for-payment-comp-dialog-comp-wrap">
+    <div class="close" v-if="hiddenHeader">
+      <i class="el-icon-close" @click="visible = false"></i>
+    </div>
     <div class="qr-code-content">
       <template v-if="payInfoData">
         <div class="img-box">
@@ -22,6 +26,19 @@
           <img v-if="QrCodeSrc && visible" v-show="loaded" :src="QrCodeSrc" alt="" @error="onImgLoadError" @load="onLoaded">
         </div>
       </template>
+      <p class="expired-time" v-if="showExpire && ExpiredTimeContent">
+        <span>请您在</span>
+        <span class="is-pink">{{ExpiredTimeContent}}</span>
+        <span>完成支付</span>
+      </p>
+      <p v-if="showPayDescription" class="pay-description"> <!-- 付款方式描述文字 -->
+        <span class="is-gray">【 请使用微信 / 支付宝扫一扫，扫描二维码支付 】</span>
+      </p>
+      <p class="warning is-pink" v-if="showWarning && payInfoData && payInfoData.Warning">[ {{payInfoData.Warning}} ]</p>
+      <p v-if="showAmount && payInfoData" class="amount-box"> <!-- 付款金额信息 -->
+        <span>扫码支付：</span>
+        <span class="is-pink is-bold">￥{{(+payInfoData.Amount).toFixed(2)}}<i class="is-font-13">元</i></span>
+      </p>
       <slot></slot>
     </div>
   </CommonDialogComp>
@@ -44,6 +61,42 @@ export default {
       type: String,
       default: '11',
     },
+    showExpire: { // 是否展示到期付款时间
+      type: Boolean,
+      default: false,
+    },
+    dynamic: { // 是否动态刷新付款时间
+      type: Boolean,
+      default: false,
+    },
+    showPayDescription: { // 是否展示付款方式描述文字
+      type: Boolean,
+      default: false,
+    },
+    showAmount: { // 是否展示付款金额信息
+      type: Boolean,
+      default: false,
+    },
+    showWarning: { // 是否展示警告信息
+      type: Boolean,
+      default: false,
+    },
+    hiddenHeader: { // 是否隐藏弹窗标题
+      type: Boolean,
+      default: false,
+    },
+    width: {
+      type: String,
+      default: '600px',
+    },
+    top: {
+      type: String,
+      default: '13vh',
+    },
+    successTitle: {
+      type: String,
+      default: '付款成功',
+    },
   },
   components: {
     CommonDialogComp,
@@ -58,8 +111,8 @@ export default {
       },
     },
     QrCodeSrc() {
-      if (!this.payInfoData || !this.payInfoData.PayWay) return '';
-      return this.payInfoData.PayWay.AllinPay;
+      if (!this.payInfoData || ((!this.payInfoData.PayWay || !this.payInfoData.PayWay.AllinPay) && !this.payInfoData.PayQRCode)) return '';
+      return this.payInfoData.PayWay ? this.payInfoData.PayWay.AllinPay : this.payInfoData.PayQRCode;
     },
   },
   data() {
@@ -67,6 +120,8 @@ export default {
       timer: null,
       loaded: false,
       loadError: false,
+      ExpiredTimeContent: '',
+      timer4Expired: null,
     };
   },
   methods: {
@@ -75,22 +130,31 @@ export default {
         clearTimeout(this.timer);
         this.timer = null;
       }
+      if (this.timer4Expired) {
+        clearTimeout(this.timer4Expired);
+        this.timer4Expired = null;
+      }
       this.loaded = false;
       this.loadError = false;
+      this.ExpiredTimeContent = '';
+      this.handleExpiredTimeSet();
     },
     onClosed() {
       clearTimeout(this.timer);
       this.timer = null;
+      clearTimeout(this.timer4Expired);
+      this.timer4Expired = null;
       this.loaded = false;
       this.loadError = false;
+      this.ExpiredTimeContent = '';
     },
     onImgLoadError(e) { // 图片下载出错
       this.loadError = true;
       if (e.type === 'error') {
-        this.messageBox.failSingleError(
-          '二维码获取失败！',
-          '[ 获取不到图片，请检查网络或稍后再试 ]',
-        );
+        this.messageBox.failSingleError({
+          title: '二维码获取失败！',
+          msg: '[ 获取不到图片，请检查网络或稍后再试 ]',
+        });
       }
     },
     onLoaded() { // 图片下载完成
@@ -102,11 +166,11 @@ export default {
       if (!this.visible || !this.payInfoData || !this.payInfoData.PayCode) return;
       const resp = await this.api.getPayResult(this.payInfoData.PayCode, this.payType).catch(() => null); // 充值11 消费21
       if (resp && resp.data.Status === 1000 && resp.data.Data === 'True') {
-        this.messageBox.successSingle(
-          '付款成功',
-          this.handleSuccessPaid,
-          this.handleSuccessPaid,
-        );
+        this.messageBox.successSingle({
+          title: this.successTitle,
+          successFunc: this.handleSuccessPaid,
+          failFunc: this.handleSuccessPaid,
+        });
       } else {
         this.timer = setTimeout(() => {
           this.getPayStatusByPolling();
@@ -116,6 +180,45 @@ export default {
     handleSuccessPaid() { // 支付成功处理函数
       this.$emit('success');
       this.visible = false;
+    },
+    setExpiredTime() { // 设置付款时间 或 倒计时 时间
+      if (!this.showExpire || !this.payInfoData || !this.payInfoData.ExpiredTime) return;
+      const date = new Date(this.payInfoData.ExpiredTime);
+      const targetYear = date.getFullYear();
+      const targetMonth = date.getMonth();
+      const targetDay = date.getDate();
+      const targetHour = date.getHours();
+      const targetMinute = date.getMinutes();
+      const curYear = new Date().getFullYear();
+      const curMonth = new Date().getMonth();
+      const curDay = new Date().getDate();
+      if (targetYear !== curYear || targetMonth !== curMonth || targetDay !== curDay) {
+        this.ExpiredTimeContent = `${targetYear}-${targetMonth}-${targetDay}日${targetHour}:${targetMinute}前`;
+        return;
+      }
+      const msDifference = date.getTime() - Date.now();
+      const oneHourMsCount = 60 * 60 * 1000; // 1个小时拥有的毫秒时间
+      if (msDifference < 2 * oneHourMsCount) { // 两个小时内 显示时分秒
+        const hourDifferenceNum = Math.floor(msDifference / oneHourMsCount);
+        const oneMinuteMsCount = 60 * 1000;
+        const minuteDifferenceNum = Math.floor((msDifference - oneHourMsCount * hourDifferenceNum) / oneMinuteMsCount);
+        const secondDifferenceNum = Math.floor((msDifference - oneHourMsCount * hourDifferenceNum - minuteDifferenceNum * oneMinuteMsCount) / 1000);
+        const _hour = hourDifferenceNum > 0 ? `${hourDifferenceNum}小时` : '';
+        const _minute = `0${minuteDifferenceNum}分`.slice(-3);
+        const _second = `0${secondDifferenceNum}秒`.slice(-3);
+        this.ExpiredTimeContent = `${_hour}${_minute}${_second}内`;
+        return;
+      }
+      this.ExpiredTimeContent = `今天${targetHour}:${targetMinute}前`;
+    },
+    handleExpiredTimeSet() { // 设置到期时间
+      if (!this.showExpire || !this.payInfoData || !this.payInfoData.ExpiredTime) return;
+      this.setExpiredTime();
+      if (this.dynamic) {
+        this.timer4Expired = setInterval(() => {
+          this.setExpiredTime();
+        }, 1000);
+      }
     },
   },
 };
@@ -150,10 +253,55 @@ export default {
         }
         padding-bottom: 30px;
       }
+      > .expired-time {
+        color: #888;
+        margin-top: -20px;
+        padding-bottom: 4px;
+        > .is-pink {
+          margin: 0 5px;
+        }
+      }
+      > .warning {
+        padding-top: 15px;
+        margin-bottom: -10px;
+      }
+      > .pay-description {
+        padding-top: 10px;
+      }
+      > .amount-box {
+        padding-top: 25px;
+        > .is-pink {
+          font-size: 16px;
+          display: inline-block;
+          vertical-align: -1px;
+          min-width: 73px;
+        }
+      }
     }
   }
   .dialog-footer {
     display: none;
+  }
+  &.hidden-header {
+    .el-dialog__header {
+      display: none;
+    }
+    .el-dialog__body {
+      padding-top: 35px;
+      position: relative;
+      > div.close {
+        position: absolute;
+        right: 12px;
+        top: 11px;
+        font-size: 16px;
+        > i {
+          cursor: pointer;
+          &:hover {
+            color: #428dfa;
+          }
+        }
+      }
+    }
   }
 }
 </style>

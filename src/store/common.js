@@ -157,6 +157,9 @@ export default {
     /** 客户资金余额
     ---------------------------------------- */
     customerBalance: null,
+    /** 客户印豆余额
+    ---------------------------------------- */
+    BeanNumberBalance: 0,
     /** 客户账单交易类型筛选方式列表
     ---------------------------------------- */
     TransactionTypeList: [
@@ -186,6 +189,7 @@ export default {
       { name: '手动入账', ID: 16 },
       { name: '手动扣款', ID: 23 },
       { name: '支付订单', ID: 24 },
+      { name: '购买印豆', ID: 25 },
     ],
     /* 订单状态列表
     -------------------------------*/
@@ -269,8 +273,9 @@ export default {
       state.customerInfo = { ...data, Address };
       if (!data || !data.FundInfo) return;
       if (bool) {
-        const { Amount } = data.FundInfo;
+        const { Amount, BeanNumber } = data.FundInfo;
         if ((Amount || Amount === 0) && Amount !== state.customerBalance) state.customerBalance = Amount;
+        if ((BeanNumber || BeanNumber === 0) && BeanNumber !== state.BeanNumberBalance) state.BeanNumberBalance = BeanNumber;
       }
     },
     SetDefaultAddress(state, AddressID) {
@@ -345,8 +350,10 @@ export default {
     },
     /** 设置客户资金余额
     ---------------------------------------- */
-    setCustomerBalance(state, balance) {
-      state.customerBalance = balance;
+    setCustomerBalance(state, balanceData) {
+      const { FundBalance, FundBeanNumber } = balanceData;
+      if (typeof FundBalance === 'number') state.customerBalance = FundBalance;
+      if (typeof FundBeanNumber === 'number') state.BeanNumberBalance = FundBeanNumber;
     },
     /** 设置配送列表
     ---------------------------------------- */
@@ -364,6 +371,7 @@ export default {
       state.customerInfo = null;
       state.customerAccountList = [];
       state.customerBalance = null;
+      state.BeanNumberBalance = 0;
     },
     /* 修改默认选择地址
     -------------------------------*/
@@ -449,9 +457,10 @@ export default {
     },
     async getCustomerFundBalance({ commit }) {
       let key = true;
-      const res = await api.getCustomerFundBalance().catch(() => { key = false; });
-      if (key && res.data.Status === 1000) {
-        commit('setCustomerBalance', res.data.Data);
+      const res = await api.getCustomerBalance().catch(() => { key = false; });
+      if (key && res.data.Status === 1000 && typeof res.data.Data === 'object') {
+        const { Cash, PrintBean } = res.data.Data;
+        commit('setCustomerBalance', { FundBalance: Cash, FundBeanNumber: PrintBean });
         return true;
       }
       return false;

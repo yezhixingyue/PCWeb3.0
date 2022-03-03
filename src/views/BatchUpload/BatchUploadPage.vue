@@ -161,7 +161,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'ScrollInfo', 'customerBalance']),
+    ...mapState('common', ['customerInfo', 'ScrollInfo']),
     ...mapState('Quotation', ['RiskWarningTipsTypes']),
     customer() {
       return this.customerInfo;
@@ -339,16 +339,24 @@ export default {
         });
       }
     },
+    handleBalance(obj) {
+      const { FundBalance, FundBeanNumber } = obj;
+      const temp = {};
+      if (typeof FundBalance === 'number') {
+        temp.FundBalance = FundBalance;
+      }
+      if (typeof FundBeanNumber === 'number') {
+        temp.FundBeanNumber = FundBeanNumber;
+      }
+      this.$store.commit('common/setCustomerBalance', temp);
+    },
     handleSubmitSuccess(list, resp) { // 创建订单成功后的回调函数，打开支付窗口
       this.cbToClearSuccessItem(list);
       this.preCreateVisible = false;
       if (resp) {
         this.payInfoData = resp;
         this.QrCodeVisible = true;
-        const { FundBalance } = resp;
-        if (FundBalance !== +this.customerBalance) {
-          this.$store.commit('common/setCustomerBalance', FundBalance);
-        }
+        this.handleBalance(resp);
       } else {
         this.messageBox.successSingle({ title: '下单成功' });
         this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
@@ -363,19 +371,17 @@ export default {
       this.preCreateOriginDataList = [];
       const _PreData = await BatchUploadClass.getPreOrderCreate(list, this.basicObj);
       if (!_PreData) return;
-      const { FundBalance } = _PreData;
-      if (FundBalance !== +this.customerBalance) {
-        this.$store.commit('common/setCustomerBalance', FundBalance);
-      }
+      this.handleBalance(_PreData);
       this.PreCreateData = _PreData;
       this.preCreateOriginDataList = list;
       this.preCreateVisible = true;
     },
-    onOrderSubmit({ OriginList, PayInFull }) { // 最终确认下单
+    onOrderSubmit({ OriginList, PayInFull, UsePrintBean }) { // 最终确认下单
       this.preCreateVisible = false;
       const temp = {
         ...this.basicObj,
         PayInFull,
+        UsePrintBean,
       };
       BatchUploadClass.BatchUploadFiles(OriginList, temp, this.handleSubmitSuccess);
     },

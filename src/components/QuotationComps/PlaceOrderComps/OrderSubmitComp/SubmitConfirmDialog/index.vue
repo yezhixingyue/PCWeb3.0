@@ -45,26 +45,7 @@
     <footer>
       <template  v-if="OrderPreData && isSubmitType">
         <TipsBox onlyTips />
-        <ul>
-          <li>
-            <span class="label">在线支付：</span>
-            <span class="content is-bold is-pink">{{onLineAmount}}<i class="is-font-12">元</i></span>
-          </li>
-          <li>
-            <span class="label">货到付款：</span>
-            <span class="content is-pink">{{PayOnDelivery}}<i class="is-font-12">元</i></span>
-          </li>
-          <li>
-            <span class="label">当前可用余额：</span>
-            <span class="content">{{FundBalance}}<i class="is-font-12">元</i></span>
-          </li>
-          <li>
-            <template v-if="MinimumCost < FullPayout">
-              <span class="label">支付方式：</span>
-              <el-checkbox v-model="PayInFull" class="content">在线支付全款</el-checkbox>
-            </template>
-          </li>
-        </ul>
+        <PaymentPriceDisplayComp v-model="PayInFull" :PreCreateData='OrderPreData' :UsePrintBean.sync='UsePrintBean' />
         <span class="blue-span" @click="localVisible = false">取消</span>
         <el-button type="primary" @click="onSubmit">确认提交</el-button>
       </template>
@@ -80,6 +61,7 @@
 import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
 import OrderProgress from '@/components/OrderListComps/OrderDetail/OrderProgress.vue';
 import OrderPackageList from '@/components/OrderListComps/OrderDetail/OrderPackageList.vue';
+import PaymentPriceDisplayComp from '@/components/common/OrderCommonComps/PaymentPriceDisplayComp';
 import DetailComp from './DetailComp.vue';
 
 export default {
@@ -134,6 +116,7 @@ export default {
     DetailComp,
     OrderProgress,
     OrderPackageList,
+    PaymentPriceDisplayComp,
   },
   computed: {
     localVisible: {
@@ -143,27 +126,6 @@ export default {
       set(bool) {
         this.$emit('update:visible', bool);
       },
-    },
-    MinimumCost() {
-      return this.OrderPreData ? +(this.OrderPreData.MinimumCost.toFixed(2)) : '';
-    },
-    FullPayout() {
-      return this.OrderPreData ? +(this.OrderPreData.FullPayout.toFixed(2)) : '';
-    },
-    ProductPrice() {
-      return this.OrderPreData ? this.OrderPreData.ProductPrice : '';
-    },
-    onLineAmount() {
-      if (!this.PayInFull) return this.MinimumCost;
-      return this.FullPayout;
-    },
-    PayOnDelivery() {
-      const price = this.OrderPreData ? +(this.OrderPreData.PayOnDelivery.toFixed(2)) : '';
-      if (!this.PayInFull) return price;
-      return 0;
-    },
-    FundBalance() {
-      return this.OrderPreData ? this.OrderPreData.FundBalance : '';
     },
     ProductParams() {
       if (!this.localVisible) return null;
@@ -223,12 +185,15 @@ export default {
       activeName: '',
       ProgressData: null,
       PackageDataList: null,
+      UsePrintBean: false, // 是否使用印豆
     };
   },
   methods: {
     onOpen() {
       this.$store.dispatch('common/getExpressList');
       this.getLocalDetailData();
+      this.PayInFull = false;
+      this.UsePrintBean = false;
       if (this.isFullType) this.activeName = 'detail';
     },
     onClosed() {
@@ -240,7 +205,7 @@ export default {
       if (!this.loading) done();
     },
     onSubmit() {
-      this.$emit('submit', { ...this.requestObj, PayInFull: this.PayInFull });
+      this.$emit('submit', { ...this.requestObj, PayInFull: this.PayInFull, UsePrintBean: this.UsePrintBean });
     },
     onDetailSubmitClick() {
       this.$emit('submit');
@@ -385,7 +350,7 @@ export default {
         &.is-detail {
           height: 590px;
           > div .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap .panel-content > ul.content {
-            height: 410px;
+            height: 430px;
             margin-bottom: 10px;
           }
           > div.right > div {
@@ -459,7 +424,7 @@ export default {
               }
             }
             .mp-pc-order-detail-page-package-list-comp-wrap {
-              width: 740px;
+              width: 800px;
               > header {
                 display: none;
               }

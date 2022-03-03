@@ -169,9 +169,10 @@ export default {
             const msgArray = PreCreateData.RiskList.filter(it => it.First === 2).map(it => it.Second);
             if (msgArray.length > 0) {
               this.messageBox.warnCancelBox({
-                title: '存在风险，是否继续下单?',
-                msg: msgArray,
-                confirmButtonText: '继续下单',
+                title: '注意',
+                msg: [...msgArray, '继续下单吗？'],
+                confirmButtonText: '是',
+                cancelButtonText: '否',
                 closeOnClickModal: false,
                 successFunc: async () => {
                   this.$store.dispatch('common/setIsPopperVisibleAsync', false);

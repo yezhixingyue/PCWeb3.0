@@ -5,6 +5,7 @@
     top="6vh"
     custom-class="mp-pre-create-order-comfirm-dialog-comp-wrap"
     v-dialogDrag
+    @open='onOpen'
   >
     <header slot="title">
       <span>提交订单</span>
@@ -19,24 +20,7 @@
                     总运费：<i>¥{{PreCreateData.Freight}}元</i>，
                     优惠券：<i :class="Coupon ? 'is-pink' : ''">{{ Coupon ? `-¥${Coupon}` : `¥${0}`}}元</i> ）</span>
         </p>
-        <div class="price-wrap">
-          <div class="price-box">
-            <div class="price-left">
-              <p>在线支付：</p>
-              <p class="gray">货到付款：</p>
-              <p class="gray" v-if="PreCreateData.MinimumCost !== PreCreateData.FullPayout">支付方式：</p>
-              <p class="final-price gray">当前可用余额：</p>
-            </div>
-            <div class="price-right">
-              <p class="is-pink">¥ <i class="is-font-16 is-bold">{{payNumOnline | formatNumber}}元</i></p>
-              <p class="is-pink">¥ {{PayOnDelivery | formatNumber}}元</p>
-              <p v-if="PreCreateData.MinimumCost !== PreCreateData.FullPayout">
-                <el-checkbox v-model="checked">在线支付全款</el-checkbox>
-              </p>
-              <p class="last">¥{{PreCreateData.FundBalance | formatNumber}}元</p>
-            </div>
-          </div>
-        </div>
+        <PaymentPriceDisplayComp v-model="isFullPayout" :PreCreateData='PreCreateData' :UsePrintBean.sync='UsePrintBean' />
         <div class="btn-wrap">
           <span class="blue-span" @click="localVisible = false">取消</span>
           <el-button type="danger" @click="handleSubmit">提交订单</el-button>
@@ -47,6 +31,7 @@
 
 <script>
 import Table4PlaceOrderFromShoppingCar from '@/components/ShoppingCarComps/PlaceOrderFromShoppingCarComps/Table4PlaceOrderFromShoppingCar.vue';
+import PaymentPriceDisplayComp from '@/components/common/OrderCommonComps/PaymentPriceDisplayComp';
 
 export default {
   props: {
@@ -65,10 +50,12 @@ export default {
   },
   components: {
     Table4PlaceOrderFromShoppingCar,
+    PaymentPriceDisplayComp,
   },
   data() {
     return {
       isFullPayout: false,
+      UsePrintBean: false,
     };
   },
   computed: {
@@ -97,27 +84,16 @@ export default {
       });
       return _num;
     },
-    payNumOnline() {
-      if (this.isFullPayout) return this.PreCreateData.FullPayout;
-      return this.PreCreateData.MinimumCost;
-    },
-    PayOnDelivery() {
-      if (this.isFullPayout) return 0;
-      return this.PreCreateData.PayOnDelivery;
-    },
-    checked: {
-      get() {
-        if (this.PreCreateData.MinimumCost !== this.PreCreateData.FullPayout) return this.isFullPayout;
-        return true;
-      },
-      set(key) {
-        this.isFullPayout = key;
-      },
-    },
   },
   methods: {
     handleSubmit() {
-      this.$emit('submit', { OriginList: this.OriginList, PayInFull: this.checked, PreCreateData: this.PreCreateData });
+      this.$emit('submit', {
+        OriginList: this.OriginList, PayInFull: this.isFullPayout, UsePrintBean: this.UsePrintBean, PreCreateData: this.PreCreateData,
+      });
+    },
+    onOpen() {
+      this.isFullPayout = false;
+      this.UsePrintBean = false;
     },
   },
 };
@@ -168,36 +144,6 @@ export default {
         }
         > span.remark {
           font-size: 13px;
-        }
-      }
-      > .price-wrap {
-        height: 180px;
-        text-align: right;
-        > .price-box {
-          height: 100%;
-          overflow: hidden;
-          display: inline-block;
-          > div {
-            padding-top: 18px;
-            > p {
-              line-height: 33px;
-              &.final-price {
-                margin-top: 6px;
-              }
-            }
-            &.price-left {
-              float: left;
-            }
-            &.price-right {
-              float: right;
-              > p {
-                min-width: 100px;
-                &.last {
-                  margin-top: 6px;
-                }
-              }
-            }
-          }
         }
       }
       > .btn-wrap {

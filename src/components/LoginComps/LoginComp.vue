@@ -36,7 +36,7 @@
 <script>
 import { Base64 } from 'js-base64';
 // eslint-disable-next-line object-curly-newline
-import { homeUrl, useCookie, domain, rightOpenUrl } from '@/assets/js/setup';
+import { homeUrl, useCookie, domain } from '@/assets/js/setup';
 import Cookie from '@/assets/js/Cookie';
 import messageBox from '@/assets/js/utils/message';
 
@@ -214,13 +214,13 @@ export default {
   },
   mounted() {
     // console.log(process.env.VUE_APP_BASE_URL);
-    const reg = new RegExp(`^${rightOpenUrl}`);
-    if (rightOpenUrl && !reg.test(window.location.href)) {
-      // eslint-disable-next-line max-len
-      const url = this.$router.mode === 'hash' ? `${rightOpenUrl}#${this.$route.fullPath}` : `${rightOpenUrl}${this.$route.fullPath}`;
-      window.location.href = url;
-      return;
-    }
+    // const reg = new RegExp(`^${rightOpenUrl}`);
+    // if (rightOpenUrl && !reg.test(window.location.href)) {
+    //   // eslint-disable-next-line max-len
+    //   const url = this.$router.mode === 'hash' ? `${rightOpenUrl}#${this.$route.fullPath}` : `${rightOpenUrl}${this.$route.fullPath}`;
+    //   window.location.href = url;
+    //   return;
+    // }
     const info = localStorage.getItem('info');
     if (info) {
       const temp = JSON.parse(info);

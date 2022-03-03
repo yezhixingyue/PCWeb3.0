@@ -288,6 +288,23 @@ const api = {
   getAfterSalesCancle(applyCode) { // PUT /Api/AfterSales/Cancle 取消问题反馈
     return instance.put(`/Api/AfterSales/Cancle?applyCode=${applyCode}`);
   },
+  /* 印豆相关api
+   ----------------------------------------------------------------------------------- */
+  getShopPrintBeanList() { // GET /Api/Shop/PrintBean/List  商城-印豆购买列表
+    return instance.get('/Api/Shop/PrintBean/List');
+  },
+  getShopPrintBeanBuy(data) { // POST /Api/Shop/PrintBean/Buy   商城-印豆购买
+    return instance.post('/Api/Shop/PrintBean/Buy', data);
+  },
+  getCustomerBalance() { // 获取余额及印豆余额  /Api/Customer/Balance
+    return instance.get('/Api/Customer/Balance', { closeLoading: true });
+  },
+  getPrintBeanRechargeList(data) { // POST /Api/PrintBean/Recharge/List  印豆购买记录列表
+    return instance.post('/Api/PrintBean/Recharge/List', data);
+  },
+  getPrintBeanRechargeCancle(payCode) { // Delate请求 /Api/PrintBean/Recharge/Cancle 参数：payCode//付款单号  取消印豆购买条目
+    return instance.delete('/Api/PrintBean/Recharge/Cancle', { params: { payCode } });
+  },
 };
 
 export default api;

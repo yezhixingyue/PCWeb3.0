@@ -15,12 +15,15 @@
           :dateList="dateList"
           dateType="date"
         />
+        <div class="switch">
+          <span class="blue-span" @click="onBillTypeSwitchClick">查看{{nextBillTypeEnumText}}</span>
+        </div>
       </div>
     </header>
     <div class="content-wrap" v-if="FundBillList.length > 0 || FundBillListNumber > 0">
       <!-- FundBillListNumber -->
       <div class="content">
-        <FundBillTable :dataList='FundBillList' />
+        <FundBillTable :dataList='FundBillList' :curBillType='condition4FundBillList.BillType' />
         <Count
           :watchPage='condition4FundBillList.Page'
           :handlePageChange='handlePageChange'
@@ -43,6 +46,7 @@ import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
 import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
+import { BillTypeEnumList, BillTypeEnums } from '@/assets/js/ClassType/Summary/ConditionForBillList';
 
 export default {
   components: {
@@ -64,7 +68,6 @@ export default {
         return this.condition4FundBillList.Type;
       },
       set(newVal) {
-        // // console.log(newVal);
         this.$store.commit('summary/setCondition4FundBillList', [['Type', ''], newVal]);
         this.$store.dispatch('summary/getFundBillList');
       },
@@ -73,15 +76,27 @@ export default {
       if (this.condition4FundBillList && this.condition4FundBillList.DateType !== 'all') {
         if (this.condition4FundBillList.DateType) {
           const t = this.dateList.find(it => it.value === this.condition4FundBillList.DateType);
-          if (t) return `${t.label}暂无账单，快去下单吧...`;
-          return '当前暂无账单，快去下单吧...';
+          if (t) return `${t.label}暂无${this.curBillTypeEnumText || '账单'}，快去下单吧...`;
+          return `当前暂无${this.curBillTypeEnumText || '账单'}，快去下单吧...`;
         }
         if (this.condition4FundBillList.Date.First && this.condition4FundBillList.Date.Second) {
-          return '所选期间暂无账单，快去下单吧...';
+          return `所选期间暂无${this.curBillTypeEnumText || '账单'}，快去下单吧...`;
         }
-        return '当前暂无账单，快去下单吧...';
+        return `当前暂无${this.curBillTypeEnumText || '账单'}，快去下单吧...`;
       }
-      return '当前暂无账单，快去下单吧...';
+      return `当前暂无${this.curBillTypeEnumText || '账单'}，快去下单吧...`;
+    },
+    nextBillType() {
+      const temp = this.condition4FundBillList.BillType === BillTypeEnums.FundCash.ID ? BillTypeEnums.PrintBean.ID : BillTypeEnums.FundCash.ID;
+      return temp;
+    },
+    curBillTypeEnumText() { // 当前显示即将切换的账单类型展示文字：现金余额 | 印豆
+      const t = this.utils.getNameFromListByIDs(this.condition4FundBillList.BillType, BillTypeEnumList);
+      return t || '';
+    },
+    nextBillTypeEnumText() { // 当前显示即将切换的账单类型展示文字：现金余额 | 印豆
+      const t = this.utils.getNameFromListByIDs(this.nextBillType, BillTypeEnumList);
+      return t || '';
     },
   },
   data() {
@@ -96,6 +111,10 @@ export default {
     ...mapActions('summary', ['getFundBillList']),
     handlePageChange(page) {
       this.$store.dispatch('summary/getFundBillList', page);
+    },
+    onBillTypeSwitchClick() {
+      this.setCondition4FundBillList([['BillType', ''], this.nextBillType]);
+      this.$store.dispatch('summary/getFundBillList');
     },
   },
   mounted() {
@@ -121,6 +140,14 @@ export default {
       }
       > div {
         display: inline-block;
+        &.mp-line-date-selector-wrap > .box {
+          width: 710px;
+        }
+        &.switch {
+          vertical-align: top;
+          line-height: 28px;
+          font-size: 13px;
+        }
       }
     }
   }
@@ -128,7 +155,7 @@ export default {
     margin-top: 22px;
     width: 100%;
     background-color: #fff;
-    min-height: calc(100vh - 135px - 100px - 61px);
+    min-height: calc(100vh - 255px);
     > .content {
       width: 1200px;
       margin: 0 auto;

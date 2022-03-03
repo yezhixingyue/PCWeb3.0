@@ -4,31 +4,31 @@
     <div class="content">
       <el-table :data="localPackageListData" border style="width: 100%" :max-height="OrderID ? '' : 530"
        :span-method="objectSpanMethod" v-show="localPackageListData.length > 0 || OrderID">
-        <el-table-column label="运单号" :width="OrderID ? 180 : 140" show-overflow-tooltip>
+        <el-table-column label="运单号" :min-width="OrderID ? 180 : 140" show-overflow-tooltip>
           <span v-if="scope.row && scope.row.Logistics && scope.row.Logistics.BillNo" class="gray" slot-scope="scope"
             >{{scope.row.Logistics.BillNo}}</span>
           <span v-else class="gray is-font-12">暂未生成</span>
         </el-table-column>
-        <el-table-column label="数量" :width="OrderID ? 140 : 92" show-overflow-tooltip>
+        <el-table-column label="数量" :min-width="OrderID ? 140 : 92" show-overflow-tooltip>
           <span class="gray" slot-scope="scope">{{scope.row | formarProductAmount}}</span>
         </el-table-column>
-        <el-table-column label="配送" :width="OrderID ? 180 : 92" show-overflow-tooltip>
+        <el-table-column label="配送" :min-width="OrderID ? 180 : 92" show-overflow-tooltip>
           <span class="gray" slot-scope="scope">{{ scope.row.Logistics && scope.row.Logistics.ExpressName }}</span>
         </el-table-column>
-        <el-table-column label="配送进度" :width="OrderID ? 120 :80" show-overflow-tooltip>
+        <el-table-column label="配送进度" :min-width="OrderID ? 120 :80" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Status | formatStatus4PackageList}}</template>
         </el-table-column>
-        <el-table-column label="配送代收" :width="OrderID ? 140 : 80" show-overflow-tooltip>
+        <el-table-column label="配送代收" :min-width="OrderID ? 140 : 80" show-overflow-tooltip>
           <template slot-scope="scope">{{scope.row.UnPaidAmount | formatNumber}}元</template>
         </el-table-column>
-        <el-table-column label="操作" :width="OrderID ? 140 : 80">
+        <el-table-column label="操作" :min-width="OrderID ? 140 : 80">
           <template slot-scope="scope">
             <span class="span-title-blue is-font-12"
              v-if="scope.row && scope.row.Logistics && scope.row.Logistics.BillNo" @click="onExpressClick(scope.row)">配送进度</span>
             <span v-else> -- </span>
           </template>
         </el-table-column>
-        <el-table-column label="" :width="OrderID ? 239 : 158" class-name='total-col' show-overflow-tooltip>
+        <el-table-column label="" :min-width="OrderID ? 239 : 158" class-name='total-col' show-overflow-tooltip>
           <template slot-scope="scope">
             <span>配送共代收：<i class="is-pink num">{{ scope.row && totalUnPaidAmount}}</i><i class="is-pink">元</i></span>
           </template>
