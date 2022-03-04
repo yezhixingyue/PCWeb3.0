@@ -40,12 +40,63 @@
         <span class="is-pink is-bold">￥{{(+payInfoData.Amount).toFixed(2)}}<i class="is-font-13">元</i></span>
       </p>
       <slot></slot>
+      <!-- 支付显示大礼包组合 -->
+      <footer class="mp-pay-price-wrap" v-if="payInfoData && showPayGroup">
+        <div class="left">
+          <p class="f">
+            <span>扫码支付:</span>
+          </p>
+          <p>
+            <span>已扣余额:</span>
+          </p>
+          <p v-if="payInfoData.PaidBeanNumber > 0">
+            <span>已扣印豆:</span>
+          </p>
+          <p>
+            <span>货到付款:</span>
+          </p>
+          <p>
+            <span>订单总金额:</span>
+          </p>
+        </div>
+        <div class="right">
+          <p class="f">
+            <span class="should-pay is-pink">
+              <i>￥</i>
+              {{payInfoData.Amount | formatNumber}}元
+            </span>
+          </p>
+          <p>
+            <span>
+              <i>￥</i>
+              {{payInfoData.BalanceAmount | formatNumber}}元
+            </span>
+          </p>
+          <p v-if="payInfoData.PaidBeanNumber > 0">
+            <span>
+              {{payInfoData.PaidBeanNumber}}个
+            </span>
+          </p>
+          <p>
+            <span>
+              <i>￥</i>
+              {{payInfoData.PayOnDelivery | formatNumber}}元
+            </span>
+          </p>
+          <p>
+            <span>
+              <i>￥</i>
+              {{payInfoData.TotalAmount | formatNumber}}元
+            </span>
+          </p>
+        </div>
+      </footer>
     </div>
   </CommonDialogComp>
 </template>
 
 <script>
-import CommonDialogComp from './CommonDialogComp';
+import CommonDialogComp from './CommonDialogComp.vue';
 
 export default {
   props: {
@@ -82,6 +133,10 @@ export default {
       default: false,
     },
     hiddenHeader: { // 是否隐藏弹窗标题
+      type: Boolean,
+      default: false,
+    },
+    showPayGroup: { // 是否显示支付价格组合
       type: Boolean,
       default: false,
     },
@@ -122,6 +177,7 @@ export default {
       loadError: false,
       ExpiredTimeContent: '',
       timer4Expired: null,
+      isPaidSuccess: false,
     };
   },
   methods: {
@@ -136,10 +192,12 @@ export default {
       }
       this.loaded = false;
       this.loadError = false;
+      this.isPaidSuccess = false;
       this.ExpiredTimeContent = '';
       this.handleExpiredTimeSet();
     },
     onClosed() {
+      this.$emit('close', this.isPaidSuccess);
       clearTimeout(this.timer);
       this.timer = null;
       clearTimeout(this.timer4Expired);
@@ -147,6 +205,7 @@ export default {
       this.loaded = false;
       this.loadError = false;
       this.ExpiredTimeContent = '';
+      this.isPaidSuccess = false;
     },
     onImgLoadError(e) { // 图片下载出错
       this.loadError = true;
@@ -179,6 +238,7 @@ export default {
     },
     handleSuccessPaid() { // 支付成功处理函数
       this.$emit('success');
+      this.isPaidSuccess = true;
       this.visible = false;
     },
     setExpiredTime() { // 设置付款时间 或 倒计时 时间
@@ -251,11 +311,11 @@ export default {
             margin-right: 3px;
           }
         }
-        padding-bottom: 30px;
+        padding-bottom: 25px;
       }
       > .expired-time {
         color: #888;
-        margin-top: -20px;
+        margin-top: -15px;
         padding-bottom: 4px;
         > .is-pink {
           margin: 0 5px;
@@ -275,6 +335,43 @@ export default {
           display: inline-block;
           vertical-align: -1px;
           min-width: 73px;
+        }
+      }
+      > footer.mp-pay-price-wrap {
+        // display: flex;
+        // justify-content: center;
+        font-size: 12px;
+        margin-top: 28px;
+        > .left {
+          width: 6em;
+          text-align: right;
+          margin-right: 10px;
+          margin-left: -10px;
+          display: inline-block;
+        }
+        > .right {
+          margin-top: -3px;
+          text-align: right;
+          display: inline-block;
+        }
+        p {
+          font-size: 12px;
+          width: 100%;
+          .should-pay {
+            font-size: 16px;
+            font-weight: 600;
+            i {
+              width: 14px;
+              display: inline-block;
+            }
+          }
+          span {
+            white-space: nowrap;
+          }
+          padding-bottom: 15px;
+          &.f {
+            padding-bottom: 20px;
+          }
         }
       }
     }

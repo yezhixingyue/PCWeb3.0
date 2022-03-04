@@ -25,39 +25,7 @@
           @itemRemove='handleItemRemove'
           @itemUpload='handleItemUpload'
           @multipleSelect='handleMultipleSelect' />
-        <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21'>
-          <div class="page-pay-info-box" v-if="payInfoData">
-            <div class="customer">
-              <!-- <p>
-                <span>客户：</span>
-                <span class="is-bold">{{customer.CustomerName}}<template v-if="customer.CustomerSN">（{{customer.CustomerSN}}）</template></span>
-              </p> -->
-              <p>
-                <span class="is-gray">[ 请使用微信或支付宝扫码支付 ]</span>
-              </p>
-            </div>
-            <div class="amount item">
-              <span class="k">扫码支付：</span>
-              <span class="v is-origin is-bold">￥{{payInfoData.Amount | formatNumber}}元</span>
-            </div>
-            <div class="item">
-              <span class="k">已扣余额：</span>
-              <span class="v">￥{{payInfoData.BalanceAmount | formatNumber}}元</span>
-            </div>
-            <div class="item bean" v-if="payInfoData.PaidBeanNumber">
-              <span class="k">已扣印豆：</span>
-              <span class="v">{{payInfoData.PaidBeanNumber}}个</span>
-            </div>
-            <div class="item">
-              <span class="k">货到付款：</span>
-              <span class="v">￥{{payInfoData.PayOnDelivery | formatNumber}}元</span>
-            </div>
-            <div class="item">
-              <span class="k">订单总金额：</span>
-              <span class="v">￥{{payInfoData.TotalAmount | formatNumber}}元</span>
-            </div>
-          </div>
-        </QrCodeForPayDialogComp>
+        <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21' showPayGroup showPayDescription />
         <PreCreateDialog :visible.sync="preCreateVisible" :PreCreateData="PreCreateData" :OriginList='preCreateOriginDataList' @submit="onOrderSubmit" />
       </div>
     </main>
@@ -489,36 +457,6 @@ export default {
       }
       > .table {
         min-height: 515px;
-      }
-      .page-pay-info-box {
-        .customer {
-          padding-bottom: 15px;
-          > p {
-            padding-bottom: 16px;
-          }
-        }
-        .item {
-          font-size: 14px;
-          padding-bottom: 15px;
-          > span {
-            display: inline-block;
-            width: 50%;
-            &.k {
-              text-align: right;
-            }
-            &.v {
-              text-align: left;
-            }
-          }
-          &.amount {
-            .is-origin {
-              font-size: 15px;
-            }
-          }
-          &.bean .v{
-            text-indent: 1em;
-          }
-        }
       }
     }
   }

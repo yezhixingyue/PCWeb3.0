@@ -59,13 +59,13 @@
           <p>
             <span class="should-pay is-pink">
               <i>￥</i>
-              {{numToFixed(curPayInfo2Code.Amount, 2)}}元
+              {{curPayInfo2Code.Amount | formatNumber}}元
             </span>
           </p>
           <p>
             <span>
               <i>￥</i>
-              {{numToFixed(curPayInfo2Code.BalanceAmount, 2)}}元
+              {{curPayInfo2Code.BalanceAmount | formatNumber}}元
             </span>
           </p>
           <p v-if="curPayInfo2Code.PaidBeanNumber > 0">
@@ -76,13 +76,13 @@
           <p>
             <span>
               <i>￥</i>
-              {{numToFixed(curPayInfo2Code.PayOnDelivery, 2)}}元
+              {{curPayInfo2Code.PayOnDelivery | formatNumber}}元
             </span>
           </p>
           <p>
             <span>
               <i>￥</i>
-              {{numToFixed(curPayInfo2Code.TotalAmount, 2)}}元
+              {{curPayInfo2Code.TotalAmount | formatNumber}}元
             </span>
           </p>
         </div>
@@ -117,10 +117,8 @@ export default {
   },
   data() {
     return {
-      dialogVisible: false,
       showImg: false,
       timer: null,
-      count: 0,
       getImageCodeFail: false,
     };
   },
@@ -200,11 +198,6 @@ export default {
           this.getPayStatus();
         }, 2800);
       }
-    },
-    numToFixed(num, count) {
-      // 转换数字格式
-      if (!num && num !== 0) return '';
-      return num.toFixed(count);
     },
     onFetchCodeAgainClick() {
       this.getImageCodeFail = false;

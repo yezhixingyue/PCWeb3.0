@@ -3,6 +3,7 @@
   :title="title"
   :visible.sync="dialogVisible"
   :close-on-click-modal='false'
+  :close-on-press-escape='false'
   :width="width"
   :top='top'
   v-dialogDrag

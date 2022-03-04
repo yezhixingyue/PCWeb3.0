@@ -217,7 +217,7 @@ export default {
             height: 150px;
             width: 200px;
             > img {
-              transition: transform 0.3s ease-in-out;
+              transition: transform 0.25s ease-in-out;
               border-radius: 2px;
             }
           }
@@ -247,6 +247,12 @@ export default {
             // text-decoration: underline;
             &::after {
               background-color: mix(#428dfa, #fff, 80%);
+            }
+          }
+          div.el-image {
+            > img {
+              transform: scale(1.02);
+              transform: translate(-50%, -50%) scale(1.02)\0;
             }
           }
           // box-shadow: 0 0px 5px rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.08);
@@ -283,6 +289,7 @@ export default {
     > header:hover {
       .span-title-blue {
         opacity: 0.8;
+        font-weight: 700;
         color: #26bcf9;
       }
       box-shadow: 0 0px 5px rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.08);
@@ -292,9 +299,9 @@ export default {
           transform: translate(-50%, -50%) scale(1.05)\0;
         }
       }
-      > h2 {
-        font-weight: 700;
-      }
+      // > h2 {
+      //   font-weight: 700;
+      // }
     }
   }
 }
