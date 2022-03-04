@@ -168,7 +168,7 @@ export default class BatchUpload {
   }
 
   static generateCommitData(list, basicObj, isFromPreCreate) { // 生成下单提交数据
-    const { CustomerID, Address, Terminal, PayInFull, OrderType, Position, IsBatchUpload, IgnoreRiskLevel } = basicObj;
+    const { CustomerID, Address, Terminal, UsePrintBean, PayInFull, OrderType, Position, IsBatchUpload, IgnoreRiskLevel } = basicObj;
     const List = list.map(it => {
       const { ProductParams, Content, OutPlate, PrintFileID } = it.result;
       const FileList = !isFromPreCreate && (PrintFileID || PrintFileID === 0) ? [{
@@ -197,6 +197,7 @@ export default class BatchUpload {
     });
     return {
       PayInFull,
+      UsePrintBean,
       Terminal,
       OrderType,
       List,

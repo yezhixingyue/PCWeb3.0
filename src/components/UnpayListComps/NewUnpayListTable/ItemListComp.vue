@@ -220,11 +220,12 @@ export default {
     handlePayClick() {
       if (!this.data || this.data.isCanceled || this.data.isPaid) return;
       const {
-        FullPayout, PayOnlineAmount, PayOnDelivery, BalanceAmount, PayQRCode, PayCode,
+        FullPayout, PayOnlineAmount, PayOnDelivery, PaidBeanNumber, BalanceAmount, PayQRCode, PayCode,
       } = this.data;
       this.$store.commit('Quotation/setCurPayInfo2Code', {
         Amount: PayOnlineAmount,
         BalanceAmount,
+        PaidBeanNumber,
         PayOnDelivery,
         TotalAmount: FullPayout,
         PayCode,

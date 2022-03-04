@@ -89,6 +89,10 @@
           <span class="k">已扣余额：</span>
           <span class="v">￥{{payInfoData.BalanceAmount | formatNumber}}元</span>
         </div>
+        <div class="item bean" v-if="payInfoData.PaidBeanNumber">
+          <span class="k">已扣印豆：</span>
+          <span class="v">{{payInfoData.PaidBeanNumber}}个</span>
+        </div>
         <div class="item">
           <span class="k">货到付款：</span>
           <span class="v">￥{{payInfoData.PayOnDelivery | formatNumber}}元</span>
@@ -315,22 +319,22 @@ export default {
       const resp = await this.api.CreateOrderFromPreCreate(_requestObj, { closeLoading: false, closeTip: false }).catch(() => null);
       if (resp && resp.data.Status === 1000) { // 下单成功
         // 修改列表数据状态
+        this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
         this.$store.commit('shoppingCar/setShoppingDataStatusAfterSubmit', { List, Msg: '已下单', _isOrder: true, _isPaid: false });
         this.multipleSelection = this.multipleSelection.filter(it => !it._isOrder);
         if (resp.data.Data) {
-          const { FundBalance, FundBeanNumber } = resp.data.Data;
-          const temp = {};
-          if (typeof FundBalance === 'number') {
-            temp.FundBalance = FundBalance;
-          }
-          if (typeof FundBeanNumber === 'number') {
-            temp.FundBeanNumber = FundBeanNumber;
-          }
-          this.$store.commit('common/setCustomerBalance', temp);
+          // const { FundBalance, FundBeanNumber } = resp.data.Data;
+          // const temp = {};
+          // if (typeof FundBalance === 'number') {
+          //   temp.FundBalance = FundBalance;
+          // }
+          // if (typeof FundBeanNumber === 'number') {
+          //   temp.FundBeanNumber = FundBeanNumber;
+          // }
+          // this.$store.commit('common/setCustomerBalance', temp);
           this.payInfoData = resp.data.Data;
           this.QrCodeVisible = true;
         } else {
-          this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
           this.messageBox.successSingle({
             title: '下单成功!',
             successFunc: () => {
@@ -550,6 +554,9 @@ export default {
         .is-origin {
           font-size: 15px;
         }
+      }
+      &.bean .v{
+        text-indent: 1em;
       }
     }
   }

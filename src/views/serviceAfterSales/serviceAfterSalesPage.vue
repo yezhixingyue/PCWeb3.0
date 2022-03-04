@@ -37,12 +37,12 @@
               </el-table-column>
               <el-table-column label="订单减款" width="100" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  <i>{{scope.row.Solution.Type === 2 ? scope.row.Solution.RefundAmount + '元' : ''}}</i>
+                  <i>{{scope.row.Solution.Type === 2 ? scope.row.Solution.Refund + '元' : ''}}</i>
                 </template>
               </el-table-column>
               <el-table-column label="运费减款" width="90" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  <i v-if="scope.row.Solution.Type===2 && scope.row.Solution.RefundFreightAmount > 0">{{scope.row.Solution.RefundFreightAmount}}元</i>
+                  <i v-if="scope.row.Solution.Type===2 && scope.row.Solution.RefundFreight > 0">{{scope.row.Solution.RefundFreight}}元</i>
                   <!-- <i v-else>-</i> -->
                 </template>
               </el-table-column>

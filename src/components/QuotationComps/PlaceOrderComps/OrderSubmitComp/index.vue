@@ -431,7 +431,7 @@ export default {
       }
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
       const cb = () => {
-        this.$store.dispatch('common/getCustomerFundBalance');
+        // this.$store.dispatch('common/getCustomerFundBalance');
         this.fileContent = '';
         this.FileAuthorMobile = '';
         if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();

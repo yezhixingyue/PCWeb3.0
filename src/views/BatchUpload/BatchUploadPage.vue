@@ -44,6 +44,10 @@
               <span class="k">已扣余额：</span>
               <span class="v">￥{{payInfoData.BalanceAmount | formatNumber}}元</span>
             </div>
+            <div class="item bean" v-if="payInfoData.PaidBeanNumber">
+              <span class="k">已扣印豆：</span>
+              <span class="v">{{payInfoData.PaidBeanNumber}}个</span>
+            </div>
             <div class="item">
               <span class="k">货到付款：</span>
               <span class="v">￥{{payInfoData.PayOnDelivery | formatNumber}}元</span>
@@ -353,13 +357,13 @@ export default {
     handleSubmitSuccess(list, resp) { // 创建订单成功后的回调函数，打开支付窗口
       this.cbToClearSuccessItem(list);
       this.preCreateVisible = false;
+      this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
       if (resp) {
         this.payInfoData = resp;
         this.QrCodeVisible = true;
         this.handleBalance(resp);
       } else {
         this.messageBox.successSingle({ title: '下单成功' });
-        this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
       }
     },
     handlePaidSuccess() {
@@ -510,6 +514,9 @@ export default {
             .is-origin {
               font-size: 15px;
             }
+          }
+          &.bean .v{
+            text-indent: 1em;
           }
         }
       }

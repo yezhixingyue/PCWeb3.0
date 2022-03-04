@@ -88,7 +88,7 @@ export default {
     },
     top: {
       type: String,
-      default: '70px',
+      default: '63px',
     },
     submitLabel: {
       type: String,
@@ -418,20 +418,20 @@ export default {
               }
               > ul.content {
                 padding-left: 80px;
-                max-height: 510px;
-                height: 510px;
+                max-height: 550px;
+                height: 550px;
                 padding-bottom: 0;
               }
             }
             .mp-pc-order-detail-page-package-list-comp-wrap {
-              width: 800px;
+              width: 810px;
               > header {
                 display: none;
               }
               > .content {
                 padding: 20px 8px;
-                padding-top: 10px;
-                height: 530px;
+                padding-top: 6px;
+                height: 550px;
                 .el-table__header .cell {
                   font-size: 13px;
                 }
@@ -445,12 +445,12 @@ export default {
             }
           }
           &::after {
-            width: 20px;
+            width: 22px;
             height: 1px;
             content: "";
             position: absolute;
             background-color: #e6e6e6;
-            top: 56px;
+            top: 60px;
             left: 0px;
             z-index: 99;
           }
@@ -539,13 +539,52 @@ export default {
   }
   &.e {
     > .el-dialog {
-      > .el-dialog__header > header {
-        height: 20px;
-        padding: 0;
-        border: none;
+      > .el-dialog__header {
+          > header {
+          height: 24px;
+          padding: 0;
+          border: none;
+        }
+        .el-dialog__headerbtn {
+          top: 20px;
+          font-size: 18px;
+          right: 18px;
+        }
       }
       > .el-dialog__body {
         padding-top: 0;
+        padding-left: 22px;
+        padding-right: 22px;
+        > main .order-list-tabs-box {
+          .el-tabs__header {
+            &::after {
+              width: 30px;
+              height: 1px;
+              content: '';
+              background-color: #E4E7ED;
+              position: absolute;
+              right: -30px;
+              bottom: -1px;
+            }
+          }
+          .el-tabs__content {
+            height: 600px;
+            main.mp-common-detail-comp-wrap.is-detail {
+              height: 600px;
+              > div .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap .panel-content > ul.content {
+                height: 440px;
+              }
+              > div.right {
+                > div.express {
+                  height: 240px;
+                }
+                > div.order {
+                  height: 340px;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

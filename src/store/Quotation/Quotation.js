@@ -786,7 +786,7 @@ export default {
       const res = await api.getPayResult(state.curPayInfo2Code.PayCode);
       if (res.data.Status === 1000) cb(res.data.Data);
     },
-    async placeOrderFromPreCreate({ state, commit, rootState }, { temp, cb, isFormOrder, PayInFull, submitSuccessFunc }) {
+    async placeOrderFromPreCreate({ state, commit, rootState, dispatch }, { temp, cb, isFormOrder, PayInFull, submitSuccessFunc }) {
       const _obj = temp ? { ...temp } : { OrderType: 2, PayInFull, List: [] };
       let item;
       if (!isFormOrder) {
@@ -799,17 +799,18 @@ export default {
         throw new Error(res && res.data.Message ? res.data.Message : '服务器未响应');
       }
       if (submitSuccessFunc) submitSuccessFunc();
-      if (res.data.Data) {
-        const { FundBalance, FundBeanNumber } = res.data.Data;
-        const _temp = {};
-        if (typeof FundBalance === 'number') {
-          _temp.FundBalance = FundBalance;
-        }
-        if (typeof FundBeanNumber === 'number') {
-          _temp.FundBeanNumber = FundBeanNumber;
-        }
-        commit('common/setCustomerBalance', _temp, { root: true });
-      }
+      // if (res.data.Data) {
+      //   const { FundBalance, FundBeanNumber } = res.data.Data;
+      //   const _temp = {};
+      //   if (typeof FundBalance === 'number') {
+      //     _temp.FundBalance = FundBalance;
+      //   }
+      //   if (typeof FundBeanNumber === 'number') {
+      //     _temp.FundBeanNumber = FundBeanNumber;
+      //   }
+      //   commit('common/setCustomerBalance', _temp, { root: true });
+      // }
+      dispatch('common/getCustomerFundBalance', {}, { root: true });
       commit('setCurPayInfo2Code', res.data.Data);
       commit('clearStateAfterPlaceOrderSuccess');
       // 成功后清除优惠券等信息
@@ -846,6 +847,7 @@ export default {
         }
         commit('common/setCustomerBalance', temp, { root: true });
       }
+      // dispatch('common/getCustomerFundBalance');
       commit('setCurPayInfo2Code', res.data.Data);
       commit('clearStateAfterPlaceOrderSuccess');
       // 成功后清除优惠券等信息

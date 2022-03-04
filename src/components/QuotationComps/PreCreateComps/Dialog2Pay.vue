@@ -45,6 +45,9 @@
           <p>
             <span>已扣余额:</span>
           </p>
+          <p v-if="curPayInfo2Code.PaidBeanNumber > 0">
+            <span>已扣印豆:</span>
+          </p>
           <p>
             <span>货到付款:</span>
           </p>
@@ -63,6 +66,11 @@
             <span>
               <i>￥</i>
               {{numToFixed(curPayInfo2Code.BalanceAmount, 2)}}元
+            </span>
+          </p>
+          <p v-if="curPayInfo2Code.PaidBeanNumber > 0">
+            <span>
+              {{curPayInfo2Code.PaidBeanNumber}}个
             </span>
           </p>
           <p>
