@@ -7,7 +7,7 @@
     <div class="content">
       <ul v-if="FileList && FileList.length > 0">
         <li class="file-content-box" v-show="!isSpotGoods">
-           <el-form :model="{ fileContent: fileContent, FileAuthorMobile: FileAuthorMobile }" ref="contentValidateForm" label-width="86px"
+           <el-form :model="ruleForm" ref="contentValidateForm" label-width="86px"
             size="mini" hide-required-asterisk :disabled='isUploading'>
             <el-form-item
               label="文件内容："
@@ -20,7 +20,7 @@
               ]"
             >
               <el-input
-                v-model="fileContent"
+                v-model="ruleForm.fileContent"
                 maxlength="130"
                 show-word-limit
                 placeholder="1.请填写文件中“具有明显特征”的名称；2.此名称不作为最终制作要求，请正确点选制作要求；"></el-input>
@@ -37,7 +37,7 @@
               ]"
             >
               <el-input
-                v-model.trim="FileAuthorMobile"
+                v-model.trim="ruleForm.FileAuthorMobile"
                 maxlength="20"
                 placeholder="请输入传稿人电话，方便核对问题订单"></el-input>
             </el-form-item>
@@ -130,13 +130,14 @@ export default {
       return !t;
     },
     CustomerID() {
-      return this.customerInfo && this.customerInfo.CustomerID ? this.customerInfo.CustomerID : '';
+      return this.customerInfo && this.customerInfo.Account && this.customerInfo.Account.CustomerID ? this.customerInfo.Account.CustomerID : '';
+    },
+    CustomerMobile() {
+      return this.customerInfo && this.customerInfo.Account && this.customerInfo.Account.Mobile ? this.customerInfo.Account.Mobile : '';
     },
   },
   data() {
     return {
-      fileContent: '',
-      FileAuthorMobile: '',
       title: '', // 用于弹窗标题显示   下单 | 添加购物车   后面自动添加失败2字
       visible: false,
       OrderPreData: null,
@@ -146,6 +147,10 @@ export default {
       loadingInstance: null,
       uploadType: '',
       phoneRegxp: /^\d{11}$|^\d{7,12}$|^\d{3,4}-\d{6,8}$/,
+      ruleForm: {
+        fileContent: '',
+        FileAuthorMobile: '',
+      },
     };
   },
   methods: {
@@ -155,7 +160,7 @@ export default {
       this.requestObj = null;
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
-      const { fileContent, FileAuthorMobile } = this;
+      const { fileContent, FileAuthorMobile } = this.ruleForm;
       const resp = await this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent, FileAuthorMobile });
       if (resp) {
         if (Array.isArray(resp)) {
@@ -228,12 +233,10 @@ export default {
       }
       // 下面执行加购提交操作
       const callBack = () => {
-        this.fileContent = '';
-        this.FileAuthorMobile = '';
-        if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
+        this.setRuleFormInit();
         this.scrollToTop();
       };
-      const { fileContent, FileAuthorMobile } = this;
+      const { fileContent, FileAuthorMobile } = this.ruleForm;
       await this.$store.dispatch('Quotation/getQuotationSave2Car', {
         FileList, fileContent, FileAuthorMobile, callBack,
       });
@@ -298,13 +301,13 @@ export default {
     },
     fillFileContent(name) {
       // if (!this.fileContent) this.fileContent = name;
-      this.fileContent = name;
+      this.ruleForm.fileContent = name;
     },
     async getProductPriceLocal() { // 校验函数  用来判断是否可以进行下单
       const res = await this.OrderPanelChecker();
       if (!res) return false;
-      if (!this.fileContent && !this.isSpotGoods) return '请输入文件内容';
-      if (this.FileAuthorMobile && !this.phoneRegxp.test(this.FileAuthorMobile)) return '传稿人电话格式不正确';
+      if (!this.ruleForm.fileContent && !this.isSpotGoods) return '请输入文件内容';
+      if (this.ruleForm.FileAuthorMobile && !this.phoneRegxp.test(this.ruleForm.FileAuthorMobile)) return '传稿人电话格式不正确';
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
       const asyncInputchecker = await this.asyncInputchecker();
       if (!asyncInputchecker) return '有内容未识别，请先识别或清除';
@@ -353,10 +356,10 @@ export default {
       if (!this.$refs.contentValidateForm) return '';
       const res = await this.$refs.contentValidateForm.validate().catch(() => {});
       if (!res && !this.isSpotGoods) {
-        if (!this.fileContent) return '请输入文件内容';
-        if (this.fileContent && this.fileContent.length > 130) return '[ 文件内容 ] 字数不能超过130个字';
-        if (this.FileAuthorMobile && !this.phoneRegxp.test(this.FileAuthorMobile)) return '传稿人电话格式不正确';
-        if (!/\S+/.test(this.fileContent)) return '文件内容不能全部为空格';
+        if (!this.ruleForm.fileContent) return '请输入文件内容';
+        if (this.ruleForm.fileContent && this.ruleForm.fileContent.length > 130) return '[ 文件内容 ] 字数不能超过130个字';
+        if (this.ruleForm.FileAuthorMobile && !this.phoneRegxp.test(this.ruleForm.FileAuthorMobile)) return '传稿人电话格式不正确';
+        if (!/\S+/.test(this.ruleForm.fileContent)) return '文件内容不能全部为空格';
         return '文件内容输入有误，请检查';
       }
       return '';
@@ -432,10 +435,7 @@ export default {
       this.$store.commit('Quotation/setIsShow2PayDialog', true);
       const cb = () => {
         // this.$store.dispatch('common/getCustomerFundBalance');
-        this.fileContent = '';
-        this.FileAuthorMobile = '';
-        if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
-        if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
+        this.setRuleFormInit();
         this.$emit('clearAdd');
         this.scrollToTop();
       };
@@ -452,10 +452,7 @@ export default {
       });
     },
     handleSuccessFunc(goToUnPayList) {
-      this.fileContent = '';
-      this.FileAuthorMobile = '';
-      if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
-      if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
+      this.setRuleFormInit();
       this.$emit('clearAdd');
       this.scrollToTop();
       if (goToUnPayList) {
@@ -477,15 +474,22 @@ export default {
         this.handleSuccessFunc();
       }
     },
+    setRuleFormInit() {
+      this.ruleForm.fileContent = '';
+      if (!this.ruleForm.FileAuthorMobile) this.ruleForm.FileAuthorMobile = this.CustomerMobile;
+      // if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
+      if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
+    },
   },
   mounted() {
     // this.$store.dispatch('Quotation/getFileTypeList');
   },
   watch: {
-    curProductID() {
-      this.fileContent = '';
-      this.FileAuthorMobile = '';
-      if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
+    curProductID: {
+      handler() {
+        this.setRuleFormInit();
+      },
+      immediate: true,
     },
   },
 };
