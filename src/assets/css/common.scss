@@ -506,6 +506,21 @@ body .el-radio__inner, body .el-checkbox__inner {
 
 .el-message-box__wrapper {
   z-index: 4000 !important;
+  .el-message-box.widen {
+    width: 520px !important;
+    &.mp-order-del-pop-reverse-fail {
+      display: inline-block !important;
+      width: auto !important;
+      max-width: 520px !important;
+      .el-message-box__content {
+        padding: 25px 30px 35px;
+        min-width: 360px;
+      }
+    }
+    .el-message-box__message {
+      line-height: 24px;
+    }
+  }
 }
 
 .el-input__count-inner {

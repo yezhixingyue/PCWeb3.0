@@ -37,6 +37,9 @@
      :PartIndex='PartIndex'
      :PartAffectedPropList='PartAffectedPropList'
      @triggerInteraction='onTriggerInteractionClick' />
+     <template slot="error" slot-scope="row">
+       <div class='el-form-item__error' :title="row.error">{{row.error}}</div>
+     </template>
   </el-form-item>
 </template>
 
@@ -333,9 +336,15 @@ export default {
           const res = checkElement({
             values: this.itemValue, prop: this.target, AffectedPropList: this.localAffectedPropList, PartName: this.curPartName,
           });
-          if (res && typeof res === 'string') {
-            callback(new Error(res));
-            return;
+          if (res) {
+            if (typeof res === 'string') {
+              callback(new Error(res));
+              return;
+            }
+            if (typeof res === 'object' && res.text) {
+              callback(new Error(res.text));
+              return;
+            }
           }
         }
         if (this.curTypeName === '元素组' && this.isNormalGroup) {

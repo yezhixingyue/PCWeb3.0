@@ -466,7 +466,7 @@ export default {
           max-height: 60px;
           overflow-y: auto;
           padding-top: 0px;
-          padding-bottom: 13px;
+          padding-bottom: 10px;
           > .tips {
             margin: 0;
             > li {

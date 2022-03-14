@@ -21,7 +21,7 @@
         <span
           v-show="failedList.length > 0"
           class="is-font-size-12 is-gray"
-          >共有
+          >有
           <i class="is-pink is-bold is-font-size-13">{{ failedList.length }}</i>
           个文件报价失败</span
         >

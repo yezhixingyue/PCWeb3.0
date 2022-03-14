@@ -252,6 +252,7 @@ export default {
       return new Promise((resolve) => {
         this.$refs.oProductPanel.$refs.ruleForm.validate(async (bool, obj) => {
           const arr = [];
+          console.log(obj);
           arr.push(bool || this.transformErrorObj(obj));
           if (this.$refs.oPartPanels) {
             const partCheckList = await Promise.all(this.$refs.oPartPanels.map(oPart => oPart.onSubmitCheck()));
@@ -289,8 +290,9 @@ export default {
             }
           }
         };
+        console.log(res);
         this.messageBox.failSingleError({
-          title: '价格计算失败', msg: res, successFunc: scrollHandler, failFunc: scrollHandler,
+          title: '报价失败', msg: res, successFunc: scrollHandler, failFunc: scrollHandler,
         });
       }
     },

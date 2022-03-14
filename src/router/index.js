@@ -219,7 +219,7 @@ const routes = [
             meta: {
               requiresAuth: true,
               y: 0,
-              title: '账户信息 - 郑州名片之家电子商务有限公司',
+              title: '企业信息 - 郑州名片之家电子商务有限公司',
             },
             component: () => import('../views/mySettingPages/AccountPage.vue'),
           },
@@ -259,7 +259,7 @@ const routes = [
             meta: {
               requiresAuth: true,
               y: 0,
-              title: '子账号管理 - 郑州名片之家电子商务有限公司',
+              title: '账号管理 - 郑州名片之家电子商务有限公司',
             },
             component: () => import('../views/mySettingPages/SubAccountManagePage.vue'),
           },

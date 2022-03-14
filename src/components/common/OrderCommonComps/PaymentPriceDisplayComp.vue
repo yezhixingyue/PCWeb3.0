@@ -2,24 +2,32 @@
   <div class="mp-common-payment-price-display-comp-wrap" v-if="PreCreateData">
     <div class="price-box">
       <div class="price-left">
-        <p>在线支付：</p>
+        <p class="b">在线支付：</p>
         <p class="gray">货到付款：</p>
         <p class="final-price gray">当前可用余额：</p>
-        <p class="gray" v-if="FundBeanNumber > 0">使用印豆：</p>
-        <p class="gray" v-if="MinimumCost !== FullPayout">支付方式：</p>
+        <!-- <p class="gray" v-if="FundBeanNumber > 0">使用印豆：</p>
+        <p class="gray" v-if="MinimumCost !== FullPayout">支付方式：</p> -->
       </div>
       <div class="price-right">
-        <p class="is-pink">¥ <i class="is-font-16 is-bold">{{onLineAmount}}</i><i class="is-font-12">元</i></p>
+        <p class="is-pink is-bold">¥ <i class="is-font-16">{{onLineAmount}}</i><i class="is-font-13">元</i></p>
         <p class="is-pink">¥ {{PayOnDelivery}}<i class="is-font-12">元</i></p>
         <p class="last">¥{{FundBalance}}<i class="is-font-12">元</i></p>
-        <p v-if="FundBeanNumber > 0" class="bean check">
+        <!-- <p v-if="FundBeanNumber > 0" class="bean check">
           <el-checkbox v-model="UseBeanChecked">使用{{FundBeanNumber}}个印豆抵扣{{deductAmountFromBeanNumber}}元</el-checkbox>
         </p>
         <p v-if="MinimumCost !== FullPayout" class="check">
           <el-checkbox v-model="PayInFull">在线支付全款</el-checkbox>
-        </p>
+        </p> -->
       </div>
     </div>
+    <p v-if="MinimumCost !== FullPayout" class="check">
+      <label class="t" @click="PayInFull = !PayInFull">支付全款</label>
+      <el-checkbox v-model="PayInFull" />
+    </p>
+    <p v-if="FundBeanNumber > 0" class="bean check">
+      <label class="t" @click="UseBeanChecked = !UseBeanChecked">使用 {{FundBeanNumber}} 个印豆抵扣 {{deductAmountFromBeanNumber}} 元</label>
+      <el-checkbox v-model="UseBeanChecked" />
+    </p>
   </div>
 </template>
 
@@ -106,14 +114,17 @@ export default {
 .mp-common-payment-price-display-comp-wrap {
   // height: 180px;
   text-align: right;
+  padding-bottom: 8px;
   > .price-box {
     // height: 100%;
     overflow: hidden;
     display: inline-block;
     > div {
       padding: 10px 0;
+      padding-top: 5px;
       > p {
-        line-height: 28px;
+        line-height: 26px;
+        font-size: 12px;
         &.final-price {
           margin-bottom: 4px;
         }
@@ -125,6 +136,11 @@ export default {
             }
           }
         }
+        &.b {
+          color: #444;
+          font-size: 14px;
+          margin-right: -2px;
+        }
       }
       &.price-left {
         float: left;
@@ -135,11 +151,27 @@ export default {
         float: right;
         > p {
           min-width: 100px;
+          font-size: 13px;
           &.last {
             margin-bottom: 4px;
           }
+          &.is-pink {
+            font-size: 14px;
+          }
         }
       }
+    }
+  }
+  > .check {
+    font-size: 12px;
+    color: #444;
+    margin-bottom: 6px;
+    .el-checkbox {
+      margin-left: 8px;
+    }
+    > .t {
+      user-select: none;
+      cursor: pointer;
     }
   }
 }

@@ -448,6 +448,7 @@ export default {
           title: '下单失败',
           error,
           successFunc: () => this.$store.commit('Quotation/setIsShow2PayDialog', false),
+          failFunc: () => this.$store.commit('Quotation/setIsShow2PayDialog', false),
         });
       });
     },

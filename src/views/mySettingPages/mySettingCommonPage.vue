@@ -3,11 +3,11 @@
     <header></header>
     <div class="content">
       <ul class="aside">
-        <router-link tag="li" to="/mySetting/account">账户信息</router-link>
+        <router-link tag="li" to="/mySetting/account">企业信息</router-link>
         <router-link tag="li" to="/mySetting/address">收货地址</router-link>
         <router-link tag="li" to="/mySetting/couponCenter">领券中心</router-link>
         <router-link tag="li" to="/mySetting/myCoupons">我的优惠券</router-link>
-        <router-link tag="li" to="/mySetting/subAccountManage">子账号管理</router-link>
+        <router-link tag="li" to="/mySetting/subAccountManage">账号管理</router-link>
         <router-link tag="li" to="/mySetting/changePwd">修改密码</router-link>
         <router-link tag="li" to="/mySetting/changeMobile">修改手机号</router-link>
         <router-link tag="li" to="/mySetting/setting">我的设置</router-link>

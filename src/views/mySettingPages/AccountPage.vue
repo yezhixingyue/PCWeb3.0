@@ -64,7 +64,7 @@ import { imgUrl } from '@/assets/js/setup';
 import LicensePathPhotoComp from '@/components/MySettingComps/LicensePathPhotoComp';
 
 export default {
-  // 修改账户信息后要重新获取账户信息数据和账号数据 (2个接口  需在获取前设置旧数据为null) 其它情况, 如充值后也需要重新获取账号信息
+  // 修改企业信息后要重新获取企业信息数据和账号数据 (2个接口  需在获取前设置旧数据为null) 其它情况, 如充值后也需要重新获取账号信息
   components: {
     InputComp,
     LicensePathPhotoComp,

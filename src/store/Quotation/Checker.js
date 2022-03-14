@@ -6,20 +6,23 @@ import { getCombineAffectedPropList, getPropertiesAffectedByInteraction } from '
 import InterAction from '@/store/Quotation/Interaction';
 
 const getMatchedValuesInSection = (ValueList, MinValue, MaxValue) => {
-  const list = ValueList.filter(it => it > MinValue && (it <= MaxValue || MaxValue === -1));
+  const list = ValueList.filter(it => it >= MinValue && (it <= MaxValue || MaxValue === -1));
   return list;
 };
 
+/**
+ * 检测数字类型元素 - 分段控制是否符合要求
+ */
 const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit }) => {
   let isInSection = false;
   let msgArr = [];
   for (let i = 0; i < SectionList.length; i += 1) {
     const section = SectionList[i];
     const { MinValue, MaxValue, IsGeneralValue, Increment } = section;
-    if (+value > MinValue && (+value <= MaxValue || MaxValue === -1)) { // 符合范围区间 进入判断
+    if (+value >= MinValue && (+value <= MaxValue || MaxValue === -1)) { // 符合范围区间 进入判断
       isInSection = true;
       let temp = null;
-      if (!IsGeneralValue) {
+      if (!IsGeneralValue) { // 未勾选符合常规数值
         let T = Increment.toString().indexOf('.');
         T = T === -1 ? 0 : Increment.toString().length - T - 1;
         const arr = new Array(T);
@@ -29,8 +32,9 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
           temp = {
             MinValue,
             MaxValue,
-            IncrementList: [Increment],
+            Increment,
             isIncrement: true,
+            _value: +value,
           };
         }
       }
@@ -40,17 +44,20 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
           MaxValue,
           ValueList: valueList,
           isIncrement: false,
+          _value: +value,
         };
       }
       if (temp) {
-        const t = msgArr.find(it => it.MinValue === MinValue && it.MaxValue === MaxValue);
-        if (!t) {
-          msgArr.push(temp);
-        } else if (t.isIncrement && !t.IncrementList.includes(Increment)) {
-          t.IncrementList.push(Increment);
-        }
+        // 下面这种组合方式已被废弃
+        // const t = msgArr.find(it => it.MinValue === MinValue && it.MaxValue === MaxValue);
+        // if (!t) {
+        //   msgArr.push(temp);
+        // } else if (t.isIncrement && !t.IncrementList.includes(Increment)) {
+        //   t.IncrementList.push(Increment);
+        // }
+        msgArr.push(temp); // 未通过校验，返回校验规则
       } else {
-        msgArr.push('isRight');
+        msgArr.push(true); // 通过校验
       }
     }
   }
@@ -64,37 +71,99 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
     const minList = list.map(it => it.MinValue);
     const maxList = list.map(it => it.MaxValue);
     const min = Math.min(...minList);
-    if (value <= min) return `${propName}必须大于${min}${Unit}`;
+    if (value < min) return `${propName}不能少于${min}${Unit}`;
     const max = Math.max(...maxList);
     if (value > max) return `${propName}不能超过${max}${Unit}`;
     const _arrText = list.map(({ MinValue, MaxValue }) => {
       if (MaxValue === -1) return `大于${MinValue}`;
-      return `大于${MinValue}且小于等于${MaxValue}`;
+      return `${MinValue} - ${MaxValue}`;
     }).join('、');
     const msg = `${propName}输入不正确，不在取值范围内，可选取值范围：${_arrText}`;
     return msg;
   }
 
-  msgArr = msgArr.map(it => {
+  const t = msgArr.find(it => it === true); // 如果存在通过验证的某一条规则，则返回校验成功
+  if (t) return '';
+  // 1. 筛选出符合范围条件的列表
+  msgArr = msgArr.filter(it => {
+    if (typeof it === 'object') { // 其实该判断必然进入，（只能为对象或true两种情况，true的情况在上面一步已被排除）
+      const { MinValue, MaxValue, _value } = it;
+      return _value >= MinValue && (_value <= MaxValue || MaxValue === -1);
+    }
+    return false;
+  });
+  // 2. 找出当前范围区间的交集
+  const min = Math.max(...msgArr.map(it => it.MinValue));
+  const max = Math.min(...msgArr.map(it => (it.MaxValue === -1 ? Infinity : it.MaxValue)));
+  msgArr = msgArr.map((it) => {
     if (typeof it === 'object') {
-      const { MinValue, MaxValue, isIncrement, IncrementList, ValueList } = it;
+      const { MinValue, MaxValue, isIncrement, Increment, ValueList, _value } = it;
       if (isIncrement) {
-        const list = IncrementList.map(_it => `${_it}${Unit}`);
-        return `${MinValue}${Unit}以上每次增加${list.join('或')}`;
+        let _exampleBeginValue = MinValue; // 示例起始数字
+        let _intersectBeginValue = MinValue; // 交集起始数字
+        if (Increment && _value && _value > MinValue && _value < MaxValue) {
+          const n = Math.floor((_value - MinValue) / Increment);
+          _exampleBeginValue = MinValue + n * Increment;
+        }
+        if (_intersectBeginValue < min) {
+          const n = Math.ceil((min - _intersectBeginValue) / Increment);
+          _intersectBeginValue += n * Increment;
+        }
+        const examples = [];
+        let _list = [0, Increment, Increment * 2, Increment * 3];
+        _list.forEach(num => {
+          if (_exampleBeginValue + num <= max && _exampleBeginValue + num >= min && examples.length < 3) {
+            examples.push(_exampleBeginValue + num);
+          }
+        });
+        if (examples.length < 3) {
+          // 继续添加值 -- 不加了
+          _list = [-Increment, -Increment * 2];
+          _list.forEach(num => {
+            if (examples.length < 3 && _exampleBeginValue + num >= min && _exampleBeginValue + num <= max) {
+              examples.unshift(_exampleBeginValue + num);
+            }
+          });
+        }
+
+        const exampleText = `例如：${examples.join(',')}${Unit.split('/')[0]}`;
+
+        if (examples.length === 0) return '';
+
+        if (examples.length < 3) {
+          return {
+            lineMsg: '',
+            diaMsg: `等于${examples.join(`${Unit} 或 `)}${Unit}`,
+          };
+        }
+
+        return {
+          lineMsg: `${MinValue}${Unit.split('/')[0]}以上时每次应该增加${Increment}${Unit.split('/')[0]}(${exampleText})`,
+          diaMsg: `以${_intersectBeginValue}${Unit.split('/')[0]}为基数，每次增加${Increment}${Unit.split('/')[0]}(${exampleText})`,
+        };
+        // return `${MinValue}${Unit.split('/')[0]}以上每次增加${list.join('或')}(${exampleText})`;
+        // return `以${_intersectBeginValue}${Unit.split('/')[0]}为基数，每次增加${Increment}${Unit.split('/')[0]}(${exampleText})`;
       }
       const filterValueList = getMatchedValuesInSection(ValueList, MinValue, MaxValue);
       if (MaxValue === -1) {
-        return `${MinValue}${Unit}以上应从${filterValueList}中取值`;
+        return `${MinValue}${Unit.split('/')[0]}以上时应从${filterValueList}中取值`;
       }
-      return `[ 大于${MinValue}且小于等于${MaxValue} ]时应从${filterValueList}中取值`;
+      return `在[ ${MinValue} - ${MaxValue} ]之间应从${filterValueList}中取值`;
+    }
+    return it;
+  }).filter(it => it).map((it, i) => {
+    const connector = i === 0 ? '必须' : '或者';
+    if (typeof it === 'object' && it.diaMsg) {
+      return { ...it, diaMsg: `${connector}${it.diaMsg}` };
     }
     return it;
   });
-  const t = msgArr.find(it => it === 'isRight');
-  if (t === undefined) {
-    return `${propName}${msgArr.join(' 或 ')}`;
-  }
-  return '';
+  const range = `${min} ≤ ${propName} ≤ ${max}${Unit.split('/')[0]}`;
+  const text = msgArr.length > 0 ? `${msgArr.filter(it => it).map(it => (typeof it === 'object' ? it.diaMsg : it)).join('\r\n')}` : '该范围不可用';
+  // const arr = msgArr.map(it => (typeof it === 'object' ? it.diaMsg : it));
+  const _msg = `${propName}不符合要求， \r\n${range}时：\r\n${text}`;
+  // return { text, arr, propName, range };
+  return _msg;
 };
 
 /**

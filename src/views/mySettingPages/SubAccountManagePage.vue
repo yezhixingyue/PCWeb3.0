@@ -1,32 +1,33 @@
 <template>
   <section class="mp-pc-my-setting-page-sub-account-page-wrap">
     <header>
-      <span class="blue-v-line is-bold is-black">子账号管理</span>
+      <span class="blue-v-line is-bold is-black">账号管理</span>
       <span class="is-font-12">（ 共检测出<i class="is-pink is-font-16"> {{customerAccountList.length}} </i>条记录 ）</span>
     </header>
     <ul class="content" v-if="customerInfo">
       <li v-for="item in customerAccountList" :key="item.AccountID"
-          class="account-item" :class="!item.IsBranch?'active':''">
+          class="account-item" :class="{main:!item.IsBranch, active:customerInfo.Account.AccountID === item.AccountID}">
         <div class="account-item-header">
           <i class="iconfont icon-yonghu1"></i>
           <span>{{item.NickName}}</span>
+          <span class="is-font-12 is-gray">{{customerInfo.Account.AccountID === item.AccountID ? ' ( 当前用户 )' : ''}}</span>
         </div>
         <div class="account-item-content">
           <p>
             <i class="iconfont icon-dianhua"></i>
-            <span>{{ item.Mobile | formatMobile }}</span>
+            <span>{{ item.Mobile }}</span>
           </p>
           <p class="add-date">添加时间：{{item.CreateTime | format2MiddleLangTypeDate}}</p>
         </div>
         <div class="account-item-footer">
-          <span class="span-title-blue"  @click="handleEdit(item)" v-if="!customerInfo.Account.IsBranch">编辑</span>
+          <span class="span-title-blue"  @click="handleEdit(item)" v-if="IsPrimaryAccount || customerInfo.Account.AccountID === item.AccountID">编辑</span>
           <!-- <span class="span-title-blue disabled" v-else>编辑</span> -->
-          <span class="span-title-pink" @click="handleDel(item)" v-if="!customerInfo.Account.IsBranch">删除</span>
+          <span class="span-title-pink" @click="handleDel(item)" v-if="IsPrimaryAccount">删除</span>
           <!-- <span class="span-title-pink disabled" v-else>删除</span> -->
         </div>
         <div class="account-item-sign">主账号</div>
       </li>
-      <li class="add-new-account-box" @click="handleAddNewAccount" v-if="!customerInfo.Account.IsBranch">
+      <li class="add-new-account-box" @click="handleAddNewAccount" v-if="IsPrimaryAccount">
         <i class="el-icon-plus"></i>
         <span>新增子账号</span>
       </li>
@@ -42,20 +43,22 @@
         <span>{{dialogTitle}}</span>
       </header>
       <!-- 弹窗表单区域 -->
-      <el-form :model="subAccountForm" ref="subAccountForm" :rules="rules" label-width="100px" class="account-ruleForm">
+      <el-form :model="subAccountForm" ref="subAccountForm" :rules="rules" label-width="100px" class="account-ruleForm" v-if="customerInfo">
         <el-form-item label="登录手机号：" prop="Mobile">
           <!-- <el-input v-model.trim="Mobile" ></el-input> -->
-          <el-input v-model.trim="Mobile" :disabled='!subAccountForm.IsBranch'></el-input>
+          <el-input v-model.trim="Mobile" :disabled='!subAccountForm.IsBranch || subAccountForm.AccountID === customerInfo.Account.AccountID'></el-input>
         </el-form-item>
         <el-form-item label="姓名：" prop="NickName">
           <el-input v-model.trim="subAccountForm.NickName"></el-input>
         </el-form-item>
-        <el-form-item label="密码：" prop="Password">
-          <el-input type="password" :placeholder="placeholder" v-model.trim="subAccountForm.Password"></el-input>
-        </el-form-item>
-        <el-form-item label="确认密码：" prop="rePassword">
-          <el-input type="password" :placeholder="placeholder" v-model.trim="subAccountForm.rePassword"></el-input>
-        </el-form-item>
+        <template v-if="subAccountForm.IsBranch && subAccountForm.AccountID && subAccountForm.AccountID !== customerInfo.Account.AccountID">
+          <el-form-item label="密码：" prop="Password">
+            <el-input type="password" :placeholder="placeholder" :disabled='!subAccountForm.IsBranch' v-model.trim="subAccountForm.Password"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码：" prop="rePassword">
+            <el-input type="password" :placeholder="placeholder" :disabled='!subAccountForm.IsBranch' v-model.trim="subAccountForm.rePassword"></el-input>
+          </el-form-item>
+        </template>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
@@ -84,6 +87,12 @@ export default {
       set(newVal) {
         this.subAccountForm.Mobile = newVal.replace(/[^\d]/g, '');
       },
+    },
+    IsPrimaryAccount() { // 当前登录用户是否为子账号
+      if (this.customerInfo) {
+        return !this.customerInfo.Account.IsBranch;
+      }
+      return false;
     },
   },
   data() {
@@ -150,11 +159,11 @@ export default {
   methods: {
     handleEdit(item) {
       this.isEdit = true;
-      this.dialogTitle = '编辑子账号';
       const {
         AccountID, IsBranch, NickName, Mobile,
       } = item;
       this.initSubAccountForm(AccountID, IsBranch, NickName, Mobile);
+      this.dialogTitle = IsBranch ? '编辑子账号' : '编辑主账号';
 
       this.dialogVisible = !this.dialogVisible;
     },
@@ -163,8 +172,8 @@ export default {
       const { AccountID, NickName } = item;
       if (!AccountID) return;
       this.messageBox.warnCancelBox({
-        title: '确定删除该账号吗?',
-        msg: `删除子账号： [ ${NickName} ]`,
+        title: '确定删除该子账号吗?',
+        msg: `账号： [ ${NickName} ]`,
         successFunc: async () => {
           const res = await this.api.getCustomerRemoveAccount(AccountID);
           if (res.data.Status === 1000) {
@@ -325,13 +334,15 @@ export default {
           i.iconfont {
             color: #428dfa;
           }
-          > .account-item-sign {
-            display: block;
-          }
           > .account-item-footer {
             > .span-title-pink {
               display: none;
             }
+          }
+        }
+        &.main {
+          > .account-item-sign {
+            display: block;
           }
         }
         i.iconfont {
@@ -347,6 +358,7 @@ export default {
         color: #585858;
       }
       > .el-dialog__body {
+        height: 208px;
         > .el-form {
           width: 345px;
           // margin: 0 auto;
@@ -373,8 +385,11 @@ export default {
                   vertical-align: top;
                   &::placeholder {
                     color: #cbcbcb;
-                    // font-size: 13px;
+                    font-size: 13px;
                   }
+                }
+                &.is-disabled .el-input__inner {
+                  background-color: #f8f8f8
                 }
               }
             }

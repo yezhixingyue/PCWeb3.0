@@ -35,6 +35,9 @@
             @interaction="getLocalAffectedPropList"
             @input="handleElementChange($event, it)"
           />
+          <template slot="error" slot-scope="row">
+            <div class='el-form-item__error' :title="row.error">{{row.error}}</div>
+          </template>
         </el-form-item>
         <el-form-item
           v-for="(it, i) in GroupList"
@@ -63,6 +66,9 @@
             @groupItemChange='handleGroupItemChange($event, it)'
             :class="{fixedWidth:fixedWidth}"
           />
+          <template slot="error" slot-scope="row">
+            <div class='el-form-item__error' :title="row.error">{{row.error}}</div>
+          </template>
         </el-form-item>
       </el-form>
     </main>

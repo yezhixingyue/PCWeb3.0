@@ -80,7 +80,7 @@ export default {
     this.handlePathDataFetch();
     if (!this.customerInfo || this.customerInfo.AuthStatus === 2) return;
     this.messageBox.warnCancelBox({
-      title: '账户信息未完善',
+      title: '企业信息未完善',
       msg: '您尚有资料未完善，无法享受优惠价格',
       cancelButtonText: '忽略',
       confirmButtonText: '去完善资料',

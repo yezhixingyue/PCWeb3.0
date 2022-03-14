@@ -85,13 +85,14 @@
             <span class="el-dropdown-link">
               <span class="customer">{{customerInfo.CustomerName}}</span>
               <i>/</i>
-              <span class="m">{{formatMobile(customerInfo.Account.Mobile)}}</span>
+              <!-- <span class="m">{{formatMobile(customerInfo.Account.Mobile)}}</span> -->
+              <span class="m">{{formatCustomerSN(customerInfo.CustomerSN)}}</span>
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="mp-pc-my-set-drop-down-wrap">
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingAccount'}"
-                command='account' icon="el-icon-user-solid">账户信息</el-dropdown-item>
+                command='account' icon="el-icon-user-solid">企业信息</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingAddress'}"
                 command='address' icon="el-icon-location">收货地址</el-dropdown-item>
@@ -103,7 +104,7 @@
                 command='myCoupons' icon="el-icon-s-claim">我的优惠券</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'subAccountManage'}"
-                command='subAccountManage' icon="el-icon-menu">子账号管理</el-dropdown-item>
+                command='subAccountManage' icon="el-icon-menu">账号管理</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingChangePwd'}"
                 command='changePwd' icon="el-icon-s-help">修改密码</el-dropdown-item>
@@ -193,6 +194,11 @@ export default {
         return it;
       });
       return _arr1.join('');
+    },
+    formatCustomerSN(CustomerSN) {
+      const res = CustomerSN.match(/\d+/);
+      if (res.length > 0) return `ID: ${res[0]}`;
+      return '';
     },
     setShowRechange() {
       this.showRechange = !this.showRechange;
@@ -637,6 +643,11 @@ export default {
               font-size: 12px;
               color: #888;
               margin: 0 2px;
+            }
+            > .m {
+              font-size: 13px;
+              margin-right: 2px;
+              user-select: text;
             }
             &:hover {
               color: #333;

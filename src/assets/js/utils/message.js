@@ -2,6 +2,41 @@
 import { MessageBox } from 'element-ui';
 import Vue from 'vue';
 
+const msgHandler = (config, msg) => {
+  if (Array.isArray(msg)) {
+    const _config = config;
+    if (msg.length === 1 && !msg[0].includes('\r\n')) {
+      [_config.message] = msg;
+    } else {
+      _config.dangerouslyUseHTMLString = true;
+      let bool = false;
+      const content = msg
+        .map(it => {
+          const alignDirection = /^继续([\d|\D]+)?吗？$/.test(it) ? 'center' : 'left';
+          let _content = it;
+          if (it.includes('\r\n')) {
+            let list = it.split('\r\n');
+            if (list.length > 2 && /.+：$/.test(list[1])) {
+              bool = true;
+              _config.customClass += ' widen';
+            }
+            list = list.map((_it, i) => {
+              let style = '';
+              if (i > 1 && bool) {
+                style = 'text-indent: 2em;';
+              }
+              return `<div style='${style}'>${_it}</div>`;
+            });
+            _content = list.join('');
+          }
+          return `<li style='text-align:${alignDirection};line-height:${bool ? 20 : 18}px;margin-bottom:${bool ? 13 : 8}px'>${_content}</li>`;
+        })
+        .join('');
+      _config.message = `<ul style='display: inline-block'>${content}</ul>`;
+    }
+  }
+};
+
 /**
  * 警告提示框 --- 不含内容，只有标题 单按钮
  *
@@ -29,29 +64,24 @@ function failSingle({ msg, successFunc, failFunc }) {
 function failSingleError({
   title = '出错啦 ！', msg, successFunc, failFunc, beforeClose,
 }) {
-  let message = msg;
-  let dangerouslyUseHTMLString = false;
-  if (Array.isArray(msg)) {
-    // eslint-disable-next-line prefer-destructuring
-    if (msg.length === 1) message = msg[0];
-    if (msg.length > 1) {
-      dangerouslyUseHTMLString = true;
-      const text = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
-      message = `<ul style='display: inline-block'>${text}</ul>`;
-    }
-  }
+  const config = {
+    message: msg,
+    dangerouslyUseHTMLString: false,
+    customClass: 'mp-order-del-pop-reverse-fail',
+  };
+  msgHandler(config, msg);
   MessageBox({
     showClose: true,
-    message,
+    message: config.message,
     type: 'fail',
     confirmButtonText: '确定',
-    dangerouslyUseHTMLString,
+    dangerouslyUseHTMLString: config.dangerouslyUseHTMLString,
     title,
     beforeClose: (action, instance, done) => {
       if (beforeClose) beforeClose();
       done();
     },
-    customClass: 'mp-order-del-pop-reverse-fail',
+    customClass: config.customClass,
   }).then(() => successFunc && successFunc()).catch(() => failFunc && failFunc());
 }
 
@@ -67,25 +97,20 @@ function failSingleError({
 function warnSingleError({
   msg, successFunc, failFunc, title = '注意', text = '确定',
 }) {
-  let message = msg;
-  let dangerouslyUseHTMLString = false;
-  if (Array.isArray(msg)) {
-    // eslint-disable-next-line prefer-destructuring
-    if (msg.length === 1) message = msg[0];
-    if (msg.length > 1) {
-      dangerouslyUseHTMLString = true;
-      const content = msg.map(it => `<li style='text-align:left;line-height:18px;margin-bottom:8px'>${it}</li>`).join('');
-      message = `<ul style='display: inline-block'>${content}</ul>`;
-    }
-  }
+  const config = {
+    message: msg,
+    dangerouslyUseHTMLString: false,
+    customClass: 'mp-order-del-pop-reverse-warn',
+  };
+  msgHandler(config, msg);
   MessageBox({
     showClose: true,
-    message,
+    message: config.message,
     type: 'warning',
     confirmButtonText: text,
-    dangerouslyUseHTMLString,
+    dangerouslyUseHTMLString: config.dangerouslyUseHTMLString,
     title,
-    customClass: 'mp-order-del-pop-reverse-warn',
+    customClass: config.customClass,
   }).then(() => successFunc && successFunc()).catch(() => failFunc && failFunc());
 }
 
@@ -100,33 +125,23 @@ function warnSingleError({
 function warnCancelBox({
   title = '确定取消此订单吗 ?', msg, successFunc, failFunc, confirmButtonText = '确定', cancelButtonText = '取消', closeOnClickModal = true,
 }) {
-  let message = msg;
-  let dangerouslyUseHTMLString = false;
-  if (Array.isArray(msg)) {
-    // eslint-disable-next-line prefer-destructuring
-    if (msg.length === 1) message = msg[0];
-    if (msg.length > 1) {
-      dangerouslyUseHTMLString = true;
-      const content = msg
-        .map(it => {
-          const alignDirection = /^继续([\d|\D]+)?吗？$/.test(it) ? 'center' : 'left';
-          return `<li style='text-align:${alignDirection};line-height:18px;margin-bottom:8px'>${it}</li>`;
-        })
-        .join('');
-      message = `<ul style='display: inline-block'>${content}</ul>`;
-    }
-  }
+  const config = {
+    message: msg,
+    dangerouslyUseHTMLString: false,
+    customClass: 'mp-order-del-pop-reverse-warn',
+  };
+  msgHandler(config, msg);
   MessageBox({
     showClose: true,
-    message,
+    message: config.message,
     type: 'success ',
     confirmButtonText,
-    dangerouslyUseHTMLString,
+    dangerouslyUseHTMLString: config.dangerouslyUseHTMLString,
     title,
-    customClass: 'mp-order-del-pop-reverse-warn',
     showCancelButton: true,
     closeOnClickModal,
     cancelButtonText,
+    customClass: config.customClass,
   }).then(() => successFunc && successFunc()).catch(() => failFunc && failFunc());
 }
 
