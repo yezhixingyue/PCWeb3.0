@@ -117,7 +117,7 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
           }
         });
         if (examples.length < 3) {
-          // 继续添加值 -- 不加了
+          // 继续添加值
           _list = [-Increment, -Increment * 2];
           _list.forEach(num => {
             if (examples.length < 3 && _exampleBeginValue + num >= min && _exampleBeginValue + num <= max) {
@@ -158,7 +158,7 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
     }
     return it;
   });
-  const range = `${min} ≤ ${propName} ≤ ${max}${Unit.split('/')[0]}`;
+  const range = max < Infinity ? `${min} ≤ ${propName} ≤ ${max}${Unit.split('/')[0]}` : `${min}${Unit.split('/')[0]} ≤ ${propName}`;
   const text = msgArr.length > 0 ? `${msgArr.filter(it => it).map(it => (typeof it === 'object' ? it.diaMsg : it)).join('\r\n')}` : '该范围不可用';
   // const arr = msgArr.map(it => (typeof it === 'object' ? it.diaMsg : it));
   const _msg = `${propName}不符合要求， \r\n${range}时：\r\n${text}`;

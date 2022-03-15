@@ -130,7 +130,7 @@ export default {
       h: 0,
       isFootFixed: false,
       cancelVisivle: false,
-      isAddPrepare: true,
+      isAddPrepare: false,
       detailVisible: false,
       curOrderID: null,
     };
@@ -210,7 +210,7 @@ export default {
     onCancelMulClick() { // 取消选中
       if (this.multipleSelection.length === 0) return;
       this.cancelVisivle = true;
-      this.isAddPrepare = true;
+      this.isAddPrepare = false;
     },
     submitCancelOrder() {
       this.$store.dispatch('unpayList/getOrderCancle', [this.multipleSelection, this.isAddPrepare]);
@@ -218,7 +218,7 @@ export default {
     async handleDetailClick(OrderID) { // 查看详情
       if (!OrderID) return;
       this.curOrderID = OrderID;
-      this.detailVisible = true;
+      this.detailVisible = false;
     },
   },
   watch: {

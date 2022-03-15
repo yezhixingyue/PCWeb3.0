@@ -51,7 +51,7 @@
         <el-form-item label="姓名：" prop="NickName">
           <el-input v-model.trim="subAccountForm.NickName"></el-input>
         </el-form-item>
-        <template v-if="subAccountForm.IsBranch && subAccountForm.AccountID && subAccountForm.AccountID !== customerInfo.Account.AccountID">
+        <template v-if="subAccountForm.IsBranch && (!subAccountForm.AccountID || subAccountForm.AccountID !== customerInfo.Account.AccountID) && dialogVisible">
           <el-form-item label="密码：" prop="Password">
             <el-input type="password" :placeholder="placeholder" :disabled='!subAccountForm.IsBranch' v-model.trim="subAccountForm.Password"></el-input>
           </el-form-item>

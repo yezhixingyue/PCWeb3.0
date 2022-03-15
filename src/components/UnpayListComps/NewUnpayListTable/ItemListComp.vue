@@ -201,7 +201,7 @@ export default {
       if (!this.data || this.data.isCanceled || this.data.isPaid) return;
       this.cancelObj = {
         PayCode: this.data.PayCode,
-        isAddPrepare: true,
+        isAddPrepare: false,
       };
       this.cancelVisivle = true;
     },
