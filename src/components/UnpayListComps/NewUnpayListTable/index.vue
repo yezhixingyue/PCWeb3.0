@@ -218,7 +218,7 @@ export default {
     async handleDetailClick(OrderID) { // 查看详情
       if (!OrderID) return;
       this.curOrderID = OrderID;
-      this.detailVisible = false;
+      this.detailVisible = true;
     },
   },
   watch: {
