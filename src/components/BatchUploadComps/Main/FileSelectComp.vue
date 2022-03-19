@@ -7,6 +7,7 @@
     :func="handleFileSelect"
     title="选择文件"
     :selectTitle='selectTitle'
+    ref="onFileSelector"
   />
 </template>
 
@@ -33,7 +34,7 @@ export default {
   methods: {
     handleFileSelect(files, e) {
       const fileList = [...files];
-      e.target.value = '';
+      if (e && e.target) e.target.value = '';
       this.$emit('change', fileList);
     },
   },

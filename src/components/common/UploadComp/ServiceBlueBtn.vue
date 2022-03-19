@@ -1,17 +1,24 @@
 <template>
-  <!-- <div> -->
-  <span class="upload-btn" :class="{disabled: disabled}" :title="selectTitle">
+  <span
+    class="upload-btn"
+    :class="{
+      'is-dragover': dragover,
+      disabled: disabled,
+    }"
+    :title="selectTitle"
+    @drop.prevent="onDrop"
+    @dragover.prevent="onDragover"
+    @dragleave.prevent="dragover = false"
+   >
     <input
       type="file"
       ref="oInp"
       :multiple='multiple'
       :accept="accept"
-      @change="onChange"
+      @change="change"
     />
-    {{title}}
+    {{localTitle}}
   </span>
-  <!-- <img :src="url" alt=""> -->
-  <!-- </div> -->
 </template>
 
 <script>
@@ -59,22 +66,76 @@ export default { // 上传图片按钮
   data() {
     return {
       imgs: [],
-      // url: null,
+      dragover: false,
     };
   },
+  computed: {
+    localTitle() {
+      if (this.dragover) return '释放文件';
+      return this.title;
+    },
+  },
   methods: {
-    onChange(e) {
-      if (this.func && !this.multiple) this.func(e.target.files[0], e);
-      // 如果没有开启一次上传多张选项，只传递第一张图片返回(也是唯一一张)；
-      if (this.func && this.multiple) {
-      // 如果开启多张上传，返回整个数组
-        this.func(e.target.files, e);
-      }
+    change(e) {
+      if (!e || !this.func) return;
+      const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
+      this.handleFileEmit(files, e);
     },
     handleRemove() {
       this.$nextTick(() => {
         this.$refs.oInp.value = '';
       });
+    },
+    handleFileEmit(files, e) {
+      if (this.multiple) { // 多文件上传
+        this.func(files, e);
+      } else { // 单文件上传
+        this.func(files[0], e);
+      }
+    },
+    onDragover() {
+      if (!this.disabled) {
+        this.dragover = true;
+      }
+    },
+    onDrop(e) {
+      if (this.disabled) return;
+      const { accept } = this;
+      this.dragover = false;
+      if (!accept) {
+        this.handleFileEmit(e.dataTransfer.files, e);
+        return;
+      }
+      const files = [].slice.call(e.dataTransfer.files).filter(file => {
+        const { type, name } = file;
+        const extension = name.indexOf('.') > -1
+          ? `.${name.split('.').pop()}`
+          : '';
+        const baseType = type.replace(/\/.*$/, '');
+        return accept.split(',')
+          .map(it => it.trim())
+          .filter(it => it)
+          .some(acceptedType => {
+            if (/\..+$/.test(acceptedType)) {
+              return extension === acceptedType;
+            }
+            if (/\/\*$/.test(acceptedType)) {
+              return baseType === acceptedType.replace(/\/\*$/, '');
+            }
+            // eslint-disable-next-line no-useless-escape
+            if (/^[^\/]+\/[^\/]+$/.test(acceptedType)) {
+              return type === acceptedType;
+            }
+            return false;
+          });
+      });
+      const diffLength = e.dataTransfer.files.length - files.length;
+      if (diffLength > 0) {
+        if (files.length > 0) this.$message.error(`已筛掉不符合格式的文件${diffLength}个`);
+        else this.$message.error('文件格式不符合，请重新选择');
+        // this.messageBox.failSingleError('', )
+      }
+      this.handleFileEmit(files, e);
     },
   },
 
@@ -101,7 +162,6 @@ export default { // 上传图片按钮
   line-height: 25px;
   > input {
     opacity: 0;
-    width: 100px;
     position: absolute;
     left: 0;
     top: 0;
@@ -113,6 +173,10 @@ export default { // 上传图片按钮
   }
   &:active {
     background-color: #35dff9;
+  }
+  &.is-dragover {
+    background-color: #35dff9;
+    cursor: context-menu;
   }
   &.disabled {
     background-color: #cbcbcb;

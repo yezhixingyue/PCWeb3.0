@@ -14,7 +14,7 @@
         <div class="workbench">
           <AddressChangeComp :customer='customer' @change="handleAddressChange" @validAddChange='handleValidAddChange' />
           <FailListComp :failedList='failedList' />
-          <FileSelectComp @change="handleFileChange" :disabled='!canSelectFile' :accept='accept' :selectTitle='selectTitle' />
+          <FileSelectComp @change="handleFileChange" :disabled='!canSelectFile' :accept='accept' :selectTitle='selectTitle' ref="oFileBox" />
         </div>
         <MainTableComp
           ref="oTableWrap"
@@ -24,7 +24,8 @@
           :checkAllDisabled='canSelectList.length === 0'
           @itemRemove='handleItemRemove'
           @itemUpload='handleItemUpload'
-          @multipleSelect='handleMultipleSelect' />
+          @multipleSelect='handleMultipleSelect'
+          @droped='onDroped' />
         <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21' showPayGroup showPayDescription />
         <PreCreateDialog :visible.sync="preCreateVisible" :PreCreateData="PreCreateData" :OriginList='preCreateOriginDataList' @submit="onOrderSubmit" />
       </div>
@@ -248,6 +249,11 @@ export default {
      */
     handleMultipleSelect(val) { // 表格中复选框选中文件
       this.multipleSelection = val;
+    },
+    onDroped(e) {
+      if (this.$refs.oFileBox?.$refs?.onFileSelector?.onDrop) {
+        this.$refs.oFileBox.$refs.onFileSelector.onDrop(e);
+      }
     },
     handleCheckAll(bool) { // 处理底部复选框选中事件
       if (this.$refs.oTableWrap && this.$refs.oTableWrap.$refs.multipleTable) {
