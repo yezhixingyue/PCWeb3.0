@@ -2,15 +2,10 @@
 import axios from 'axios';
 import { Loading, Message } from 'element-ui';
 import router from '@/router';
-import store from '../store';
 import messageBox from '../assets/js/utils/message';
 import Cookie from '../assets/js/Cookie';
 import { useCookie } from '../assets/js/setup';
-import { delay } from '../assets/js/utils/utils';
-
-let loadingInstance;
-let closeTip = false;
-let closeLoading = false;
+// import { delay } from '../assets/js/utils/utils';
 
 const { CancelToken } = axios;
 let source = CancelToken.source();
@@ -23,6 +18,26 @@ const clearToken = () => {
   source = CancelToken.source(); // 清除后赋予axios新的取消信息
 };
 
+let closeTip = false;
+let requestNum = 0;
+let loadingInstance;
+const getShowLoading = (config) => { // 查看当前请求是否需要展示弹窗
+  let showLoading = true;
+  const arr = ['/Api/PaymentOrder/PayResult', '/Api/Upload/File', '/Api/FileType/List']; // 不需要展示loading的api地址
+  if (config && config.url) {
+    for (let i = 0; i < arr.length; i += 1) {
+      if (config.url.split('?')[0].includes(arr[i]) || config.closeLoading) {
+        showLoading = false;
+      }
+    }
+  }
+  return showLoading;
+};
+const handleLoadingClose = () => { // 关闭弹窗
+  requestNum -= 1;
+  if (requestNum === 0) loadingInstance.close();
+};
+
 axios.interceptors.request.use(
   (config) => {
     const curConfig = config;
@@ -32,21 +47,13 @@ axios.interceptors.request.use(
 
     if (!token && !useCookie) token = localStorage.getItem('token');
     closeTip = curConfig.closeTip;
-    closeLoading = curConfig.closeLoading;
     const url = curConfig.url.split('?')[0];
     const arrWithOutToken = ['/Api/Customer/Reg', '/Api/Customer/Login'];
     if (token && !arrWithOutToken.includes(url)) curConfig.headers.common.Authorization = `Bearer ${token}`;
     if (url === '/Api/Sms/Send/VerificationCode') {
       curConfig.headers.common.SessionID = Cookie.getCookie('SessionID');
     }
-    let key = true;
-    const arr = ['/Api/PaymentOrder/PayResult', '/Api/Upload/File', '/Api/FileType/List']; // 不需要展示loading的api地址
-    for (let i = 0; i < arr.length; i += 1) {
-      if (curConfig.url.includes(arr[i]) || store.state.common.isLoading) {
-        key = false;
-      }
-    }
-    if (key && !closeLoading) {
+    if (getShowLoading(curConfig)) {
       let _color = 'rgba(255, 255, 255, 0.5)';
       let _text = '加载中';
       let _customClass = 'mp-general-loading-box opAnimate';
@@ -66,6 +73,8 @@ axios.interceptors.request.use(
       if (url === '/Api/Product/Detail') _text = '请稍候，正在获取产品信息...';
       if (url === '/Api/Quotation/List') _text = '正在获取购物车信息...';
       if (url === '/Api/Product/List') _text = '获取产品列表信息...';
+
+      requestNum += 1;
       loadingInstance = Loading.service({
         lock: true,
         text: _text,
@@ -80,7 +89,7 @@ axios.interceptors.request.use(
     return curConfig;
   },
   (error) => {
-    if (loadingInstance) loadingInstance.close();
+    if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
     messageBox.failSingleError({ msg: error });
     return Promise.reject(error);
   },
@@ -88,7 +97,7 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   async (response) => {
-    if (loadingInstance) loadingInstance.close();
+    if (getShowLoading(response.config) && loadingInstance) handleLoadingClose();
     const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
 
     // IE 8-9
@@ -139,74 +148,69 @@ axios.interceptors.response.use(
       _obj.title = _msg;
       messageBox.failSingleError(_obj);
     }
-    if (_url === '/Api/Quotation/Save' || _url === '/Api/Order/Create') {
-      await delay(300);
-    }
     return response;
   },
   async (error) => {
-    if (!store.state.common.isLoading) {
-      if (loadingInstance) loadingInstance.close();
-      if (error.response) {
-        let key = false;
-        let b;
-        let r;
-        let buffterRes;
-        let buffterErr = '文件导出数据过大，请缩小导出时间区间或精确筛选条件';
-        switch (error.response.status) {
-          case 401:
-            clearToken();
-            router.replace('/login');
-            key = true;
-            break;
-          case 413: // 处理文件导出错误
-            b = new Blob([error.response.data]);
-            r = new FileReader();
-            r.readAsText(b, 'utf-8');
-            buffterRes = await new Promise(resolve => { r.onload = res => resolve(res); });
-            if (buffterRes && buffterRes.currentTarget && buffterRes.currentTarget.result) {
-              buffterErr = buffterRes.currentTarget.result;
-            }
-            messageBox.failSingleError({ msg: `${buffterErr}`, title: '导出失败' });
-            key = true;
-            break;
-          default:
-            messageBox.failSingleError({ title: '操作失败', msg: `${error.response.data && error.response.data.Message ? error.response.data.Message : error.response.statusText}` });
-            key = true;
-            break;
-        }
-        if (key) return Promise.reject(error.response);
+    if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
+    if (error.response) {
+      let key = false;
+      let b;
+      let r;
+      let buffterRes;
+      let buffterErr = '文件导出数据过大，请缩小导出时间区间或精确筛选条件';
+      switch (error.response.status) {
+        case 401:
+          clearToken();
+          router.replace('/login');
+          key = true;
+          break;
+        case 413: // 处理文件导出错误
+          b = new Blob([error.response.data]);
+          r = new FileReader();
+          r.readAsText(b, 'utf-8');
+          buffterRes = await new Promise(resolve => { r.onload = res => resolve(res); });
+          if (buffterRes && buffterRes.currentTarget && buffterRes.currentTarget.result) {
+            buffterErr = buffterRes.currentTarget.result;
+          }
+          messageBox.failSingleError({ msg: `${buffterErr}`, title: '导出失败' });
+          key = true;
+          break;
+        default:
+          messageBox.failSingleError({ title: '操作失败', msg: `${error.response.data && error.response.data.Message ? error.response.data.Message : error.response.statusText}` });
+          key = true;
+          break;
       }
-      if (error.message === 'Network Error') {
+      if (key) return Promise.reject(error.response);
+    }
+    if (error.message === 'Network Error') {
+      Message({
+        showClose: true,
+        message: '网络错误',
+        type: 'error',
+      });
+    } else if (error.message && error.message.includes('timeout')) {
+      Message({
+        showClose: true,
+        message: '网络超时',
+        type: 'error',
+      });
+    } else if (error.response && error.response.status === 404) {
+      Message({
+        showClose: true,
+        message: '404错误',
+        type: 'error',
+      });
+    } else {
+      let msg = '';
+      if (error.response && error.response.data && error.response.data.Message) {
+        msg = error.response.data.Message;
+      }
+      if (msg) {
         Message({
           showClose: true,
-          message: '网络错误',
+          message: msg,
           type: 'error',
         });
-      } else if (error.message && error.message.includes('timeout')) {
-        Message({
-          showClose: true,
-          message: '网络超时',
-          type: 'error',
-        });
-      } else if (error.response && error.response.status === 404) {
-        Message({
-          showClose: true,
-          message: '404错误',
-          type: 'error',
-        });
-      } else {
-        let msg = '';
-        if (error.response && error.response.data && error.response.data.Message) {
-          msg = error.response.data.Message;
-        }
-        if (msg) {
-          Message({
-            showClose: true,
-            message: msg,
-            type: 'error',
-          });
-        }
       }
     }
     return Promise.reject(error);

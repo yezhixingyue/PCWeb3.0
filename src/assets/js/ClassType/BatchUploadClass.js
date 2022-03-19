@@ -206,6 +206,17 @@ export default class BatchUpload {
   }
 
   static async getPreOrderCreate(list, basicObj) {
+    if (basicObj?.Address?.Express?.First === 1 && basicObj?.Address?.Express?.Second === 1) {
+      const t = list.find(it => it.result.OutPlate?.Second);
+      if (t) {
+        messageBox.failSingleError({
+          title: '上传失败',
+          msg: ['选中订单中含有平台单号，不能使用名片之家配送，请切换配送方式\r\n'],
+          center: true,
+        });
+        return null;
+      }
+    }
     const temp = this.generateCommitData(list, basicObj, true);
     const resp = await api.getOrderPreCreate(temp).catch(() => null);
     if (resp && resp.data.Status === 1000) {

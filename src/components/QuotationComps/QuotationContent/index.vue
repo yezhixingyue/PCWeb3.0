@@ -298,7 +298,7 @@ export default {
       this.priceGetErrMsg = '';
       this.isGettingPrice = true;
       this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
-      const fileContent = this.$refs.oSubmitBox ? this.$refs.oSubmitBox.fileContent : '';
+      const fileContent = this.$refs.oSubmitBox ? this.$refs.oSubmitBox.ruleForm.fileContent : '';
       const msg = await this.getProductPrice(fileContent);
       this.isGettingPrice = false;
       if (msg === true) {

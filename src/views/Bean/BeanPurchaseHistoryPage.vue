@@ -84,9 +84,9 @@ export default {
       BillTypeList: [{ ID: '', Name: '不限' }, ...BillBoughtStatusEnumList],
       dateList: [
         { label: '全部', value: 'all' },
-        { label: '今日', value: 'today' },
-        { label: '昨日', value: 'yesterday' },
-        { label: '前日', value: 'beforeyesterday' },
+        { label: '今天', value: 'today' },
+        { label: '昨天', value: 'yesterday' },
+        { label: '前天', value: 'beforeyesterday' },
         { label: '本月', value: 'curMonth' },
         { label: '上月', value: 'lastMonth' },
       ],

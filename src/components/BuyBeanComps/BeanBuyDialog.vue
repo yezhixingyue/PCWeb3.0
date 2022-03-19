@@ -41,7 +41,7 @@
       <!-- 提示 -->
       <p class="tips-box" v-if="canBuyMaxCount < Infinity">
         <i class="el-icon-warning"></i>
-        <span>注： 今日还可购买{{canBuyMaxCount}}份</span>
+        <span>注： 今天还可购买{{canBuyMaxCount}}份</span>
       </p>
     </div>
     <template slot="foot-tip">

@@ -27,7 +27,8 @@
           <template v-else>非必传，</template>
           <template v-if="multiple">可上传多个，</template>
           <template v-else>单文件，</template>
-          <em :title="FileInfo.Remark.length > 40 ? FileInfo.Remark : ''">
+          <template>点击此处添加文件或将文件拖到此处可上传 </template>
+          <em :title="FileInfo.Remark.length > 20 ? FileInfo.Remark : ''">
             {{ FileInfo.Remark }}
             <i>）</i>
           </em>
@@ -384,6 +385,7 @@ export default {
                 text-overflow: ellipsis;
                 flex: 1 1 auto;
                 padding: 0 1px;
+                margin-left: 4px;
               }
             }
           }

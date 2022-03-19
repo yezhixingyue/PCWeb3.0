@@ -35,7 +35,9 @@
           <template v-else>
             <label for="">
               <img src="@/assets/images/position.png" alt="">
-              <span>收货地址：</span>
+              <span>收货地址</span>
+              <span style="font-weight: bold;font-size: 12px;color: #585858;">（ 无平台单号时使用此地址 ）</span>
+              <span>：</span>
             </label>
             <div class="is-font-size-13">
               <span class="address" :title="curAddressInfo && curAddressInfo.address.length>50?curAddressInfo.address:''">{{ curAddressInfo.address }}</span>

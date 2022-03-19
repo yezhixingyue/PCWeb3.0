@@ -2,7 +2,7 @@
 import { MessageBox } from 'element-ui';
 import Vue from 'vue';
 
-const msgHandler = (config, msg) => {
+const msgHandler = (config, msg, center = false) => {
   if (Array.isArray(msg)) {
     const _config = config;
     if (msg.length === 1 && !msg[0].includes('\r\n')) {
@@ -12,7 +12,7 @@ const msgHandler = (config, msg) => {
       let bool = false;
       const content = msg
         .map(it => {
-          const alignDirection = /^继续([\d|\D]+)?吗？$/.test(it) ? 'center' : 'left';
+          const alignDirection = /^继续([\d|\D]+)?吗？$/.test(it) || center ? 'center' : 'left';
           let _content = it;
           if (it.includes('\r\n')) {
             let list = it.split('\r\n');
@@ -62,14 +62,14 @@ function failSingle({ msg, successFunc, failFunc }) {
  * @param {*} failFunc
  */
 function failSingleError({
-  title = '出错啦 ！', msg, successFunc, failFunc, beforeClose,
+  title = '出错啦 ！', msg, successFunc, failFunc, beforeClose, center,
 }) {
   const config = {
     message: msg,
     dangerouslyUseHTMLString: false,
     customClass: 'mp-order-del-pop-reverse-fail',
   };
-  msgHandler(config, msg);
+  msgHandler(config, msg, center);
   MessageBox({
     showClose: true,
     message: config.message,
