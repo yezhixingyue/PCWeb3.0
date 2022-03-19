@@ -22,6 +22,7 @@
           class="table"
           :multipleSelection='multipleSelection'
           :checkAllDisabled='canSelectList.length === 0'
+          :accept='accept'
           @itemRemove='handleItemRemove'
           @itemUpload='handleItemUpload'
           @multipleSelect='handleMultipleSelect'
