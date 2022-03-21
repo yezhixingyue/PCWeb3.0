@@ -393,11 +393,11 @@ export default {
         margin: 0 auto;
         padding: 14px 0;
         height: 100%;
-        height: 280px;
+        height: 305px;
         overflow-y: auto;
         transition: 0.2s;
         &.active {
-          height: 280px;
+          height: 305px;
         }
         > li {
           display: flex;

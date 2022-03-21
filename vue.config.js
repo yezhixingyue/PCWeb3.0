@@ -5,7 +5,7 @@ let proxyUrl = 'http://192.168.3.68:8050';
 let publicPath = '';
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-development-8078') proxyUrl = 'http://192.168.1.92:8050';
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-production-8088') {
-  proxyUrl = 'http://192.168.1.92:8030';
+  proxyUrl = 'http://erp.ybz888.com';
 }
 if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL) { // 打包测试环境的代码
   publicPath = '/pc/';
@@ -24,6 +24,26 @@ module.exports = {
         ws: true, // 开启websockets
         changeOrigin: true, // 开启代理
       },
+      // '/HeadPic': { // 代理员工照片地址
+      //   target: proxyUrl,
+      //   ws: true, // 开启websockets
+      //   changeOrigin: true, // 开启代理
+      // },
+      // '/Temp': { // 代理临时图片地址
+      //   target: proxyUrl,
+      //   ws: true, // 开启websockets
+      //   changeOrigin: true, // 开启代理
+      // },
+      // '//Image': { // 代理图片地址
+      //   target: proxyUrl,
+      //   ws: true, // 开启websockets
+      //   changeOrigin: true, // 开启代理
+      // },
+      // '/Image': { // 代理图片地址
+      //   target: proxyUrl,
+      //   ws: true, // 开启websockets
+      //   changeOrigin: true, // 开启代理
+      // },
     },
   },
   configureWebpack: {
