@@ -21,34 +21,34 @@ export default {
         Second: '',
       };
     },
-    TodayDate(state) {
-      const stringDate = ConvertTimeFormat(new Date(state.newDate));
+    TodayDate() {
+      const stringDate = ConvertTimeFormat(new Date());
       return {
         First: `${stringDate}T00:00:00.000Z`,
         Second: `${stringDate}T23:59:59.997Z`,
       };
     },
-    YesterdayDate(state) {
+    YesterdayDate() {
       const stringDate = ConvertTimeFormat(
-        new Date(new Date(state.newDate).getTime() - 1000 * 60 * 60 * 24),
+        new Date(new Date().getTime() - 1000 * 60 * 60 * 24),
       );
       return {
         First: `${stringDate}T00:00:00.000Z`,
         Second: `${stringDate}T23:59:59.997Z`,
       };
     },
-    BeforeYesterdayTimeDate(state) {
+    BeforeYesterdayTimeDate() {
       const stringDate = ConvertTimeFormat(
-        new Date(new Date(state.newDate).getTime() - 1000 * 60 * 60 * 24 * 2),
+        new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
       );
       return {
         First: `${stringDate}T00:00:00.000Z`,
         Second: `${stringDate}T23:59:59.997Z`,
       };
     },
-    curMonthDate(state) {
-      const stringDate1 = ConvertTimeFormat(new Date(new Date(state.newDate).setDate(1)));
-      const m = new Date(state.newDate).getMonth();
+    curMonthDate() {
+      const stringDate1 = ConvertTimeFormat(new Date(new Date().setDate(1)));
+      const m = new Date().getMonth();
       const t = new Date(new Date(new Date().setMonth(m + 1)).setDate(0));
       const stringDate2 = ConvertTimeFormat(new Date(t));
       return {
@@ -56,13 +56,13 @@ export default {
         Second: `${stringDate2}T23:59:59.997Z`,
       };
     },
-    lastMonthDate(state) {
+    lastMonthDate() {
       const stringDate1 = ConvertTimeFormat(new Date(
         new Date(
-          new Date(state.newDate).setDate(1),
-        ).setMonth(new Date(state.newDate).getMonth() - 1),
+          new Date().setDate(1),
+        ).setMonth(new Date().getMonth() - 1),
       ));
-      const stringDate2 = ConvertTimeFormat(new Date(new Date(state.newDate).setDate(0)));
+      const stringDate2 = ConvertTimeFormat(new Date(new Date().setDate(0)));
       return {
         First: `${stringDate1}T00:00:00.000Z`,
         Second: `${stringDate2}T23:59:59.997Z`,
@@ -76,16 +76,16 @@ export default {
         Second: '',
       };
     },
-    financeTodayDate(state) {
-      const stringDate = ConvertTimeFormat(new Date(state.newDate));
-      const secondDate = getSecondTime(new Date(state.newDate));
+    financeTodayDate() {
+      const stringDate = ConvertTimeFormat(new Date());
+      const secondDate = getSecondTime(new Date());
       return {
         First: `${stringDate}T08:00:00.000Z`,
         Second: `${secondDate}T07:59:59.997Z`,
       };
     },
-    financeYesterdayDate(state) {
-      const date = new Date(new Date(state.newDate).getTime() - 1000 * 60 * 60 * 24);
+    financeYesterdayDate() {
+      const date = new Date(new Date().getTime() - 1000 * 60 * 60 * 24);
       const stringDate = ConvertTimeFormat(date);
       const secondDate = getSecondTime(date);
       return {
@@ -93,8 +93,8 @@ export default {
         Second: `${secondDate}T07:59:59.997Z`,
       };
     },
-    financeDayBeforeYesterdayTimeDate(state) {
-      const date = new Date(new Date(state.newDate).getTime() - 1000 * 60 * 60 * 24 * 2);
+    financeDayBeforeYesterdayTimeDate() {
+      const date = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2);
       const stringDate = ConvertTimeFormat(date);
       const secondDate = getSecondTime(date);
       return {
@@ -102,9 +102,9 @@ export default {
         Second: `${secondDate}T07:59:59.997Z`,
       };
     },
-    financeCurMonthDate(state) {
-      const stringDate1 = ConvertTimeFormat(new Date(new Date(state.newDate).setDate(1)));
-      const m = new Date(state.newDate).getMonth();
+    financeCurMonthDate() {
+      const stringDate1 = ConvertTimeFormat(new Date(new Date().setDate(1)));
+      const m = new Date().getMonth();
       const t = new Date(new Date(new Date().setMonth(m + 1)).setDate(0));
       const secondDate = getSecondTime(t);
       return {
@@ -112,12 +112,12 @@ export default {
         Second: `${secondDate}T07:59:59.997Z`,
       };
     },
-    financeLastMonthDate(state) {
+    financeLastMonthDate() {
       const stringDate1 = ConvertTimeFormat(new Date(
-        new Date(new Date(state.newDate)
-          .setDate(1)).setMonth(new Date(state.newDate).getMonth() - 1),
+        new Date(new Date()
+          .setDate(1)).setMonth(new Date().getMonth() - 1),
       ));
-      const secondDate = getSecondTime(new Date(new Date(state.newDate).setDate(0)));
+      const secondDate = getSecondTime(new Date(new Date().setDate(0)));
       return {
         First: `${stringDate1}T08:00:00.000Z`,
         Second: `${secondDate}T07:59:59.997Z`,
