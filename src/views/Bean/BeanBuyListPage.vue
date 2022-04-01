@@ -63,7 +63,7 @@ import BeanBuyDialog from '../../components/BuyBeanComps/BeanBuyDialog.vue';
 import BeanItemComp from '../../components/BuyBeanComps/BeanItemComp.vue';
 import BeanListClassType from '../../assets/js/ClassType/BeanListClass/BeanListClassType';
 import Count from '../../components/common/Count.vue';
-import QrCodeForPayDialogComp from '../../components/common/QrCodeForPayDialogComp.vue';
+import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
 
 export default {
   components: {

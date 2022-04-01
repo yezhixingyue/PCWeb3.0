@@ -67,7 +67,7 @@ import { BillBoughtStatusEnumList, BillBoughtStatusEnums } from '../../assets/js
 import SingleSelector from '../../components/common/Selector/SingleSelector.vue';
 import LineDateSelectorComp from '../../components/common/Selector/LineDateSelectorComp.vue';
 import BeanPurchaseHistoryTable from '../../components/BuyBeanComps/BeanPurchaseHistoryTable.vue';
-import QrCodeForPayDialogComp from '../../components/common/QrCodeForPayDialogComp.vue';
+import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
 import Count from '../../components/common/Count.vue';
 
 export default {

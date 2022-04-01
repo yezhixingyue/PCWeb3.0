@@ -353,7 +353,7 @@ export default {
       this.isloading = false;
     }
     this.oApp = document.getElementById('app');
-    const _func = debounce(this.handleScroll, 50);
+    const _func = debounce(this.handleScroll, 0);
     if (this.oApp) {
       this.oApp.onscroll = () => _func(this.oApp);
     }

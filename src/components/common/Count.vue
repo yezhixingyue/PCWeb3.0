@@ -13,7 +13,7 @@
           </el-pagination>
         </div>
         <span class="count" :class="DownLoadConfigObj?'exc':''"
-          >共检索出<i class="is-pink is-font-16">{{count}}</i>条记录</span>
+          >共检索出<i class="is-pink is-font-16">{{showCount || count}}</i>{{rightContent}}</span>
         <DownLoadExcelComp :configObj="DownLoadConfigObj" v-if="DownLoadConfigObj" />
 </div>
 </template>
@@ -40,6 +40,10 @@ export default {
       type: Number,
       default: 0,
     },
+    showCount: {
+      type: Number,
+      default: 0,
+    },
     /**
      * 页面发生变化时的回调函数
      */
@@ -61,6 +65,10 @@ export default {
     DownLoadConfigObj: {
       type: Object,
       default: null,
+    },
+    rightContent: {
+      type: String,
+      default: '条记录',
     },
   },
   watch: {

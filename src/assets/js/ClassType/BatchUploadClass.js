@@ -41,6 +41,10 @@ export default class BatchUpload {
         PrintFileID: resp.data.Data[0].PrintFileID,
         isParsing: false, // 是否正在解析文件唯一名中
         parseStatus: 'ready', // ready | success | parsing
+        Express: {
+          First: '',
+          Second: '',
+        },
       };
     }
     let error = resp && resp.data && resp.data.Message && resp.data.Status !== 1000 ? resp.data.Message : '文件解析失败';
@@ -168,9 +172,9 @@ export default class BatchUpload {
   }
 
   static generateCommitData(list, basicObj, isFromPreCreate) { // 生成下单提交数据
-    const { CustomerID, Address, Terminal, UsePrintBean, PayInFull, OrderType, Position, IsBatchUpload, IgnoreRiskLevel } = basicObj;
+    const { CustomerID, Address, Terminal, UsePrintBean, PayInFull, OrderType, Position, IsBatchUpload, IgnoreRiskLevel, UseSameAddress } = basicObj;
     const List = list.map(it => {
-      const { ProductParams, Content, OutPlate, PrintFileID } = it.result;
+      const { ProductParams, Content, PrintFileID } = it.result;
       const FileList = !isFromPreCreate && (PrintFileID || PrintFileID === 0) ? [{
         ID: PrintFileID,
         List: [{
@@ -181,18 +185,24 @@ export default class BatchUpload {
         }],
       }] : [];
       const Customer = { CustomerID };
+      let add = Address;
+      if (!UseSameAddress) {
+        add = {};
+        if (it.Express) add.Express = it.Express;
+        if (it.result.Address) add.Address = it.result.Address;
+      }
       const temp = {
         ProductParams,
         Content,
-        OutPlate,
         FileList,
         Terminal,
-        Address,
+        Address: add,
         Customer,
         Position,
         key: it.key,
         IgnoreRiskLevel,
       };
+      if (it.result.Address?.OutPlateSN) temp.OutPlate = { First: 1, Second: it.result.Address.OutPlateSN };
       return temp;
     });
     return {
@@ -202,12 +212,13 @@ export default class BatchUpload {
       OrderType,
       List,
       IsBatchUpload,
+      UseSameAddress,
     };
   }
 
   static async getPreOrderCreate(list, basicObj) {
-    if (basicObj?.Address?.Express?.First === 1 && basicObj?.Address?.Express?.Second === 1) {
-      const t = list.find(it => it.result.OutPlate?.Second);
+    if (basicObj?.Address?.Express?.First === 1 && basicObj?.Address?.Express?.Second === 1 && basicObj?.UseSameAddress) {
+      const t = list.find(it => it.result.Address?.OutPlateSN);
       if (t) {
         messageBox.failSingleError({
           title: '上传失败',
@@ -217,6 +228,15 @@ export default class BatchUpload {
         return null;
       }
     }
+    if (!basicObj?.UseSameAddress
+      && list.some(it => !it.Express || (!it.Express.First && it.Express.First !== 0) || (!it.Express.Second && it.Express.Second !== 0))) {
+      messageBox.failSingleError({ title: '上传失败', msg: '配送方式必须选择' });
+      return null;
+    }
+    list.forEach(it => {
+      const _it = it;
+      _it.error = '';
+    });
     const temp = this.generateCommitData(list, basicObj, true);
     const resp = await api.getOrderPreCreate(temp).catch(() => null);
     if (resp && resp.data.Status === 1000) {
@@ -306,7 +326,7 @@ export default class BatchUpload {
     const { CustomerID, Address } = basicObj;
     if (!CustomerID || !Address) return;
     list.forEach(async it => {
-      if (it.OutPlate && it.OutPlate.Second && onlyAddChange) return; // ? 是否要跳过有平台单号的订单 - 仅地址发生改变时进行跳过，配送方式改变时仍需计算
+      if (it.result.Address?.OutPlateSN && onlyAddChange) return; // ? 是否要跳过有平台单号的订单 - 仅地址发生改变时进行跳过，配送方式改变时仍需计算
       const _it = it;
       _it.result.ExpressCost = '-';
       const { Weight, ProductParams } = _it.result;

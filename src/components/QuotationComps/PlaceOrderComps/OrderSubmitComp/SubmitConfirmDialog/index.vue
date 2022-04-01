@@ -61,7 +61,7 @@
 import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
 import OrderProgress from '@/components/OrderListComps/OrderDetail/OrderProgress.vue';
 import OrderPackageList from '@/components/OrderListComps/OrderDetail/OrderPackageList.vue';
-import PaymentPriceDisplayComp from '@/components/common/OrderCommonComps/PaymentPriceDisplayComp';
+import PaymentPriceDisplayComp from '@/packages/PaymentPriceDisplayComp';
 import DetailComp from './DetailComp.vue';
 
 export default {

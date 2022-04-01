@@ -14,19 +14,26 @@ let _beanHelpID = '60';
 /**
  * 开发 ---- 测试环境
  */
-if (mode === 'test-production-8050') {
+if (mode === 'test-development') {
   _imgUrl = 'http://192.168.1.92:8050/'; // 图片和接口地址
 }
 
 /**
  * 开发 ---- 生产环境
  */
-if (mode === 'test-production-8088') {
+if (mode === 'pro-development') {
   _homeUrl = 'http://www.ybz888.com/';
   _imgUrl = 'http://erp.ybz888.com/';
   _agreementID = '4';
   _statementID = '3';
   _beanHelpID = '3';
+}
+
+/**
+ * 正式 ---- 测试环境
+ */
+if (mode === 'test-production') {
+  _imgUrl = 'http://192.168.1.92:8050/'; // 图片和接口地址
 }
 
 /**
@@ -50,6 +57,7 @@ export const agreementID = _agreementID; // 用户协议文章ID
 export const statementID = _statementID; // 权责声明文章ID
 export const beanHelpID = _beanHelpID;
 export const amapAppkey = 'd1de441473f06000bd61463102442b1e';
+export const projectType = 'pc';
 
 export default {
   homeUrl,

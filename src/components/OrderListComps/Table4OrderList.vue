@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import RetractableDisplayComp from '@/components/common/RetractableDisplayComp/Index.vue';
+import RetractableDisplayComp from '@/packages/RetractableDisplayComp';
 import ItemListComp from './OrderListItemComp.vue';
 
 export default {

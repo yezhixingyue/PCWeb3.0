@@ -255,6 +255,21 @@ export default {
     // initLoading: false, // 初始下单页面 加载初始化信息loading展示
   },
   getters: {
+    /* 细分类 物流配送方式列表
+    -------------------------------*/
+    subExpressList(state) {
+      if (state.ExpressList.length === 0) return [];
+      const _list = [];
+      state.ExpressList.forEach(level1 => {
+        level1.List.forEach(level2 => {
+          const _obj = { ...level2 };
+          _obj.name = level2.Name;
+          _obj._Type = level1.Type;
+          _list.push(_obj);
+        });
+      });
+      return _list;
+    },
   },
   mutations: {
     /** 当下拉框展示时修改该状态，用以触发顶部zindex的值以适应对下拉框的覆盖

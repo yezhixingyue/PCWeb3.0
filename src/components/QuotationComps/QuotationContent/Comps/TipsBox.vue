@@ -4,20 +4,24 @@
       <li class="icon"><i class="el-icon-warning"></i> 温馨提示：</li>
       <li class="tips-content" v-for="it in localTipsArr" :key="it">{{it}}</li>
     </ul>
-    <ul v-if="ProductQuotationResult && ProductQuotationResult.Content && !onlyTips" class="detail">
+    <ul v-if="ProductQuotationResult && ProductQuotationResult.PriceContent && !onlyTips" class="detail">
       <li ref="detailBox">
-        <span class="info" ref="oDetailContent">{{ProductQuotationResult.Content.trim()}}</span>
+        <span class="info" ref="oDetailContent">{{ProductQuotationResult.PriceContent.trim()}}</span>
         <el-popover
           placement="top"
           popper-class='mp-place-order-copy-poper-box'
           trigger="manual"
+          v-if="showCopyBtn && ProductQuotationResult.Content"
           v-model="visible">
           <span>{{copySuccess ? '复制成功' : '复制失败，请手动复制'}}</span>
           <span class="blue-span" slot="reference" @click="handleCopyClick">
             <img src="@/assets/images/copy.png" alt="">
-            复制订单信息
+            提取批量下单信息
           </span>
         </el-popover>
+        <span class="is-pink" v-if="showCopyBtn && !ProductQuotationResult.Content">
+          <!-- <i class="el-icon-warning"></i> -->
+          [ 该产品不支持批量下单 ]</span>
       </li>
     </ul>
   </div>
@@ -29,14 +33,21 @@ import { mapState } from 'vuex';
 export default {
   props: {
     onlyTips: {
-      default: false,
       type: Boolean,
+      default: false,
     },
   },
   computed: {
     ...mapState('Quotation', ['RiskWarningTipsObj', 'ProductQuotationResult']),
+    ...mapState('common', ['customerInfo']),
     localTipsArr() {
       return this.RiskWarningTipsObj.tipsList && this.RiskWarningTipsObj.tipsList.length > 0 ? this.RiskWarningTipsObj.tipsList : null;
+    },
+    showCopyBtn() {
+      if (this.customerInfo && this.customerInfo.PermissionInfo && this.customerInfo.PermissionInfo.BatchUpload) {
+        return true;
+      }
+      return false;
     },
   },
   data() {
@@ -48,7 +59,8 @@ export default {
   methods: {
     handleCopyClick() { // 复制
       if (this.$refs.oDetailContent) {
-        const content = this.$refs.oDetailContent.innerText;
+        // const content = this.$refs.oDetailContent.innerText;
+        const content = this.ProductQuotationResult.Content;
         const textarea = document.createElement('textarea');
         textarea.style.position = 'fixed';
         textarea.style.top = 0;
@@ -129,6 +141,16 @@ export default {
         img {
           vertical-align: -3px;
           margin-right: 2px;
+        }
+      }
+      span.is-pink {
+        font-size: 13px;
+        white-space: nowrap;
+        i {
+          font-size: 14px;
+          margin-right: 4px;
+          position: relative;
+          top: 0.5px;
         }
       }
     }

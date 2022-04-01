@@ -2,19 +2,22 @@
   <section class="mp-c-batch-upload-page-wrap">
     <header>
       <div class="content">
-        <ProductFilterComp v-model="Product" :disabled='canSelectList.length > 0' @change="onProductFilterChange" />
-        <p class="tips-box">
-          <i class="el-icon-warning"></i>
-          <span>上传说明：多产品上传文件名必须携带产品名称。   单产品上传不需要携带产品名称，所有上传文件视同选定产品。</span>
-        </p>
+        <AddressChangeComp
+          :customer='customer'
+          :UseSameAddress='UseSameAddress'
+          :switchUseSameAddDisabled='canSelectList.length > 0'
+          @changeUseSameAddress='onChangeUseSameAddress'
+          @change="handleAddressChange"
+          @validAddChange='handleValidAddChange'
+          @popperVisible='handlePopperVisible'
+        />
       </div>
     </header>
     <main>
       <div class="content">
-        <div class="workbench">
-          <AddressChangeComp :customer='customer' @change="handleAddressChange" @validAddChange='handleValidAddChange' />
-          <FailListComp :failedList='failedList' />
+        <div class="upload-btn-box">
           <FileSelectComp @change="handleFileChange" :disabled='!canSelectFile' :accept='accept' :selectTitle='selectTitle' ref="oFileBox" />
+          <FailListComp :failedList='failedList' />
         </div>
         <MainTableComp
           ref="oTableWrap"
@@ -23,12 +26,21 @@
           :multipleSelection='multipleSelection'
           :checkAllDisabled='canSelectList.length === 0'
           :accept='accept'
+          :subExpressList='subExpressList'
+          :UseSameAddress='UseSameAddress'
+          :ShowProductDetail='ShowProductDetail'
           @itemRemove='handleItemRemove'
           @itemUpload='handleItemUpload'
           @multipleSelect='handleMultipleSelect'
           @droped='onDroped' />
         <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21' showPayGroup showPayDescription />
-        <PreCreateDialog :visible.sync="preCreateVisible" :PreCreateData="PreCreateData" :OriginList='preCreateOriginDataList' @submit="onOrderSubmit" />
+        <PreCreateDialog
+         :visible.sync="preCreateVisible"
+         :subExpressList='subExpressList'
+         :PreCreateData="PreCreateData"
+         :OriginList='preCreateOriginDataList'
+         @submit="onOrderSubmit"
+         />
       </div>
     </main>
     <footer>
@@ -38,9 +50,9 @@
           :expressCost='expressCost'
           :allCost='allCost'
           :showPrice='successedList.length > 0'
-          :failedList='failedList'
           :canSelectList='canSelectList'
           :multipleSelection='multipleSelection'
+          :UseSameAddress='UseSameAddress'
           @uploadSelected='handleUploadSelected'
           @removeSelected='handleRemoveSelected'
           @checkAll='handleCheckAll'
@@ -65,7 +77,7 @@
             @checkAll='handleCheckAll'
             @clearSuccess='handleClearSuccess'
             :address='address'
-            />
+          />
         </div>
       </footer>
     </transition>
@@ -74,16 +86,17 @@
 
 <script>
 // import CustomerSelectComp from '@/components/BatchUploadComps/Header/CustomerSelectComp.vue';
-import AddressChangeComp from '@/components/BatchUploadComps/Header/AddressChangeComp.vue';
-import ProductFilterComp from '@/components/BatchUploadComps/Main/ProductFilterComp.vue';
-import FileSelectComp from '@/components/BatchUploadComps/Main/FileSelectComp.vue';
-import FailListComp from '@/components/BatchUploadComps/Main/FailListComp.vue';
+import AddressChangeComp from '@/packages/BatchUploadComps/Header/AddressChangeComp.vue';
+// import ProductFilterComp from '@/components/BatchUploadComps/Main/ProductFilterComp.vue';
+import FileSelectComp from '@/packages/FileSelectComp';
+import FailListComp from '@/packages/BatchUploadComps/Main/FailListComp';
 import MainTableComp from '@/components/BatchUploadComps/Main/MainTableComp/index.vue';
-import BatchUploadFooterComp from '@/components/BatchUploadComps/Footer/BatchUploadFooterComp.vue';
+import BatchUploadFooterComp from '@/packages/BatchUploadComps/Footer/BatchUploadFooterComp';
 import BatchUploadClass from '@/assets/js/ClassType/BatchUploadClass';
-import QrCodeForPayDialogComp from '@/components/common/QrCodeForPayDialogComp';
-import PreCreateDialog from '@/components/BatchUploadComps/PreCreateDialog/index.vue';
-import { mapState } from 'vuex';
+import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
+import { mapState, mapGetters } from 'vuex';
+import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
+import PreCreateDialog from '../../packages/PreCreateDialog';
 
 export default {
   name: 'OrderBatchUploadPage',
@@ -96,7 +109,7 @@ export default {
     /**
      * 页面主体组件
      */
-    ProductFilterComp, // 产品筛选组件
+    // ProductFilterComp, // 产品筛选组件
     FailListComp, // 错误列表弹窗
     FileSelectComp, // 文件上传选择组件
     MainTableComp, // 主体表格组件
@@ -132,11 +145,14 @@ export default {
       preCreateVisible: false,
       preCreateOriginDataList: [], // 预下单原始列表数据，预下单确认后使用该列表数据生成订单
       PreCreateData: null, // 预下单数据（服务器返回数据）
+      UseSameAddress: false,
+      ShowProductDetail,
     };
   },
   computed: {
     ...mapState('common', ['customerInfo', 'ScrollInfo']),
     ...mapState('Quotation', ['RiskWarningTipsTypes']),
+    ...mapGetters('common', ['subExpressList']),
     customer() {
       return this.customerInfo;
     },
@@ -166,7 +182,8 @@ export default {
       return this.getPrice('CurrentCost', this.successedList);
     },
     expressCost() { // 运费总费用
-      return this.getPrice('ExpressCost', this.successedList);
+      // return this.getPrice('ExpressCost', this.successedList);
+      return 0;
     },
     allCost() { // 全部总费用
       return +((+this.productCost + +this.expressCost).toFixed(2));
@@ -182,6 +199,7 @@ export default {
         Position: this.Position, // 255 是自助上传
         IsBatchUpload: this.IsBatchUpload,
         IgnoreRiskLevel: this.RiskWarningTipsTypes.All,
+        UseSameAddress: this.UseSameAddress,
       };
       return temp;
     },
@@ -220,9 +238,19 @@ export default {
     handleAddressChange(address) { // 设置地址信息 --- 检查是否已有解析过的文件（解析成功且待上传） 如果有根据特定改变内容去改变列表价格 -- 待定
       this.address = address;
     },
+    onChangeUseSameAddress(val) { // 切换使用相同和不同地址
+      this.handleCheckAll(false);
+      this.successedList = [];
+      this.failedList = [];
+      this.UseSameAddress = val;
+    },
+    // eslint-disable-next-line no-unused-vars
     handleValidAddChange(onlyAddChange) {
-      if (!this.successedList || this.successedList.length === 0) return;
-      BatchUploadClass.getFreightCalculateAfterValidAddressChange(this.successedList, this.basicObj, onlyAddChange);
+      // if (!this.successedList || this.successedList.length === 0) return;
+      // BatchUploadClass.getFreightCalculateAfterValidAddressChange(this.successedList, this.basicObj, onlyAddChange);
+    },
+    handlePopperVisible(bool) {
+      this.$store.dispatch('common/setIsPopperVisibleAsync', bool);
     },
     /**
      * 中上部区域： 文件选择相关
@@ -391,6 +419,7 @@ export default {
     if (accept) this.accept = accept;
   },
   mounted() {
+    this.$store.dispatch('common/getExpressList');
     this.handlePageHeightChangeAfterDataChange = (() => { // 数据变化后对页面高度数据的重置处理 -- 选中文件解析过后 及 文件删除后调用 (直接监听列表数据变化)
       const oApp = document.getElementById('app');
       return () => {
@@ -420,46 +449,44 @@ export default {
     background-color: #fff;
     > .content {
       padding: 0px;
-      padding-top: 30px;
       height: 115px;
       width: 1200px;
       margin: 0 auto;
       box-sizing: border-box;
       border-top: 1px dashed #eee;
-      .tips-box {
-        margin-top: 16px;
-        width: 700px;
+      padding: 15px 0;
+      padding-top: 12px;
+      height: 136px;
+      .mp-pc-place-order-address-show-and-change-wrap > .content > ul > li {
+        color: #999;
+        margin-top: 0px;
+        .express-box .title{
+          color: #999;
+        }
+      }
+      .el-radio-button__orig-radio:disabled:checked + .el-radio-button__inner {
+        background-color: #a1c6fd !important;
+        color: #fff;
+        border-color: #a1c6fd !important;
       }
     }
   }
   > main {
     background-color: #fff;
-    margin-top: 20px;
+    margin-top: 15px;
     display: block;
+    padding-top: 8px;
     > div.content {
       width: 1200px;
       margin: 0 auto;
-      > div.workbench {
-        position: relative;
-        padding: 15px 0;
-        height: 100px;
-        box-sizing: border-box;
-        .upload-btn.mp-c-batch-upload-page-file-select-comp-wrap {
-          position: absolute;
-          right: 0;
-          bottom: 22px;
-          border-radius: 3px;
-        }
-        .mp-pc-place-order-address-show-and-change-wrap > .content > ul > li {
-          color: #999;
-          .express-box .title{
-            color: #999;
+      > .upload-btn-box {
+        padding-top: 5px;
+        padding-bottom: 12px;
+        > span {
+          display: inline-block;
+          &.upload-btn {
+            margin-right: 20px;
           }
-        }
-        .mp-c-batch-upload-page-failed-list-comp-wrap {
-          position: absolute;
-          right: 140px;
-          bottom: 30px;
         }
       }
       > .table {

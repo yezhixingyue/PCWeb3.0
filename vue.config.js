@@ -3,12 +3,16 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 let proxyUrl = 'http://192.168.3.68:8050';
 let publicPath = '';
-if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-development-8078') proxyUrl = 'http://192.168.1.92:8050';
-if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-production-8088') {
+// 测试开发环境：调用92接口
+if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-development') proxyUrl = 'http://192.168.1.92:8050';
+// 测试开发环境：调用正式接口
+if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-development') {
   proxyUrl = 'http://erp.ybz888.com';
 }
-if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL) { // 打包测试环境的代码
-  publicPath = '/pc/';
+// 正式环境 - 当为测试的正式环境时 修改publicPath
+if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'test-production') { // 打包测试环境的代码
+  // publicPath = '/pc/';
+  publicPath = '';
 }
 
 module.exports = {

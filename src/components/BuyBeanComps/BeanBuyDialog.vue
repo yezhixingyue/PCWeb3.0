@@ -51,7 +51,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import CommonDialogComp from '../common/CommonDialogComp.vue';
+import CommonDialogComp from '@/packages/CommonDialogComp';
 import NumberInput from '../common/NumberInput.vue.vue';
 
 export default {

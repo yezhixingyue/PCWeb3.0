@@ -106,10 +106,10 @@
 /* eslint-disable object-curly-newline */
 import { mapState } from 'vuex';
 import { throttle } from '@/assets/js/utils/throttle';
-import { getFullName } from '@/assets/js/utils/filter';
+import { getFullName } from '@/packages/commonFilters';
 import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue'; // 详情弹窗
-import PreCreateDialog from '@/components/BatchUploadComps/PreCreateDialog/index.vue';
-import QrCodeForPayDialogComp from '@/components/common/QrCodeForPayDialogComp';
+import QrCodeForPayDialogComp from '@/packages/QrCodeForPayDialogComp';
+import PreCreateDialog from '../../packages/PreCreateDialog';
 
 export default {
   components: {

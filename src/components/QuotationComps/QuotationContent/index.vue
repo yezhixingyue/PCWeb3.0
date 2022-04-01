@@ -1,7 +1,8 @@
 <template>
   <article class="mp-quotation-product-quotation-content-wrap">
-    <section class="left-place">
-      <article v-if="placeData" v-loading="isFetchingPartProductData">
+    <LeftAsideProductSelector />
+    <section class="left-place" v-if="placeData">
+      <article v-loading="isFetchingPartProductData">
         <div class="content" :key="placeData.ProductID">
           <section
             class="content-title"
@@ -121,8 +122,10 @@
        :watchClearVal='curProductID'
        :customerInfo='customerInfo'
        :ExpressList='ExpressList'
+       :curProductID='curProductID'
        @changeAddressInfo="setAddressInfo4PlaceOrder"
        @changeDefaultSelectAddress='changeSelectedAdd'
+       @popperVisible='handlePopperVisible'
        />
       <OrderSubmitComp
         :asyncInputchecker='asyncInputchecker'
@@ -132,13 +135,17 @@
         @clearAdd='clearAdd'
       />
     </section>
-    <AsideIntroComp
+    <div class="show-empty-bg" v-else>
+      <img src="@/assets/images/placeorderisempty.png" alt="">
+      <p class="is-gray">当前尚未选择产品，请通过左侧产品分类选择产品吧...</p>
+    </div>
+    <!-- <AsideIntroComp
      :asideAboutData='asideAboutData'
      :asideIntroData='asideIntroData'
      :isError='getAboutIsError'
      :productName='placeData.ShowName'
      @getProductAsideIntroData='getProductAsideIntroData'
-     />
+     /> -->
   </article>
 </template>
 
@@ -149,15 +156,16 @@ import {
 } from 'vuex';
 import tipEnums from '@/assets/js/utils/tipEnums';
 import { homeUrl } from '@/assets/js/setup';
+import ConsigneeAddressSetpComp from '@/packages/ConsigneeAddressSetpComp/index.vue';
 import ComputedResultComp from './Comps/ComputedResultComp.vue';
 // import AddShowChangeComp from '../PlaceOrderComps/AddShowChangeComp.vue';
-import ConsigneeAddressSetpComp from '../PlaceOrderComps/ConsigneeAddressSetpComp/index.vue';
 import OrderSubmitComp from '../PlaceOrderComps/OrderSubmitComp/index.vue';
 import SwiperClassifyComp from './Comps/SwiperClassifyComp.vue';
-import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
+// import AsideIntroComp from '../PlaceOrderComps/AsideIntroComp.vue';
 import PlaceOrderPanel from './Comps/PlaceOrderPanel/index.vue';
 import PartComp from './Comps/PartComp.vue';
 import TipsBox from './Comps/TipsBox.vue';
+import LeftAsideProductSelector from './LeftAsideProductSelector/index.vue';
 
 export default {
   props: ['placeData'],
@@ -166,11 +174,12 @@ export default {
     OrderSubmitComp,
     ComputedResultComp,
     SwiperClassifyComp,
-    AsideIntroComp,
+    // AsideIntroComp,
     PlaceOrderPanel,
     PartComp,
     ConsigneeAddressSetpComp,
     TipsBox,
+    LeftAsideProductSelector,
   },
   computed: {
     // eslint-disable-next-line max-len
@@ -376,6 +385,7 @@ export default {
       this.isOpenCouponCenter = true;
     },
     async getProductAsideIntroData() {
+      if (!this.placeData) return;
       const { ID } = this.placeData;
       let bool = true;
       this.asideAboutData = null;
@@ -388,6 +398,7 @@ export default {
       }
     },
     onHomeDetailClick() {
+      if (!this.placeData) return;
       window.open(`${homeUrl}product/${this.placeData.ID}.html`);
     },
     // 下面为配送地址相关
@@ -403,6 +414,9 @@ export default {
     },
     changeSelectedAdd(data) {
       this.$store.commit('common/changeSelectedAdd', data);
+    },
+    handlePopperVisible(bool) {
+      this.$store.dispatch('common/setIsPopperVisibleAsync', bool);
     },
   },
   created() {
@@ -435,7 +449,7 @@ export default {
           const t = BaseTips.find(it => it.Type === tipEnums.Product);
           if (t) this.asideIntroData = t;
         }
-        this.getProductAsideIntroData();
+        // this.getProductAsideIntroData();
       },
       immediate: true,
     },
@@ -456,12 +470,15 @@ export default {
   font-size: 14px;
   color: #585858;
   overflow: hidden;
-
+  position: relative;
+  padding-left: 280px;
+  box-sizing: border-box;
+  min-height: calc(100vh - 125px - 40px);
   > section.left-place {
     display: inline-block;
     vertical-align: top;
     width: 920px;
-    margin-right: 25px;
+    margin-right: 0;
     background-color: #fff;
     padding: 30px;
     padding-bottom: 15px;
@@ -833,6 +850,14 @@ export default {
   }
   .mp-quotation-content-tips-box-comp-wrap {
     padding-top: 10px;
+  }
+  > .show-empty-bg {
+    padding-top: 120px;
+    padding-right: 100px;
+    text-align: center;
+    > img {
+      margin-bottom: 15px;
+    }
   }
 }
 </style>

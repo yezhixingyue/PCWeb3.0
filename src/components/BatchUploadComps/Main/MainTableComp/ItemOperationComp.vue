@@ -30,7 +30,7 @@ export default {
     label() {
       // if (this.isError && this.isHovering && this.itemData.result.HavePrice && this.itemData.result.HaveFreight === true) return '重新下单';
       if (this.itemData && this.itemData.result?.HavePrice === false) return '无报价';
-      if (this.itemData && this.itemData.result?.HaveFreight === false) return '运费计算失败';
+      // if (this.itemData && this.itemData.result?.HaveFreight === false) return '运费计算失败';
       if (this.itemData && this.itemData.isParsing === true) return this.itemData.parseStatus === 'parsing' ? '正在读取文件...' : '文件读取完成';
       let text = '';
       if (this.itemData && this.itemData.uploadStatus && this.itemData.orderStatus) {
@@ -65,11 +65,10 @@ export default {
     },
     isError() {
       if (!this.itemData) return false;
-      return this.itemData.uploadStatus === 'fail' || this.itemData.orderStatus === 'fail'
-       || !this.itemData.result.HavePrice || !this.itemData.result.HavePrice;
+      return this.itemData.uploadStatus === 'fail' || this.itemData.orderStatus === 'fail' || !this.itemData.result.HavePrice;
     },
     tipsTitle() {
-      if (this.isError && this.isHovering && this.itemData.result.HavePrice && this.itemData.result.HaveFreight === true) {
+      if (this.isError && this.isHovering && this.itemData.result.HavePrice) {
         return `${this.itemData.error ? `错误原因：${this.itemData.error}；\r\n` : ''}点击重新下单`;
       }
       return '';
