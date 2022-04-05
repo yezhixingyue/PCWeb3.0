@@ -76,6 +76,18 @@ export default {
       if (key2) state.condition4ServiceAfterSaleList[key1][key2] = value;
       else state.condition4ServiceAfterSaleList[key1] = value;
     },
+    clearCondition4ServiceAfterSaleList(state) {
+      state.condition4ServiceAfterSaleList = {
+        Date: {
+          First: '',
+          Second: '',
+        },
+        DateType: 'today',
+        Page: 1,
+        PageSize: 12,
+        FieldType: 3,
+      };
+    },
     // setDate4ConditionDate(state, key) {
     //   ClassType.setDate(state[key]);
     // },

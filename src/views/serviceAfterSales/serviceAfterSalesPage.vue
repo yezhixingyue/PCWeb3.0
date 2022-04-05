@@ -15,11 +15,72 @@
           :dateList="dateList"
           dateType="date"
         />
+        <search-input-comp
+          title="关键词"
+          placeholder="请输入搜索关键词"
+          :typeList="[['KeyWords', '']]"
+          :requestFunc="getServiceAfterSaleList"
+          :changePropsFunc="setCondition4ServiceAfterSaleList"
+          :word="condition4ServiceAfterSaleList.KeyWords"
+          @reset="clearCondition4ServiceAfterSaleList"
+          :searchWatchKey="ServiceAfterSaleList"
+        />
+        <LookOverAfterSale></LookOverAfterSale>
         </div>
       </header>
-      <div class="content-wrap" v-if="ServiceAfterSaleList.length > 0 || ServiceAfterSaleListNumber > 0">
+      <div class="content-wrap">
         <div class="content">
           <div class="table-wrap">
+
+            <ul class="table">
+              <li class="column" width="300px">
+                <div class="lable">订单编号</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">下单时间</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">订单状态</div>
+                <div class="content">内容内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">商品名称</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">文件内容</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">物料</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">款数</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">数量</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">尺寸</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">工艺</div>
+                <div class="content">内容</div>
+              </li>
+              <li class="column">
+                <div class="lable">操作</div>
+                <div class="content">内容</div>
+              </li>
+            </ul>
+            <CustomSteps
+            :stepsNumber='1'
+            :stepList='[ { text: "提交申请", iconClass: "" },{ text: "系统处理中", iconClass: "" } ]'></CustomSteps>
             <el-table stripe border
               :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
               <el-table-column prop="ID" label="售后单号" width="95" show-overflow-tooltip></el-table-column>
@@ -43,7 +104,6 @@
               <el-table-column label="运费减款" width="90" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <i v-if="scope.row.Solution.Type===2 && scope.row.Solution.RefundFreight > 0">{{scope.row.Solution.RefundFreight}}元</i>
-                  <!-- <i v-else>-</i> -->
                 </template>
               </el-table-column>
               <el-table-column prop="RePrintOrderID" label="补印单号" width="120" show-overflow-tooltip>
@@ -84,10 +144,10 @@
           </transition>
         </div>
       </div>
-      <div class="show-empty-bg" v-else>
+      <!-- <div class="show-empty-bg" v-else>
         <img src="../../assets/images/order-empty.png" alt="">
         <p class="is-gray">{{showDateText}}</p>
-      </div>
+      </div> -->
     </section>
   </article>
 </template>
@@ -96,12 +156,18 @@
 import { mapState, mapMutations, mapActions } from 'vuex';
 import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
+import LookOverAfterSale from '@/components/ServiceAfterSales/LookOverAfterSale.vue';
+import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
+import CustomSteps from '@/components/ServiceAfterSales/CustomSteps.vue';
 import CommonClassType from '../../store/CommonClassType';
 
 export default {
   components: {
     Count,
     LineDateSelectorComp,
+    LookOverAfterSale,
+    SearchInputComp,
+    CustomSteps,
   },
   computed: {
     ...mapState('common', ['ScrollInfo']),
@@ -158,7 +224,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations('summary', ['setCondition4ServiceAfterSaleList']),
+    ...mapMutations('summary', ['setCondition4ServiceAfterSaleList', 'clearCondition4ServiceAfterSaleList']),
     ...mapActions('summary', ['getServiceAfterSaleList']),
     handlePageChange(page) {
       this.$store.dispatch('summary/getServiceAfterSaleList', page);
@@ -209,6 +275,17 @@ export default {
     > header {
       width: 100%;
       background-color: #fff;
+      .header-content{
+        display: flex;
+        // align-items: center;
+        .mp-line-date-selector-wrap{
+          flex: 1;
+          min-width: 650px;
+          .box{
+            width: 550px;
+          }
+        }
+      }
       > div {
         margin: 0 auto;
         width: 1200px;
@@ -227,6 +304,23 @@ export default {
         padding-top: 25px;
         > .table-wrap {
           min-height: calc(100vh - 374px);
+          > .table{
+            >.column{
+              display: inline-block;
+              border: 1px solid #efefef;
+              border-right: none;
+              text-align: center;
+              .lable{
+                background-color: #efefef;
+                padding: 10px;
+              }
+              .content{
+                line-height: 32px;
+                padding: 0 5px;
+              }
+            }
+          }
+
         }
         > .content-footer {
           margin-top: 19px;

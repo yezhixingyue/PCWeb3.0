@@ -24,7 +24,7 @@
     <p>
       <el-button type="primary" :loading='loading' @click="onSubmitClick" v-if="showSubmit" :disabled='disabled'>{{loading?'加载中':submitText}}</el-button>
       <el-button type="danger"  @click="onDangerClick" v-if="showDanger" :disabled='disabled'>{{dangerText}}</el-button>
-      <el-button @click="onCancleClick">{{cancelText}}</el-button>
+      <el-button v-if="showCancel" @click="onCancleClick">{{cancelText}}</el-button>
     </p>
   </span>
 </el-dialog>
@@ -80,6 +80,10 @@ export default {
     showDanger: {
       type: Boolean,
       default: false,
+    },
+    showCancel: {
+      type: Boolean,
+      default: true,
     },
     loading: {
       type: Boolean,

@@ -20,6 +20,10 @@
             <p class="text gray">{{ruleForm.Order.Content}}</p>
           </el-form-item>
           <el-form-item label="售后原因：" prop="QuestionList" class="mp-select">
+            <CheckButton
+              @CheckChange="problemType"
+            ></CheckButton>
+
             <SingleSelector
               v-model="ruleForm.QuestionList"
               :optionList='RejectReasonList'
@@ -109,6 +113,7 @@
 
 <script>
 import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
+import CheckButton from '@/components/common/CheckButton.vue';
 import { imgUrl } from '@/assets/js/setup';
 import { mapState } from 'vuex';
 import { Message } from 'element-ui';
@@ -116,6 +121,7 @@ import { Message } from 'element-ui';
 export default {
   components: {
     SingleSelector,
+    CheckButton,
   },
   data() {
     return {
@@ -244,6 +250,9 @@ export default {
       else this.$store.commit('order/setShouldGetNewListData', false);
       this.$router.go(-1);
     },
+    problemType(keys) {
+      console.log(keys);
+    },
   },
   async mounted() {
     const OrderID = this.$route.params.id;
@@ -287,6 +296,20 @@ export default {
   background-color: #fff;
   min-height: calc(100vh - 115px - 22px);
   min-height: calc(100vh - 115px - 42px) \0;
+  .check-button{
+    display: flex;
+    .action{
+      background-color: red;
+    }
+    li{
+      border-radius: 15px;
+      height: 30px;
+      padding: 0 10px;
+      line-height: 30px;
+      border: 1px solid red;
+      margin: 0 10px 10px 0;
+    }
+  }
   > .content {
     width: 1200px;
     margin: 0 auto;
