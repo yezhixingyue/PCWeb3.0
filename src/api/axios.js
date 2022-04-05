@@ -164,6 +164,11 @@ axios.interceptors.response.use(
           router.replace('/login');
           key = true;
           break;
+        case 403:
+          clearToken();
+          router.replace('/login');
+          key = true;
+          break;
         case 413: // 处理文件导出错误
           b = new Blob([error.response.data]);
           r = new FileReader();

@@ -69,7 +69,7 @@ import { mapState } from 'vuex';
 export default {
   components: {
     // AddMapComp,
-    AddMapComp: () => import('@/components/QuotationComps/PlaceOrderComps/ConsigneeAddressSetpComp/AddMapComp.vue'),
+    AddMapComp: () => import('@/packages/ConsigneeAddressSetpComp/AddMapComp.vue'),
   },
   computed: {
     ...mapState('common', ['customerInfo']),

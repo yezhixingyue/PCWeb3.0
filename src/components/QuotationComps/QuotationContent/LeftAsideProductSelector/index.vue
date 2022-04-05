@@ -1,0 +1,330 @@
+<template>
+  <aside
+   class="mp-quotation-product-quotation-content-left-aside-product-selector-wrap"
+   v-show="allProductClassify.length > 0"
+   :style="`top:${top}px;left:${left}px;`"
+  >
+    <el-scrollbar wrap-class="scrollbar-wrapper">
+      <ul class="menu-list">
+        <li
+          class="menu"
+          v-for="it in allProductClassify"
+          :key="it.ID"
+          :class="{
+            lvActive: curLv1ClassID===it.ID,
+            active: activeLv1Id===it.ID,
+          }">
+          <el-popover
+            placement="right-start"
+            :offset="50"
+            :visible-arrow='false'
+            :close-delay='30'
+            @show='onShow(it)'
+            @hide='onHide(it)'
+            transition="none"
+            popper-class='aside-product-selector-popper-wrap'
+            width="924"
+            trigger="hover">
+            <ul class="content">
+              <li v-for="lv2 in it.children" :key="lv2.ID">
+                <div class="label">
+                  <span class="title" :style="`min-width:${getFontNumber(it.children)}em`">{{lv2.ClassName}}</span>
+                  <i class="iconfont icon-iconfontyoujiantou"></i>
+                </div>
+                <div class="products">
+                  <span
+                    v-for="product in lv2.children"
+                    :key="product.ID"
+                    @click="selectProduct(product)"
+                    :class="curProduct && curProduct.ID === product.ID ? 'active' : ''"
+                    >{{product.ShowName}}</span>
+                </div>
+              </li>
+            </ul>
+            <span class="label" slot="reference">
+              <span class="n">{{it.ClassName}}</span>
+              <i class="iconfont icon-iconfontyoujiantou"></i>
+            </span>
+          </el-popover>
+        </li>
+        <li class="batch-upload">
+          <div @click="onBatchUploadClick">
+            <span>批量上传</span>
+            <img src="@/assets/images/batch-upload.png" alt="">
+          </div>
+        </li>
+      </ul>
+    </el-scrollbar>
+  </aside>
+</template>
+
+<script>
+import { mapState, mapGetters } from 'vuex';
+
+export default {
+  computed: {
+    ...mapState('Quotation', ['productNames', 'curProduct', 'curProductClass']),
+    ...mapState('common', ['ScrollInfo', 'NoticeList']),
+    ...mapGetters('Quotation', ['allProductClassify']),
+    curMenus() {
+      if (!this.index && this.index !== 0) return null;
+      if (this.allProductClassify.length === 0) return null;
+      return this.allProductClassify[this.index] || null;
+    },
+    defaultActive() {
+      return '';
+    },
+    NoticeHeight() {
+      return this.NoticeList.length > 0 ? 40 : 20;
+    },
+    top() {
+      const headerHeight = 125;
+      return headerHeight + this.distance;
+    },
+    positionVal() {
+      if (this.NoticeList.length === 0) return 'fixed';
+      return this.position;
+    },
+    curLv1ClassID() {
+      if (!this.curProductClass || !this.curProductClass.FirstLevel) return '';
+      return this.curProductClass.FirstLevel.ID || '';
+    },
+  },
+  data() {
+    return {
+      left: 351,
+      distance: 20,
+      activeLv1Id: '',
+    };
+  },
+  methods: {
+    selectProduct(product) {
+      if (this.curProduct && this.curProduct.ID === product.ID) return;
+      this.$store.commit('Quotation/setCurProductInfo', product);
+      this.$store.dispatch('Quotation/getProductDetail');
+      this.$store.commit('Quotation/setSelectedCoupon', null);
+    },
+    getFontNumber(list) {
+      if (!Array.isArray(list) || list.length === 0) return 4;
+      const _list = list.map(it => {
+        let len = it.ClassName.length;
+        const matchVals = it.ClassName.match(/\d|[A-z]/g);
+        if (matchVals && matchVals.length > 0) {
+          len -= Math.floor(matchVals.length / 2);
+        }
+        return len;
+      });
+      const len = Math.max(..._list);
+      return len > 4 ? 4 : len;
+    },
+    getLeft() {
+      const oContent = document.querySelector('.mp-quotation-product-quotation-content-wrap');
+      if (oContent) {
+        const obj = oContent.getBoundingClientRect();
+        if (obj) this.left = obj.x;
+      }
+    },
+    handleScroll() {
+      if (this.NoticeList.length === 0) return;
+      const { scrollTop } = this.ScrollInfo;
+      const d = this.NoticeHeight - scrollTop;
+      this.distance = d > 20 ? d : 20;
+    },
+    onShow(lv1) {
+      this.activeLv1Id = lv1.ID;
+    },
+    onHide(lv1) {
+      if (lv1.ID === this.activeLv1Id) this.activeLv1Id = '';
+    },
+    onBatchUploadClick() { // 跳转至批量上传页面
+      this.$router.push('/BatchUpload');
+    },
+  },
+  mounted() {
+    this.getLeft();
+    window.addEventListener('resize', this.getLeft);
+    this.handleScroll();
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.getLeft);
+  },
+  watch: {
+    ScrollInfo: {
+      handler() {
+        this.handleScroll();
+      },
+      deep: true,
+      immediate: true,
+    },
+    curProduct() {
+      this.handleScroll();
+    },
+    NoticeList() {
+      this.handleScroll();
+    },
+  },
+};
+</script>
+<style lang='scss'>
+.mp-quotation-product-quotation-content-left-aside-product-selector-wrap {
+  position: fixed;
+  text-align: left;
+  padding: 14px 0;
+  background: #fff;
+  border-radius: 5px;
+  display: inline-block;
+  width: 244px;
+  .menu-list {
+    max-height: calc(100vh - 360px);
+    > li {
+      padding: 0;
+      font-size: 15px;
+      line-height: 44px;
+      border-radius: 5px;
+      transition: ease-in-out 0.1s;
+      span.n {
+        padding-left: 66px;
+        display: inline-block;
+        vertical-align: top;
+        width: 210px;
+        padding-right: 0px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        box-sizing: border-box;
+        color: #333;
+        transition: ease-in-out 0.1s;
+      }
+      i.iconfont {
+        font-size: 16px;
+        color: #fff;
+        opacity: 0;
+        transition: ease-in-out 0.1s;
+      }
+      &.menu {
+        span.label {
+          width: 244px;
+          display: block;
+        }
+        &.lvActive {
+          span.n {
+            color: #428dfa;
+          }
+          position: relative;
+          &::after {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 2px;
+            background: #428dfa;
+            right: 0;
+            top: 14px;
+          }
+        }
+        &.active,&:hover {
+          background-color: #428dfa;
+          color: #fff;
+          span.n {
+            color: #fff;
+          }
+          i.iconfont {
+            opacity: 1;
+          }
+        }
+      }
+      &.batch-upload {
+        border-top: 1px solid #eee;
+        margin: 0 30px;
+        margin-top: 4px;
+        border-radius: 0;
+        > div {
+          text-align: center;
+          padding-right: 4px;
+          height: 42px;
+          line-height: 38px;
+          margin: 0 -30px;
+          margin-top: 8px;
+          border-radius: 3px;
+          user-select: none;
+          > span {
+            margin-right: 33px;
+            font-size: 15px;
+            color: #428dfa;
+          }
+          img {
+            vertical-align: -2px;
+          }
+          cursor: pointer;
+          transition: ease-in-out 0.1s;
+          &:hover {
+            // background: rgba($color: #428dfa, $alpha: 0.1);
+            opacity: 0.8;
+          }
+          &:active {
+            // background: rgba($color: #428dfa, $alpha: 0.3);
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}
+// .el-menu--vertical {
+//   .el-menu--popup-right-start {
+//     width: 950px;
+//   }
+// }
+.aside-product-selector-popper-wrap {
+  // z-index: 800 !important;
+  margin-top: -45px !important;
+  margin-left: 8px !important;
+  box-shadow: 0px 2px 15px 0px rgba(20, 57, 112, 0.25);
+  ul.content {
+    padding-top: 8px;
+    > li {
+      white-space: nowrap;
+      overflow: hidden;
+      margin-bottom: 8px;
+      > div {
+        display: inline-block;
+        vertical-align: top;
+        color: #444;
+        line-height: 36px;
+        &.label {
+          font-weight: bold;
+          > span {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 10px;
+          }
+          margin-right: 30px;
+          margin-left: 18px;
+          font-size: 14px;
+        }
+        &.products {
+          font-size: 13px;
+          white-space: normal;
+          width: 730px;
+          color: #888;
+          > span {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 24px;
+            // min-width: 4em;
+            cursor: pointer;
+            transition: color 0.05s ease-in-out;
+            &:hover {
+              color: #428dfa;
+            }
+            &.active {
+              color: #428dfa;
+              cursor: text;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>

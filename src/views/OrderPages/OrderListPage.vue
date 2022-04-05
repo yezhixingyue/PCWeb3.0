@@ -47,8 +47,10 @@
             :watchPage='condition4OrderList.Page'
             :handlePageChange='handlePageChange'
             :count='OrderListNumber'
+            :showCount="showOrderListNumber"
             :pageSize='10'
             :DownLoadConfigObj='DownLoadConfigObj'
+            rightContent='个订单'
             class="float"
             >
             <span class="footer-price-box">
@@ -63,12 +65,14 @@
           <footer  v-show="isFootFixed" class="floating">
             <div>
               <Count
-              :watchPage='condition4OrderList.Page'
-              :handlePageChange='handlePageChange'
-              :count='OrderListNumber'
-              :pageSize='10'
-              :DownLoadConfigObj='DownLoadConfigObj'
-              class="float"
+                :watchPage='condition4OrderList.Page'
+                :handlePageChange='handlePageChange'
+                :count='OrderListNumber'
+                :showCount="showOrderListNumber"
+                :pageSize='10'
+                :DownLoadConfigObj='DownLoadConfigObj'
+                rightContent='个订单'
+                class="float"
               >
                 <span class="footer-price-box">
                   <i class="gray">共计金额：</i>
@@ -118,7 +122,7 @@ export default {
   },
   computed: {
     ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
-    ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount']),
+    ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount', 'showOrderListNumber']),
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },

@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import CommonDialogComp from '@/components/common/CommonDialogComp.vue';
+import CommonDialogComp from '@/packages/CommonDialogComp';
 
 export default {
   data() {

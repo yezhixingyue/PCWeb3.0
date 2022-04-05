@@ -149,11 +149,23 @@ export default {
     },
     /* 当前选中产品名称信息，用于报价页头文字展示
     -------------------------------*/
-    curProductShowNameInfo(state) {
+    curProductShowNameInfo(state, getters) {
       if (!state.curProductClass) return [];
       const { FirstLevel, SecondLevel } = state.curProductClass;
-      const FirstName = FirstLevel.Name;
-      const SecondName = SecondLevel.Name;
+      let FirstName = FirstLevel.Name;
+      let SecondName = SecondLevel.Name;
+      if (!FirstName || !SecondName) {
+        const t = getters.allProductClassify.find(it => it.ID === FirstLevel.ID);
+        if (t) {
+          if (!FirstName) FirstName = t.ClassName;
+          if (!SecondName) {
+            const lv2Item = t.children.find(it => it.ID === SecondLevel.ID);
+            if (lv2Item) {
+              SecondName = lv2Item.ClassName;
+            }
+          }
+        }
+      }
       return [FirstName, SecondName, state.curProductName];
     },
     localAllControlList(state) {

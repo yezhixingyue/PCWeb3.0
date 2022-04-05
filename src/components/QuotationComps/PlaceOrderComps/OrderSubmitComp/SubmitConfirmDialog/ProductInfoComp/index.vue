@@ -4,55 +4,28 @@
       <img src="@/assets/images/product-info.png" alt="">
     </template>
     <ul class="content mp-scroll-wrap">
+      <!-- 订单提交 -->
       <template v-if="!OrderDetail">
         <li v-for="(item, i) in DetailDisplayDataList" :key="item.Name">
-          <DisplayItem :ShowData='item' :showBorder='i > 0' />
+          <OrderDetailDisplayItem :ShowData='item' :showBorder='i > 0' />
         </li>
       </template>
+      <!-- 订单详情 -->
       <li v-else>
-        <DisplayItem :ShowData='ProductShowData' />
-        <DisplayItem v-for="(it, i) in PartShowDataList" :ShowData='it' :key="it.Name" :class="{border: i > 0}" showBorder />
+        <OrderDetailDisplayItem :ShowData='ProductShowData' />
+        <OrderDetailDisplayItem v-for="(it, i) in PartShowDataList" :ShowData='it' :key="it.Name" :class="{border: i > 0}" showBorder />
       </li>
     </ul>
-    <div class="footer price-box">
-      <div>
-        <span class="label">原价：</span>
-        <span class="text">{{OriginalPrice | formatNumber}}元</span>
-      </div>
-      <div>
-        <span class="label w">成交价：</span>
-        <span class="text is-origin is-font-15 is-bold">{{FinalPrice | formatNumber}}<i class="is-font-14">元</i></span>
-      </div>
-      <div>
-        <span class="label">已付：</span>
-        <span class="text" :class="{paid: PaidBeanAmount > 0}">{{havePaid | formatNumber}}元</span>
-        <span class="remark" v-if="PaidBeanAmount > 0">（ <i class="freight">印豆抵扣{{PaidBeanAmount | formatNumber}}元</i> ）</span>
-      </div>
-      <div>
-        <span class="label">退款：</span>
-        <span class="text">{{Refund | formatNumber}}元</span>
-      </div>
-      <!-- <div v-if="PromoteAmount || PromoteAmount > 0">
-        <span class="label">活动：</span>
-        <span class="text" :class="{'is-pink': !!PromoteAmount}">{{ PromoteAmount ? `${PromoteAmount > 0 ? '-' : ''}${Math.abs(PromoteAmount)}` : 0}}元</span>
-      </div> -->
-      <div v-if="!CouponAmount || CouponAmount > 0">
-        <span class="label w">优惠券：</span>
-        <span class="text" :class="{'is-pink': !!CouponAmount}">{{ CouponAmount ? `${CouponAmount > 0 ? '-' : ''}${Math.abs(CouponAmount)}` : 0}}元</span>
-      </div>
-      <div>
-        <span class="label">未付：</span>
-        <span class="text">{{Unpaid | formatNumber}}元</span>
-      </div>
-    </div>
+    <OrderDetailPriceBox :OrderData='OrderData' />
   </PanelItemComp>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
+import OrderDetailDisplayItem from '@/packages/OrderDetailDisplayItem';
+import OrderDetailPriceBox from '@/packages/OrderDetailPriceBox';
 import PanelItemComp from '../PanelItemComp.vue';
-import DisplayItem from './DisplayItem';
 
 export default {
   props: {
@@ -79,7 +52,8 @@ export default {
   },
   components: {
     PanelItemComp,
-    DisplayItem,
+    OrderDetailDisplayItem,
+    OrderDetailPriceBox,
   },
   computed: {
     ...mapState('Quotation', ['selectedCoupon']),
@@ -104,30 +78,6 @@ export default {
       }
       return null;
     },
-    OriginalPrice() {
-      return this.OrderData ? this.OrderData.Funds.OriginalPrice : 0;
-    },
-    FinalPrice() {
-      return this.OrderData ? this.OrderData.Funds.FinalPrice : 0;
-    },
-    havePaid() {
-      return this.OrderData ? this.OrderData.Funds.HavePaid : 0;
-    },
-    PaidBeanAmount() {
-      return this.OrderData ? this.OrderData.Funds.PaidBeanAmount : 0;
-    },
-    Refund() {
-      return this.OrderData ? this.OrderData.Funds.Refund : 0;
-    },
-    Unpaid() {
-      return this.OrderData ? this.OrderData.Funds.Unpaid : 0;
-    },
-    CouponAmount() {
-      return this.OrderData ? this.OrderData.Funds.CouponAmount : 0;
-    },
-    // PromoteAmount() {
-    //   return +(this.OriginalPrice - this.FinalPrice - this.CouponAmount).toFixed(2);
-    // },
     Freight() {
       if (!this.OrderDetail) return this.OrderPreData.Freight;
       return this.OrderDetail.Funds.Freight;

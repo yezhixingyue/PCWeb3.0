@@ -81,10 +81,10 @@
 
 <script>
 import { mapState } from 'vuex';
-import RetractableDisplayComp from '@/components/common/RetractableDisplayComp/Index.vue';
+import RetractableDisplayComp from '@/packages/RetractableDisplayComp';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
 import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
-// import { getFullName } from '@/assets/js/utils/filter';
+// import { getFullName } from '@/packages/commonFilters';
 import ItemListComp from './ItemListComp.vue';
 import CancelDialogBox from './CancelDialogBox.vue';
 

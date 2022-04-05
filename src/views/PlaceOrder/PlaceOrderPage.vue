@@ -1,15 +1,18 @@
 <template>
   <section class="mp-pc-place-order-page-wrap">
     <header>
-      <PlaceOrderProductClassifyComp />
+      <!-- <PlaceOrderProductClassifyComp /> -->
     </header>
+    <!-- 顶部公告列表 -->
     <div class="notice-box" :class="{hasContent: NoticeList.length > 0}">
       <template v-if="NoticeList.length > 0">
         <i></i>
         <a :href="it.Url" target="_blank" v-for="(it, i) in NoticeList" :key="i" :style="`max-width:${NoticeList.length > 1 ? '' : 1180}px`">{{it.Title}}</a>
       </template>
     </div>
+    <!-- 内容区 -->
     <div class="content">
+      <!-- 下单成功显示文字 -->
       <div v-if='initPageText' class="empty">
         <div>
           <img src="@/assets/images/order-success.png" alt="">
@@ -19,27 +22,29 @@
           <span class="blue-span" @click="closeSuccessState">  ＜ 返回当前产品</span>
         </p>
       </div>
-      <QuotationContent v-else-if="curProductInfo2Quotation" :placeData='curProductInfo2Quotation' />
-      <!-- <div v-else class="bg-empty-wrap"></div> -->
-      <div v-else-if="initLoading" class="init-loading-box">
+      <!-- 初始化数据loading展示 -->
+      <div v-else-if="initLoading && !curProductInfo2Quotation" class="init-loading-box">
         <p><i class="el-icon-loading"></i>请稍候，正在加载中。。。</p>
       </div>
-      <div class="show-empty-bg" v-else>
+      <!-- 产品参数面板 -->
+      <QuotationContent v-else :placeData='curProductInfo2Quotation' />
+      <!-- 未选择产品展示 -->
+      <!-- <div class="show-empty-bg" v-else>
         <img src="../../assets/images/placeorderisempty.png" alt="">
         <p class="is-gray">当前尚未选择产品，请通过上方产品分类选择产品吧...</p>
-      </div>
+      </div> -->
     </div>
   </section>
 </template>
 
 <script>
-import PlaceOrderProductClassifyComp from '@/components/QuotationComps/PlaceOrderProductClassifyComp.vue';
+// import PlaceOrderProductClassifyComp from '@/components/QuotationComps/PlaceOrderProductClassifyComp.vue';
 import QuotationContent from '@/components/QuotationComps/QuotationContent';
 import { mapState } from 'vuex';
 
 export default {
   components: {
-    PlaceOrderProductClassifyComp,
+    // PlaceOrderProductClassifyComp,
     QuotationContent,
   },
   computed: {
@@ -55,7 +60,6 @@ export default {
     async handlePathDataFetch() {
       this.$store.commit('Quotation/setInitPageText', '');
       const productID = this.$route.query.id;
-      // console.log(this.curProductInfo2Quotation);
       if (!productID) {
         if (this.curProductInfo2Quotation && this.curProductInfo2Quotation.ID) {
           this.$router.replace(`?id=${this.curProductInfo2Quotation.ID}`);
@@ -150,7 +154,7 @@ export default {
     }
   }
   > .notice-box {
-    padding: 15px 0;
+    padding: 10px 0;
     width: 1200px;
     margin: 0 auto;
     overflow: hidden;

@@ -12,6 +12,7 @@ export default {
     ---------------------------------------- */
     OrderList: [], // --------- 订单信息列表
     OrderListNumber: 0,
+    showOrderListNumber: 0,
     orderTotalAmount: 0,
     condition4OrderList: {
       Date: {
@@ -61,9 +62,10 @@ export default {
   mutations: {
     /** 设置订单列表数据
     ---------------------------------------- */
-    setOrderList(state, [list, num]) {
+    setOrderList(state, [list, num, count]) {
       state.OrderList = list;
       if (num || num === 0) state.OrderListNumber = num;
+      if (count || count === 0) state.showOrderListNumber = count;
     },
     setOrderTotalAmount(state, amount) {
       state.orderTotalAmount = amount;
@@ -131,6 +133,7 @@ export default {
     clearStateForNewCustomer(state) {
       state.OrderList = [];
       state.OrderListNumber = 0;
+      state.showOrderListNumber = 0;
       state.condition4OrderList = {
         Date: {
           First: '',
@@ -170,7 +173,7 @@ export default {
       }
       const res = await api.getCustomerOrderList(_obj);
       if (res.data.Status === 1000) {
-        commit('setOrderList', [res.data.Data, res.data.DataNumber]);
+        commit('setOrderList', [res.data.Data, res.data.DataNumber, res.data.VersionCode]);
         if (res.data.Message && page === 1) commit('setOrderTotalAmount', res.data.Message);
       }
     },

@@ -630,6 +630,9 @@ const getSingleItemListIsMatched = (item, ProductParams, curProductInfo2Quotatio
   const { Property, Operator, ValueList } = item;
   if (!Property || (!Operator && Operator !== 0) || !ValueList || ValueList.length === 0) return temp;
   temp.PropValueData = getTargetPropertyValue(Property, ProductParams, curProductInfo2Quotation, isSubControl, ControlItem);
+  if (!temp.PropValueData) {
+    return temp;
+  }
   const { value } = temp.PropValueData;
   if (!value && value !== 0 && value !== false && typeof value !== 'boolean' && Operator !== 2) return temp;
   if (value === 'craftIsNotExist') return temp;

@@ -1,8 +1,8 @@
 import Vue from 'vue';
 
 import {
-  Dialog, Dropdown, DropdownMenu, DropdownItem, Select, Option, Steps, Step, Popover, Link, Radio, Collapse, Upload,
-  CollapseItem, RadioGroup, Tabs, TabPane, Message, Input, Form, FormItem, Button, CheckboxGroup, Checkbox, Progress,
+  Dialog, Dropdown, DropdownMenu, DropdownItem, Select, Option, Steps, Step, Popover, Link, Radio, Collapse, Upload, Scrollbar,
+  CollapseItem, RadioGroup, Tabs, TabPane, Message, Input, Form, FormItem, Button, CheckboxGroup, Checkbox, Progress, Menu, Submenu, MenuItem,
   Table, TableColumn, Tooltip, DatePicker, RadioButton, Pagination, Image, Loading, Backtop, Icon, Drawer, Switch, Notification,
 } from 'element-ui';
 
@@ -41,6 +41,10 @@ Vue.use(Image);
 Vue.use(Backtop);
 Vue.use(Icon);
 Vue.use(Drawer);
+Vue.use(Menu);
+Vue.use(Submenu);
+Vue.use(MenuItem);
+Vue.use(Scrollbar);
 
 Vue.use(Loading.directive);
 Vue.prototype.$message = Message;
