@@ -1,3 +1,4 @@
+import anime from 'animejs/lib/anime.es';
 import store from '../../../store';
 
 export function isNumber(val) {
@@ -145,6 +146,34 @@ export const getNameFromListByIDs = (ids, list, defaultKeys = { label: 'Name', v
   return '';
 };
 
+export const handleScrollAfterGetPriceFailed = () => {
+  const oFirstErrorDom = document.getElementsByClassName('el-form-item__error')[0];
+  if (oFirstErrorDom && oFirstErrorDom.parentElement) {
+    const { top } = oFirstErrorDom.parentElement.getBoundingClientRect();
+    if (top - 130 < 0) { // 在视野外 需要滚动至上方
+      const oApp = document.getElementById('app');
+      if (oApp) {
+        const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
+        anime({
+          targets: oApp,
+          scrollTop: willToTop,
+          duration: 400,
+          easing: 'easeInOutSine',
+          complete() {
+            const oInputWrap = oFirstErrorDom.parentElement.getElementsByClassName('mp-erp-number-type-element-display-input-comp')[0];
+            if (oInputWrap) {
+              const oInputDom = oInputWrap.getElementsByClassName('el-input__inner')[0];
+              if (oInputDom) {
+                oInputDom.focus();
+              }
+            }
+          },
+        });
+      }
+    }
+  }
+};
+
 export default {
   isEqual,
   isGreatThen,
@@ -161,4 +190,5 @@ export default {
   transformNumToChindNum,
   getIsOrNotHasRepeatItemInArray,
   getNameFromListByIDs,
+  handleScrollAfterGetPriceFailed,
 };

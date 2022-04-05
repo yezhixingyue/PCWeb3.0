@@ -72,7 +72,6 @@
 </template>
 
 <script>
-import anime from 'animejs/lib/anime.es';
 import { mapState } from 'vuex';
 import { Loading } from 'element-ui';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
@@ -327,26 +326,8 @@ export default {
     async OrderPanelChecker() { // 下单面板校验及返回页面顶部处理
       const bool = await this.getCheckResult();
       if (bool !== true) {
-        const scrollHandler = () => {
-          const oFirstErrorDom = document.getElementsByClassName('el-form-item__error')[0];
-          if (oFirstErrorDom && oFirstErrorDom.parentElement) {
-            const { top } = oFirstErrorDom.parentElement.getBoundingClientRect();
-            if (top - 130 < 0) { // 在视野外 需要滚动至上方
-              const oApp = document.getElementById('app');
-              if (oApp) {
-                const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
-                anime({
-                  targets: oApp,
-                  scrollTop: willToTop,
-                  duration: 500,
-                  easing: 'easeInOutQuad',
-                });
-              }
-            }
-          }
-        };
         this.messageBox.failSingleError({
-          title: `${this.title}失败`, msg: bool, successFunc: scrollHandler, failFunc: scrollHandler,
+          title: `${this.title}失败`, msg: bool, successFunc: this.utils.handleScrollAfterGetPriceFailed, failFunc: this.utils.handleScrollAfterGetPriceFailed,
         });
         return false;
       }

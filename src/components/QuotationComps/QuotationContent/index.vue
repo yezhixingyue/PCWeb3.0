@@ -150,7 +150,6 @@
 </template>
 
 <script>
-import anime from 'animejs/lib/anime.es';
 import {
   mapState, mapGetters, mapActions,
 } from 'vuex';
@@ -277,29 +276,8 @@ export default {
       // 如果验证通过 执行算价
       if (res === true) this.getProductPriceLocal();
       else {
-        const scrollHandler = () => {
-          const oFirstErrorDom = document.getElementsByClassName('el-form-item__error')[0];
-          if (oFirstErrorDom && oFirstErrorDom.parentElement) {
-            const { top } = oFirstErrorDom.parentElement.getBoundingClientRect();
-            if (top - 130 < 0) { // 在视野外 需要滚动至上方
-              const oApp = document.getElementById('app');
-              if (oApp) {
-                const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
-                // this.utils.animateScroll(oApp.scrollTop, willToTop, num => {
-                //   oApp.scrollTop = num;
-                // });
-                anime({
-                  targets: oApp,
-                  scrollTop: willToTop,
-                  duration: 400,
-                  easing: 'easeInOutSine',
-                });
-              }
-            }
-          }
-        };
         this.messageBox.failSingleError({
-          title: '报价失败', msg: res, successFunc: scrollHandler, failFunc: scrollHandler,
+          title: '报价失败', msg: res, successFunc: this.utils.handleScrollAfterGetPriceFailed, failFunc: this.utils.handleScrollAfterGetPriceFailed,
         });
       }
     },

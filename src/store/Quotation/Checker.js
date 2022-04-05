@@ -448,7 +448,7 @@ export const checkCraft = ({ value, prop, CraftConditionList, CraftList, Affecte
             if (!target) {
               const craftNames = List.map(_craftID => _CraftList.find(_it => _it.ID === _craftID))
                 .filter(_it => _it && !_it.HiddenToCustomer).map(_it => _it.ShowName);
-              if (craftNames.length === 1) return `${PartName || ''} [ ${craftNames[0]} ]为必选工艺`;
+              if (craftNames.length === 1) return `${PartName || ''} [ ${craftNames[0]} ]工艺必选`;
               return `${PartName ? `${PartName}中` : ''} [ ${craftNames.join('、')} ] 至少选择一种`;
             }
           }

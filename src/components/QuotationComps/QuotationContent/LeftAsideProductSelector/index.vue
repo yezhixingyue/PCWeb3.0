@@ -104,18 +104,18 @@ export default {
       this.$store.dispatch('Quotation/getProductDetail');
       this.$store.commit('Quotation/setSelectedCoupon', null);
     },
-    getFontNumber() {
-      // if (!Array.isArray(list) || list.length === 0) return 4;
-      // const _list = list.map(it => {
-      //   let len = it.ClassName.length;
-      //   const matchVals = it.ClassName.match(/\d|[A-z]/g);
-      //   if (matchVals && matchVals.length > 0) {
-      //     len -= Math.floor(matchVals.length / 2);
-      //   }
-      //   return len;
-      // });
-      // return Math.max(..._list);
-      return 4;
+    getFontNumber(list) {
+      if (!Array.isArray(list) || list.length === 0) return 4;
+      const _list = list.map(it => {
+        let len = it.ClassName.length;
+        const matchVals = it.ClassName.match(/\d|[A-z]/g);
+        if (matchVals && matchVals.length > 0) {
+          len -= Math.floor(matchVals.length / 2);
+        }
+        return len;
+      });
+      const len = Math.max(..._list);
+      return len > 4 ? 4 : len;
     },
     getLeft() {
       const oContent = document.querySelector('.mp-quotation-product-quotation-content-wrap');
