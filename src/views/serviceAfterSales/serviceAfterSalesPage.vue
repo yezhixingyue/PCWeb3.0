@@ -13,7 +13,7 @@
           :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
           label="售后时间"
           :dateList="dateList"
-          dateType="date"
+          dateType="daterange"
         />
         </div>
       </header>

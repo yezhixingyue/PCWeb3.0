@@ -103,9 +103,10 @@ export default {
   },
   computed: {
     ...mapState('Quotation', [
-      'selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading', 'curProductID', 'RiskWarningTipsTypes',
+      'selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder',
+      'FileList', 'isUploading', 'curProductID', 'RiskWarningTipsTypes', 'curProductInfo2Quotation',
     ]),
-    ...mapState('common', ['customerInfo']),
+    ...mapState('common', ['customerInfo', 'keepOrderData']),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -433,13 +434,10 @@ export default {
         });
       });
     },
-    handleSuccessFunc(goToUnPayList) {
+    handleSuccessFunc() {
       this.setRuleFormInit();
       this.$emit('clearAdd');
       this.scrollToTop();
-      if (goToUnPayList) {
-        this.$router.push('/unpay/list');
-      }
     },
     handleCodeDialogClose(isPaid) {
       if (!isPaid) {
@@ -452,6 +450,10 @@ export default {
           // showCancelButton: true,
           // confirmButtonText: '前往未付款单',
         });
+        if (!this.keepOrderData) {
+          const _obj = JSON.parse(JSON.stringify(this.curProductInfo2Quotation));
+          this.$store.commit('Quotation/setCurProductInfo2Quotation', { data: _obj, onlyClearParams: true });
+        }
       } else {
         this.handleSuccessFunc();
       }

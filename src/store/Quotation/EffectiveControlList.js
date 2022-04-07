@@ -75,6 +75,9 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
   } else {
     const [{ ID, Name, Value, IsOpen }] = t.CustomerInputValues;
     _Value = ID || Name || IsOpen;
+    if (_Value && !ID && Name && _El.Type === 2 && _El.OptionAttribute.IsRadio) {
+      _Value = '00000000-0000-0000-0000-000000000000';
+    }
     if (!_Value && _Value !== false) _Value = Value;
     if (isSize && ID) {
       const _t = _El.OptionAttribute.OptionList.find(it => it.ID === ID);

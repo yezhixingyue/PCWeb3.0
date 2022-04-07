@@ -110,7 +110,6 @@ export default {
     async onSubmitCheck() { // 部件提交校验
       const checkItem = (ruleForm) => new Promise((resolve) => {
         ruleForm.validate((bool, obj) => {
-          console.log(bool, obj);
           resolve(bool || this.transformErrorObj(obj));
         });
       });
@@ -120,7 +119,6 @@ export default {
         return res;
       }));
       resultList = resultList.filter(it => it !== true).reduce((prev, next) => [...prev, ...next], []);
-      console.log(resultList);
       return resultList.length === 0 ? true : resultList;
     },
   },

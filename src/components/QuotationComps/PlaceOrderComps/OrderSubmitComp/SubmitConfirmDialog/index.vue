@@ -293,6 +293,8 @@ export default {
         height: 490px;
         text-align: center;
         display: block;
+        display: flex;
+        justify-content: center;
         > div {
           display: inline-block;
           vertical-align: top;
@@ -305,13 +307,21 @@ export default {
             width: 300px;
             margin-left: 20px;
             margin-left: 10px\0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
             > div {
               &.express {
+                height: auto !important;
                 height: 200px;
+                flex: 0 1 auto;
+                min-height: 193px;
               }
               &.order {
+                height: auto !important;
                 height: 270px;
                 margin-top: 20px;
+                flex: 1 0 auto;
                 // margin-top: 15px\0;
               }
             }

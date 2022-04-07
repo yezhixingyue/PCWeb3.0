@@ -124,6 +124,7 @@ export default {
   },
   computed: {
     ...mapState('Quotation', ['isShow2PayDialog', 'curPayInfo2Code']),
+    ...mapState('common', ['keepOrderData']),
     imgSrc() {
       if (!this.curPayInfo2Code || !this.curPayInfo2Code.PayWay || !this.curPayInfo2Code.PayWay.AllinPay || this.getImageCodeFail) return '';
       return this.curPayInfo2Code.PayWay.AllinPay;
@@ -170,7 +171,7 @@ export default {
     },
     handleSuccessPay() {
       // 轮询到付款成功后的处理函数
-      if (this.pageType === 'placeOrderPage') this.setPaySuccessOrderDataStatus();
+      if (this.pageType === 'placeOrderPage') this.setPaySuccessOrderDataStatus(this.keepOrderData);
       else if (this.pageType === 'shoppingCarPage' || this.pageType === 'unpayPage') {
         if (this.pageType === 'shoppingCarPage') this.$router.push('/shopping/car');
         else if (this.pageType === 'unpayPage') this.$store.commit('unpayList/setOrderStatusAfterPaid', this.curPayInfo2Code.PayCode);

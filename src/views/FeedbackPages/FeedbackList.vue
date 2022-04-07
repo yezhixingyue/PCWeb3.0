@@ -26,7 +26,7 @@
             label="申请时间"
             :dateList="dateList"
             :initDate='condition4FeedbackList.Date'
-            dateType="date"
+            dateType="daterange"
           />
           <search-input-comp
             title="订单号"

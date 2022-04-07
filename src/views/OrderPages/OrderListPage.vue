@@ -24,7 +24,7 @@
             :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
             label="下单时间"
             :dateList="dateList"
-            dateType="date"
+            dateType="daterange"
           />
           <search-input-comp
             title="关键词"

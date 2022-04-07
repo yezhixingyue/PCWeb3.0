@@ -1,9 +1,9 @@
 <template>
-  <PanelItemComp title="配送信息" class="express" v-if="Address && ExpressList">
+  <PanelItemComp title="配送信息" class="express" v-if="Address && ExpressList" :style="`min-height:${minHeight}px`">
     <template #img>
       <img src="@/assets/images/express-info.png" alt="">
     </template>
-    <ul class="display-box">
+    <ul class="display-box" ref="oBox">
       <li v-if="OutPlateNo">
         <span class="label">平台单号：</span>
         <div class="text">{{OutPlateNo}}</div>
@@ -82,6 +82,29 @@ export default {
         }
       }
       return '';
+    },
+    watchVal() {
+      return `${this.ExpressName}${this.Consignee}${this.Mobile}${this.AddressDetail}`;
+    },
+  },
+  data() {
+    return {
+      minHeight: 198,
+    };
+  },
+  watch: {
+    watchVal: {
+      handler(val) {
+        if (val) {
+          setTimeout(() => {
+            if (this.$refs.oBox) {
+              const h = this.$refs.oBox.offsetHeight + 69;
+              this.minHeight = Math.min(Math.max(h, 198), 240);
+            }
+          }, 0);
+        }
+      },
+      immediate: true,
     },
   },
 };

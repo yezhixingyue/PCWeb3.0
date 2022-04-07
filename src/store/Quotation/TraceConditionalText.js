@@ -48,15 +48,16 @@ const PropertyFixedType = [ // FixedType对应列表
  * @returns
  */
 const getElementConditionTextByElOriginData = ({ ElOriginData, OperatoText, value, PRLabel, compareValue }) => {
+  const _formatValue = value === '00000000-0000-0000-0000-000000000000' ? '自定义' : value;
   if (ElOriginData.Element && !ElOriginData.HiddenToCustomer) {
     const { Name, Type, Unit, OptionAttribute, SwitchAttribute } = ElOriginData.Element;
     let label = `${PRLabel || ''}${Name}`;
     if (ElOriginData.FixedType || ElOriginData.FixedType === 0) {
       const t = PropertyFixedType.find(it => it.ID === ElOriginData.FixedType);
       if (t) label = `${label}${t.Name || ''}`;
-      return `${label}${OperatoText}${compareValue || compareValue === 0 ? compareValue : value}`;
+      return `${label}${OperatoText}${compareValue || compareValue === 0 ? compareValue : _formatValue}`;
     }
-    let _value = compareValue || compareValue === 0 ? compareValue : value;
+    let _value = compareValue || compareValue === 0 ? compareValue : _formatValue;
     let _OperatoText = OperatoText;
     switch (Type) {
       case 1:

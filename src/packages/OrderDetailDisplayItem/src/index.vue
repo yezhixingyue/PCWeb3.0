@@ -1,7 +1,7 @@
 <template>
   <ul class="display-box mp-order-detail-item-comp-wrap" :class="{border: showBorder}">
     <li>
-      <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称':'部件'}}：</span>
+      <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称：':' '}}</span>
       <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}</div>
     </li>
     <li v-for="(item, lv1Index) in localContentList" :key="item.Label + item.Content + lv1Index">
@@ -67,17 +67,16 @@ export default {
       float: left;
       margin-right: 2px;
       &.part {
-        position: relative;
-        padding-left: 13px;
         &::before {
           content: '';
-          position: absolute;
+          display: inline-block;
           width: 6px;
           height: 6px;
           background: #F4A307;
           border-radius: 50%;
-          left: 0;
-          top: 8px;
+          margin-right: 5px;
+          position: relative;
+          top: -1px;
         }
       }
       &.opacity-0 {

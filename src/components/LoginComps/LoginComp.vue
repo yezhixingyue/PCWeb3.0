@@ -212,15 +212,14 @@ export default {
       }
     },
   },
+  watch: {
+    Mobile(newVal, oldVal) {
+      if ((!newVal || newVal.length === 1) && oldVal && oldVal.length === 11) {
+        this.ruleForm.rememberPwd = false;
+      }
+    },
+  },
   mounted() {
-    // console.log(process.env.VUE_APP_BASE_URL);
-    // const reg = new RegExp(`^${rightOpenUrl}`);
-    // if (rightOpenUrl && !reg.test(window.location.href)) {
-    //   // eslint-disable-next-line max-len
-    //   const url = this.$router.mode === 'hash' ? `${rightOpenUrl}#${this.$route.fullPath}` : `${rightOpenUrl}${this.$route.fullPath}`;
-    //   window.location.href = url;
-    //   return;
-    // }
     const info = localStorage.getItem('info');
     if (info) {
       const temp = JSON.parse(info);
@@ -240,7 +239,6 @@ export default {
     }
     if (this.$route.query.redirect) {
       this.repath = this.$route.query.redirect;
-      // // console.log(this.repath);
     }
   },
 };

@@ -10,7 +10,7 @@
           :key="item[defaultProps.label] + '-' + i" :name="item[defaultProps.value]">
         </el-tab-pane>
       </el-tabs>
-      <el-popover
+      <!-- <el-popover
         placement="bottom" v-model="visible" popper-class="order-time-select" trigger="click">
         <div class="select-block-wrap">
           <div class="block">
@@ -36,14 +36,41 @@
             自定义时间
           </span>
           <span v-else :class="{'active':UserDefinedTimeIsActive, 'manual-select-date-box': 1}">
-            <template v-if="dateType === 'date'">{{ Format2DateBegin }}</template>
+            <template v-if="dateType === 'daterange'">{{ Format2DateBegin }}</template>
             <template v-else>{{ beginTime | formatDate }}</template>
             <span style="font-size:12px;margin:0 2px;vertical-align:0%;">至</span>
-            <template v-if="dateType === 'date'">{{ Format2DateEnd }}</template>
+            <template v-if="dateType === 'daterange'">{{ Format2DateEnd }}</template>
             <template v-else>{{ endTime | formatDate }}</template>
           </span>
         </span>
-      </el-popover>
+      </el-popover> -->
+      <span @click="onDefineBtnClick">
+        <span v-if="!showText" class="manual-select-date-box">
+          自定义时间
+        </span>
+        <span v-else :class="{'active':UserDefinedTimeIsActive, 'manual-select-date-box': 1}">
+          <template>{{ beginTime | formatDateContent  }}</template>
+          <span style="font-size:12px;margin:0 2px;vertical-align:0%;">至</span>
+          <template>{{ endTime | formatDateContent }}</template>
+        </span>
+      </span>
+      <el-date-picker
+        v-model="localValue"
+        :type="dateType"
+        align="center"
+        :visible-arrow='false'
+        unlink-panels
+        value-format="yyyy-MM-ddTHH:mm:ss"
+        :format="format"
+        :default-time='defaultTime'
+        :clearable='false'
+        @focus='onPickerFocus'
+        @blur="onPickerBlur"
+        size="mini"
+        ref="oPicker"
+        popper-class="date-selector-popper-box"
+      >
+      </el-date-picker>
     </div>
   </div>
 </template>
@@ -53,8 +80,14 @@ export default {
   props: {
     dateList: {
       type: Array,
-      // eslint-disable-next-line max-len
-      default: () => [{ name: '不限', ID: 'all' }, { name: '今天', ID: 'today' }, { name: '昨天', ID: 'yesterday' }, { name: '前天', ID: 'beforeyesterday' }],
+      default: () => [
+        { label: '不限', value: 'all' },
+        { label: '今天', value: 'today' },
+        { label: '昨天', value: 'yesterday' },
+        { label: '前天', value: 'beforeyesterday' },
+        { label: '本月', value: 'curMonth' },
+        { label: '上月', value: 'lastMonth' },
+      ],
     },
     dateValue: {
       type: String,
@@ -87,7 +120,7 @@ export default {
     },
     dateType: {
       type: String,
-      default: 'datetime',
+      default: 'datetimerange',
     },
     defaultProps: {
       type: Object,
@@ -100,11 +133,18 @@ export default {
       type: Object,
     },
   },
+  filters: {
+    formatDateContent(str) {
+      if (str) {
+        return str.split('T')[0];
+      }
+      return '';
+    },
+  },
   computed: {
     showText: {
       get() {
-        if (this.key && this.beginTime && this.endTime) return true;
-        return false;
+        return !!(this.key && this.beginTime && this.endTime);
       },
     },
     Format2DateEnd() {
@@ -131,6 +171,29 @@ export default {
         }
       },
     },
+    localValue: {
+      get() {
+        if (this.beginTime && this.endTime) {
+          return [this.beginTime, this.endTime];
+        }
+        return [];
+      },
+      set(val) {
+        if (Array.isArray(val)) {
+          [this.beginTime, this.endTime] = val;
+        } else {
+          this.beginTime = '';
+          this.endTime = '';
+        }
+      },
+    },
+    defaultTime() { // 后续的特殊处理？
+      return ['00:00:00', '23:59:59'];
+    },
+    format() {
+      if (this.dateType === 'daterange') return 'yyyy-MM-dd';
+      return 'yyyy-MM-dd HH:mm';
+    },
   },
   data() {
     return {
@@ -141,6 +204,7 @@ export default {
       start: '',
       end: '',
       isNotFoulCloseType: false, // 是否使用犯规方式关闭
+      clickTarget: false,
     };
   },
   watch: {
@@ -163,7 +227,7 @@ export default {
   methods: {
     onSelectTimeSubmit() {
       if (!this.endTime || !this.beginTime) return;
-      if (this.dateType === 'date') {
+      if (this.dateType === 'daterange') {
         this.endTime = `${this.Format2DateEnd}T23:59:59.997Z`;
       }
       const bool = new Date(this.endTime) - new Date(this.beginTime) > 0;
@@ -203,6 +267,28 @@ export default {
       }
       return false;
     },
+    onDefineBtnClick() {
+      this.$refs.oPicker.focus();
+    },
+    onPickerFocus() {
+      setTimeout(() => {
+        this.clickTarget = null;
+      }, 0);
+    },
+    onPickerBlur() {
+      setTimeout(() => {
+        if (!this.clickTarget) {
+          this.changePropsFunc([this.typeList[0], '']);
+          this.changePropsFunc([this.typeList[1], this.beginTime]);
+          this.changePropsFunc([this.typeList[2], this.endTime]);
+          this.requestFunc();
+          this.key = true;
+        }
+      }, 0);
+    },
+    onDocumentClick(e) {
+      this.clickTarget = e;
+    },
   },
   mounted() {
     if (this.UserDefinedTimeIsActive) {
@@ -215,6 +301,10 @@ export default {
       this.endTime = this.$route.query.Second;
       this.key = true;
     }
+    document.body.addEventListener('click', this.onDocumentClick);
+  },
+  beforeDestroy() {
+    document.body.removeEventListener('click', this.onDocumentClick);
   },
 };
 </script>
@@ -329,6 +419,20 @@ export default {
     padding: 0 10px;
     width: 68px;
     text-align: center;
+  }
+  .el-date-editor {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    vertical-align: top;
+    padding: 0;
+    border: none;
+    position: relative;
+    top: 18px;
+    right: 95px;
+    .el-popper[x-placement^="bottom"] .popper__arrow::after {
+      display: none;
+    }
   }
 }
 .order-time-select {

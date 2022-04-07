@@ -290,13 +290,13 @@ export default {
     },
     /* 当前选中产品详细信息
     -------------------------------*/
-    setCurProductInfo2Quotation(state, data) {
+    setCurProductInfo2Quotation(state, { data, onlyClearParams }) {
       if (!data && data !== null) return;
       // 处理产品信息
-      const curProductInfo2Quotation = QuotationClassType.initOriginData(data);
+      const curProductInfo2Quotation = onlyClearParams ? state.curProductInfo2Quotation : QuotationClassType.initOriginData(data);
       const ProductParams = QuotationClassType.init(data);
 
-      state.curProductInfo2Quotation = curProductInfo2Quotation;
+      if (!onlyClearParams) state.curProductInfo2Quotation = curProductInfo2Quotation;
       state.obj2GetProductPrice.ProductParams = ProductParams;
 
       state.initPageText = '';
@@ -363,7 +363,7 @@ export default {
     },
     /* 设置订单付款成功后的状态
     -------------------------------*/
-    setPaySuccessOrderDataStatus(state) {
+    setPaySuccessOrderDataStatus(state, keepOrderData) {
       // '设置订单付款成功后的状态,清除一些数据的状态值'); ----------------- !!!
       state.PreCreateData = null;
 
@@ -373,8 +373,7 @@ export default {
       state.curReqObj4PreCreate = null;
       state.selectedCoupon = null;
 
-      const _keepingData = localStorage.getItem('isOrderDataKeeping');
-      if (!(_keepingData && _keepingData === 'true')) {
+      if (!keepOrderData) {
         state.initPageText = '下单成功';
         // state.curProduct = null;
       } else {
@@ -564,7 +563,7 @@ export default {
         router.push('');
         return false;
       }
-      commit('setCurProductInfo2Quotation', res.data.Data);
+      commit('setCurProductInfo2Quotation', { data: res.data.Data });
       if (!router.currentRoute.query.id || router.currentRoute.query.id !== (id || state.curProductID)) {
         router.push(`?id=${id || state.curProductID}`);
       }
@@ -720,7 +719,8 @@ export default {
     },
     /* 下单 - 保存购物车
     -------------------------------*/
-    async getQuotationSave2Car({ state, commit, dispatch }, { FileList, fileContent, FileAuthorMobile, callBack }) {
+    async getQuotationSave2Car({ state, commit, rootState }, { FileList, fileContent, FileAuthorMobile, callBack }) {
+      console.log(rootState.common.keepOrderData);
       const _itemObj = { IgnoreRiskLevel: state.RiskWarningTipsTypes.PageTips };
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
       if (FileList) {
@@ -745,11 +745,13 @@ export default {
 
       const handleSuccess = async () => { // 处理成功后的函数
         massage.successSingle({ title: '添加成功!', successFunc: callBack });
-        const _obj = JSON.parse(JSON.stringify(state.curProductInfo2Quotation));
-        commit('setCurProductInfo2Quotation', null);
         commit('setSelectedCoupon', null);
-        await dispatch('delay', 10);
-        commit('setCurProductInfo2Quotation', _obj);
+        if (!rootState.common.keepOrderData) {
+          const _obj = JSON.parse(JSON.stringify(state.curProductInfo2Quotation));
+          commit('setCurProductInfo2Quotation', { data: _obj, onlyClearParams: true });
+          // await dispatch('delay', 10);
+          // commit('setCurProductInfo2Quotation', _obj, true);
+        }
       };
 
       const handleError = () => { // 失败处理函数 暂未使用 -- 交由统一错误方式处理
@@ -819,7 +821,7 @@ export default {
         massage.successSingle({
           title: '下单成功!',
           successFunc: () => {
-            if (isFormOrder) commit('setPaySuccessOrderDataStatus');
+            if (isFormOrder) commit('setPaySuccessOrderDataStatus', rootState.common.keepOrderData);
             if (cb) cb(); // 清除购物车中一些数据 然后跳转购物车列表页面 该方法目前只在购物车提交时使用
             commit('setIsShow2PayDialog', false);
           },

@@ -13,7 +13,7 @@
           :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
           label="交易时间"
           :dateList="dateList"
-          dateType="date"
+          dateType="daterange"
         />
         <div class="switch">
           <span class="blue-span" @click="onBillTypeSwitchClick">查看{{nextBillTypeEnumText}}</span>
