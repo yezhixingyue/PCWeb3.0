@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 const TerserPlugin = require('terser-webpack-plugin');
 
-// let proxyUrl = 'http://192.168.3.68:8050';
-let proxyUrl = 'http://erp.ybz888.com/';
+let proxyUrl = 'http://192.168.3.68:8050';
+// let proxyUrl = 'http://erp.ybz888.com/';
 let publicPath = '';
 // 测试开发环境：调用92接口
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-development') proxyUrl = 'http://192.168.1.92:8050';
@@ -10,10 +10,8 @@ if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-devel
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-development') {
   proxyUrl = 'http://erp.ybz888.com';
 }
-// 正式环境 - 当为测试的正式环境时 修改publicPath
-if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'test-production') { // 打包测试环境的代码
-  // publicPath = '/pc/';
-  publicPath = '';
+if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'withPcPath') { // 打包测试环境的代码(路径中带/pc/)
+  publicPath = '/pc/';
 }
 
 module.exports = {

@@ -108,11 +108,16 @@ export default {
     };
   },
   methods: {
-    selectProduct(product) {
+    async selectProduct(product) {
       if (this.curProduct && this.curProduct.ID === product.ID) return;
       this.$store.commit('Quotation/setCurProductInfo', product);
-      this.$store.dispatch('Quotation/getProductDetail');
       this.$store.commit('Quotation/setSelectedCoupon', null);
+      this.$store.dispatch('Quotation/getProductDetail');
+      const doms = document.getElementsByClassName('aside-product-selector-popper-wrap');
+      doms.forEach(it => {
+        const _it = it;
+        _it.style.display = 'none';
+      });
     },
     getFontNumber(list) {
       if (!Array.isArray(list) || list.length === 0) return 4;
@@ -129,9 +134,11 @@ export default {
     },
     getLeft() {
       const oContent = document.querySelector('.mp-quotation-product-quotation-content-wrap');
-      if (oContent) {
+      if (oContent && oContent.getBoundingClientRect) {
         const obj = oContent.getBoundingClientRect();
-        if (obj) this.left = obj.x;
+        if (obj) this.left = obj.left;
+      } else {
+        this.left = 10;
       }
     },
     handleScroll() {
@@ -182,6 +189,7 @@ export default {
   border-radius: 5px;
   display: inline-block;
   width: 260px;
+  z-index: 9;
   .menu-list {
     max-height: calc(100vh - 361px);
     width: 244px;
@@ -295,16 +303,16 @@ export default {
     }
   }
   > .el-scrollbar {
-    display: inline-block;
+    // display: inline-block;
     width: 100%;
   }
   > .white-space {
     height: 14px;
     width: 244px;
     background: #fff;
-    &.b {
-      margin-top: -2px;
-    }
+    // &.b {
+    //   margin-top: -2px;
+    // }
   }
 }
 // .el-menu--vertical {

@@ -10,40 +10,6 @@
           :key="item[defaultProps.label] + '-' + i" :name="item[defaultProps.value]">
         </el-tab-pane>
       </el-tabs>
-      <!-- <el-popover
-        placement="bottom" v-model="visible" popper-class="order-time-select" trigger="click">
-        <div class="select-block-wrap">
-          <div class="block">
-            <el-date-picker value-format='yyyy-MM-ddTHH:mm:ss.000Z' :clearable='false'
-              :picker-options="{disabledDate: handleDisabledDate4Begin}"
-              v-model="beginTime" :type="dateType" placeholder="选择开始日期">
-              </el-date-picker>
-          </div>
-          <div class="totext-box">至</div>
-          <div class="block">
-            <el-date-picker value-format='yyyy-MM-ddTHH:mm:ss.997Z' :clearable='false'
-              :picker-options="{disabledDate: handleDisabledDate4End}"
-              default-time='23:59:59'
-              v-model="endTime" :type="dateType" placeholder="选择结束日期"
-            ></el-date-picker>
-          </div>
-        </div>
-        <div class="select-btn-wrap">
-          <el-button @click="onSelectTimeSubmit" type="primary" >确定</el-button>
-        </div>
-        <span slot="reference">
-          <span v-if="!showText" class="manual-select-date-box">
-            自定义时间
-          </span>
-          <span v-else :class="{'active':UserDefinedTimeIsActive, 'manual-select-date-box': 1}">
-            <template v-if="dateType === 'daterange'">{{ Format2DateBegin }}</template>
-            <template v-else>{{ beginTime | formatDate }}</template>
-            <span style="font-size:12px;margin:0 2px;vertical-align:0%;">至</span>
-            <template v-if="dateType === 'daterange'">{{ Format2DateEnd }}</template>
-            <template v-else>{{ endTime | formatDate }}</template>
-          </span>
-        </span>
-      </el-popover> -->
       <span @click="onDefineBtnClick">
         <span v-if="!showText" class="manual-select-date-box">
           自定义时间

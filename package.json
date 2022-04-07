@@ -8,6 +8,7 @@
     "serve.pro": "vue-cli-service serve --port 8088 --mode prodevelopment",
     "build.test": "vue-cli-service build --mode alpha",
     "build.pro": "vue-cli-service build",
+    "build.pc": "vue-cli-service build --mode pc",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
