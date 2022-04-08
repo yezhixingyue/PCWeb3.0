@@ -4,10 +4,10 @@
     <el-button @click="visible=true">联系客服</el-button> -->
     <el-tooltip class="item" effect="dark" content="查看售后政策" placement="top">
       <i @click="visible=true" class="el-icon-edit"></i>
-    </el-tooltip>
+    </el-tooltip>售后政策
     <el-tooltip class="item" effect="dark" content="联系客服" placement="top">
-      <i @click="visible=true" class="el-icon-edit"></i>
-    </el-tooltip>
+      <i @click="visible=true" class="el-icon-edit"></i>售后政策
+    </el-tooltip>售后政策
     <CommonDialogComp
       title="售后政策"
       :visible.sync="visible"

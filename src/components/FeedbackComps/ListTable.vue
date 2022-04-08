@@ -1,40 +1,40 @@
 <template>
   <el-table stripe border :data="dataList" style="width: 100%" class="ft-14-table">
       <!--  :max-height="h" :height="h" -->
-      <el-table-column prop="Order.OrderID" label="订单号" width="120" show-overflow-tooltip></el-table-column>
-      <el-table-column label="产品名称" prop="Order.ProductName" width="150" show-overflow-tooltip>
+      <el-table-column prop="Order.OrderID" label="订单编号" width="133" show-overflow-tooltip></el-table-column>
+      <el-table-column label="下单时间" prop="Order.ProductName" width="137" show-overflow-tooltip>
       </el-table-column>
-      <el-table-column label="产品类型" width="120" prop="Order.SecondLevelName" show-overflow-tooltip>
+      <el-table-column label="订单状态" width="137" prop="Order.SecondLevelName" show-overflow-tooltip>
         <!-- <span slot-scope="scope" :class="{'is-pink': scope.row.Type === 21, 'is-success': scope.row.Type === 11}"
          >{{ scope.row.Type | formatTransactionType }}</span> -->
          <template slot-scope="scope">{{ scope.row.Order.ClassList | getClassName }}</template>
       </el-table-column>
-      <el-table-column label="售后原因" width="260" show-overflow-tooltip>
+      <el-table-column label="商品名称" width="138" show-overflow-tooltip>
         <template slot-scope="scope">{{getApplyText(scope.row.QuestionList)}}</template>
       </el-table-column>
-      <el-table-column label="诉求意向" width="120" show-overflow-tooltip>
+      <el-table-column label="文件内容" width="138" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.AppealType | formatAppealType }}</template>
       </el-table-column>
-      <el-table-column label="申请时间" show-overflow-tooltip width="150">
+      <el-table-column label="数量" show-overflow-tooltip width="109">
         <template slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
       </el-table-column>
-      <el-table-column prop="Content" label="进度" show-overflow-tooltip width="119">
+      <el-table-column prop="Content" label="尺寸" show-overflow-tooltip width="109">
         <div slot-scope="scope">
           <span :class="getStatusClass(scope.row.Status)">{{ scope.row.Status | formatFeedbackProgress }}
           </span>
-          <!-- <el-tooltip effect="dark" :content="scope.row.RejectReason" placement="top"
-           v-if="(scope.row.Status === 3 && scope.row.RejectReason)">
-            <i class="el-icon-question"></i>
-          </el-tooltip> -->
         </div>
       </el-table-column>
-      <el-table-column label="操作" width="160" show-overflow-tooltip>
-        <div class="is-font-12 btn-wrap" slot-scope="scope">
-          <!-- <span class="span-title-blue"
-            v-if="scope.row.Status !== 0">编辑</span> -->
-          <span class="span-title-blue" @click="onDetailClick(scope.row)" style="margin-right: 8px">查看详情</span>
-          <span class="span-title-pink" v-if="scope.row.Status === 0" @click="onCancleClick(scope.row)">取消</span>
-          <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>取消</span>
+      <el-table-column prop="Content" label="工艺" show-overflow-tooltip width="108">
+        <div slot-scope="scope">
+          <span :class="getStatusClass(scope.row.Status)">{{ scope.row.Status | formatFeedbackProgress }}
+          </span>
+        </div>
+      </el-table-column>
+      <el-table-column label="操作" width="190" show-overflow-tooltip>
+        <div class="is-font-12 btn-wrap">
+          <span class="span-title-blue" style="margin-right: 8px">待处理</span>
+          <span class="span-title-pink">查看</span>
+          <span class="is-cancel">申请售后</span>
         </div>
       </el-table-column>
     </el-table>

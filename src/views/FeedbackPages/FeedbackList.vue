@@ -2,7 +2,7 @@
   <section class="mp-mpzj-order-feedback-list-page-wrap">
     <header>
       <ul>
-        <li>
+        <!-- <li>
           <SingleSelector
             v-model="QuestionID"
             :optionList='QuestionList'
@@ -14,7 +14,7 @@
             :optionList='StatusList'
             title="售后进度"
           />
-        </li>
+        </li> -->
         <li class="bottom">
           <LineDateSelectorComp
             :changePropsFunc='setCondition4Feedback'
@@ -31,6 +31,7 @@
           <search-input-comp
             title="订单号"
             placeholder="请输入订单号"
+            :resetWords="'清空'"
             :typeList="[['KeyWords', '']]"
             :requestFunc="getListData4Feedback"
             :changePropsFunc="setCondition4Feedback"
@@ -38,11 +39,14 @@
             @reset="clearCondition4Feedback"
             :searchWatchKey="FeedbackList"
           />
+          <LookOverAfterSale></LookOverAfterSale>
         </li>
       </ul>
       <p></p>
     </header>
     <section class="content">
+      <a href="tencent://message/?uin=800065607&Site=Sambow&Menu=yes">QQ在线咨询</a>
+      <router-link to="/feedback/:id/:desc/:type">aaa</router-link>
       <ListTable :dataList='FeedbackList' :dataNumber='FeedbackDataNumber' @handleCancel='handleCancel' />
       <footer>
         <Count
@@ -59,7 +63,8 @@
 
 <script>
 import ListTable from '@/components/FeedbackComps/ListTable.vue';
-import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
+// import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
+import LookOverAfterSale from '@/components/ServiceAfterSales/LookOverAfterSale.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
@@ -69,14 +74,15 @@ export default {
   components: {
     Count,
     ListTable,
-    SingleSelector,
+    // SingleSelector,
+    LookOverAfterSale,
     SearchInputComp,
     LineDateSelectorComp,
   },
   data() {
     return {
       // eslint-disable-next-line max-len
-      dateList: [{ label: '全部', value: 'all' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '全部', value: 'all' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
     };
   },
   computed: {
@@ -202,12 +208,22 @@ export default {
           margin-right: 50px;
         }
         &.bottom {
-          padding-top: 24px;
-          > .mp-line-date-selector-wrap {
-            width: 775px;
-            overflow: hidden;
-            white-space: nowrap;
+          // padding-top: 24px;
+            display: flex;
+            // align-items: center;
+            .mp-line-date-selector-wrap{
+              flex: 1;
+              min-width: 625px;
+              margin-top: 10px;
+              .box{
+                width: 550px;
+              }
           }
+          // > .mp-line-date-selector-wrap {
+          //   width: 775px;
+          //   overflow: hidden;
+          //   white-space: nowrap;
+          // }
           > section {
             vertical-align: 28px;
           }
@@ -224,6 +240,16 @@ export default {
     width: 1200px;
     margin: 0 auto;
     padding-top: 25px;
+    .el-table{
+      .has-gutter{
+        >tr{
+          // transform: translateX(-1px);
+          >th:nth-child(1){
+            border-left: 2px solid #428DFA;
+          }
+        }
+      }
+    }
     > footer {
       padding: 20px 0;
     }

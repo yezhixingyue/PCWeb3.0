@@ -6,8 +6,8 @@
           <i class="el-icon-back"></i>
           <em class="is-font-13"> 返回列表</em>
         </span>
-        <span class="is-bold is-black">{{ canEdit ? '售后申请' : '查看售后申请'}}</span>
-        <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span>
+        <span class="is-bold is-black">申请服务详情</span>
+        <!-- <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span> -->
       </header>
       <div>
         <el-table stripe border
@@ -26,159 +26,35 @@
           </el-table-column>
         </el-table>
 
-        <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="诉求意向：" prop="AppealType">
-            <div class="intention">
-              <span :class="ruleForm.AppealType===0 ? 'action' : ''" @click="ruleForm.AppealType = 0">退款</span>
-              <span :class="ruleForm.AppealType===1 ? 'action' : ''" @click="ruleForm.AppealType = 1">补印</span>
-              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">其它</span>
-            </div>
-          </el-form-item>
+        <CustomSteps
+            :stepsNumber='1'
+            :stepList='[ { text: "提交申请", iconClass: "" },{ text: "系统处理中", iconClass: "" } ]'></CustomSteps>
 
-          <!--  -->
+        <div>
+          <h4>售后信息</h4>
+          <p class="reprint">
+            补印：数量：4款/1000张
+          </p>
+          <h4>处理意见</h4>
+          <p class="opinion">
+            处理意见处理意见处理意见处理意见处理意见处理意见处理意见处理意见
+          </p>
+          <p class="opinion">
+            处理意见处理意见处理意见处理意见处理意见处理意见处理意见处理意见
+          </p>
+          <div> <el-button style="height:30px;padding:0 10px; line-height:30px;border:1px solid red">aaa</el-button> </div>
+          <table class="table" border="10px">
+              <tr>
+                  <td class="w300">1行1列的内容</td>
+                  <td>1行2列的内容</td>
+              </tr>
+              <tr>
+                  <td>2行1列的内容</td>
+                  <td>2行2列的内容</td>
+              </tr>
+          </table>
+        </div>
 
-          <el-form-item v-if="ruleForm.AppealType===1" >
-            <div class="make-up-for">
-              <div class="item">款数：<el-input-number size="small" :controls="false" v-model="aaa" :min="1" :max="1000" label="描述文字"></el-input-number>款</div>
-              <!-- <div class="item">补印数量：<el-input v-model="aaa" type="number"></el-input>款</div> -->
-              <div class="item">
-                补印数量：<el-input-number size="small" :controls="false" v-model="aaa" :min="1" :max="1000" label="描述文字"></el-input-number>款
-                <span>您最多可提交数量为<span>1000</span></span>
-                </div>
-            </div>
-          </el-form-item>
-
-          <!--  -->
-
-          <el-form-item v-if="ruleForm.AppealType===0">
-            <div class="make-up-for">
-              退款金额：<div class="item"><el-input-number size="small" :controls="false" v-model="aaa" :min="0" :max="1000" label="描述文字"></el-input-number>元</div>
-            </div>
-          </el-form-item>
-
-          <!--  -->
-
-          <el-form-item label="问题类型：" prop="AppealType" style="margin-bottom:0">
-            <CheckButton
-              @CheckChange="problemType"
-              :checkList="RejectReasonList"
-              LabelKey="Title"
-              ValueKey="ID"
-            ></CheckButton>
-          </el-form-item>
-
-          <!--  -->
-
-          <!-- <el-form-item label="订单号：">
-            <p class="text">{{ruleForm.Order.OrderID}}</p>
-          </el-form-item>
-          <el-form-item label="文件内容：">
-            <p class="text gray">{{ruleForm.Order.Content}}</p>
-          </el-form-item>
-          <el-form-item label="售后原因：" prop="QuestionList" class="mp-select">
-            <SingleSelector
-              v-model="ruleForm.QuestionList"
-              :optionList='RejectReasonList'
-              multiple
-              :disabled='!canEdit'
-              placeholder="请选择售后原因"
-              :defaultProps="{ label: 'Title', value: 'ID', }"
-            />
-          </el-form-item> -->
-          <el-form-item label="问题描述：" prop="Remark">
-            <el-input type="textarea" v-model="ruleForm.Remark" :disabled='!canEdit'
-             maxlength="600" show-word-limit placeholder="请输入具体问题描述"></el-input>
-          </el-form-item>
-          <!-- <el-form-item label="诉求意向：" prop="AppealType" class="mp-select">
-            <SingleSelector
-              :disabled='!canEdit'
-              v-model="ruleForm.AppealType"
-              :optionList='AppealList'
-              placeholder="请选择诉求意向"
-            />
-          </el-form-item> -->
-          <el-form-item label="上传图片：">
-            <el-upload
-              :action="baseUrl + '/Api/Upload/Image?type=3'"
-              list-type="picture-card"
-              :file-list="fileList"
-              ref="upload"
-              drag
-              :disabled='!canEdit'
-              accept='.png,.jpeg,.jpg,.bmp'
-              :multiple='true'
-              :limit='4'
-              :on-success='handllePictureUploaded'
-              :on-preview="handlePictureCardPreview"
-              >
-              <!-- :on-success='handllePictureUploaded'
-              :on-remove="handleRemove" -->
-              <i class="el-icon-plus"></i>
-            </el-upload>
-            <el-dialog :visible.sync="dialogVisible" top="8vh" title="查看图片">
-              <img width="100%" :src="dialogImageUrl" alt="">
-            </el-dialog>
-            <p v-if="!canEdit && fileList.length === 0">未上传照片</p>
-            <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M,支持bmp、gif、png、jpeg</p>
-          </el-form-item>
-          <!-- <div class="linkman">
-            <el-form-item label="联系人：" prop="Mobile">
-              <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入手机号码"></el-input>
-            </el-form-item>
-
-            <el-form-item label="联系电话：" prop="Mobile">
-              <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入手机号码"></el-input>
-            </el-form-item>
-            <el-form-item label="QQ号码：" prop="QQ">
-              <el-input v-model="ruleForm.QQ" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入QQ号码"></el-input>
-            </el-form-item>
-          </div>
-          <el-form-item label="处理情况：" v-if="!canEdit" class="mp-feedback-progress-box">
-            <p>
-              <span style="margin-right:6px">处理进度：</span>
-              <span  :class="getStatusClass(ruleForm.Status)">{{ruleForm.Status | formatFeedbackProgress}}</span>
-            </p>
-            <p v-if="(ruleForm.RejectReason && ruleForm.Status === 3) || ruleForm.Result && ruleForm.Status === 2">
-              <span style="margin-right:6px">{{ruleForm.Status === 3?'拒绝原因':'处理信息'}}：</span>
-              <span :class="ruleForm.Status === 3?'is-pink':''" class="is-font-12"
-               >{{ruleForm.Status === 3?ruleForm.RejectReason:ruleForm.Result}}</span>
-            </p>
-          </el-form-item> -->
-        </el-form>
-        <div class="line"></div>
-        <el-form label-position="left" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <div class="linkman">
-            <el-form-item label="联系人：" prop="Mobile">
-              <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入手机号码"></el-input>
-            </el-form-item>
-
-            <el-form-item label="联系电话：" prop="Mobile">
-              <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入手机号码"></el-input>
-            </el-form-item>
-            <el-form-item label="QQ号码：" prop="QQ">
-              <el-input v-model="ruleForm.QQ" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入QQ号码"></el-input>
-            </el-form-item>
-          </div>
-          <el-form-item label="处理情况：" v-if="!canEdit" class="mp-feedback-progress-box">
-            <p>
-              <span style="margin-right:6px">处理进度：</span>
-              <span  :class="getStatusClass(ruleForm.Status)">{{ruleForm.Status | formatFeedbackProgress}}</span>
-            </p>
-            <p v-if="(ruleForm.RejectReason && ruleForm.Status === 3) || ruleForm.Result && ruleForm.Status === 2">
-              <span style="margin-right:6px">{{ruleForm.Status === 3?'拒绝原因':'处理信息'}}：</span>
-              <span :class="ruleForm.Status === 3?'is-pink':''" class="is-font-12"
-               >{{ruleForm.Status === 3?ruleForm.RejectReason:ruleForm.Result}}</span>
-            </p>
-          </el-form-item>
-          <!-- <el-form-item>
-          </el-form-item> -->
-        </el-form>
             <div class="btn-box">
               <!-- <div>
                 <p class="is-bold">请注意：</p>
@@ -201,7 +77,7 @@
 
 <script>
 // import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
-import CheckButton from '@/components/common/CheckButton.vue';
+import CustomSteps from '@/components/ServiceAfterSales/CustomSteps.vue';
 import { imgUrl } from '@/assets/js/setup';
 import { mapState } from 'vuex';
 import { Message } from 'element-ui';
@@ -209,7 +85,7 @@ import { Message } from 'element-ui';
 export default {
   components: {
     // SingleSelector,
-    CheckButton,
+    CustomSteps,
   },
   data() {
     return {
@@ -394,6 +270,16 @@ export default {
 
 <style lang='scss'>
 .mp-mpzj-order-feedback-add-page-wrap {
+  .table{
+    border: 1px solid red;
+    border-spacing: 0;
+    .w300{
+      width: 300px;
+    }
+    td{
+      border: 1px solid red;
+    }
+  }
   width: 100%;
   margin-top: 25px;
   // background-color: #fff;

@@ -60,15 +60,17 @@
             <!-- <i class="iconfont icon-zhangdan"></i> -->
             <span>账单</span>
           </router-link>
-          <router-link class="normal-item" tag="li" to="/serviceAfterSales">
-            <!-- <i class="iconfont icon-shouhoudan"></i> -->
-            <span>售后记录</span>
-          </router-link>
           <router-link class="normal-item" tag="li" to="/feedbackList" :class="{
               active: $route.name === 'feedback',
             }">
             <!-- <i class="iconfont icon-zhangdan"></i> -->
-            <span>售后进度</span>
+            <span>申请售后</span>
+          </router-link>
+          <router-link class="normal-item" tag="li" to="/serviceAfterSales" :class="{
+              active: $route.name === 'serviceAfterSalesDetails',
+            }">
+            <!-- <i class="iconfont icon-shouhoudan"></i> -->
+            <span>售后记录</span>
           </router-link>
         </ul>
         <div class="customer-box" v-if="customerInfo">

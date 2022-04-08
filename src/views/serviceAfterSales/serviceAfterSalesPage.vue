@@ -32,7 +32,7 @@
         <div class="content">
           <div class="table-wrap">
 
-            <ul class="table">
+            <!-- <ul class="table">
               <li class="column" width="300px">
                 <div class="lable">订单编号</div>
                 <div class="content">内容</div>
@@ -77,46 +77,48 @@
                 <div class="lable">操作</div>
                 <div class="content">内容</div>
               </li>
-            </ul>
-            <CustomSteps
-            :stepsNumber='1'
-            :stepList='[ { text: "提交申请", iconClass: "" },{ text: "系统处理中", iconClass: "" } ]'></CustomSteps>
+            </ul> -->
+
             <el-table stripe border
               :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
-              <el-table-column prop="ID" label="售后单号" width="95" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="Order.OrderID" label="订单号" width="110" show-overflow-tooltip>
+              <el-table-column prop="ID" label="售后服务单号" width="197" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="Order.OrderID" label="订单编号" width="171" show-overflow-tooltip>
               </el-table-column>
-              <el-table-column label="产品名称" width="180" show-overflow-tooltip>
+              <el-table-column label="商品名称" width="171" show-overflow-tooltip>
                 <span slot-scope="scope">{{ scope.row.Order | getFullName }}</span>
               </el-table-column>
-              <el-table-column label="订单金额" show-overflow-tooltip width="114">
+              <el-table-column label="文件内容" show-overflow-tooltip width="171">
                 <template slot-scope="scope">{{ scope.row.Order.Funds.FinalPrice }}元</template>
               </el-table-column>
-              <el-table-column label="售后类型" width="90" show-overflow-tooltip>
+              <el-table-column label="申请时间" width="171" show-overflow-tooltip>
                 <template slot-scope="scope"
                 >{{scope.row.Solution && scope.row.Solution.Type ? getSolutionType(scope.row.Solution.Type) : ''}}</template>
               </el-table-column>
-              <el-table-column label="订单减款" width="100" show-overflow-tooltip>
+              <el-table-column label="售后进度" width="171" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <i>{{scope.row.Solution.Type === 2 ? scope.row.Solution.Refund + '元' : ''}}</i>
                 </template>
               </el-table-column>
-              <el-table-column label="运费减款" width="90" show-overflow-tooltip>
+              <el-table-column label="操作" width="146" show-overflow-tooltip>
                 <template slot-scope="scope">
+                  <span>查看</span>
+                  <el-divider direction="vertical"></el-divider>
+                  <span>售后评价</span>
                   <i v-if="scope.row.Solution.Type===2 && scope.row.Solution.RefundFreight > 0">{{scope.row.Solution.RefundFreight}}元</i>
                 </template>
               </el-table-column>
-              <el-table-column prop="RePrintOrderID" label="补印单号" width="120" show-overflow-tooltip>
-              </el-table-column>
-              <el-table-column prop="RePrintOrderID" label="优惠券" width="130" show-overflow-tooltip>
-                <template slot-scope="scope" v-if="scope.row.Solution && scope.row.Solution.Type===8">
-                  <i>{{scope.row.Solution | getCouponList}}</i>
-                </template>
-              </el-table-column>
-              <el-table-column label="处理时间" show-overflow-tooltip width="170">
-                <span class="gray" slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate }}</span>
-              </el-table-column>
+
             </el-table>
+
+            <div class="null-data">
+              <img src="" alt="">
+              <div class="null-data-right">
+                最近没下过订单哦
+                <router-link to="/serviceAfterSalesDetails">
+                  <el-button>去首页看看</el-button>
+                </router-link>
+              </div>
+            </div>
           </div>
           <div class="content-footer">
             <Count
@@ -158,7 +160,6 @@ import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import LookOverAfterSale from '@/components/ServiceAfterSales/LookOverAfterSale.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
-import CustomSteps from '@/components/ServiceAfterSales/CustomSteps.vue';
 import CommonClassType from '../../store/CommonClassType';
 
 export default {
@@ -167,7 +168,6 @@ export default {
     LineDateSelectorComp,
     LookOverAfterSale,
     SearchInputComp,
-    CustomSteps,
   },
   computed: {
     ...mapState('common', ['ScrollInfo']),
@@ -320,7 +320,29 @@ export default {
               }
             }
           }
-
+          >.null-data{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            >img{
+              width: 200px;
+              height: 200px;
+              background-color: #efefef;
+              margin-right: 30px;
+            }
+            .null-data-right{
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              .el-button{
+                margin-top: 20px;
+              }
+            }
+          }
+          >.el-table .has-gutter > tr > th.is-leaf::after{
+            width: 0;
+          }
         }
         > .content-footer {
           margin-top: 19px;

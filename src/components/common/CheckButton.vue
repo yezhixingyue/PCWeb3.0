@@ -2,8 +2,8 @@
   <ul class="check-button">
     <li v-for="(item, index) in checkList"
     :key="index"
-    :class="isAction(CheckedItemKey?item[CheckedItemKey]:index)?'action':''"
-    @click="onChange(CheckedItemKey?item[CheckedItemKey]:index)">{{item.a}}</li>
+    :class="isAction(ValueKey?item[ValueKey]:index)?'action':''"
+    @click="onChange(ValueKey?item[ValueKey]:index)">{{item[LabelKey]}}</li>
   </ul>
 </template>
 <script>
@@ -13,7 +13,10 @@ export default {
       type: Array,
       default: () => [{ a: 'a', b: 'b' }, { a: 'c', b: 'd' }],
     },
-    CheckedItemKey: { // 返回的列表中数据对应key的值 默认是索引
+    ValueKey: { // 返回的列表中数据对应key的值 默认是索引
+      type: String,
+    },
+    LabelKey: {
       type: String,
     },
   },
@@ -29,7 +32,7 @@ export default {
   },
   methods: {
     onChange(key) {
-      console.log(this.checkKey);
+      console.log(this.checkList);
       if (this.checkKey.findIndex((it) => it === key) === -1) {
         this.checkKey.push(key);
       } else {

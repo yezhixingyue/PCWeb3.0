@@ -195,7 +195,17 @@ const routes = [
           y: 0,
           title: '售后单列表 - 郑州名片之家电子商务有限公司',
         },
-        component: () => import('../views/serviceAfterSales/serviceAfterSalesPage.vue'),
+        component: () => import('../views/ServiceAfterSales/ServiceAfterSalesPage.vue'),
+      },
+      {
+        path: '/serviceAfterSalesDetails',
+        name: 'serviceAfterSalesDetails',
+        meta: {
+          requiresAuth: true,
+          y: 0,
+          title: '售后详情 - 郑州名片之家电子商务有限公司',
+        },
+        component: () => import('../views/ServiceAfterSales/ServiceAfterSalesDetails.vue'),
       },
       {
         path: '/bill',
