@@ -73,11 +73,13 @@
         </ul>
         <div class="customer-box" v-if="customerInfo">
           <span class="price-box">
-            <label>余额：</label>
-            <span class="price is-pink"><i>￥</i>{{customerBalance?+customerBalance:0}}</span>
-            <i>/</i>
-            <label>印豆：</label>
-            <span class="is-pink">{{BeanNumberBalance?+BeanNumberBalance:0}}个</span>
+            <span @click.stop="setShowRechange">
+              <label>余额：</label>
+              <span class="price is-pink"><i>￥</i>{{customerBalance?+customerBalance:0}}</span>
+              <i>/</i>
+              <label>印豆：</label>
+              <span class="is-pink">{{BeanNumberBalance?+BeanNumberBalance:0}}个</span>
+            </span>
           </span>
           <el-button round @click.stop="setShowRechange">在线充值</el-button>
           <el-dropdown trigger="click" @command='onCommand'>
@@ -588,15 +590,21 @@ export default {
           vertical-align: top;
           text-align: end;
           text-align: right;
-          > i {
-            font-size: 13px;
-            margin: 0 3px;
-            color: #888;
-          }
-          > .price {
-            font-size: 15px;
+          > span {
+            cursor: pointer;
+            > label {
+              cursor: pointer;
+            }
             > i {
-              font-size: 14px;
+              font-size: 13px;
+              margin: 0 3px;
+              color: #888;
+            }
+            > .price {
+              font-size: 15px;
+              > i {
+                font-size: 14px;
+              }
             }
           }
         }

@@ -1,7 +1,7 @@
 <template>
   <div class="mp-pc-common-comps-number-input-comp-wrap">
     <span class="l" @click="onDecreaseClick" :class="{'is-disabled': (value || value === 0) && typeof max === 'number' && value <= min}">-</span>
-    <el-input v-model.number="localValue" :placeholder="placeholder" size="small"></el-input>
+    <el-input v-model.number="localValue" :placeholder="placeholder" size="small" maxlength="11"></el-input>
     <span class="r" @click="onIncreaseClick" :class="{'is-disabled': (value || value === 0) && typeof max === 'number' && value >= max}">+</span>
   </div>
 </template>

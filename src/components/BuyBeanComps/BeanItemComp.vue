@@ -2,11 +2,16 @@
   <li
     v-if="itemData"
     class="mp-pc-bean-buy-list-page-bean-list-single-item-comp-wrap"
-    :class="{'sell-out': isSellOut, 'can-buy': !isSellOut}"
     :style="`background: url(${itemData._bgImg}) no-repeat center center/cover;`"
+    :class="{
+      'sell-out': isSellOut,
+      'today-sell-out': isTodaySellOut,
+      'can-buy': !isSellOut && !isTodaySellOut,
+    }"
     @click='onBuyClick'
     >
     <img v-if="isSellOut" src="@/assets/images/bean-sell-out.png" alt="">
+    <img v-if="isTodaySellOut" class="today-out" src="@/assets/images/bean-today-sell-out.png" alt="">
     <h2>
       <label>印豆：</label>
       <span class="is-bold">{{itemData.BeanNumber}}个</span>
@@ -32,15 +37,15 @@ export default {
   },
   computed: {
     isSellOut() {
-      if (this.itemData) {
-        return this.itemData.EverydayBuyMaxNumber === 0;
-      }
-      return false;
+      return this.itemData?.TodayBuyMaxNumber === 0 && !this.itemData?.IsTomorrowBuyable;
+    },
+    isTodaySellOut() {
+      return this.itemData?.TodayBuyMaxNumber === 0 && this.itemData?.IsTomorrowBuyable;
     },
   },
   methods: {
     onBuyClick() {
-      if (this.isSellOut) return;
+      if (this.isSellOut || this.isTodaySellOut) return;
       this.$emit('buy', this.itemData);
     },
   },
@@ -50,22 +55,17 @@ export default {
 .mp-pc-bean-buy-list-page-bean-list-single-item-comp-wrap {
   width: 380px;
   height: 200px;
-  box-sizing: border-box;
   border-radius: 4px;
   overflow: hidden;
   display: inline-block;
   margin-right: 30px;
   margin-bottom: 40px;
-  color: #6F4437;
-  padding: 20px 30px;
+  transition: 0.2s ease-in-out;
   position: relative;
   cursor: pointer;
-  transition: 0.2s ease-in-out;
-  > img {
-    position: absolute;
-    right: 13px;
-    top: 15px;
-  }
+  box-sizing: border-box;
+  color: #6F4437;
+  padding: 20px 30px;
   > h2 {
     padding: 25px 0;
     font-size: 24px;
@@ -85,13 +85,23 @@ export default {
       font-size: 18px;
     }
   }
+  > img {
+    position: absolute;
+    right: 13px;
+    top: 15px;
+    cursor: not-allowed;
+    &.today-out {
+      right: -10px;
+      top: -3px;
+    }
+  }
   &.can-buy{
     &:hover {
       // box-shadow: 0 2px 12px 0 rgba($color: #000000, $alpha: 0.1);
       transform: scale(1.03);
     }
   }
-  &.sell-out {
+  &.sell-out, &.today-sell-out {
     opacity: 0.45;
     cursor: not-allowed;
     // pointer-events: none;

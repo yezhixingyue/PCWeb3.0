@@ -23,7 +23,9 @@ export default class BeanItemClassType {
 
   BuyMaxNumber = 0
 
-  EverydayBuyMaxNumber = 0
+  TodayBuyMaxNumber = 0
+
+  IsTomorrowBuyable = 0
 
   _EndTime = ''
 
@@ -34,8 +36,8 @@ export default class BeanItemClassType {
   constructor(itemData) {
     if (itemData) {
       const {
-        ID, BeanID, EndTime, BeanNumber, Price, TotalNumber, BuyMaxNumber, EverydayBuyMaxNumber,
-      } = itemData;
+        ID, BeanID, EndTime, BeanNumber, Price, TotalNumber, BuyMaxNumber, TodayBuyMaxNumber, IsTomorrowBuyable,
+      } = itemData; // 总份数  客户可购买总份数  当日限购份数  已购买份数  当日已购买份数
 
       this.ID = ID;
       this.BeanID = BeanID;
@@ -44,7 +46,8 @@ export default class BeanItemClassType {
       this.Price = Price;
       this.TotalNumber = TotalNumber;
       this.BuyMaxNumber = BuyMaxNumber;
-      this.EverydayBuyMaxNumber = EverydayBuyMaxNumber;
+      this.TodayBuyMaxNumber = TodayBuyMaxNumber;
+      this.IsTomorrowBuyable = IsTomorrowBuyable;
 
       this._EndTime = EndTime && EndTime.length >= 10 ? `${EndTime.slice(0, 10)}日` : (EndTime || '售完为止');
       const t = _bgImgList.find(it => BeanNumber <= it.maxBeanNumber);
@@ -54,14 +57,18 @@ export default class BeanItemClassType {
       let _TotalNumberText = '';
       let _BuyMaxNumberText = '';
       if (TotalNumber && typeof +TotalNumber === 'number' && !Number.isNaN(+TotalNumber)) {
-        _TotalNumberText = `总份数：${TotalNumber}`;
+        _TotalNumberText = `一共 ${TotalNumber} 份`;
       }
       if (BuyMaxNumber && typeof +BuyMaxNumber === 'number' && !Number.isNaN(+BuyMaxNumber)) {
-        _BuyMaxNumberText = `最大可购买份数：${BuyMaxNumber}`;
+        _BuyMaxNumberText = `每个客户限购 ${BuyMaxNumber} 份，售完为止`;
       }
-      this._description = `${_TotalNumberText}${_TotalNumberText && _BuyMaxNumberText ? '；' : ''}${_BuyMaxNumberText}`;
+      if (_TotalNumberText && _BuyMaxNumberText && TotalNumber === BuyMaxNumber) {
+        _BuyMaxNumberText = '先到先得，售完为止';
+      }
+      // 一共 10份，每个客户限购 10份，售完为止
+      this._description = `${_TotalNumberText}${_TotalNumberText && _BuyMaxNumberText ? '，' : ''}${_BuyMaxNumberText}`;
     }
   }
-  // 是否已售完状态通过计算属性获取（EverydayBuyMaxNumber === 0时为已售完）
+  // 是否已售完状态通过计算属性获取（TodayBuyMaxNumber === 0时为已售完）
   // 已过期状态同上 ---  无已过期状态
 }

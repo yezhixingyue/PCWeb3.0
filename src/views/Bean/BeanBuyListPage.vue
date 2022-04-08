@@ -103,12 +103,12 @@ export default {
       const resp = await this.api.getShopPrintBeanBuy(e).catch(() => null);
       if (resp && resp.data.Status === 1000) {
         this.$store.dispatch('common/getCustomerFundBalance');
-        if (typeof this.curBuyItemData.EverydayBuyMaxNumber === 'number') {
-          this.curBuyItemData.EverydayBuyMaxNumber -= e.Number; // 修改印豆可购买数据
-        }
         if (!resp.data.Data) {
           const cb = () => {
             this.visible = false;
+            if (typeof this.curBuyItemData.TodayBuyMaxNumber === 'number') {
+              this.curBuyItemData.TodayBuyMaxNumber -= e.Number; // 修改印豆可购买数据
+            }
           };
           this.messageBox.successSingle({
             title: '购买成功',

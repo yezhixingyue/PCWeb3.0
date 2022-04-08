@@ -144,6 +144,7 @@ axios.interceptors.response.use(
       if (_url === '/Api/Quotation/Save') _msg = '添加失败';
       if (_url === '/Api/Upload/File') _msg = '文件上传失败';
       if (_url === '/Api/Calculate/ProductPrice') _msg = '报价失败';
+      if (_url === '/Api/Shop/PrintBean/Buy') _msg = '购买失败';
 
       _obj.title = _msg;
       messageBox.failSingleError(_obj);

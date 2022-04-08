@@ -266,8 +266,6 @@ export default {
         }
       }
       &.batch-upload {
-        // margin: 0 30px;
-        // margin-top: -1px;
         border-radius: 0;
         background: #fff;
         > div {
@@ -291,11 +289,9 @@ export default {
           cursor: pointer;
           transition: ease-in-out 0.05s;
           &:hover {
-            // background: rgba($color: #428dfa, $alpha: 0.1);
             opacity: 0.8;
           }
           &:active {
-            // background: rgba($color: #428dfa, $alpha: 0.3);
             opacity: 1;
           }
         }
@@ -303,7 +299,6 @@ export default {
     }
   }
   > .el-scrollbar {
-    // display: inline-block;
     width: 100%;
   }
   > .white-space {
@@ -315,13 +310,7 @@ export default {
     // }
   }
 }
-// .el-menu--vertical {
-//   .el-menu--popup-right-start {
-//     width: 950px;
-//   }
-// }
 .aside-product-selector-popper-wrap {
-  // z-index: 800 !important;
   margin-top: -45px !important;
   margin-left: -8px !important;
   box-shadow: 0px 2px 15px 0px rgba(20, 57, 112, 0.25);

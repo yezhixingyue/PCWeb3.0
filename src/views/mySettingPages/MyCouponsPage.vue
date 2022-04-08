@@ -545,7 +545,7 @@ export default {
         // box-shadow: 0 0 10px rgba(0,0,0,.12);
         &.add-new {
           animation: new-add-item 0.7s, new-add-item-color 6s ;
-          box-shadow: 0px 0px 3px #ff3769;
+          // box-shadow: 0px 0px 3px #ff3769;
         }
         &.old {
           animation: new-add-item-opacity 2s;
@@ -573,13 +573,14 @@ export default {
       transform: scale(1);
     }
     25%{
-      transform: scale(1.05);
+      // transform: scale(1.05);
     }
     50%{
-      transform: scale(1);
+      // transform: scale(1);
+      transform: scale(1.05);
     }
     75%{
-      transform: scale(1.05);
+      // transform: scale(1.05);
     }
     100%{
       transform: scale(1);
@@ -587,10 +588,10 @@ export default {
   }
   @keyframes new-add-item-color{
     0%{
-      box-shadow: 0px 0px 10px #ff3769;
+      // box-shadow: 0px 0px 10px #ff3769;
     }
     100%{
-      box-shadow: 0px 0px 0px #ff3769;
+      // box-shadow: 0px 0px 0px #ff3769;
     }
   }
   @keyframes new-add-item-opacity{

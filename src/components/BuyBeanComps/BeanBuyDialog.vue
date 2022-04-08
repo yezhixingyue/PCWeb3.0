@@ -7,6 +7,7 @@
     :showSubmit='false'
     :visible.sync="visible"
     :disabled="loading"
+    title='购买印豆'
     @danger="onSubmit"
     @cancle="onCancle"
     @open="onOpen">
@@ -28,12 +29,14 @@
         <span>购买</span>
         <NumberInput v-model.number="buyNumber" :max='canBuyMaxCount' :min="1" />
         <i>份</i>
-        <div class="price">
-          <span>价格：</span>
-          <span class="is-pink is-font-18" v-show="canBuyMaxCount >= buyNumber">{{totalPrice}}</span>
-          <span class="is-pink" v-show="canBuyMaxCount >= buyNumber">元</span>
-          <span class="is-pink" v-if="canBuyMaxCount < buyNumber">已超出最大购买份数</span>
-        </div>
+        <span class="remark" v-if="hasTodayBuyMaxNumber">( 您今天还可以购买 {{canBuyMaxCount}} 份 )</span>
+        <span class="remark" v-else>( 本次可购买 {{canBuyMaxCount}} 份 )</span>
+      </div>
+      <div class="price">
+        <span>价格：</span>
+        <span class="is-pink is-font-18" v-show="canBuyMaxCount >= buyNumber">{{totalPrice}}</span>
+        <span class="is-pink" v-show="canBuyMaxCount >= buyNumber">元</span>
+        <span class="is-pink is-font-18" v-if="canBuyMaxCount < buyNumber">已超出最大购买份数</span>
       </div>
       <div class="balance">
         <el-checkbox v-model="UseBalance" :disabled='UseBalanceDisabled'>使用余额支付</el-checkbox>
@@ -41,7 +44,7 @@
       <!-- 提示 -->
       <p class="tips-box" v-if="canBuyMaxCount < Infinity">
         <i class="el-icon-warning"></i>
-        <span>注： 今天还可购买{{canBuyMaxCount}}份</span>
+        <span>注意：支付尾款时，不能使用印豆抵扣</span>
       </p>
     </div>
     <template slot="foot-tip">
@@ -52,7 +55,7 @@
 <script>
 import { mapState } from 'vuex';
 import CommonDialogComp from '@/packages/CommonDialogComp';
-import NumberInput from '../common/NumberInput.vue.vue';
+import NumberInput from '../common/NumberInput.vue';
 
 export default {
   props: {
@@ -78,11 +81,14 @@ export default {
   },
   computed: {
     ...mapState('common', ['customerBalance']),
+    hasTodayBuyMaxNumber() {
+      return this.curBuyItemData && typeof this.curBuyItemData.TodayBuyMaxNumber === 'number';
+    },
     canBuyMaxCount() { // 当日可用购买的最大数量
-      if (this.curBuyItemData && typeof this.curBuyItemData.EverydayBuyMaxNumber === 'number') {
-        return this.curBuyItemData.EverydayBuyMaxNumber;
+      if (this.hasTodayBuyMaxNumber) {
+        return this.curBuyItemData.TodayBuyMaxNumber;
       }
-      return Infinity;
+      return 10000;
     },
     totalPrice() {
       if (!this.curBuyItemData) return 0;
@@ -115,7 +121,8 @@ export default {
         return false;
       }
       if (this.buyNumber > this.canBuyMaxCount) {
-        this.messageBox.failSingleError({ title: '购买失败', msg: `购买份数超出，最多还可购买 ${this.canBuyMaxCount} 份` });
+        const msg = `已超出最大可购买份数，${this.hasTodayBuyMaxNumber ? '最多还可购买' : '本次可购买'} ${this.canBuyMaxCount} 份`;
+        this.messageBox.failSingleError({ title: '购买失败', msg });
         return false;
       }
       return true;
@@ -146,17 +153,13 @@ export default {
 </script>
 <style lang='scss'>
 .mp-pc-bean-buy-list-page-dialog-comp-wrap {
-  .el-dialog__header {
-    img {
-      vertical-align: -1px;
-      margin-right: 6px;
-    }
-  }
   .el-dialog__body {
+    padding-bottom: 15px;
     > .content {
-      text-align: center;
+      text-align: left;
       color: #585858;
       padding-top: 15px;
+      padding-left: 150px;
       > p.info {
         > span {
           margin-right: 18px;
@@ -166,7 +169,8 @@ export default {
         }
       }
       > div.num-box {
-        padding: 45px 0;
+        padding: 20px 0;
+        padding-top: 24px;
         > .mp-pc-common-comps-number-input-comp-wrap {
           width: 150px;
           margin-left: 13px;
@@ -175,20 +179,27 @@ export default {
           color: #aaa;
           margin-left: 10px;
         }
-        > .price {
-          display: inline-block;
-          margin-left: 16px;
-          min-width: 120px;
+        > .remark {
+          font-size: 13px;
+          color: #989898;
+          margin-left: 20px;
         }
       }
+      > .price {
+        // display: inline-block;
+        // margin-left: 16px;
+        min-width: 120px;
+        margin-bottom: 20px;
+        line-height: 28px;
+      }
       > p.tips-box {
-        margin-top: 25px;
+        margin-top: 45px;
         text-align: left;
-        margin-left: 30px;
-        width: 600px;
+        // margin-left: 30px;
+        width: 356px;
       }
       .balance {
-        margin-top: -13px;
+        // margin-top: -13px;
         padding-bottom: 20px;
         .el-checkbox__label {
           font-size: 13px;
