@@ -348,7 +348,7 @@ export default {
     },
     AddressInfoChecker() {
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
-      if (!this.addressInfo4PlaceOrder.Address.Express.First || !this.addressInfo4PlaceOrder.Address.Express.Second) return '未选中配送方式';
+      if (!this.addressInfo4PlaceOrder.Address.Express.First || !this.addressInfo4PlaceOrder.Address.Express.Second) return '请选择配送方式，如果没有可用配送方式时请切换配送地址';
       return '';
     },
     async OutPlateChecker() {

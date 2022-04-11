@@ -42,7 +42,7 @@
         <el-checkbox v-model="UseBalance" :disabled='UseBalanceDisabled'>使用余额支付</el-checkbox>
       </div>
       <!-- 提示 -->
-      <p class="tips-box" v-if="canBuyMaxCount < Infinity">
+      <p class="tips-box">
         <i class="el-icon-warning"></i>
         <span>注意：支付尾款时，不能使用印豆抵扣</span>
       </p>
@@ -121,7 +121,7 @@ export default {
         return false;
       }
       if (this.buyNumber > this.canBuyMaxCount) {
-        const msg = `已超出最大可购买份数，${this.hasTodayBuyMaxNumber ? '最多还可购买' : '本次可购买'} ${this.canBuyMaxCount} 份`;
+        const msg = `已超出最大可购买份数，${this.hasTodayBuyMaxNumber ? '最多可购买' : '本次最多可购买'} ${this.canBuyMaxCount} 份`;
         this.messageBox.failSingleError({ title: '购买失败', msg });
         return false;
       }

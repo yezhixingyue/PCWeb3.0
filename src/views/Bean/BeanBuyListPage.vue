@@ -20,6 +20,7 @@
           v-model="QrCodeVisible"
           :payInfoData="payInfoData"
           @success='handlePaidSuccess'
+          @close='handleQrCodeClosed'
           showExpire
           dynamic
           showPayDescription
@@ -28,7 +29,7 @@
           showWarning
           width='550px'
           top='18vh'
-          successTitle='购买成功，请查看印豆余额'
+          successTitle='购买成功'
          >
           <div class="bean-pay-detail-box" v-if="payInfoData && curBuyItemData">
             <p>
@@ -103,12 +104,10 @@ export default {
       const resp = await this.api.getShopPrintBeanBuy(e).catch(() => null);
       if (resp && resp.data.Status === 1000) {
         this.$store.dispatch('common/getCustomerFundBalance');
+        this.buyBeanNumber = e.Number;
         if (!resp.data.Data) {
           const cb = () => {
             this.visible = false;
-            if (typeof this.curBuyItemData.TodayBuyMaxNumber === 'number') {
-              this.curBuyItemData.TodayBuyMaxNumber -= e.Number; // 修改印豆可购买数据
-            }
           };
           this.messageBox.successSingle({
             title: '购买成功',
@@ -117,7 +116,6 @@ export default {
           });
           return;
         }
-        this.buyBeanNumber = e.Number;
         this.payInfoData = resp.data.Data;
         this.visible = false;
         this.QrCodeVisible = true;
@@ -127,6 +125,11 @@ export default {
       // 对印豆项目进行修改 -- 已在前面进行修改
       // 重新获取账号余额及印豆信息
       this.$store.dispatch('common/getCustomerFundBalance');
+    },
+    handleQrCodeClosed() {
+      if (typeof this.curBuyItemData.TodayBuyMaxNumber === 'number') {
+        this.curBuyItemData.TodayBuyMaxNumber -= this.buyBeanNumber; // 修改印豆可购买数据
+      }
     },
     handlePageChange(Page) { // 跳转页码
       const oApp = document.getElementById('app');
