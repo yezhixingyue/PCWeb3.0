@@ -58,6 +58,7 @@ export const statementID = _statementID; // 权责声明文章ID
 export const beanHelpID = _beanHelpID;
 export const amapAppkey = 'd1de441473f06000bd61463102442b1e';
 export const projectType = 'pc';
+export const PrintBeanExchangeRate = 0.1; // 印豆对人民币比率 1个印豆可抵扣0.1元人民币
 
 export default {
   homeUrl,
@@ -68,4 +69,5 @@ export default {
   statementID,
   beanHelpID,
   amapAppkey,
+  PrintBeanExchangeRate,
 };

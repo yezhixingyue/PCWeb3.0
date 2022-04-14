@@ -40,7 +40,7 @@
               <img src="@/assets/images/wen.png" alt="">
               <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a>
             </li>
-            <li>
+            <li class='buy-box'>
               <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">购买印豆</span>
             </li>
           </ul>
@@ -330,6 +330,7 @@ export default {
                 }
                 margin-bottom: 22px;
                 font-size: 12px;
+                height: 20px;
                 a {
                   color: #888;
                   &:hover {
@@ -343,8 +344,11 @@ export default {
               text-align: left;
             }
             &.s {
-              position: relative;
-              top: -1px;
+              .buy-box {
+                padding-right: 11px;
+                position: relative;
+                top: -3px;
+              }
             }
           }
           .is-disabled {
@@ -366,9 +370,9 @@ export default {
           display: inline-block;
           width: 848px;
           vertical-align: top;
-          margin-top: 104px;
+          margin-top: 102px;
           > div {
-            margin-bottom: 13px;
+            margin-bottom: 14px;
             margin-left: 18px;
             > i.iconfont {
               color: rgb(210, 210, 210);

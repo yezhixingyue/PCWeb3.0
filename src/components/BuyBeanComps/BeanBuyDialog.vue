@@ -42,10 +42,13 @@
         <el-checkbox v-model="UseBalance" :disabled='UseBalanceDisabled'>使用余额支付</el-checkbox>
       </div>
       <!-- 提示 -->
-      <p class="tips-box">
-        <i class="el-icon-warning"></i>
-        <span>注意：支付尾款时，不能使用印豆抵扣</span>
-      </p>
+      <div class="tips-box">
+        <span><i class="el-icon-warning"></i>注意：</span>
+        <div>
+          <span>支付尾款时，不能使用印豆抵扣；</span>
+          <span v-if="PrintBeanExchangeNumber">{{PrintBeanExchangeNumber}}个印豆可抵扣1元人民币。</span>
+        </div>
+      </div>
     </div>
     <template slot="foot-tip">
     </template>
@@ -66,6 +69,10 @@ export default {
     curBuyItemData: {
       type: Object,
       default: null,
+    },
+    PrintBeanExchangeNumber: {
+      type: Number,
+      default: 0,
     },
   },
   components: {
@@ -192,11 +199,27 @@ export default {
         margin-bottom: 20px;
         line-height: 28px;
       }
-      > p.tips-box {
+      > div.tips-box {
         margin-top: 45px;
         text-align: left;
         // margin-left: 30px;
-        width: 356px;
+        width: 450px;
+        letter-spacing:0.5px;
+        height: unset;
+        height: auto;
+        padding: 2px 0 3px 16px;
+        > div {
+          display: inline-block;
+          vertical-align: top;
+          line-height: 20px;
+          padding: 3px;
+          > span {
+            display: block;
+            &:last-of-type {
+              text-indent: -1px;
+            }
+          }
+        }
       }
       .balance {
         // margin-top: -13px;

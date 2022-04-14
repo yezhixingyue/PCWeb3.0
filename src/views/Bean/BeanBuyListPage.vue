@@ -4,6 +4,7 @@
       <header>
         <span class="blue-v-line is-bold is-black">购买印豆</span>
         <span class="record">( <i @click="goToHistoryPage" class="blue-span">查看购买记录</i> )</span>
+        <span class='is-origin is-font-12' style="margin-left:20px"><i class='el-icon-info is-font-13'></i> {{PrintBeanExchangeNumber}}个印豆可抵扣1元人民币</span>
       </header>
       <main>
         <ul :class="{op: showOpacity}">
@@ -15,7 +16,12 @@
           <img src="@/assets/images/empty.png" alt="">
           <p>暂无数据</p>
         </div>
-        <BeanBuyDialog :visible.sync='visible' :curBuyItemData='curBuyItemData' @submit='beanItemBuyHandler' />
+        <BeanBuyDialog
+         :visible.sync='visible'
+         :curBuyItemData='curBuyItemData'
+         :PrintBeanExchangeNumber='PrintBeanExchangeNumber'
+         @submit='beanItemBuyHandler'
+        />
         <QrCodeForPayDialogComp
           v-model="QrCodeVisible"
           :payInfoData="payInfoData"
@@ -65,6 +71,7 @@ import BeanItemComp from '../../components/BuyBeanComps/BeanItemComp.vue';
 import BeanListClassType from '../../assets/js/ClassType/BeanListClass/BeanListClassType';
 import Count from '../../components/common/Count.vue';
 import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
+import { PrintBeanExchangeRate } from '../../assets/js/setup';
 
 export default {
   components: {
@@ -93,6 +100,9 @@ export default {
         return this.BeanListClassData.BeanList.slice(index, length);
       }
       return [];
+    },
+    PrintBeanExchangeNumber() {
+      return Math.round(1 / PrintBeanExchangeRate);
     },
   },
   methods: {

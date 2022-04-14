@@ -12,7 +12,7 @@
   @close='onClose'
   @closed='onClosed'
   class="mp-img-style-header mp-erp-common-dialog-comp-wrap"
-  :class="{smallBtn: smallBtn}"
+  :class="{smallBtn: smallBtn, [projectType]: projectType}"
   :before-close="onCancleClick">
   <slot></slot>
   <span slot="footer" class="dialog-footer">
@@ -34,6 +34,7 @@
 // <CommonDialogComp width='580px' title="测试弹窗" :visible.sync='addNewProductVisible' @submit="onTestDialogSubmit" @cancle="onTestDialogCancle" >
 //   测试弹窗组件 --- slot内容区
 // </CommonDialogComp>
+import { projectType } from '@/assets/js/setup';
 
 export default {
   name: 'CommonDialogComp',
@@ -119,6 +120,7 @@ export default {
   data() {
     return {
       checkList: [],
+      projectType,
     };
   },
   methods: {
@@ -164,6 +166,12 @@ export default {
       &::before {
         width: 3px !important;
         background-color: #26bcf9;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        vertical-align: -12%;
+        margin-right: 10px;
       }
     }
     border-radius: 5px 5px 0px 0;
@@ -171,6 +179,7 @@ export default {
     height: 30px !important;
     line-height: 30px !important;
     position: relative;
+    padding: 10px 20px;
     .el-dialog__headerbtn {
       top: 13px;
     }
@@ -268,6 +277,11 @@ export default {
           }
         }
       }
+    }
+  }
+  &.pc {
+    .el-dialog__header > span::before {
+      background-color: #428dfa
     }
   }
 }
