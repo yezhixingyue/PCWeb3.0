@@ -131,7 +131,7 @@ axios.interceptors.response.use(
       } else {
         _obj.successFunc = undefined;
       }
-      let _msg = '错误';
+      let _msg = '操作失败';
       if (_url === '/Api/Customer/Login') _msg = '登录失败';
       if (_url === '/Api/Customer/Reg') _msg = '注册失败';
       if (_url === '/Api/Sms/Send/VerificationCode') _msg = '验证失败';

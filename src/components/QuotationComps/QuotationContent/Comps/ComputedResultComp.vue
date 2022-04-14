@@ -15,7 +15,7 @@
             (ProductQuotationResult.ExpressCost || ProductQuotationResult.ExpressCost === 0)
             && showExpressCost
           "
-          >(<i class="is-font-12">含运费：{{ ProductQuotationResult.ExpressCost }}元</i>)</span
+          >(<i class="is-font-12">含运费：{{ ProductQuotationResult.ExpressCost | formatNumber }}元</i>)</span
         >
       </div>
       <!-- 其余详情信息 -->

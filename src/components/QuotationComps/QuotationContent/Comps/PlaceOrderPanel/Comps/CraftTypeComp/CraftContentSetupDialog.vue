@@ -224,7 +224,6 @@ export default {
         this.localSetupData = JSON.parse(JSON.stringify(this.setupData));
       }
       this.showMain = true;
-      // this.getAffectedPropList();
       this.getSubGroupAffectedPropLists();
     },
     onClosed() {
@@ -345,7 +344,6 @@ export default {
     },
     getSubGroupAffectedPropLists() { // 获取工艺元素组子交互数据
       this.getLocalAffectedPropList();
-      this.getAffectedPropList();
       this.subGroupAffectedPropLists = this.GroupList.map(it => {
         const t = this.localSetupData.GroupList.find(_it => _it.GroupID === it.ID);
         if (t && t.SubControlList) {
@@ -390,6 +388,7 @@ export default {
           return true;
         });
       }
+      this.getAffectedPropList();
     },
   },
 };
@@ -399,7 +398,7 @@ export default {
   > .el-dialog.set-craft-dia.mp-place-order-panel-comp-craft-type-item-dialog-comp-wrap {
     width: unset;
     width: auto\0;
-    min-width: 520px;
+    min-width: 570px;
     display: table;
     border-radius: 5px;
     > .el-dialog__header {

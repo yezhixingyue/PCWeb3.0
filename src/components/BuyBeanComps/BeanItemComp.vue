@@ -16,7 +16,7 @@
       <label>印豆：</label>
       <span class="is-bold">{{itemData.BeanNumber}}个</span>
     </h2>
-    <p>
+    <p class="describe">
       <!-- <label>有效期至：</label> -->
       <span>{{itemData._description}}</span>
     </p>
@@ -66,9 +66,11 @@ export default {
   box-sizing: border-box;
   color: #6F4437;
   padding: 20px 30px;
+  padding-right: 15px;
   > h2 {
     padding: 25px 0;
     font-size: 24px;
+    padding-bottom: 23px;
   }
   > h4 {
     position: absolute;
@@ -94,6 +96,9 @@ export default {
       right: -10px;
       top: -3px;
     }
+  }
+  > p.describe {
+    line-height: 18px;
   }
   &.can-buy{
     &:hover {

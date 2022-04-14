@@ -368,10 +368,10 @@ export default {
       } else if (this.openType === 'tempAdd') {
         this.$emit('changeProps', this.newAdd);
         this.canClose = true;
-        this.$message({
-          message: '已定位',
-          type: 'success',
-        });
+        // this.$message({
+        //   message: '已定位',
+        //   type: 'success',
+        // });
         this.handleBeforeDiaClose(true);
       } else {
         // 编辑地址
@@ -386,10 +386,10 @@ export default {
           if (valid) {
             const _obj = JSON.parse(JSON.stringify(this.newAdd));
             if (this.isTemp) {
-              this.$message({
-                message: '已定位',
-                type: 'success',
-              });
+              // this.$message({
+              //   message: '已定位',
+              //   type: 'success',
+              // });
               // eslint-disable-next-line max-len
               this.$emit('submit', { ..._obj, RegionalList: this.RegionalList, CityList: this.CityList, CountyList: this.CountyList });
               return;
