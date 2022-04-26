@@ -413,6 +413,14 @@ export default {
     successedList() {
       this.handlePageHeightChangeAfterDataChange();
     },
+    customer: {
+      handler() {
+        if (this.customer?.PermissionInfo?.BatchUpload === false) {
+          this.$router.replace('/placeOrder');
+        }
+      },
+      immediate: true,
+    },
   },
   async created() {
     const accept = await BatchUploadClass.getFileSuffixList();

@@ -54,9 +54,10 @@
         padding: 0;
         padding-top: 25px;
         padding-bottom: 35px;
-        flex: 1;
+        // flex: 1;
         overflow-y: auto;
         max-height: 320px;
+
         .el-message-box__container{
             .el-message-box__status{
                 position: absolute;
@@ -74,6 +75,17 @@
                     color: #888;
                     word-break: break-word;
                 }
+            }
+        }
+        &::-webkit-scrollbar {
+            width: 6px;
+            height: 8px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #ddd;
+            border-radius: 3px;
+            &:hover {
+                background-color: $--color-text-secondary;
             }
         }
     }

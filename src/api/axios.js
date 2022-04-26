@@ -5,17 +5,16 @@ import router from '@/router';
 import messageBox from '../assets/js/utils/message';
 import Cookie from '../assets/js/Cookie';
 import { useCookie } from '../assets/js/setup';
+import LocalCancelToken from './CancelToken';
 // import { delay } from '../assets/js/utils/utils';
 
-const { CancelToken } = axios;
-let source = CancelToken.source();
+const localCancelToken = new LocalCancelToken();
 
 const clearToken = () => {
   sessionStorage.removeItem('token');
   localStorage.removeItem('token');
   Cookie.removeCookie('token');
-  source.cancel(); // 跳转登录页时 清除页面其它后续请求
-  source = CancelToken.source(); // 清除后赋予axios新的取消信息
+  localCancelToken.cancelAllRequest();
 };
 
 let closeTip = false;
@@ -84,7 +83,7 @@ axios.interceptors.request.use(
       });
     }
 
-    curConfig.cancelToken = source.token;
+    localCancelToken.setCancelToken(config);
 
     return curConfig;
   },
@@ -144,14 +143,16 @@ axios.interceptors.response.use(
       if (_url === '/Api/Quotation/Save') _msg = '添加失败';
       if (_url === '/Api/Upload/File') _msg = '文件上传失败';
       if (_url === '/Api/Calculate/ProductPrice') _msg = '报价失败';
-      if (_url === '/Api/Shop/PrintBean/Buy') _msg = '购买失败';
+      if (_url === '/Api/Shop/PrintBean/Buy') _msg = '充值失败';
 
       _obj.title = _msg;
       messageBox.failSingleError(_obj);
     }
+    localCancelToken.removeCancelToken(response.config);
     return response;
   },
   async (error) => {
+    localCancelToken.removeCancelToken(error.config || '');
     if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
     if (error.response) {
       let key = false;

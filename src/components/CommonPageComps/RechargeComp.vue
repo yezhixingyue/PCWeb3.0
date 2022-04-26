@@ -27,8 +27,10 @@
           <!-- <p class="is-pink"><i class="is-bold is-pink is-font-22">{{customerBalance}}</i>元</p> -->
           <ul class="f">
             <li class="c">
-              <img src="@/assets/images/bean.png" alt="">
+              <img class="bean" src="@/assets/images/bean.png" alt="">
               <span>当前印豆：</span>
+              <!-- <img src="@/assets/images/wen.png" alt="">
+              <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a> -->
             </li>
             <li>
               <span class="is-bold">{{BeanNumberBalance || 0}}</span>
@@ -41,7 +43,7 @@
               <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a>
             </li>
             <li class='buy-box'>
-              <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">购买印豆</span>
+              <!-- <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">充值印豆</span> -->
             </li>
           </ul>
         </div>
@@ -310,6 +312,7 @@ export default {
           text-align: right;
           > ul {
             display: inline-block;
+            vertical-align: top;
             > li {
               > .is-bold {
                 font-size: 22px;
@@ -317,22 +320,34 @@ export default {
               &.c {
                 line-height: 22px;
                 img {
+                  vertical-align: -3px;
+                  margin-right: 5px;
+                }
+                img.bean {
                   vertical-align: -5px;
                   margin-right: 8px;
                 }
                 margin-bottom: 16px;
                 margin-left: -30px;
+                a {
+                  color: #888;
+                  font-size: 12px;
+                  &:hover {
+                    color: #585858;
+                  }
+                }
               }
               &.t {
                 img {
                   vertical-align: -3px;
                   margin-right: 8px;
                 }
-                margin-bottom: 22px;
+                margin-bottom: 20px;
                 font-size: 12px;
                 height: 20px;
                 a {
                   color: #888;
+                  outline: none;
                   &:hover {
                     color: #585858;
                   }
@@ -344,10 +359,10 @@ export default {
               text-align: left;
             }
             &.s {
+              padding-top: 4px;
               .buy-box {
                 padding-right: 11px;
-                position: relative;
-                top: -3px;
+                height: 14px;
               }
             }
           }

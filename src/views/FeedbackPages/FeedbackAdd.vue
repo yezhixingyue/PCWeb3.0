@@ -54,6 +54,7 @@
               :limit='4'
               :on-success='handllePictureUploaded'
               :on-preview="handlePictureCardPreview"
+              :on-error='handleUploadError'
               >
               <!-- :on-success='handllePictureUploaded'
               :on-remove="handleRemove" -->
@@ -235,9 +236,16 @@ export default {
           message: response.Message,
           type: 'error',
         });
-        // eslint-disable-next-line max-len
-        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
+        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.status === 'success' && it.response && it.response.Status === 1000);
       }
+    },
+    handleUploadError() {
+      Message({
+        showClose: true,
+        message: '图片上传失败',
+        type: 'error',
+      });
+      this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.status === 'success' && it.response && it.response.Status === 1000);
     },
     handleReturn() {
       if (!this.canEdit) this.$store.commit('summary/setNeedFetchListData', false);

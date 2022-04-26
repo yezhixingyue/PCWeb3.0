@@ -321,7 +321,7 @@ const routes = [
         meta: {
           requiresAuth: true,
           y: 0,
-          title: '购买印豆 - 郑州名片之家电子商务有限公司',
+          title: '充值印豆 - 郑州名片之家电子商务有限公司',
         },
         component: () => import('../views/Bean/BeanBuyListPage.vue'),
       },
@@ -331,7 +331,7 @@ const routes = [
         meta: {
           requiresAuth: true,
           y: 0,
-          title: '印豆购买记录 - 郑州名片之家电子商务有限公司',
+          title: '印豆充值记录 - 郑州名片之家电子商务有限公司',
         },
         component: () => import('../views/Bean/BeanPurchaseHistoryPage.vue'),
       },

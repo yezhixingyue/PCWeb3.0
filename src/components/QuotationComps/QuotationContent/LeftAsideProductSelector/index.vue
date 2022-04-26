@@ -112,12 +112,16 @@ export default {
       if (this.curProduct && this.curProduct.ID === product.ID) return;
       this.$store.commit('Quotation/setCurProductInfo', product);
       this.$store.commit('Quotation/setSelectedCoupon', null);
-      this.$store.dispatch('Quotation/getProductDetail');
       const doms = document.getElementsByClassName('aside-product-selector-popper-wrap');
       doms.forEach(it => {
         const _it = it;
         _it.style.display = 'none';
       });
+      const key = await this.$store.dispatch('Quotation/getProductDetail', [{ saveOldData: true }]);
+      if (!key) {
+        this.$store.commit('Quotation/clearCurProductInfo2Quotation');
+        this.$store.commit('Quotation/setCurProductInfo', null);
+      }
     },
     getFontNumber(list) {
       if (!Array.isArray(list) || list.length === 0) return 4;
@@ -300,14 +304,24 @@ export default {
   }
   > .el-scrollbar {
     width: 100%;
+    @media screen\0 {
+      .scrollbar-wrapper { // E 8 9 10 11下起作用的样式
+        margin-bottom: -21px !important;
+      }
+    }
   }
   > .white-space {
     height: 14px;
     width: 244px;
     background: #fff;
-    // &.b {
-    //   margin-top: -2px;
-    // }
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    &.b {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
   }
 }
 .aside-product-selector-popper-wrap {

@@ -88,7 +88,7 @@ export default {
     onCancelClick(item) {
       if (item.Status !== BillBoughtStatusEnums.NoPay.ID) return;
       this.messageBox.warnCancelBox({
-        title: '确定取消该条购买记录吗?',
+        title: '确定取消该次充值吗?',
         msg: `印豆数量：[ ${item.Number}个 ]`,
         successFunc: () => {
           this.$emit('cancle', item);

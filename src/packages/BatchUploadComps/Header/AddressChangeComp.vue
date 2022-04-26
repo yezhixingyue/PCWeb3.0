@@ -4,7 +4,7 @@
       <el-radio-group v-model="localUseSameAddress" size="small" :disabled='switchUseSameAddDisabled'
        :title="switchUseSameAddDisabled?'如需切换时，请先清空文件列表再进行切换':''">
         <el-radio-button :label="false">使用不同地址</el-radio-button>
-        <el-radio-button :label="true">使用同一地址</el-radio-button>
+        <el-radio-button :label="true">使用相同地址</el-radio-button>
       </el-radio-group>
       <span class="tips-box" v-show="switchUseSameAddDisabled">
         <i class="el-icon-warning"></i>下方解析成功的文件列表为空时，才可切换地址使用方式

@@ -7,15 +7,15 @@
     :showSubmit='false'
     :visible.sync="visible"
     :disabled="loading"
-    title='购买印豆'
+    title='充值印豆'
     @danger="onSubmit"
     @cancle="onCancle"
     @open="onOpen">
     <!-- 弹窗图标 -->
-    <template slot="title">
+    <!-- <template slot="title">
       <img src="@/assets/images/bean-y.png" alt="">
-      <span>购买印豆</span>
-    </template>
+      <span>充值印豆</span>
+    </template> -->
     <div v-if="curBuyItemData" class="content" v-loading='loading'>
       <!-- 信息 -->
       <p class="info">
@@ -26,17 +26,17 @@
       </p>
       <!-- 购买数量输入 -->
       <div class="num-box">
-        <span>购买</span>
+        <span>充值</span>
         <NumberInput v-model.number="buyNumber" :max='canBuyMaxCount' :min="1" />
         <i>份</i>
-        <span class="remark" v-if="hasTodayBuyMaxNumber">( 您今天还可以购买 {{canBuyMaxCount}} 份 )</span>
-        <span class="remark" v-else>( 本次可购买 {{canBuyMaxCount}} 份 )</span>
+        <span class="remark" v-if="hasTodayBuyMaxNumber">( 您今天还可以充值 {{canBuyMaxCount}} 份 )</span>
+        <span class="remark" v-else>( 本次可充值 {{canBuyMaxCount}} 份 )</span>
       </div>
       <div class="price">
         <span>价格：</span>
         <span class="is-pink is-font-18" v-show="canBuyMaxCount >= buyNumber">{{totalPrice}}</span>
         <span class="is-pink" v-show="canBuyMaxCount >= buyNumber">元</span>
-        <span class="is-pink is-font-18" v-if="canBuyMaxCount < buyNumber">已超出最大购买份数</span>
+        <span class="is-pink is-font-18" v-if="canBuyMaxCount < buyNumber">已超出最大充值次数</span>
       </div>
       <div class="balance">
         <el-checkbox v-model="UseBalance" :disabled='UseBalanceDisabled'>使用余额支付</el-checkbox>
@@ -116,20 +116,20 @@ export default {
     },
     checker() {
       if (this.buyNumber === '') {
-        this.messageBox.failSingleError({ title: '购买失败', msg: '请输入购买份数' });
+        this.messageBox.failSingleError({ title: '充值失败', msg: '请输入充值份数' });
         return false;
       }
       if (!this.utils.getValueIsOrNotNumber(this.buyNumber, true)) {
-        this.messageBox.failSingleError({ title: '购买失败', msg: '购买份数不正确，应为整数数字类型' });
+        this.messageBox.failSingleError({ title: '充值失败', msg: '充值份数不正确，应为整数数字类型' });
         return false;
       }
       if (this.buyNumber <= 0) {
-        this.messageBox.failSingleError({ title: '购买失败', msg: '购买份数不正确，最少购买1份' });
+        this.messageBox.failSingleError({ title: '充值失败', msg: '充值份数不正确，最少应充值1份' });
         return false;
       }
       if (this.buyNumber > this.canBuyMaxCount) {
-        const msg = `已超出最大可购买份数，${this.hasTodayBuyMaxNumber ? '最多可购买' : '本次最多可购买'} ${this.canBuyMaxCount} 份`;
-        this.messageBox.failSingleError({ title: '购买失败', msg });
+        const msg = `已超出最大可充值份数，${this.hasTodayBuyMaxNumber ? '最多可充值' : '本次最多可充值'} ${this.canBuyMaxCount} 份`;
+        this.messageBox.failSingleError({ title: '充值失败', msg });
         return false;
       }
       return true;

@@ -394,6 +394,11 @@ export default {
               this.$emit('submit', { ..._obj, RegionalList: this.RegionalList, CityList: this.CityList, CountyList: this.CountyList });
               return;
             }
+            if (this.isEmitType) {
+              this.$emit('submit', _obj, this.openType);
+              this.handleBeforeDiaClose();
+              return;
+            }
             const res = await this.api.getCustomerAddress(_obj);
             // // console.log(res);
             if (res.data.Status === 1000) {

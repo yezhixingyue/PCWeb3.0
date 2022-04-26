@@ -282,11 +282,17 @@ export default {
     -------------------------------*/
     setCurProductInfo(state, payload) {
       state.curProduct = payload;
-      const { ID, ClassifyList, ShowName } = payload; // payload为当前产品所有信息
-      const t = ClassifyList.find(it => it.Type === 2);
-      state.curProductID = ID;
-      state.curProductClass = t || null;
-      state.curProductName = ShowName;
+      if (payload) {
+        const { ID, ClassifyList, ShowName } = payload; // payload为当前产品所有信息
+        const t = ClassifyList.find(it => it.Type === 2);
+        state.curProductID = ID;
+        state.curProductClass = t || null;
+        state.curProductName = ShowName;
+      } else {
+        state.curProductID = '';
+        state.curProductClass = null;
+        state.curProductName = '';
+      }
     },
     /* 当前选中产品详细信息
     -------------------------------*/

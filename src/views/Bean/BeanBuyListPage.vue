@@ -2,8 +2,8 @@
   <div class="mp-pc-bean-buy-list-page-wrap">
     <section>
       <header>
-        <span class="blue-v-line is-bold is-black">购买印豆</span>
-        <span class="record">( <i @click="goToHistoryPage" class="blue-span">查看购买记录</i> )</span>
+        <span class="blue-v-line is-bold is-black">充值印豆</span>
+        <span class="record">( <i @click="goToHistoryPage" class="blue-span">查看充值记录</i> )</span>
         <span class='is-origin is-font-12' style="margin-left:20px"><i class='el-icon-info is-font-13'></i> {{PrintBeanExchangeNumber}}个印豆可抵扣1元人民币</span>
       </header>
       <main>
@@ -35,7 +35,7 @@
           showWarning
           width='550px'
           top='18vh'
-          successTitle='购买成功'
+          successTitle='充值成功'
          >
           <div class="bean-pay-detail-box" v-if="payInfoData && curBuyItemData">
             <p>
@@ -43,11 +43,11 @@
               <span>{{curBuyItemData.BeanNumber}}个</span>
             </p>
             <p>
-              <label>购买份数：</label>
+              <label>充值份数：</label>
               <span>{{buyBeanNumber}}份</span>
             </p>
             <p>
-              <label>购买单价：</label>
+              <label>充值单价：</label>
               <span>{{curBuyItemData.Price}}元</span>
             </p>
           </div>
@@ -120,7 +120,7 @@ export default {
             this.visible = false;
           };
           this.messageBox.successSingle({
-            title: '购买成功',
+            title: '充值成功',
             successFunc: cb,
             failFunc: cb,
           });

@@ -48,15 +48,15 @@
     <li class="ProducePeriod" v-if="ProducePeriod">
       <div class="is-pink is-font-13 is-bold">
         <span style="margin-right:0px">{{ ProducePeriod | getPayTime }}，</span>
-        <span>{{ ProducePeriod | getDoneTime }}</span>
+        <span style="margin-right:2px">{{ ProducePeriod | getDoneTime }}</span>
       </div>
       <div v-if="!ProducePeriod.IncludeDiliveryTime || ProducePeriod.Tips" class="tip">
         <span class="is-pink is-font-12 perod-tip" style="margin-right:0;" :title="ProducePeriod.Tips || ''">
-          <template>(</template>
+          <template>( </template>
           <template v-if="!ProducePeriod.IncludeDiliveryTime">配送时间视快递物流速度</template>
           <template v-if="!ProducePeriod.IncludeDiliveryTime && ProducePeriod.Tips">，</template>
           <template v-if="ProducePeriod.Tips" >{{ProducePeriod.Tips}}</template>
-          <template>)</template>
+          <template> )</template>
         </span>
       </div>
     </li>

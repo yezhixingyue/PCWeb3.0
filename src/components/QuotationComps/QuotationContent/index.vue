@@ -49,8 +49,7 @@
                     <ComputedResultComp :ProductQuotationResult="ProductQuotationResult" :selectedCoupon="selectedCoupon" v-if="!priceGetErrMsg" />
                     <!-- 错误 或 优惠券选择信息显示区域 -->
                     <div class="err-or-selected-coupon-info-box">
-                      <span class="is-pink error-msg"  v-if="priceGetErrMsg"
-                       :title="priceGetErrMsg.length > 41 ? priceGetErrMsg : ''">{{ priceGetErrMsg }}</span>
+                      <span class="is-pink error-msg"  v-if="priceGetErrMsg">{{ priceGetErrMsg }}</span>
                       <span class="gray no-cursor is-font-12"
                         v-if="selectedCoupon && !priceGetErrMsg && !ProductQuotationResult && !isGettingPrice"
                         @click.stop
@@ -609,8 +608,8 @@ export default {
                     display: inline-block;
                     vertical-align: top;
                     line-height: 26px;
-                    white-space: nowrap;
-                    height: 28px;
+                    // white-space: nowrap;
+                    min-height: 28px;
                     padding: 6px 0;
                     > span {
                       vertical-align: middle;
@@ -618,6 +617,9 @@ export default {
                       overflow: hidden;
                       text-overflow: ellipsis;
                       display: inline-block;
+                      &.error-msg {
+                        letter-spacing: 0.5px;
+                      }
                     }
                   }
                 }

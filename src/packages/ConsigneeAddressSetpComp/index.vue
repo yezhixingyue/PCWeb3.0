@@ -7,7 +7,7 @@
       <header class="bg-gray"></header>
       <div class="comp-title float">
         <span class="left is-bold">收货信息</span>
-        <span class="right span-title-blue" @click="onAddressChangeClick">{{
+        <span class="right span-title-blue" :class="ValidExpressLoading?'l':''" @click="onAddressChangeClick">{{
           addCompTitle
         }}</span>
       </div>
@@ -460,6 +460,7 @@ export default {
     /** 弹窗地址修改相关方法
     ---------------------------------------------------- */
     onAddressChangeClick() { // 点击更改配送地址
+      if (this.ValidExpressLoading) return;
       this.SetAddressVisible = true;
     },
     onDialogSubmit(e) { // 弹窗提交
@@ -659,10 +660,10 @@ export default {
     customerInfo() {
       this.handleInfoChange();
     },
-    curProductID(newVal, oldVal) {
-      if (newVal && oldVal && oldVal !== newVal) {
-        this.handleInfoChange();
-      }
+    curProductID() { // 切换产品时初始化收货地址等信息
+      // if (newVal && oldVal && oldVal !== newVal) {
+      //   this.handleInfoChange();
+      // }
     },
   },
   created() {
@@ -1096,6 +1097,9 @@ export default {
   .out-place-code-content {
     display: inline-block;
     width: 253px;
+  }
+  .comp-title > span.span-title-blue.l {
+    pointer-events: none;
   }
 }
 </style>
