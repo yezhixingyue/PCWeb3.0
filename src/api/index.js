@@ -247,6 +247,36 @@ const api = {
   getAfterSalesList(data) { // POST /Api/AfterSales/List 获取售后单列表
     return instance.post('/Api/AfterSales/List', data);
   },
+  getOrderAfterSaleList(data) { // POST /Api/OrderAfterSale/List  获取售后记录
+    return instance.post('/Api/OrderAfterSale/List', data);
+  },
+  getServiceDetail(afterSaleCode) { // POST /Api/OrderAfterSale/ServiceDetail  获取售后详情
+    return instance.get(`/Api/OrderAfterSale/ServiceDetail?afterSaleCode=${afterSaleCode}`);
+  },
+  getAfterSaleOrderList(data) { // POST /Api/AfterSaleOrder/List  获取售后申请列表
+    return instance.post('/Api/AfterSaleOrder/List', data);
+  },
+  getApplyQuestionList() { // POST /Api/OrderAfterSale/ApplyQuestionList  获取客户申请售后问题分类列表
+    return instance.get('/Api/OrderAfterSale/ApplyQuestionList');
+  },
+  getApplyQuestionApply(data) { // POST /Api/OrderAfterSale/Apply  售后申请
+    return instance.post('/Api/OrderAfterSale/Apply', data);
+  },
+  getCancleApply(code) { // POST //Api/OrderAfterSale/CancleApply  售后申请
+    return instance.put(`/Api/OrderAfterSale/CancleApply?afterSaleCode=${code}`);
+  },
+  getSolutionQuestionList() { // POST /Api/OrderAfterSale/SolutionQuestionList  获取售后常见问题分类列表
+    return instance.get('/Api/OrderAfterSale/SolutionQuestionList');
+  },
+  getServiceLableList() { // POST /Api/OrderAfterSale/ServiceLableList  获取服务标签
+    return instance.get('/Api/OrderAfterSale/ServiceLableList', { closeLoading: true });
+  },
+  getOrderAfterSaleEvaluateDetail(afterSaleCode) { // POST /Api/OrderAfterSale/EvaluateDetail  获取售后评价
+    return instance.get(`/Api/OrderAfterSale/EvaluateDetail?afterSaleCode=${afterSaleCode}`, { closeLoading: true });
+  },
+  getOrderAfterSaleEvaluate(data) { // POST /Api/OrderAfterSale/EvaluateDetail  设置售后评价
+    return instance.post('/Api/OrderAfterSale/Evaluate', data);
+  },
   getServiceListData2Excel(data) { // POST /Api/AfterSales/Excel
     return instance.post('/Api/AfterSales/Excel', data, { responseType: 'arraybuffer' });
   },

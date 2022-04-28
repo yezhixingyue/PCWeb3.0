@@ -165,14 +165,11 @@ export default {
     },
     async goToDetailPage(data) {
       if (!data) return;
-      // this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
-      // this.$router.push('/order/detail');
       this.curOrderID4Detail = data.OrderID;
       this.detailVisible = true;
     },
     goToFeedback(item) {
-      const { OrderID, Content } = item;
-      this.$router.push({ name: 'feedback', params: { id: OrderID, desc: Content || '无', type: 'add' } });
+      this.$router.push({ name: 'feedback', query: { data: JSON.stringify(item) } });
     },
     handleOrderCancel({ OrderID }) {
       this.messageBox.warnCancelBox({
@@ -202,11 +199,7 @@ export default {
 <style lang='scss'>
 .mp-pc-order-list-page-table-item-comp-wrap {
   margin-top: 20px;
-  // margin-bottom: 20px;
   font-size: 12px;
-  // border-top: 1px solid #eee;
-  // border-bottom: 1px solid #eee;
-  // border-bottom: none;
   box-sizing: border-box;
 
   .product-item-header {

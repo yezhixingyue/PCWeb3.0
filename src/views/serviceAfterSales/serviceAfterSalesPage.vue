@@ -2,133 +2,96 @@
   <article class="mp-pc-service-after-sales-page-wrap">
     <section>
       <header>
-        <div class="header-content">
-          <LineDateSelectorComp
-          :changePropsFunc='setCondition4ServiceAfterSaleList'
-          :requestFunc='getServiceAfterSaleList'
-          :isFull="false"
-          :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
-          :dateValue='condition4ServiceAfterSaleList.DateType'
-          :initDate='condition4ServiceAfterSaleList.Date'
-          :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
-          label="售后时间"
-          :dateList="dateList"
-          dateType="date"
-        />
-        <search-input-comp
-          title="关键词"
-          placeholder="请输入搜索关键词"
-          :typeList="[['KeyWords', '']]"
-          :requestFunc="getServiceAfterSaleList"
-          :changePropsFunc="setCondition4ServiceAfterSaleList"
-          :word="condition4ServiceAfterSaleList.KeyWords"
-          @reset="clearCondition4ServiceAfterSaleList"
-          :searchWatchKey="ServiceAfterSaleList"
-        />
-        <LookOverAfterSale></LookOverAfterSale>
-        </div>
+        <ul class="header-content">
+          <li>
+            <SingleSelector v-model="AfterSalesStatus" :optionList='AfterSalesStatusList' title="售后进度" />
+            <ProductSelector
+              :changePropsFunc='setCondition4ServiceAfterSaleList'
+              :requestFunc='getServiceAfterSaleList'
+              :ClassID='condition4ServiceAfterSaleList.ProductClass.First'
+              :TypeID='condition4ServiceAfterSaleList.ProductClass.Second'
+              :ProductID='condition4ServiceAfterSaleList.ProductID'
+              :typeList="[['ProductClass', 'First'],['ProductClass', 'Second'],['ProductID', '']]"
+            />
+          </li>
+          <li class="second">
+            <LineDateSelectorComp
+              :changePropsFunc='setCondition4ServiceAfterSaleList'
+              :requestFunc='getServiceAfterSaleList'
+              :isFull="false"
+              :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
+              :dateValue='condition4ServiceAfterSaleList.DateType'
+              :initDate='condition4ServiceAfterSaleList.Date'
+              :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
+              label="售后时间"
+              :dateList="dateList"
+              dateType="date"
+            />
+            <search-input-comp
+              title="关键词"
+              placeholder="请输入搜索关键词"
+              :typeList="[['KeyWords', '']]"
+              :requestFunc="getServiceAfterSaleList"
+              :changePropsFunc="setCondition4ServiceAfterSaleList"
+              :word="condition4ServiceAfterSaleList.KeyWords"
+              @reset="clearCondition4ServiceAfterSaleList"
+              :searchWatchKey="ServiceAfterSaleList"
+            />
+          </li>
+        </ul>
       </header>
-      <div class="content-wrap">
+      <div class="content-wrap" v-if="ServiceAfterSaleList.length">
         <div class="content">
           <div class="table-wrap">
 
-            <!-- <ul class="table">
-              <li class="column" width="300px">
-                <div class="lable">订单编号</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">下单时间</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">订单状态</div>
-                <div class="content">内容内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">商品名称</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">文件内容</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">物料</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">款数</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">数量</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">尺寸</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">工艺</div>
-                <div class="content">内容</div>
-              </li>
-              <li class="column">
-                <div class="lable">操作</div>
-                <div class="content">内容</div>
-              </li>
-            </ul> -->
-
             <el-table stripe border
               :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
-              <el-table-column prop="ID" label="售后服务单号" width="197" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="Order.OrderID" label="订单编号" width="171" show-overflow-tooltip>
+              <el-table-column prop="AfterSaleCode" label="售后服务单号" width="197" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="OrderID" label="订单编号" width="171" show-overflow-tooltip>
               </el-table-column>
               <el-table-column label="商品名称" width="171" show-overflow-tooltip>
-                <span slot-scope="scope">{{ scope.row.Order | getFullName }}</span>
+                <span slot-scope="scope">{{ scope.row.ProductName }}</span>
               </el-table-column>
               <el-table-column label="文件内容" show-overflow-tooltip width="171">
-                <template slot-scope="scope">{{ scope.row.Order.Funds.FinalPrice }}元</template>
+                <template slot-scope="scope">{{ scope.row.Content ? scope.row.Content : '--'}}</template>
               </el-table-column>
               <el-table-column label="申请时间" width="171" show-overflow-tooltip>
                 <template slot-scope="scope"
-                >{{scope.row.Solution && scope.row.Solution.Type ? getSolutionType(scope.row.Solution.Type) : ''}}</template>
+                >{{scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
               </el-table-column>
               <el-table-column label="售后进度" width="171" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  <i>{{scope.row.Solution.Type === 2 ? scope.row.Solution.Refund + '元' : ''}}</i>
+                  <span :class="{
+                    'coloraaa': isAccomplish(scope.row.Status),
+                    }">{{getAfterSaleStatusText(scope.row.Status)}}</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="146" show-overflow-tooltip>
                 <template slot-scope="scope">
-                  <span>查看</span>
-                  <el-divider direction="vertical"></el-divider>
-                  <span>售后评价</span>
-                  <i v-if="scope.row.Solution.Type===2 && scope.row.Solution.RefundFreight > 0">{{scope.row.Solution.RefundFreight}}元</i>
+                  <div class="operate">
+                    <span @click="$router.push( { name: 'serviceAfterSalesDetails', query: {data: JSON.stringify(scope.row)} })">查看</span>
+                    <!-- <template v-if="true"> -->
+                    <template v-if="isAccomplish(scope.row.Status)">
+                      <el-divider direction="vertical"></el-divider>
+                      <span class="after-sale" v-if="scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
+                      <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
+                    </template>
+                  </div>
+                  <!-- <i>{{scope.row.Solution}}</i> -->
                 </template>
               </el-table-column>
-
             </el-table>
 
-            <div class="null-data">
-              <img src="" alt="">
-              <div class="null-data-right">
-                最近没下过订单哦
-                <router-link to="/serviceAfterSalesDetails">
-                  <el-button>去首页看看</el-button>
-                </router-link>
-              </div>
-            </div>
           </div>
           <div class="content-footer">
             <Count
               :watchPage='condition4ServiceAfterSaleList.Page'
               :handlePageChange='handlePageChange'
               :count='ServiceAfterSaleListNumber'
-              :DownLoadConfigObj='DownLoadConfigObj'
               :pageSize='12'
               class="float"
             />
+              <!-- :DownLoadConfigObj='DownLoadConfigObj' -->
           </div>
           <transition name="el-fade-in-linear">
             <div class="content-footer floating" v-show="isFootFixed">
@@ -137,19 +100,38 @@
                   :watchPage='condition4ServiceAfterSaleList.Page'
                   :handlePageChange='handlePageChange'
                   :count='ServiceAfterSaleListNumber'
-                  :DownLoadConfigObj='DownLoadConfigObj'
                   :pageSize='12'
                   class="float"
                 />
+                  <!-- :DownLoadConfigObj='DownLoadConfigObj' -->
               </div>
             </div>
           </transition>
         </div>
       </div>
-      <!-- <div class="show-empty-bg" v-else>
+      <div v-else class="show-empty-bg">
         <img src="../../assets/images/order-empty.png" alt="">
-        <p class="is-gray">{{showDateText}}</p>
-      </div> -->
+        <p>{{showDateText}}
+          <router-link tag="span" :to="{path: '/placeOrder'}">
+            去下单<i class="el-icon-arrow-right"></i>
+          </router-link>
+        </p>
+        <!-- <p class="is-gray"></p> -->
+      </div>
+
+      <!-- 售后评价 -->
+      <EstimateDialogComp
+      :AfterSaleCode='AfterSaleCode'
+      :visible='estimateVisible'
+      @closed="estimateClosed"
+      @submit="estimateSubmit"></EstimateDialogComp>
+      <!-- 查看售后评价 -->
+      <SeeEstimateDialogComp
+      :AfterSaleCode='AfterSaleCode'
+      :visible='seeEstimateVisible'
+      @closed="seeEstimateVisible = false"
+      @submit="seeEstimateVisible = false"></SeeEstimateDialogComp>
+
     </section>
   </article>
 </template>
@@ -158,16 +140,22 @@
 import { mapState, mapMutations, mapActions } from 'vuex';
 import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
-import LookOverAfterSale from '@/components/ServiceAfterSales/LookOverAfterSale.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
+import EstimateDialogComp from '@/components/common/EstimateDialogComp/EstimateDialogComp.vue';
+import SeeEstimateDialogComp from '@/components/common/EstimateDialogComp/SeeEstimateDialogComp.vue';
+import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
+import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
 import CommonClassType from '../../store/CommonClassType';
 
 export default {
   components: {
     Count,
     LineDateSelectorComp,
-    LookOverAfterSale,
     SearchInputComp,
+    EstimateDialogComp,
+    SeeEstimateDialogComp,
+    ProductSelector,
+    SingleSelector,
   },
   computed: {
     ...mapState('common', ['ScrollInfo']),
@@ -214,11 +202,38 @@ export default {
       }
       return '当前暂无售后单信息';
     },
+    AfterSalesStatus: {
+      get() {
+        return this.condition4ServiceAfterSaleList.Status;
+      },
+      set(newVal) {
+        this.$store.commit('summary/setCondition4ServiceAfterSaleList', [['Status', ''], newVal]);
+        this.$store.dispatch('summary/getServiceAfterSaleList');
+      },
+    },
   },
   data() {
     return {
+      seeEstimateVisible: false,
+      estimateVisible: false,
+      AfterSaleCode: null,
+
+      form: {
+        name: 0,
+        region: '',
+      },
       h: 0,
       isFootFixed: false,
+      // AfterSalesStatus: '',
+      AfterSalesStatusList: [
+        { label: '不限', value: null },
+        { label: '待处理', value: 0 },
+        { label: '处理中', value: 10 },
+        { label: '退款中', value: 20 },
+        { label: '处理完成', value: 30 },
+        { label: '已驳回', value: 40 },
+        { label: '已取消', value: 255 },
+      ],
       // eslint-disable-next-line max-len
       dateList: [{ label: '全部', value: 'all' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
     };
@@ -226,6 +241,49 @@ export default {
   methods: {
     ...mapMutations('summary', ['setCondition4ServiceAfterSaleList', 'clearCondition4ServiceAfterSaleList']),
     ...mapActions('summary', ['getServiceAfterSaleList']),
+    getAfterSaleStatusText(status) {
+      let str = '';
+      switch (status) {
+        case 0:
+          str = '待处理';
+          break;
+        case 10:
+          str = '处理中';
+          break;
+        case 20:
+          str = '退款中';
+          break;
+        case 30:
+          str = '处理成功';
+          break;
+        case 40:
+          str = '已驳回';
+          break;
+        case 255:
+          str = '已取消';
+          break;
+        default:
+          break;
+      }
+      return str;
+    },
+    isAccomplish(status) {
+      let bool = false;
+      switch (status) {
+        case 30:
+          bool = '处理成功';
+          break;
+        case 40:
+          bool = '已驳回';
+          break;
+        case 255:
+          bool = '已取消';
+          break;
+        default:
+          break;
+      }
+      return bool;
+    },
     handlePageChange(page) {
       this.$store.dispatch('summary/getServiceAfterSaleList', page);
     },
@@ -234,11 +292,31 @@ export default {
       const { scrollTop, scrollHeight, offsetHeight } = oEl;
       this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
     },
-    getSolutionType(Type) {
-      if (Type === 2) return '减款';
-      if (Type === 7) return '补印';
-      if (Type === 8) return '赠送优惠券';
-      return '';
+    onOpen() {},
+    problemType() {},
+    // 售后评价
+    estimateClick(AfterSaleCode) {
+      this.estimateVisible = true;
+      this.AfterSaleCode = AfterSaleCode;
+    },
+    // 售后评价弹窗关闭
+    estimateClosed() {
+      this.estimateVisible = false;
+      this.AfterSaleCode = null;
+    },
+    estimateSubmit(data) {
+      this.api.getOrderAfterSaleEvaluate(data).then(res => {
+        if (res.data.Status === 1000) {
+          this.$store.dispatch('summary/getServiceAfterSaleList');
+        }
+      });
+      this.estimateVisible = false;
+      this.AfterSaleCode = null;
+    },
+    // 查看评价
+    seeEstimateClick(AfterSaleCode) {
+      this.seeEstimateVisible = true;
+      this.AfterSaleCode = AfterSaleCode;
     },
   },
   watch: {
@@ -266,77 +344,94 @@ export default {
 
 <style lang='scss'>
 .mp-pc-service-after-sales-page-wrap {
+
   width: 100%;
   // background-color: #fff;
   margin-bottom: 17px;
   // min-height: calc(100vh - 135px - 180px);
   > section {
     width: 100%;
-    > header {
-      width: 100%;
+    header{
+      margin-bottom: 22px;
       background-color: #fff;
-      .header-content{
-        display: flex;
-        // align-items: center;
-        .mp-line-date-selector-wrap{
-          flex: 1;
-          min-width: 650px;
-          .box{
-            width: 550px;
+      .header-content {
+        margin: 0 auto;
+        width: 1200px;
+        padding: 25px 0 0px;
+        border-top: 1px dashed #eee;
+        > li {
+          .is-bold{
+            margin: 0;
+          }
+          > section {
+            vertical-align: top;
+          }
+          > .mp-pc-order-product-select-wrap {
+            vertical-align: top;
+            padding-top: 1px;
+            padding-left: 12px;
+          }
+          &.second {
+            padding-top: 28px;
+            .mp-line-date-selector-wrap > .box {
+              width: 600px;
+              &::after {
+                display: none;
+              }
+            }
+            .mp-common-comps-search-box {
+              vertical-align: 25px;
+              margin-left: 64px;
+              // margin-right: -10px;
+            }
           }
         }
       }
-      > div {
-        margin: 0 auto;
-        width: 1200px;
-        padding: 35px 0 0px 0;
-        border-top: 1px dashed #eee;
-      }
-      margin-bottom: 22px;
     }
     > .content-wrap {
       width: 100%;
       background-color: #fff;
-      min-height: calc(100vh - 135px - 45px - 116px);
+      min-height: calc(100vh - 135px - 170px - 38px);
       > .content {
         margin: 0 auto;
         width: 1200px;
         padding-top: 25px;
         > .table-wrap {
-          min-height: calc(100vh - 374px);
-          > .table{
-            >.column{
-              display: inline-block;
-              border: 1px solid #efefef;
-              border-right: none;
-              text-align: center;
-              .lable{
-                background-color: #efefef;
-                padding: 10px;
-              }
-              .content{
-                line-height: 32px;
-                padding: 0 5px;
-              }
+          min-height: calc(100vh - 457px);
+          // > .table{
+          //   >.column{
+          //     display: inline-block;
+          //     border: 1px solid #efefef;
+          //     border-right: none;
+          //     text-align: center;
+          //     .lable{
+          //       background-color: #efefef;
+          //       padding: 10px;
+          //     }
+          //     .content{
+          //       line-height: 32px;
+          //       padding: 0 5px;
+          //     }
+          //   }
+          // }
+          .el-table{
+            .coloraaa{
+              color: #AAAAAA;
             }
-          }
-          >.null-data{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50px;
-            >img{
-              width: 200px;
-              height: 200px;
-              background-color: #efefef;
-              margin-right: 30px;
-            }
-            .null-data-right{
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              .el-button{
-                margin-top: 20px;
+            .operate{
+              span:nth-child(1){
+                color: #428DFA;
+                cursor:pointer
+              }
+              span:nth-child(1):active{
+                color: #26BCF9;
+              }
+              >.after-sale{
+                color: #FEB829;
+                cursor:pointer
+              }
+              .el-divider{
+                margin: 0 10px;
               }
             }
           }
@@ -380,6 +475,16 @@ export default {
       align-items: center;
       > p {
         margin-top: 15px;
+        span{
+          color: #428dfa;
+          margin-left: 20px;
+          i{
+            margin-left: -1px;
+          }
+        }
+        span:hover{
+          cursor: pointer;
+        }
       }
       > img {
         height: 266px;

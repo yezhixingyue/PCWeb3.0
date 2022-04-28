@@ -2,75 +2,208 @@
   <section class="mp-mpzj-order-feedback-add-page-wrap">
     <section class="content">
       <header>
-        <span v-if="!canEdit" style="margin-right:20px;cursor:pointer;" @click="handleReturn">
-          <i class="el-icon-back"></i>
-          <em class="is-font-13"> 返回列表</em>
-        </span>
         <span class="is-bold is-black">申请服务详情</span>
         <!-- <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span> -->
       </header>
       <div>
-        <el-table stripe border
-          :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="ID" label="商品名称" width="234" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="Order.OrderID" label="文件内容" width="257" show-overflow-tooltip>
+        <el-table stripe border v-if="productInfo"
+          :data="[productInfo]" style="width: 100%" class="ft-14-table">
+          <el-table-column prop="ProductName" label="商品名称" width="234" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="Content" label="文件内容" width="257" show-overflow-tooltip>
+            <span slot-scope="scope" v-if="scope.row.Content">{{ scope.row.Content }}</span>
+            <span v-else>--</span>
           </el-table-column>
           <el-table-column label="数量" width="229" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.Order.name }}</span>
+            <span slot-scope="scope">{{ scope.row.ProductAmount }}/款{{ scope.row.KindCount }}款</span>
           </el-table-column>
           <el-table-column label="尺寸" show-overflow-tooltip width="229">
-            <template slot-scope="scope">{{ scope.row.Order.Funds.FinalPrice }}元</template>
+            <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
+            <span v-else>--</span>
           </el-table-column>
           <el-table-column label="工艺" show-overflow-tooltip width="190">
-            <template slot-scope="scope">{{ scope.row.Order.Funds.FinalPrice }}元</template>
+            <!-- ================================== -->
+            <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemCraft } }}</span>
+            <span v-else>--</span>
           </el-table-column>
         </el-table>
 
-        <CustomSteps
-            :stepsNumber='1'
-            :stepList='[ { text: "提交申请", iconClass: "" },{ text: "系统处理中", iconClass: "" } ]'></CustomSteps>
-
-        <div>
+        <div class="info" v-if="AfterSaleInfo">
           <h4>售后信息</h4>
-          <p class="reprint">
-            补印：数量：4款/1000张
+          <CustomSteps
+              :stepsNumber='stepsNumber'
+              :underway='underway'
+              :stepList='stepList'></CustomSteps>
+
+          <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
+            <h4>处理结果</h4>
+            <p class="opinion" v-if="AfterSaleInfo.Status === 40">
+              <span>已驳回</span>
+            </p>
+            <p class="reprint" v-if="AfterSaleInfo.SolutionType === 7">
+              补印：数量： <span>{{AfterSaleInfo.SuccessKindCount}}</span> 款/ <span>{{AfterSaleInfo.SuccessNumber}}</span> 张
+            </p>
+            <p class="reprint" v-if="AfterSaleInfo.SolutionType === 2">
+              退款：退款总额：￥ <span>{{AfterSaleInfo.SuccessOriginalAmount}}</span>   退回至原支付卡：￥ <span>{{AfterSaleInfo.SuccessRefundAmount}}</span>
+              从未支付款项中减款：￥<span>{{AfterSaleInfo.SuccessOriginalAmount-AfterSaleInfo.SuccessRefundAmount}}</span>
+            </p>
+            <div class="reprint coupon" >
+              <div>
+                赠送优惠券：
+              </div>
+              <ul>
+                <li v-for="(it,i) in AfterSaleInfo.CouponList" :key="i">
+                    <span class="is-pink">{{it.Amount}}</span>元
+                    满<span class="MinPayAmount">{{it.MinPayAmount}}</span>元使用
+                    （ <i class="is-origin">{{it.Number}}</i>张 ）
+                </li>
+              </ul>
+            </div>
+          </template>
+
+          <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
+            <h4>处理意见</h4>
+            <p class="opinion">
+              <span> {{AfterSaleInfo.ProcessingRemark}}</span>
+            </p>
+          </template>
+
+          <template v-if="AfterSaleInfo.Status < 30">
+            <h4>进度说明</h4>
+            <p class="opinion">
+              <span v-if="AfterSaleInfo.Status === 0">亲爱的客户，您的服务单已经提交成功，请您耐心等待名片之家处理。</span>
+              <span v-if="AfterSaleInfo.Status === 10">亲爱的客户，您的服务单我们正在努力处理，请耐心等待。</span>
+              <span v-if="AfterSaleInfo.Status === 20">亲爱的客户，您的服务单我们正在退款，请耐心等待。</span>
+            </p>
+          </template>
+          <p style="margin-top:30px;color:#585858" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
+            <span>是否已解决您的问题？若未解决可点击再次申请售后服务</span>
           </p>
-          <h4>处理意见</h4>
-          <p class="opinion">
-            处理意见处理意见处理意见处理意见处理意见处理意见处理意见处理意见
-          </p>
-          <p class="opinion">
-            处理意见处理意见处理意见处理意见处理意见处理意见处理意见处理意见
-          </p>
-          <div> <el-button style="height:30px;padding:0 10px; line-height:30px;border:1px solid red">aaa</el-button> </div>
-          <table class="table" border="10px">
-              <tr>
-                  <td class="w300">1行1列的内容</td>
-                  <td>1行2列的内容</td>
-              </tr>
-              <tr>
-                  <td>2行1列的内容</td>
-                  <td>2行2列的内容</td>
-              </tr>
+          <div class="btns" v-if="AfterSaleInfo.Status !== 255">
+            <el-button @click="toAfterSale" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">申请售后</el-button>
+            <el-button @click="seeHandlerVisible = true" v-if="AfterSaleInfo.Status >= 10 && AfterSaleInfo.Status != 255">联系处理人员</el-button>
+            <!-- <el-button @click="seeHandlerVisible = true" >联系处理人员</el-button> -->
+            <template v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
+              <el-button v-if="!AfterSaleInfo.IsEvaluate" @click="estimateClick(productInfo.AfterSaleCode)">售后评价</el-button>
+              <el-button v-else @click="seeEstimateClick(productInfo.AfterSaleCode)">查看评价</el-button>
+            </template>
+            <el-button @click="editAfterSale" v-if="AfterSaleInfo.Status === 0" class="safety">修改服务单</el-button>
+            <el-button @click="cancelAfterSale(productInfo.AfterSaleCode)" v-if="AfterSaleInfo.Status === 0" class="danger">取消服务单</el-button>
+          </div>
+          <h4>服务单信息</h4>
+          <table class="table" v-if="AfterSaleInfo">
+            <div class="tr">
+              <div class="td title">问题类型：</div>
+              <div class="td content">{{AfterSaleInfo.QuestionTypeTitleList.join('，')}}</div>
+              <div class="td title">诉求意向：</div>
+              <div class="td content">{{AfterSaleInfo.AppealType === 0 ? '退款' : AfterSaleInfo.AppealType === 1 ? '补印' : '其他'}}</div>
+            </div>
+            <div class="tr">
+              <div class="td title">问题描述：</div>
+              <div class="td content texts">{{AfterSaleInfo.QuestionRemark}}</div>
+              <div class="td title">上传图片：</div>
+              <div class="td content">
+                <el-image v-for="item in AfterSaleInfo.QuestionPicList" :key="item" :src="baseUrl + item" fit="cover" ></el-image>
+                <!-- {{AfterSaleInfo.QuestionPicList}} -->
+              </div>
+            </div>
+            <div class="tr" v-if="AfterSaleInfo.AppealType === 0 || AfterSaleInfo.AppealType === 1">
+              <div class="td title">{{AfterSaleInfo.AppealType === 0 ? '退款金额：' : '补印数量：'}}</div>
+              <div class="td content">{{AfterSaleInfo.AppealType === 0 ?`${AfterSaleInfo.AppealRefundAmount}元` : AfterSaleInfo.SuccessNumber}}</div>
+              <div class="td title">联系信息：</div>
+              <div class="td content">
+                <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
+                <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
+                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ:{{AfterSaleInfo.QQ}}</span>
+                </div>
+            </div>
+            <div class="tr" v-else>
+              <div class="td title">联系信息：</div>
+              <div class="td content">
+                <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
+                <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
+                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ:{{AfterSaleInfo.QQ}}</span>
+              </div>
+              <div class="td title"></div>
+              <div class="td content"></div>
+            </div>
           </table>
         </div>
 
             <div class="btn-box">
-              <!-- <div>
-                <p class="is-bold">请注意：</p>
-                <div class="is-font-12">
-                  <p>1、数量问题请在配送人员送货时现场确认，已使用的产品无法处理数量问题的售后；</p>
-                  <p>2、请在下单日起算一个月内申请售后，超出一个月的无法处理售后问题。</p>
-                </div>
-              </div> -->
-              <el-button type="primary" @click="submitForm('ruleForm')" v-if='canEdit'>立即提交</el-button>
-              <span class="blue-span is-font-12" style="margin: 0 60px 0 30px" @click="resetForm('ruleForm')" v-if='canEdit'>重置</span>
               <el-button  @click="handleReturn">
                 <i class="el-icon-d-arrow-left is-font-15"></i>
                 <em style="margin-left: 6px">返回</em>
               </el-button>
             </div>
       </div>
+      <el-dialog
+        :visible.sync="seeHandlerVisible"
+        @cancle="seeHandlerVisible = false"
+        @closed='seeHandlerVisible = false'
+        submitText='确定'
+        width='432px'
+        >
+        <div class="text">
+          <div class="row">
+            <div class="left">
+              <i class="el-icon-user-solid"></i>
+            </div>
+            <div class="right">
+              <h4>处理人</h4>
+              <ul>
+                <li v-if="AfterSaleInfo">{{AfterSaleInfo.OperaterUserName}}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="line"></div>
+          <div class="row">
+            <div class="left">
+              <i class="iconfont icon-dianhua1"></i>
+            </div>
+            <div class="right">
+              <h4>联系电话</h4>
+              <ul>
+                <li>15639757696</li>
+                <li>1111111111</li>
+                <li>1111111111</li>
+              </ul>
+            </div>
+          </div>
+          <div class="line"></div>
+          <div class="row">
+            <div class="left">
+              <i class="iconfont icon-QQ1"></i>
+            </div>
+            <div class="right">
+              <h4>联系QQ</h4>
+              <ul>
+                <li>15639757696</li>
+                <li>1111111111</li>
+                <li>1111111111</li>
+                <li>1111111111</li>
+              </ul>
+            </div>
+          </div>
+          <!-- <div class="row"></div> -->
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <p>
+            <el-button type="primary" @click="seeHandlerVisible = false" >确定</el-button>
+          </p>
+        </span>
+      </el-dialog>
+      <!-- 售后评价 -->
+      <EstimateDialogComp
+      :AfterSaleCode='AfterSaleCode'
+      :visible='estimateVisible'
+      @closed="estimateClosed"
+      @submit="estimateSubmit"></EstimateDialogComp>
+      <!-- 查看售后评价 -->
+      <SeeEstimateDialogComp
+      :AfterSaleCode='AfterSaleCode'
+      :visible='seeEstimateVisible'
+      @closed="seeEstimateVisible = false"
+      @submit="seeEstimateVisible = false"></SeeEstimateDialogComp>
     </section>
   </section>
 </template>
@@ -78,206 +211,262 @@
 <script>
 // import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
 import CustomSteps from '@/components/ServiceAfterSales/CustomSteps.vue';
+import EstimateDialogComp from '@/components/common/EstimateDialogComp/EstimateDialogComp.vue';
+import SeeEstimateDialogComp from '@/components/common/EstimateDialogComp/SeeEstimateDialogComp.vue';
 import { imgUrl } from '@/assets/js/setup';
-import { mapState } from 'vuex';
-import { Message } from 'element-ui';
 
 export default {
   components: {
     // SingleSelector,
     CustomSteps,
+    EstimateDialogComp,
+    SeeEstimateDialogComp,
   },
   data() {
     return {
-      fileList: [],
-      canEdit: true,
-      ruleForm: {
-        ID: 0,
-        Order: {
-          OrderID: '', // 订单号
-          Content: '', // 订单备注
-        },
-        QuestionList: [], // 售后原因
-        Remark: '', // 问题描述
-        AppealType: '', // 诉求意向
-        Mobile: '', // 联系方式 - 手机号码
-        QQ: '', // QQ号码
-        PicList: [], // 上传图片列表
-      },
-      intentionAction: 0,
-      rules: {
-        QuestionList: [
-          { required: true, message: '请选择售后原因', trigger: 'change' },
-        ],
-        Remark: [
-          { required: true, message: '请输入具体问题描述', trigger: 'blur' },
-          {
-            min: 3, max: 600, message: '长度在 3 到 600 个字符', trigger: 'blur',
-          },
-        ],
-        AppealType: [
-          { required: true, message: '请选择诉求意向', trigger: 'change' },
-        ],
-        Mobile: [
-          { required: true, message: '请输入手机号码', trigger: 'blur' },
-          { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' },
-        ],
-        QQ: [
-          { required: true, message: '请输入QQ号码', trigger: 'blur' },
-          { pattern: /(^[1-9]\d*$)/, message: 'QQ号码必须为数字值，且不能以0开头' },
-          {
-            min: 5, max: 11, message: '长度在 5 到 11 个字符', trigger: 'blur',
-          },
-        ],
-      },
-      dialogImageUrl: '',
-      dialogVisible: false,
+      seeEstimateVisible: false,
+      estimateVisible: false,
+      AfterSaleCode: null,
+
+      seeHandlerVisible: false,
       baseUrl: imgUrl,
-
-      ServiceAfterSaleList: [{
-        ID: 1,
-        Order: {
-          OrderID: 2,
-          name: 'aaa',
-          Funds: {
-            FinalPrice: 3,
-          },
+      // 传入的商品信息
+      productInfo: null,
+      // 请求回来的售后信息
+      AfterSaleInfo: null,
+      stepList: [{ text: '提交申请', type: 1 }],
+      stepsNumber: 1,
+      underway: '处理中',
+      Steps: {
+        submitApplications: { // 提交申请
+          text: '提交申请',
+          imgUrl: '@/assets/images/stepsImg/submit-applications.png',
+          actionImgUrl: '@/assets/images/stepsImg/submit-applications-action.png',
         },
-      }],
-
-      aaa: 0,
+        beingProcessed: { // 处理中
+          text: '系统处理中',
+          imgUrl: '@/assets/images/stepsImg/being-processed.png',
+          actionImgUrl: '@/assets/images/stepsImg/being-processed-action.png',
+        },
+        refund: { // 退款中
+          text: '退款中',
+          imgUrl: '@/assets/images/stepsImg/refund.png',
+          actionImgUrl: '@/assets/images/stepsImg/refund-action.png',
+        },
+        figureOut: { // 处理完成
+          text: '处理完成',
+          imgUrl: '@/assets/images/stepsImg/figure-out.png',
+          actionImgUrl: '@/assets/images/stepsImg/figure-out-action.png',
+        },
+      },
     };
   },
-  computed: {
-    ...mapState('common', ['customerInfo', 'AppealList']),
-    ...mapState('summary', ['editFeedbackData', 'RejectReasonList']),
-  },
+
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate(async (valid) => {
-        if (valid) {
-          const _list = this.$refs.upload.uploadFiles.map(it => {
-            if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
-            return '';
-          }).filter(it => it);
-          this.ruleForm.PicList = _list;
-          this.ruleForm.QuestionList = this.ruleForm.QuestionList.map(ID => ({ ID }));
-          const res = await this.api.getAfterSalesApply(this.ruleForm);
-          if (res.data.Status === 1000) {
-            this.messageBox.successSingle({
-              title: '提交成功',
-              successFunc: () => {
-                this.$router.replace('/feedbackList');
-              },
-            });
+    toAfterSale() {
+      this.$router.push({ name: 'feedback', query: { isEdit: false, data: JSON.stringify(this.productInfo) } });
+    },
+    editAfterSale() {
+      this.$router.replace({ name: 'feedback', query: { isEdit: true, data: JSON.stringify({ ...this.AfterSaleInfo, ...this.productInfo }) } });
+    },
+    cancelAfterSale(code) {
+      // this.messageBox
+      this.messageBox.warnCancelBox({
+        msg: '您确定取消本次申请吗？',
+        title: '操作确认',
+        successFunc: () => {
+          // 发送取消请求
+          this.api.getCancleApply(code).then(res => {
+            if (res.data.Status === 1000) {
+              this.handleReturn();
+            }
+          });
+        },
+      });
+    },
+    handleReturn() {
+      this.$router.go(-1);
+    },
+    // 售后评价
+    estimateClick(AfterSaleCode) {
+      this.estimateVisible = true;
+      this.AfterSaleCode = AfterSaleCode;
+    },
+    // 售后评价弹窗关闭
+    estimateClosed() {
+      this.estimateVisible = false;
+      this.AfterSaleCode = null;
+    },
+    estimateSubmit(data) {
+      this.api.getOrderAfterSaleEvaluate(data).then(res => {
+        if (res.data.Status === 1000) {
+          this.initData();
+        }
+      });
+      this.estimateVisible = false;
+      this.AfterSaleCode = null;
+    },
+    // 查看评价
+    seeEstimateClick(AfterSaleCode) {
+      this.seeEstimateVisible = true;
+      this.AfterSaleCode = AfterSaleCode;
+    },
+    getSteps(AfterSaleInfo) {
+      this.stepList = [{ text: '提交申请', type: 1 }];
+      if (AfterSaleInfo.Status === 255) { // 取消
+        this.stepList.push({ text: '服务单已取消', type: 255 });
+      } else if (AfterSaleInfo.Status === 40) {
+        this.stepList.push({ text: '服务单已驳回', type: 255 });
+      } else if (AfterSaleInfo.Status === 20) { // 如果处理结果为退款
+        this.stepList.push({ text: '处理中', type: 10 });
+        this.stepList.push({ text: '退款中', type: 20 });
+        this.stepList.push({ text: '处理完成', type: 255 });
+      } else {
+        this.stepList.push({ text: '处理中', type: 10 });
+        this.stepList.push({ text: '处理完成', type: 255 });
+      }
+      // 确定步数
+      switch (AfterSaleInfo.Status) {
+        case 0:
+          this.stepsNumber = 1;
+          this.underway = '待处理';
+          break;
+        case 10:
+          this.stepsNumber = 2;
+          this.underway = '处理中';
+          break;
+        case 20:
+          if (AfterSaleInfo.SolutionType === 2) { // 退款
+            this.stepsNumber = 3;
+            this.underway = '退款中';
           }
+          break;
+        case 30: // 处理完成 并 处理结果为退款
+          if (AfterSaleInfo.SolutionType === 2) { // 退款
+            this.stepsNumber = 4;
+            this.underway = '已完成';
+          } else {
+            this.stepsNumber = 3;
+            this.underway = '已完成';
+          }
+          break;
+        default:
+          this.stepsNumber = 2;
+          this.underway = '已完成';
+      }
+    },
+    initData() {
+      this.api.getServiceDetail(this.productInfo.AfterSaleCode).then(res => {
+        if (res.data.Status === 1000) {
+          this.AfterSaleInfo = res.data.Data;
+          this.getSteps(res.data.Data);
+        //
         }
       });
     },
-    getStatusClass(status) {
-      let str = '';
-      switch (status) {
-        case 0:
-          str = 'is-black';
-          break;
-        case 1:
-          str = 'is-cyan';
-          break;
-        case 2:
-          str = 'is-success';
-          break;
-        case 3:
-          str = 'is-pink';
-          break;
-        case 255:
-          str = 'is-gray';
-          break;
-        default:
-          break;
-      }
-      return str;
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      if (this.customerInfo) {
-        this.ruleForm.Mobile = this.customerInfo.Account.Mobile;
-        this.ruleForm.QQ = this.customerInfo.QQ;
-      }
-    },
-    // handleRemove(file, fileList) {
-    //   console.log(file, fileList);
-    //   console.log('handleRemove', this.fileList);
-    // },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    handllePictureUploaded(response) {
-      if (response.Status !== 1000) {
-        Message({
-          showClose: true,
-          message: response.Message,
-          type: 'error',
-        });
-        // eslint-disable-next-line max-len
-        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
-      }
-    },
-    handleReturn() {
-      if (!this.canEdit) this.$store.commit('summary/setNeedFetchListData', false);
-      else this.$store.commit('order/setShouldGetNewListData', false);
-      this.$router.go(-1);
-    },
-    problemType(keys) {
-      console.log(keys);
-    },
   },
-  async mounted() {
-    console.log(this.RejectReasonList);
-    const OrderID = this.$route.params.id;
-    const Content = this.$route.params.desc;
-    const { type } = this.$route.params;
-    if (!OrderID || !Content || !type) return;
-    if (type === 'detail') {
-      this.canEdit = false;
-      if (this.editFeedbackData) { // 仓库提前保存好的编辑数据
-        let QuestionList = [];
-        if (this.editFeedbackData.QuestionList.length > 0) {
-          QuestionList = this.editFeedbackData.QuestionList.map(it => it.ID);
-        }
-        this.ruleForm = {
-          ...this.ruleForm,
-          ...JSON.parse(JSON.stringify(this.editFeedbackData)),
-          QuestionList,
-        };
-        // console.log(this.editFeedbackData.QuestionList);
-        this.fileList = this.editFeedbackData.PicList.map(path => ({ url: `${imgUrl}${path}` }));
-        // this.$store.commit('summary/setEditFeedbackData', null);
-      } else {
-        this.$router.replace('/feedbackList');
-        return;
-      }
-    } else if (type === 'add' && this.customerInfo) {
-      this.ruleForm.Mobile = this.customerInfo.Account.Mobile;
-      this.ruleForm.QQ = this.customerInfo.QQ;
-    }
-    this.ruleForm.Order.OrderID = OrderID;
-    this.ruleForm.Order.Content = Content;
-    this.$store.dispatch('summary/getRejectReasonList');
+  mounted() {
+    this.productInfo = JSON.parse(this.$route.query.data);
+    this.initData();
   },
 };
 </script>
 
 <style lang='scss'>
 .mp-mpzj-order-feedback-add-page-wrap {
-  .table{
-    border: 1px solid red;
-    border-spacing: 0;
-    .w300{
-      width: 300px;
+  .info{
+    color: #333;
+    font-size: 14px;
+    h4{
+      font-weight: 700;
+      // line-height: 3em;
+      margin-bottom: 20px;
+      margin-top: 30px;
+      color: #585858;
     }
-    td{
-      border: 1px solid red;
+    p{
+      // line-height: 2em;
+      color: #888888;
+    }
+    .btns{
+      border-bottom: 1px dotted #EEEEEE;
+      padding:20px 0px;
+      .el-button{
+        width: 100px;
+        height:30px;
+        padding:0 10px;
+        line-height:30px;
+        border:1px solid #428dfa;
+        color:#428dfa
+      }
+      .safety{
+        background-color: #428dfa;
+        color: #fff;
+      }
+      .danger{
+        color: #FF3769;
+        border:1px solid #FF3769;
+      }
+    }
+    .reprint{
+      span{
+        color: #FF3769;
+      }
+    }
+    .coupon{
+      display: flex;
+      ul{
+        line-height: 2em;
+        margin: -0.5em 0;
+        color: #888888;
+      }
+    }
+  }
+  .table{
+    border: 1px solid #eeeeee;
+    border-spacing: 0;
+    border-bottom: 0;
+    .tr,.td{
+      box-sizing: border-box;
+    }
+    >.tr{
+      display: flex;
+      border-bottom: 1px solid #eeeeee;;
+      .td{
+        border-left: 1px solid #eeeeee;
+      }
+      .td:nth-child(1){
+        border-left: 0;
+      }
+
+      .title{
+        width: 100px;
+        font-size: 14px;
+        color: #585858;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 52px;
+      }
+      .content{
+        padding: 0 20px;
+        color: #888888;
+        width: 469px;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        min-height: 52px;
+        &.texts{
+          padding: 8px 20px;
+          line-height: 30px;
+        }
+        .el-image{
+          width: 40px;
+          height: 40px;
+          padding: 25px 0;
+          margin-left: 9px;
+        }
+      }
     }
   }
   width: 100%;
@@ -311,146 +500,13 @@ export default {
         margin-top: -16px;
         margin-bottom: 30px;
       }
-      .el-textarea__inner {
-        min-height: 88px !important;
-      }
-      .el-form-item__label:before {
-        color: #FEB829 !important;
-      }
-      // 诉求意向
-      .intention{
-        display: flex;
-        height: 40px;
-        align-items: center;
-        span:hover{
-          cursor:pointer;
-          color: #428DFA;
-          background-color: #EBF0FE;
-          border-color: #428dfa;
-        }
-        >.action{
-          border-color: #428dfa;
-          background-color: #428dfa;
-          color: #fff;
-          &:hover{
-          border-color: #428dfa;
-          background-color: #428dfa;
-          color: #fff;
-        }
-        }
-        span{
-          width: 140px;
-          line-height: 40px;
-          border-radius: 5px;
-          height: 40px;
-          text-align: center;
-          border: 1px solid #efefef;
-          margin-right: 20px;
-          color: #888888;
-        }
-      }
-      // 补印
-      .make-up-for{
-        display: flex;
-        color: #888888;
-        .item{
-          display: flex;
-          margin-right: 120px;
-          align-items: center;
-          >span{
-            font-size: 12px;
-            margin-left: 20px;
-            color: #aaa;
-            >span{
-              color: #FF3769;
-            }
-          }
-          .el-input-number{
-            width: 80px;
-            text-align: center;
-            margin-right: 10px;
-          }
-        }
-      }
-      // 问题类型
-      .check-button{
-        display: flex;
-        flex-wrap: wrap;
-        .action{
-          background-color: #428dfa;
-          border-color: #428dfa;
-          color: #fff;
-          &:hover{
-            border-color: #428dfa;
-            background-color: #428dfa;
-            color: #fff;
-          }
-        }
-        li{
-          width: 100px;
-          height: 30px;
-          border-radius: 5px;
-          line-height: 30px;
-          border: 1px solid #E6E6E6;
-          margin: 0px 30px 30px 0;
-          text-align: center;
-          color: #888888;
-        }
-        li:hover{
-          cursor:pointer;
-          color: #428DFA;
-          border-color: #428dfa;
-          background-color: #EBF0FE;
-        }
-      }
-      // 联系人
-      .linkman{
-        display: flex;
-        flex-wrap: wrap;
-        .el-input{
-          width: 200px;
-          margin-right: 140px;
-        }
-      }
-      .mp-select {
-        .el-form-item__content {
-          // height: 40px;
-          > .mp-pc-common-comps-select-comp-wrap {
-            width: 260px;
-            display: block;
-            > header {
-              display: none;
-            }
-            > .el-select {
-              width: 260px;
-              height: auto;
-              .el-input__inner {
-                width: 260px;
-                height: 40px;
-              }
-              .el-input__suffix .el-input__icon::before {
-                top: 11px;
-              }
-            }
-          }
-          // .el-form-item__error {
-          //   padding-top: 0;
-          // }
-        }
-      }
+
       .btn-box {
         padding-bottom: 60px;
         margin-top: 20px;
         line-height: 41px;
         display: flex;
         justify-content: center;
-        > div {
-          padding-bottom: 86px;
-          padding-top: 20px;
-          p {
-            line-height: 24px;
-          }
-        }
         > button {
           width: 120px;
           & + button {
@@ -458,55 +514,72 @@ export default {
           }
         }
       }
-      .text {
-        padding-left: 13px;
-        // color: #888;
-        font-size: 13px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        // font-weight: 700;
+    }
+
+  .text{
+    width: 320px;
+    margin: 0 auto;
+    .row{
+      display: flex;
+
+      .left{
+        width: 40px;
+        // border: 1px solid #efefef;
+        box-sizing: border-box;
+        i{
+          margin-left: 5px;
+          font-size: 15px;
+          width: 28px;
+          height: 28px;
+          border: 1px solid #428dfa;
+          border-radius: 50%;
+          text-align: center;
+          line-height: 28px;
+          color: #428dfa;
+          display: inline-block;
+        }
       }
-      .el-upload-list__item-thumbnail {
-        object-fit: cover;
-      }
-      // .upload-Remark {
-      //   // line-height: 34px;
-      //   // padding-bottom: 10px;
-      // }
-      .el-upload-dragger {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-      .el-form-item__label {
-        font-weight: 700;
-      }
-      .is-disabled + .el-upload {
-        display: none;
-      }
-      .mp-feedback-progress-box {
-        padding: 20px 0;
-        margin-top: 35px;
-        border-radius: 4px;
-        border: 1px solid #eee;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.08);
-        background-color: rgb(253, 253, 253);
-      }
-      .el-form-item__content {
-        > .el-dialog__wrapper {
-          .el-dialog__header {
-            padding: 10px 20px;
-            // height: 30px;
-            .el-dialog__title {
-              font-size: 17px;
-            }
-          }
-          .el-dialog__body {
-            padding-top: 10px;
-            padding-bottom: 20px;
+      .right{
+        flex:1;
+        padding: 0 8px;
+        box-sizing: border-box;
+        h4{
+          line-height: 30px;
+          font-size: 16px;
+          color: #888888;
+        }
+        ul{
+          color: #585858;
+          font-size: 14px;
+          display: flex;
+          flex-wrap: wrap;
+          li{
+            line-height: 24px;
+            width: 50%;
           }
         }
+      }
+    }
+    .line{
+      height: 1px;
+      background-color: #EEEEEE;
+      margin: 18px 0;
+    }
+  }
+  }
+    .dialog-footer>p {
+    text-align: center;
+    > button {
+      height: 35px;
+      width: 100px;
+      padding: 0;
+      border-radius: 3px;
+      & + button {
+        margin-left: 20px;
+      }
+      &.is-disabled {
+        background: #cbcbcb !important;
+        opacity: 1 !important;
       }
     }
   }

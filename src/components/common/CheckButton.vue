@@ -11,7 +11,11 @@ export default {
   props: {
     checkList: { // 选项数据
       type: Array,
-      default: () => [{ a: 'a', b: 'b' }, { a: 'c', b: 'd' }],
+      default: () => [],
+    },
+    ActiveList: {
+      type: Array,
+      default: () => [],
     },
     ValueKey: { // 返回的列表中数据对应key的值 默认是索引
       type: String,
@@ -22,7 +26,7 @@ export default {
   },
   data() {
     return {
-      checkKey: [],
+      checkKey: this.ActiveList,
     };
   },
   computed: {
@@ -32,13 +36,20 @@ export default {
   },
   methods: {
     onChange(key) {
-      console.log(this.checkList);
       if (this.checkKey.findIndex((it) => it === key) === -1) {
         this.checkKey.push(key);
       } else {
         this.checkKey.splice(this.checkKey.findIndex((it) => it === key), 1);
       }
       this.$emit('CheckChange', this.checkKey);
+    },
+    clearCheck() {
+      this.checkKey = [];
+    },
+  },
+  watch: {
+    ActiveList(newVal) {
+      this.checkKey = newVal;
     },
   },
 };

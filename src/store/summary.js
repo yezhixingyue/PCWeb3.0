@@ -27,25 +27,61 @@ export default {
       Page: 1,
       PageSize: 12,
       FieldType: 3,
+
+      ProductClass: {
+        First: '',
+        Second: '',
+      },
+      Status: null,
+      ProductID: '',
+      PlaceDate: {
+        First: '',
+        Second: '',
+      },
+      ID: '',
+      KeyWords: '',
+      Order: {
+        First: '',
+        Second: 0,
+      },
     },
     editFeedbackData: null, // 问题反馈编辑信息
-    RejectReasonList: [], // 问题原因列表
+    // RejectReasonList: [], // 问题原因列表
     needFetchListData: true, // 是否需要获取反馈列表信息
     listData: null, // 反馈列表信息数据
     listDataNumber: 0,
-    /** 售后申请单页面相关（客户反馈页面）
+    /** 售后申请 单页面相关（客户反馈页面）
     ---------------------------------------- */
     condition4FeedbackList: {
-      Page: 1,
-      PageSize: 12,
-      QuestionID: '',
-      Status: '',
+      ProductClass: {
+        First: '',
+        Second: '',
+      },
+      ProductID: '',
       Date: {
         First: '',
         Second: '',
       },
       DateType: 'today',
+      Page: 1,
+      PageSize: 12,
       KeyWords: '',
+      Product: {
+        ClassID: '',
+        TypeID: '',
+        ProductID: '',
+      },
+      Status: '',
+      PlaceDate: {
+        First: '',
+        Second: '',
+      },
+      ID: '',
+      FieldType: 1,
+      Order: {
+        First: '',
+        Second: '',
+      },
     },
     FeedbackList: [],
     FeedbackDataNumber: 0,
@@ -86,11 +122,26 @@ export default {
         Page: 1,
         PageSize: 12,
         FieldType: 3,
+
+        ProductClass: {
+          First: '',
+          Second: '',
+        },
+        Status: null,
+        ProductID: '',
+        PlaceDate: {
+          First: '',
+          Second: '',
+        },
+        ID: '',
+        KeyWords: '',
+        Order: {
+          First: '',
+          Second: 0,
+        },
       };
     },
-    // setDate4ConditionDate(state, key) {
-    //   ClassType.setDate(state[key]);
-    // },
+
     setEditFeedbackData(state, data) { // 设置问题反馈编辑信息
       state.editFeedbackData = data;
     },
@@ -123,19 +174,55 @@ export default {
         Page: 1,
         PageSize: 12,
         FieldType: 3,
+
+        ProductClass: {
+          First: '',
+          Second: '',
+        },
+        Status: null,
+        ProductID: '',
+        PlaceDate: {
+          First: '',
+          Second: '',
+        },
+        ID: '',
+        KeyWords: '',
+        Order: {
+          First: '',
+          Second: 0,
+        },
       };
       state.editFeedbackData = null;
       state.condition4FeedbackList = {
-        Page: 1,
-        PageSize: 12,
-        QuestionID: '',
-        Status: '',
+        ProductClass: {
+          First: '',
+          Second: '',
+        },
+        ProductID: '',
         Date: {
           First: '',
           Second: '',
         },
         DateType: 'today',
+        Page: 1,
+        PageSize: 12,
         KeyWords: '',
+        Product: {
+          ClassID: '',
+          TypeID: '',
+          ProductID: '',
+        },
+        Status: '',
+        PlaceDate: {
+          First: '',
+          Second: '',
+        },
+        ID: '',
+        FieldType: 1,
+        Order: {
+          First: '',
+          Second: '',
+        },
       };
       state.FeedbackList = [];
       state.FeedbackDataNumber = 0;
@@ -152,16 +239,35 @@ export default {
     },
     clearCondition4Feedback(state) {
       state.condition4FeedbackList = {
-        Page: 1,
-        PageSize: 12,
-        QuestionID: '',
-        Status: '',
+        ProductClass: {
+          First: '',
+          Second: '',
+        },
+        ProductID: '',
         Date: {
           First: '',
           Second: '',
         },
         DateType: 'today',
+        Page: 1,
+        PageSize: 12,
         KeyWords: '',
+        Product: {
+          ClassID: '',
+          TypeID: '',
+          ProductID: '',
+        },
+        Status: '',
+        PlaceDate: {
+          First: '',
+          Second: '',
+        },
+        ID: '',
+        FieldType: 1,
+        Order: {
+          First: '',
+          Second: '',
+        },
       };
     },
     setFullCondition4Feedback(state, obj) {
@@ -186,7 +292,7 @@ export default {
         commit('setFundBillList', [res.data.Data, res.data.DataNumber]);
       }
     },
-    /** 售后单页面相关
+    /** 售后记录页面相关
     ---------------------------------------- */
     async getServiceAfterSaleList({ state, commit }, page = 1) {
       commit('setCondition4ServiceAfterSaleList', [['Page', ''], page]);
@@ -194,16 +300,17 @@ export default {
       commit('setDate4ConditionDate', 'condition4ServiceAfterSaleList');
       const _obj = ClassType.filter(state.condition4ServiceAfterSaleList);
       if (_obj.Date) {
-        _obj.CreateTime = _obj.Date;
+        _obj.PlaceDate = _obj.Date;
         delete _obj.Date;
       }
-      const res = await api.getAfterSalesList(_obj);
+      const res = await api.getOrderAfterSaleList(_obj);
       if (res.data.Status === 1000) {
         commit('setServiceAfterSaleList', [res.data.Data, res.data.DataNumber]);
       }
     },
+
     async getRejectReasonList({ state, commit }) { // 获取问题原因列表
-      if (state.RejectReasonList.length > 0) return state.RejectReasonList;
+      if (state.RejectReasonList?.length > 0) return state.RejectReasonList;
       const res = await api.getQuestionList();
       if (res.data.Status === 1000) {
         commit('setRejectReasonList', res.data.Data);
@@ -211,20 +318,21 @@ export default {
       }
       return [];
     },
-    /** 售后申请单页面相关（客户反馈页面）
+
+    /** 申请售后 单页面相关
     ---------------------------------------- */
     async getListData4Feedback({ state, commit }, page = 1) {
       commit('setCondition4Feedback', [['Page', ''], page]);
       commit('setDate4ConditionDate', 'condition4FeedbackList');
       const _obj = ClassType.filter(state.condition4FeedbackList, true);
       if (_obj.Date) {
-        _obj.ApplyTime = _obj.Date;
+        _obj.PlaceDate = _obj.Date;
         delete _obj.Date;
       }
       let key = true;
       // state.dataList = [];
       commit('setFeedbackList', [[]]);
-      const res = await api.getAfterSalesApplyList(_obj).catch(() => { key = false; });
+      const res = await api.getAfterSaleOrderList(_obj).catch(() => { key = false; });
       if (key && res.data.Status === 1000) {
         commit('setFeedbackList', [res.data.Data, res.data.DataNumber]);
       }
