@@ -27,7 +27,7 @@
               <img v-else src="@/assets/images/stepsImg/figure-out-action.png" alt="">
             </template>
           </div>
-          <p>{{item.text}}</p>
+          <p :class="{'action':i+1 <= stepsNumber}">{{item.text}}</p>
         </div>
       </div>
     </div>
@@ -130,6 +130,8 @@ export default {
         text-align: center;
         left: -50%;
         width: 6em;
+      }
+      .action{
         color: #428dfa;
       }
     }

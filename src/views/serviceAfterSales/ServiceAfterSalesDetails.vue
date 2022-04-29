@@ -14,7 +14,7 @@
             <span v-else>--</span>
           </el-table-column>
           <el-table-column label="数量" width="229" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductAmount }}/款{{ scope.row.KindCount }}款</span>
+            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}/{{ scope.row.KindCount }}款</span>
           </el-table-column>
           <el-table-column label="尺寸" show-overflow-tooltip width="229">
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
@@ -46,7 +46,7 @@
               退款：退款总额：￥ <span>{{AfterSaleInfo.SuccessOriginalAmount}}</span>   退回至原支付卡：￥ <span>{{AfterSaleInfo.SuccessRefundAmount}}</span>
               从未支付款项中减款：￥<span>{{AfterSaleInfo.SuccessOriginalAmount-AfterSaleInfo.SuccessRefundAmount}}</span>
             </p>
-            <div class="reprint coupon" >
+            <div class="reprint coupon" v-if="AfterSaleInfo.SolutionType === 8">
               <div>
                 赠送优惠券：
               </div>
@@ -73,6 +73,9 @@
               <span v-if="AfterSaleInfo.Status === 0">亲爱的客户，您的服务单已经提交成功，请您耐心等待名片之家处理。</span>
               <span v-if="AfterSaleInfo.Status === 10">亲爱的客户，您的服务单我们正在努力处理，请耐心等待。</span>
               <span v-if="AfterSaleInfo.Status === 20">亲爱的客户，您的服务单我们正在退款，请耐心等待。</span>
+            </p>
+            <p class="opinion" style="margin-top:10px">
+              <span> {{AfterSaleInfo.ProcessingRemark}}</span>
             </p>
           </template>
           <p style="margin-top:30px;color:#585858" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
@@ -108,12 +111,15 @@
             </div>
             <div class="tr" v-if="AfterSaleInfo.AppealType === 0 || AfterSaleInfo.AppealType === 1">
               <div class="td title">{{AfterSaleInfo.AppealType === 0 ? '退款金额：' : '补印数量：'}}</div>
-              <div class="td content">{{AfterSaleInfo.AppealType === 0 ?`${AfterSaleInfo.AppealRefundAmount}元` : AfterSaleInfo.SuccessNumber}}</div>
+              <div class="td content">
+                {{AfterSaleInfo.AppealType === 0 ? `${AfterSaleInfo.AppealRefundAmount}元` :
+                `${AfterSaleInfo.AppealNumber}${productInfo.Unit}/${AfterSaleInfo.AppealKindCount}款`}}
+              </div>
               <div class="td title">联系信息：</div>
               <div class="td content">
                 <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
                 <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
-                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ:{{AfterSaleInfo.QQ}}</span>
+                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ：{{AfterSaleInfo.QQ}}</span>
                 </div>
             </div>
             <div class="tr" v-else>

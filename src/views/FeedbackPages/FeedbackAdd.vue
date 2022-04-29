@@ -18,7 +18,7 @@
             <span v-else>--</span>
           </el-table-column>
           <el-table-column label="数量" width="229" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductAmount }}/{{ scope.row.Unit }}{{ scope.row.KindCount }}</span>
+            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}/{{ scope.row.KindCount}}款</span>
           </el-table-column>
           <el-table-column label="尺寸" show-overflow-tooltip width="229">
             <!-- <template slot-scope="scope">{{ scope.row.SizeList | formatListItemSize }}</template> -->
@@ -105,7 +105,7 @@
               maxlength="600" show-word-limit placeholder="请输入具体问题描述"></el-input>
             </el-form-item>
 
-            <el-form-item label="上传图片：">
+            <el-form-item label="上传图片：" prop="QuestionPicList">
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
                 list-type="picture-card"
@@ -206,6 +206,14 @@ export default {
         callback();
       }
     };
+    const QuestionPicList = (rule, value, callback) => {
+      console.log(value);
+      if (value?.length === 0) {
+        callback(new Error('请上传问题图片'));
+      } else {
+        callback();
+      }
+    };
     const validateRefundAmount = (rule, value, callback) => {
       if (value === 0) {
         callback(new Error('退款金额不能为0'));
@@ -267,6 +275,10 @@ export default {
           {
             min: 3, max: 599, message: '长度在 3 到 600 个字符', trigger: 'change',
           },
+        ],
+        QuestionPicList: [
+          { validator: QuestionPicList, trigger: 'blur' },
+          { required: true, message: '请上传问题图片', trigger: 'change' },
         ],
         RefundAmount: [
           { validator: validateRefundAmount, trigger: 'blur' },
@@ -422,6 +434,10 @@ export default {
       this.ruleForm.Mobile = this.queryData.Mobile;
       this.fileList = this.ruleForm.QuestionPicList.map(path => ({ url: `${imgUrl}${path}` }));
       setTimeout(() => { this.initPicList(this.ruleForm.QuestionPicList); }, 500);
+    } else {
+      this.ruleForm.Mobile = this.customerInfo.Account.Mobile;
+      this.ruleForm.ContactName = this.customerInfo.CustomerName;
+      this.ruleForm.QQ = this.customerInfo.QQ;
     }
     // 获取问题类型数据
     this.api.getApplyQuestionList().then(res => {

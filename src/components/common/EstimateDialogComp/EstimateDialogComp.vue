@@ -1,77 +1,74 @@
 <template>
-  <article class="mp-pc-service-after-sales-page-wrap">
-    <section>
-      <CommonDialogComp
-        title="售后评价"
-        :visible.sync="visible"
-        @cancle="cancle"
-        @open='onOpen'
-        @closed='closed'
-        submitText='确定'
-        :showCancel='false'
-        @submit='submit("rulesform")'
-        width='800px'
-        top="5vh"
-        >
-        <div slot="title" class="title">aaa</div>
-        <el-form label-position="right" label-width="100px" ref="rulesform" :model="form" :rules="rules" class="estimate">
-          <el-form-item label="服务评分：" prop="Score">
-            <el-rate v-model="form.Score" show-text :texts="['非常差', '差', '一般', '好', '非常好',]"></el-rate>
-          </el-form-item>
-          <el-form-item label="服务结果：" prop="Result">
-            <div class="result">
-              <span :class="{'action': form.Result === 1}" @click="form.Result = 1">问题已解决</span>
-              <span :class="{'action': form.Result === 2}" @click="form.Result = 2">问题未解决</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="服务标签：" prop="Label" style="margin:0">
-            <CheckButton
-              ref="CheckButton"
-              @CheckChange="problemType"
-              :checkList="checkList"
-              LabelKey="Title"
-              ValueKey="ID"
-            ></CheckButton>
-          </el-form-item>
-          <el-form-item label="填写评价：" prop="EvaluateContent">
-            <el-input
-              style="width:590px"
-              type="textarea"
-              v-model="form.EvaluateContent"
-              :rows="5"
-              placeholder="请填写评价"
-              maxlength="300"
-              show-word-limit>
-            </el-input>
-          </el-form-item>
-          <el-form-item label="评价晒图：" prop="EvaluatePicList">
-            <div class="upload">
-              <el-upload
-                :action="baseUrl + '/Api/Upload/Image?type=3'"
-                list-type="picture-card"
-                ref="upload"
-                drag
-                accept='.png,.jpeg,.jpg,.bmp'
-                :multiple='true'
-                :limit='2'
-                :before-upload='beforeUpload'
-                :on-preview="handlePictureCardPreview"
-                >
-                <!-- :on-remove="handleRemove" -->
-                <!-- :on-success='handllePictureUploaded' -->
-                <i class="el-icon-plus"></i>
-              </el-upload>
-              <el-dialog :visible.sync="dialogVisible" top="8vh" title="查看图片" append-to-body>
-                <img width="100%" :src="dialogImageUrl" alt="">
-              </el-dialog>
-              <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M,支持bmp、gif、png、jpeg</p>
-            </div>
-          </el-form-item>
-        </el-form>
-      </CommonDialogComp>
-    </section>
-  </article>
+  <CommonDialogComp
+    class="mp-pc-service-after-sales-estimate-wrap"
+    title="售后评价"
+    :visible.sync="visible"
+    @cancle="cancle"
+    @open='onOpen'
+    @closed='closed'
+    submitText='确定'
+    :showCancel='false'
+    @submit='submit("rulesform")'
+    width='800px'
+    top="5vh"
+    >
+    <div slot="title" class="title">aaa</div>
+    <el-form label-position="right" label-width="100px" ref="rulesform" :model="form" :rules="rules" class="estimate">
+      <el-form-item label="服务评分：" prop="Score">
+        <el-rate v-model="form.Score" show-text :texts="['非常差', '差', '一般', '好', '非常好',]"></el-rate>
+      </el-form-item>
+      <el-form-item label="服务结果：" prop="Result">
+        <div class="result">
+          <span :class="{'action': form.Result === 1}" @click="form.Result = 1">问题已解决</span>
+          <span :class="{'action': form.Result === 2}" @click="form.Result = 2">问题未解决</span>
+        </div>
+      </el-form-item>
+      <el-form-item label="服务标签：" prop="Label" style="margin:0">
+        <CheckButton
+          ref="CheckButton"
+          @CheckChange="problemType"
+          :checkList="checkList"
+          LabelKey="Title"
+          ValueKey="ID"
+        ></CheckButton>
+      </el-form-item>
+      <el-form-item label="填写评价：" prop="EvaluateContent">
+        <el-input
+          style="width:590px"
+          type="textarea"
+          v-model="form.EvaluateContent"
+          :rows="5"
+          placeholder="请填写评价"
+          maxlength="300"
+          show-word-limit>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="评价晒图：" prop="EvaluatePicList">
+        <div class="upload">
+          <el-upload
+            :action="baseUrl + '/Api/Upload/Image?type=3'"
+            list-type="picture-card"
+            ref="upload"
+            drag
+            accept='.png,.jpeg,.jpg,.bmp'
+            :multiple='true'
+            :limit='2'
+            :before-upload='beforeUpload'
+            :on-preview="handlePictureCardPreview"
+            >
+            <!-- :on-remove="handleRemove" -->
+            <!-- :on-success='handllePictureUploaded' -->
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible" top="8vh" title="查看图片" append-to-body>
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
+          <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
+          <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M,支持bmp、gif、png、jpeg</p>
+        </div>
+      </el-form-item>
+    </el-form>
+  </CommonDialogComp>
 </template>
 
 <script>
@@ -99,6 +96,11 @@ export default {
         callback(new Error('请评分'));
       }
     };
+    const checkePicList = (rule, value, callback) => {
+      if (value.length === 0) {
+        callback(new Error('请上传图片'));
+      }
+    };
     return {
       baseUrl: imgUrl,
       dialogVisible: false,
@@ -116,6 +118,10 @@ export default {
         Score: [
           { required: true, message: '请评分', trigger: 'change' },
           { validator: checkMoney, trigger: 'change' },
+        ],
+        EvaluatePicList: [
+          { required: true, message: '请评分', trigger: 'change' },
+          { validator: checkePicList, trigger: 'change' },
         ],
         Result: [
           { required: true, message: '请输入具体问题描述', trigger: 'change' },
@@ -209,12 +215,10 @@ export default {
 </script>
 
 <style lang='scss'>
-.mp-pc-service-after-sales-page-wrap {
+.mp-pc-service-after-sales-estimate-wrap {
   margin: 0;
   width: 100%;
-  // background-color: #fff;
-  margin-bottom: 17px;
-  // min-height: calc(100vh - 135px - 180px);
+  background-color: rgba($color: #000000, $alpha: 0.5);
   .estimate{
     .el-rate{
       margin-top: 10px;
@@ -294,7 +298,7 @@ export default {
           height: 80px;
           margin-right: 30px;
           i{
-            font-size: 14px;
+            font-size: 16px;
           }
         }
       }
