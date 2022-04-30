@@ -59,14 +59,14 @@
                 <template slot-scope="scope"
                 >{{scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
               </el-table-column>
-              <el-table-column label="售后进度" width="171" show-overflow-tooltip>
+              <el-table-column label="售后进度" width="170" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <span :class="{
                     'coloraaa': isAccomplish(scope.row.Status),
                     }">{{getAfterSaleStatusText(scope.row.Status)}}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="146" show-overflow-tooltip>
+              <el-table-column label="操作" width="148" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <div class="operate">
                     <span @click="$router.push( { name: 'serviceAfterSalesDetails', query: {data: JSON.stringify(scope.row)} })">查看</span>
@@ -435,9 +435,9 @@ export default {
               }
             }
           }
-          >.el-table .has-gutter > tr > th.is-leaf::after{
-            width: 0;
-          }
+          // >.el-table .has-gutter > tr > th.is-leaf::after{
+          //   width: 0;
+          // }
         }
         > .content-footer {
           margin-top: 19px;

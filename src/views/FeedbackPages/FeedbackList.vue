@@ -30,8 +30,8 @@
             dateType="date"
           />
           <search-input-comp
-            title="订单号"
-            placeholder="请输入订单号"
+            title="关键词"
+            placeholder="请输入搜索关键词"
             :resetWords="'清空所有筛选项条件'"
             :typeList="[['KeyWords', '']]"
             :requestFunc="getListData4Feedback"
@@ -219,11 +219,18 @@ export default {
       const condition = { ...this.condition4FeedbackList, ..._obj };
       this.$store.commit('summary/setFullCondition4Feedback', condition);
     },
+    handleScroll(oEl) {
+      if (!oEl) return;
+      const { scrollTop, scrollHeight, offsetHeight } = oEl;
+      this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
+    },
   },
   watch: {
-    // watchConditionPartChange() {
-    //   this.$store.dispatch('summary/getListData4Feedback');
-    // },
+    FeedbackList() {
+      this.$nextTick(() => {
+        this.handleScroll(this.oApp);
+      });
+    },
     condition4FeedbackList: {
       handler(newVal) {
         if (!newVal) return;
@@ -246,7 +253,13 @@ export default {
     } else {
       this.$store.commit('summary/setFeedbackList', [this.listData, this.listDataNumber]);
     }
-    // this.$store.dispatch('summary/getRejectReasonList');
+    this.$store.commit('summary/clearCondition4Feedback');
+  },
+  mounted() {
+    this.oApp = document.getElementById('app');
+    this.$nextTick(() => {
+      this.handleScroll(this.oApp);
+    });
   },
   beforeDestroy() {
     this.$store.commit('summary/setNeedFetchListData', true);

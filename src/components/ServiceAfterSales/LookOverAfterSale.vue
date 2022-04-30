@@ -22,7 +22,7 @@
             <i class="iconfont icon-dianhua1"></i>
           </div>
           <div class="right">
-            <h4>联系电话</h4>
+            <h4>联系QQ</h4>
             <ul>
               <li>15639757696</li>
               <li>1111111111</li>
@@ -161,8 +161,9 @@ export default {
           font-size: 14px;
           display: flex;
           flex-wrap: wrap;
+          margin-top: 12px;
           li{
-            line-height: 24px;
+            line-height: 38px;
             width: 50%;
           }
         }
