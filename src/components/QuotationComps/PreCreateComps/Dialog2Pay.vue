@@ -90,7 +90,7 @@
     </section>
     <LoadingComp v-else />
     <span slot="footer" class="dialog-footer">
-      <el-button @click.native="handleClose()" :disabled='!curPayInfo2Code'>关闭</el-button>
+      <el-button @click.native="handleClose()">关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -139,7 +139,7 @@ export default {
     ...mapMutations('Quotation', ['setIsShow2PayDialog', 'setCurPayInfo2Code', 'setPaySuccessOrderDataStatus']),
     handleClose(isPaid = false) {
       // 关闭前清除img元素src地址
-      if (!this.curPayInfo2Code) return;
+      // if (!this.curPayInfo2Code) return;
       this.setIsShow2PayDialog(false);
       clearTimeout(this.timer);
       this.timer = null;
@@ -193,6 +193,7 @@ export default {
         this.messageBox.successSingle({
           title: '付款成功',
           successFunc: () => this.handleSuccessPay(),
+          failFunc: () => this.handleSuccessPay(),
         });
       } else {
         this.timer = setTimeout(() => {

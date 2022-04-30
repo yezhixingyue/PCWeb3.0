@@ -285,12 +285,18 @@ export default {
       this.isGettingPrice = true;
       this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
       const fileContent = this.$refs.oSubmitBox ? this.$refs.oSubmitBox.ruleForm.fileContent : '';
-      const msg = await this.getProductPrice(fileContent);
+      const res = await this.getProductPrice(fileContent);
       this.isGettingPrice = false;
-      if (msg === true) {
+      if (res === true) {
         // this.$router.push('/offerResult');
-      } else if (typeof msg === 'string') {
-        this.priceGetErrMsg = msg;
+      } else if (typeof res === 'object' && res.message) {
+        this.priceGetErrMsg = res.message;
+        // if (res.Status === 9164 && this.$refs.oConsigneeAddressSetpComp) {
+        //   const i = this.$refs.oConsigneeAddressSetpComp.curAddIndex;
+        //   this.$refs.oConsigneeAddressSetpComp.curAddIndex = '';
+        //   await this.$nextTick();
+        //   this.$refs.oConsigneeAddressSetpComp.curAddIndex = i;
+        // }
       }
     },
     handleChange(list) {
@@ -358,7 +364,8 @@ export default {
       }
     },
     handleGoToCouponCenter() {
-      window.open('/#/mySetting/couponCenter');
+      const routeData = this.$router.resolve({ path: '/mySetting/couponCenter' });
+      window.open(routeData.href, '_blank');
       this.isOpenCouponCenter = true;
     },
     async getProductAsideIntroData() {

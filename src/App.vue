@@ -37,6 +37,9 @@ export default {
     } else {
       window.addEventListener('storage', this.handleStorageChange);
     }
+    if (document.body && 'order' in document.body.style) {
+      this.$store.commit('common/setCanUseflex', true);
+    }
   },
 };
 </script>

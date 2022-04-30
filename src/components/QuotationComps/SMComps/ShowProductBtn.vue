@@ -51,6 +51,7 @@ export default {
   &:hover {
     // color: $--color-blue;
     background-color: #ebf7ff;
+    border-color: #aaa;
   }
   &.disabled {
     // color: $--color-text-light;

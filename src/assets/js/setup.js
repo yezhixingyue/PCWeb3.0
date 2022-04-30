@@ -17,8 +17,14 @@ let _beanHelpID = '60';
 /**
  * 开发 ---- 测试环境
  */
-if (mode === 'test-development') {
+if (mode === 'test-development' || mode === 'withPcPath') {
   _imgUrl = `${testProtocol}://192.168.1.92:8050/`; // 图片和接口地址
+  // _homeUrl = `${prodProtocol}://www.ybz888.com/`;
+  // _domain = 'ybz888.com';
+  // _imgUrl = `${prodProtocol}://erp.ybz888.com/`;
+  // _agreementID = '4';
+  // _statementID = '3';
+  // _beanHelpID = '37';
 }
 
 /**

@@ -40,7 +40,8 @@
           <ul class="s">
             <li class="t">
               <img src="@/assets/images/wen.png" alt="">
-              <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a>
+              <!-- <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a> -->
+              <router-link to="/toPrintBeanHelp" target="_blank">什么是印豆？</router-link>
             </li>
             <li class='buy-box'>
               <!-- <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">充值印豆</span> -->
@@ -134,7 +135,7 @@ export default {
       if (!this.reCharge) {
         this.isShowTips = true;
         this.messageBox.failSingleError({
-          title: '校验错误',
+          title: '充值失败',
           msg: '请输入充值金额',
           beforeClose: () => { this.isShowTips = false; },
         });
@@ -143,7 +144,7 @@ export default {
       if (+this.reCharge === 0) {
         this.isShowTips = true;
         this.messageBox.failSingleError({
-          title: '校验错误',
+          title: '充值失败',
           msg: '充值金额必须大于0',
           beforeClose: () => { this.isShowTips = false; },
         });
@@ -154,7 +155,7 @@ export default {
       if (`${this.Amount}` === 'NaN') {
         this.isShowTips = true;
         this.messageBox.failSingleError({
-          title: '校验错误',
+          title: '充值失败',
           msg: '金额不正确',
           beforeClose: () => { this.isShowTips = false; },
         });

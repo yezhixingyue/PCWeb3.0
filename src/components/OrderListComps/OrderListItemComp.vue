@@ -256,7 +256,7 @@ export default {
       }
     }
     .product-item-header-right {
-      height: 29px;
+      height: 35px;
       width: 25px;
       margin-right: 22px;
       position: relative;
@@ -266,13 +266,13 @@ export default {
       user-select: none;
       > div {
         height: 12px;
-        width: 7px;
+        width: 12px;
         position: absolute;
         top: 50%;
         left: 50%;
         transition: 0.05s !important;
         transform: translate(-50%, -50%) rotate(90deg);
-        background: url("../../assets/images/right-arrow.png") center
+        background: url("../../assets/images/r.png") center
           no-repeat;
         background-size: 100% 100%;
         &.active {

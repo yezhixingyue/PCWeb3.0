@@ -89,11 +89,9 @@ export default {
     QQ: {
       get() {
         return this.AuthenInfo4Submit.QQ.replace(/^0/, '');
-        // return this.AuthenInfo4Submit.AuthenInfo.QQ;
       },
       set(newVal) {
         this.AuthenInfo4Submit.QQ = newVal.replace(/^0/, '').replace(/[^\d]/g, '');
-        // this.AuthenInfo4Submit.AuthenInfo.QQ = newVal.replace(/[^\d]/g, '');
       },
     },
     TaxID: {
@@ -106,9 +104,6 @@ export default {
     },
   },
   data() {
-    // const validateQQ = (rule, value, callback) => {
-    //   if (this.validateCheck(value, this.QQRules, callback)) callback();
-    // };
     return {
       RegionalList: [],
       CityList: [],
@@ -205,12 +200,11 @@ export default {
     },
     handleCountyChange(e) {
       const _t = this.CountyList.find(it => it.ID === e);
-      // console.log(_t);
       this.AuthenInfo4Submit.AuthenInfo.SellArea.CountyName = _t.Name;
     },
     reportError(msg) {
       this.messageBox.warnSingleError({
-        title: '校验错误',
+        title: '保存失败',
         msg,
       });
     },
@@ -218,18 +212,15 @@ export default {
       const {
         SellArea,
         DetailAddress,
-        // CompanyName,
         TaxID,
       } = this.AuthenInfo4Submit.AuthenInfo;
       if (!SellArea) {
         this.reportError('请选择地址!');
         return false;
       }
-      // eslint-disable-next-line object-curly-newline
       const { RegionalID, CityID, CountyID } = SellArea;
       const { CustomerName, QQ } = this.AuthenInfo4Submit;
       if (!this.validateCheck(CustomerName, this.simpNameRules, this.reportError)) return false; // 企业简称校验
-      // if (!this.validateCheck(CompanyName, this.companyRules, this.reportError)) return false; // 企业全称校验
       if (!this.validateCheck(RegionalID, this.RegionalRules, this.reportError)) return false; // 省校验
       if (!this.validateCheck(CityID, this.CityRules, this.reportError)) return false; // 市校验
       if (!this.validateCheck(CountyID, this.CountyRules, this.reportError)) return false; // 县区校验
@@ -261,14 +252,11 @@ export default {
     },
     async handleSubmit() {
       if (!this.checkValue()) return;
-      // // console.log(this.AuthenInfo4Submit);
       const res = await this.api.getCustomerApplyAuthentication(this.AuthenInfo4Submit);
       if (res.data.Status === 1000) {
         this.messageBox.successSingle({
           title: '修改成功',
           successFunc: async () => {
-            // this.AuthenInfo4Submit.AllowEdit = false;
-            // this.$store.commit('common/setCustomerAuthenInfo', this.AuthenInfo4Submit);
             const bool = await this.$store.dispatch('common/getCustomerDetail', true);
             if (bool) {
               const { redirect } = this.$route.query;
@@ -290,14 +278,12 @@ export default {
         const { CompanyName, DetailAddress, LicensePath, TaxID, SellArea } = AuthenInfo;
         this.AuthenInfo4Submit.CustomerName = CustomerName;
         this.AuthenInfo4Submit.QQ = QQ;
-        // this.AuthenInfo4Submit.AuthenInfo.QQ = QQ;
         this.AuthenInfo4Submit.AllowEdit = AllowEdit;
         this.AuthenInfo4Submit.AuthenInfo.TaxID = TaxID;
         this.AuthenInfo4Submit.AuthenInfo.CompanyName = CompanyName;
         this.AuthenInfo4Submit.AuthenInfo.DetailAddress = DetailAddress;
         this.AuthenInfo4Submit.AuthenInfo.LicensePath = LicensePath;
         if (LicensePath) this.hasUploadedImg = true;
-        // // console.log(SellArea);
         if (SellArea) this.AuthenInfo4Submit.AuthenInfo.SellArea = { ...SellArea };
         if (SellArea) {
           const { RegionalID, CityID } = SellArea;
@@ -329,21 +315,14 @@ export default {
       immediate: true,
     },
   },
-  mounted() {
-    // console.log(this.$route.query);
-  },
 };
 </script>
 
 <style lang='scss'>
 .mp-pc-my-setting-account-page-wrap {
   > .basic-info {
-    // padding-top: 10px;
     > div {
       margin-top: 20px;
-      // &.second {
-      //   margin-top: 30px;
-      // }
       > div + div {
         margin-left: 60px;
       }
@@ -396,91 +375,10 @@ export default {
       }
     }
   }
-  // > .img-info {
-  //   margin-top: 40px;
-  //   > .img-box {
-  //     margin-top: 32px;
-  //     > div {
-  //       // display: inline-block;
-  //       &.pic {
-  //         width: 360px;
-  //         height: 360px;
-  //         overflow: hidden;
-  //         text-align: center;
-  //         // padding-top: 175px;
-  //         user-select: none;
-  //         position: relative;
-  //         &.show-bg {
-  //           background: url(../../assets/images/license-empty.jpg) no-repeat center/100% 100%;
-  //         }
-  //         color: #aaa;
-  //         > .el-image {
-  //           width: 100%;
-  //           height: 100%;
-  //         }
-  //         > span {
-  //           position: absolute;
-  //           top: 175px;
-  //           left: 96px;
-  //         }
-  //         > input.upload {
-  //           opacity: 0;
-  //           width: 1px;
-  //           height: 1px;
-  //           position: absolute;
-  //         }
-  //         > .img-mask {
-  //           position: absolute;
-  //           top: 0;
-  //           left: 0;
-  //           right: 0;
-  //           bottom: 0;
-  //           z-index: 9;
-  //         }
-  //         > .upload-img {
-  //           background-color: rgba($color: #000000, $alpha: 0.4);
-  //         }
-  //         > div.empty {
-  //           width: 100%;
-  //           height: 100%;
-  //           > .remark {
-  //             width: 100%;
-  //             height: 60px;
-  //             position: absolute;
-  //             left: 0;
-  //             bottom: 0;
-  //             font-size: 14px;
-  //             background-color: rgba($color: #428dfa, $alpha: 0.5);
-  //             color: #fff;
-  //             > p.remoark-text1 {
-  //               margin: 12px 0;
-  //               margin-left: 12px;
-  //             }
-  //           }
-  //         }
-  //       }
-  //       &.text {
-  //         line-height: 20px;
-  //         padding-left: 4px;
-  //         padding-top: 10px;
-  //         vertical-align: bottom;
-  //         &.cancel {
-  //           color: #aaa !important;
-  //         }
-  //         > p {
-  //           // display: inline-block;
-  //           letter-spacing: 1px;
-  //           width: 360px;
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
   > footer {
     margin-top: 50px;
     margin-bottom: 80px;
     padding-right: 80px;
-    // padding-left: 325px;
     text-align: center;
     > button {
       width: 120px;

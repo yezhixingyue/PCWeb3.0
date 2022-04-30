@@ -6,7 +6,7 @@
   >
     <div class="white-space"></div>
     <el-scrollbar wrap-class="scrollbar-wrapper">
-      <ul class="menu-list">
+      <ul class="menu-list" :style="`max-height: calc(100vh - ${202 + bottomHeight}px);`">
         <li
           class="menu"
           v-for="it in allProductClassify"
@@ -105,6 +105,7 @@ export default {
       left: 351,
       distance: 20,
       activeLv1Id: '',
+      bottomHeight: 0,
     };
   },
   methods: {
@@ -146,8 +147,11 @@ export default {
       }
     },
     handleScroll() {
+      const { scrollTop, scrollHeight, offsetHeight } = this.ScrollInfo;
+      if (offsetHeight > 0) {
+        this.bottomHeight = Math.abs(Math.min(scrollHeight - scrollTop - offsetHeight - 160, 0));
+      }
       if (this.NoticeList.length === 0) return;
-      const { scrollTop } = this.ScrollInfo;
       const d = this.NoticeHeight - scrollTop;
       this.distance = d > 20 ? d : 20;
     },

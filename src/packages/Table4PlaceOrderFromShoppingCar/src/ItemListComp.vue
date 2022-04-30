@@ -184,13 +184,13 @@ export default {
       user-select: none;
       > div {
         height: 12px;
-        width: 7px;
+        width: 12px;
         position: absolute;
         top: 50%;
         left: 50%;
         transition: 0.05s linear !important;
         transform: translate(-50%, -50%) rotate(90deg);
-        background: url("../../../assets/images/right-arrow.png") center
+        background: url("../../../assets/images/r.png") center
           no-repeat;
         background-size: 100% 100%;
         &.active {

@@ -145,7 +145,6 @@ export default {
         } else if (redirect) {
           path = redirect;
         }
-        // console.log(path, document.cookie, Cookie.getCookie('token'), useCookie);
         this.$router.push(path);
       } else {
         // 登录域名不匹配，请使用正确域名登录

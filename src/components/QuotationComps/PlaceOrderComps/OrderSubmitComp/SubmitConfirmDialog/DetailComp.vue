@@ -11,7 +11,7 @@
       />
     </div>
     <div class="right">
-      <ExpressInfoComp :Address="Address" :ExpressList="ExpressList" :OutPlateNo='OutPlateNo' />
+      <ExpressInfoComp :Address="Address" :ExpressList="ExpressList" :OutPlateNo='OutPlateNo' :canflex="canflex" />
       <OrderInfoComp :orderInfo="orderInfo" :OrderDetail='OrderDetail' :isCar='isCar' />
     </div>
   </main>
@@ -48,6 +48,10 @@ export default {
     ProductParams: {
       type: Object,
       default: null,
+    },
+    canflex: { // 页面是否支持flex布局
+      type: Boolean,
+      default: false,
     },
   },
   components: {

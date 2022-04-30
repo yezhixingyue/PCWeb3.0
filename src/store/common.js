@@ -257,6 +257,7 @@ export default {
     /** 下单成功后是否保存原有订单面板数据
     ---------------------------------------- */
     keepOrderData: false,
+    canUseflex: false, // 页面是否支持flex
   },
   getters: {
     /* 细分类 物流配送方式列表
@@ -276,6 +277,9 @@ export default {
     },
   },
   mutations: {
+    setCanUseflex(state, bool) {
+      state.canUseflex = bool;
+    },
     /** 当下拉框展示时修改该状态，用以触发顶部zindex的值以适应对下拉框的覆盖
     ---------------------------------------- */
     setIsPopperVisible(state, bool) {

@@ -317,15 +317,15 @@ export default {
           height: 32px;
           width: 30px;
           position: absolute;
-          top: calc(50% + 3px);
+          top: calc(50% + 4px);
           top: calc(50% + 5px)\9;
           right: -12px;
-          transition: 0.05s !important;
-          transform: translate(-50%, -50%) rotate(90deg);
-          background: url("../../../assets/images/right-arrow.png") center no-repeat;
-          background-size: 6px 10px;
+          // transition: 0.05s !important;
+          transform: translate(-50%, -50%) rotate(90deg) scale(0.9);
+          background: url("../../../assets/images/r.png") center no-repeat;
+          background-size: 12px 12px;
           &.active {
-            transform: translate(-50%, -50%) rotate(-90deg);
+            transform: translate(-50%, -50%) rotate(-90deg) scale(0.9);
           }
         }
       }

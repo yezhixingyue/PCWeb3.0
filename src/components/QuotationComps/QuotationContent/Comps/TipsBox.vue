@@ -144,7 +144,7 @@ export default {
         }
       }
       span.is-pink {
-        font-size: 13px;
+        font-size: 12px;
         white-space: nowrap;
         i {
           font-size: 14px;

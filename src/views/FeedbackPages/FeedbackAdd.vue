@@ -313,16 +313,16 @@ export default {
         .el-form-item__content {
           // height: 40px;
           > .mp-pc-common-comps-select-comp-wrap {
-            width: 260px;
+            width: 300px;
             display: block;
             > header {
               display: none;
             }
             > .el-select {
-              width: 260px;
+              width: 300px;
               height: auto;
               .el-input__inner {
-                width: 260px;
+                width: 300px;
                 height: 40px;
               }
               .el-input__suffix .el-input__icon::before {

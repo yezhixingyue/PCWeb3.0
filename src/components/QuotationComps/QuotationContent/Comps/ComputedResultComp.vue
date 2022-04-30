@@ -47,16 +47,17 @@
     <!-- 工期信息 -->
     <li class="ProducePeriod" v-if="ProducePeriod">
       <div class="is-pink is-font-13 is-bold">
+        <i class="el-icon-time" style="margin-right:5px;font-size:15px;font-weight:600"></i>
         <span style="margin-right:0px">{{ ProducePeriod | getPayTime }}，</span>
-        <span style="margin-right:2px">{{ ProducePeriod | getDoneTime }}</span>
+        <span style="margin-right:2px">{{ ProducePeriod | getDoneTime }}。</span>
       </div>
       <div v-if="!ProducePeriod.IncludeDiliveryTime || ProducePeriod.Tips" class="tip">
         <span class="is-pink is-font-12 perod-tip" style="margin-right:0;" :title="ProducePeriod.Tips || ''">
-          <template>( </template>
-          <template v-if="!ProducePeriod.IncludeDiliveryTime">配送时间视快递物流速度</template>
-          <template v-if="!ProducePeriod.IncludeDiliveryTime && ProducePeriod.Tips">，</template>
+          <!-- <template>( </template> -->
+          <template v-if="!ProducePeriod.IncludeDiliveryTime">配送时间视快递物流速度。</template>
+          <!-- <template v-if="!ProducePeriod.IncludeDiliveryTime && ProducePeriod.Tips"></template> -->
           <template v-if="ProducePeriod.Tips" >{{ProducePeriod.Tips}}</template>
-          <template> )</template>
+          <!-- <template> )</template> -->
         </span>
       </div>
     </li>
@@ -160,8 +161,10 @@ ul.place-price-result {
       }
     }
     &.ProducePeriod {
+      margin-top: 2px;
+      letter-spacing: 0.5px;
       > div {
-        line-height: 20px;
+        line-height: 21px;
         color: #ff3769;
         max-width: 100%;
         text-overflow: ellipsis;
@@ -173,6 +176,18 @@ ul.place-price-result {
           // max-width: 100%;
           line-height: 18px;
           white-space: normal;
+          &.perod-tip {
+            max-width: 568px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 14px;
+          }
+        }
+        &.is-bold {
+          margin-bottom: 2px;
+        }
+        &.tip {
+          line-height: 18px;
         }
       }
     }
@@ -181,13 +196,6 @@ ul.place-price-result {
       padding-top: 5px;
       padding-bottom: 8px;
     }
-  }
-  .perod-tip {
-    white-space: nowrap;
-    max-width: 568px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 14px;
   }
 }
 </style>

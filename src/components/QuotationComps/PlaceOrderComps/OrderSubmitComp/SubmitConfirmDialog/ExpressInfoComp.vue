@@ -1,5 +1,6 @@
 <template>
-  <PanelItemComp title="配送信息" class="express" v-if="Address && ExpressList" :style="`min-height:${minHeight}px`">
+  <!--  :style="`min-height:${minHeight}px`" -->
+  <PanelItemComp title="配送信息" class="express" v-if="Address && ExpressList" :style="`height:${minHeight}px;opacity=${opacity}`" >
     <template #img>
       <img src="@/assets/images/express-info.png" alt="">
     </template>
@@ -44,6 +45,10 @@ export default {
       type: String,
       default: '',
     },
+    canflex: { // 页面是否支持flex布局
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     PanelItemComp,
@@ -84,23 +89,26 @@ export default {
       return '';
     },
     watchVal() {
-      return `${this.ExpressName}${this.Consignee}${this.Mobile}${this.AddressDetail}`;
+      return this.canflex && `${this.ExpressName}${this.Consignee}${this.Mobile}${this.AddressDetail}`;
     },
   },
   data() {
     return {
-      minHeight: 198,
+      minHeight: '',
+      opacity: 1,
     };
   },
   watch: {
     watchVal: {
       handler(val) {
         if (val) {
+          this.opacity = 0;
           setTimeout(() => {
             if (this.$refs.oBox) {
-              const h = this.$refs.oBox.offsetHeight + 69;
+              const h = this.$refs.oBox.offsetHeight + 56;
               this.minHeight = Math.min(Math.max(h, 198), 240);
             }
+            this.opacity = 1;
           }, 0);
         }
       },

@@ -365,6 +365,7 @@ export default {
     /* 控制弹窗3- 支付二维码弹窗显示状态
     -------------------------------*/
     setIsShow2PayDialog(state, bool) {
+      console.log('setIsShow2PayDialog', bool);
       state.isShow2PayDialog = bool;
     },
     /* 设置订单付款成功后的状态
@@ -603,9 +604,11 @@ export default {
       const res = await api.getProductPrice(_data).catch(() => { key = false; });
       if (!key || res.data.Status === 7025 || res.data.Status === 8037) return;
       // if (res.data.Status === 6225) return res.data;
-      if (res.data.Status !== 1000) return res.data.Message;
+      if (res.data.Status !== 1000) {
+        return { message: res.data.Message, Status: res.data.Status };
+      }
       if (!res.data.Data || !res.data.Data.HavePrice) {
-        return '暂无报价，请联系客服获取报价信息!';
+        return { message: '暂无报价，请联系客服获取报价信息!', Status: res.data.Status };
       } // 可能为null 当需要客服咨询报价
       if (res.data.Data && res.data.Data.RiskList && res.data.Data.RiskList.length > 0) {
         const tipsList = res.data.Data.RiskList.filter(it => it.First === 3).map(it => it.Second);
@@ -725,8 +728,7 @@ export default {
     },
     /* 下单 - 保存购物车
     -------------------------------*/
-    async getQuotationSave2Car({ state, commit, rootState }, { FileList, fileContent, FileAuthorMobile, callBack }) {
-      console.log(rootState.common.keepOrderData);
+    async getQuotationSave2Car({ state, commit, rootState }, { FileList, fileContent, FileAuthorMobile, callBack, callbackOnError }) {
       const _itemObj = { IgnoreRiskLevel: state.RiskWarningTipsTypes.PageTips };
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
       if (FileList) {
@@ -760,7 +762,8 @@ export default {
         }
       };
 
-      const handleError = () => { // 失败处理函数 暂未使用 -- 交由统一错误方式处理
+      const handleError = (e) => { // 失败处理函数 暂未使用 -- 交由统一错误方式处理
+        callbackOnError(e);
         // massage.failSingleError({ title: '添加购物车失败!', msg: response && response.data.Message ? response.data.Message : '服务器响应失败' });
       };
       if (res && res.data.Status === 1000) {
@@ -796,7 +799,7 @@ export default {
           },
         });
       } else {
-        handleError(res);
+        handleError(res.data);
       }
     },
     /* 最终下单

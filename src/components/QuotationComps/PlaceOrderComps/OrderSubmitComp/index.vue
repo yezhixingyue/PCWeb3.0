@@ -237,9 +237,12 @@ export default {
         this.scrollToTop();
       };
       const { fileContent, FileAuthorMobile } = this.ruleForm;
+      const callbackOnError = this.handleSubmitOrJoinCarError;
       await this.$store.dispatch('Quotation/getQuotationSave2Car', {
-        FileList, fileContent, FileAuthorMobile, callBack,
+        FileList, fileContent, FileAuthorMobile, callBack, callbackOnError,
       });
+    },
+    handleSubmitOrJoinCarError() { // 加入购物车及预下单失败（未设置）后的处理函数 暂无用 不做处理
     },
     scrollToTop() {
       this.$nextTick(() => {
