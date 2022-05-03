@@ -106,9 +106,16 @@ export default {
       return arr;
     },
     ProductShowData() {
+      let Name = this.OrderDetail?.ProductParams?.Attributes?.DisplayName || '产品名称';
+      if (Array.isArray(this.OrderDetail?.ProductParams?.Attributes?.ClassList)) {
+        const t = this.OrderDetail.ProductParams.Attributes.ClassList.find(it => it.Type === 2);
+        if (t && t.FirstLevel?.Name) {
+          Name = `${t.FirstLevel.Name}-${Name}`;
+        }
+      }
       if (this.OrderDetail?.ProductParams?.Attributes?.DisplayOrderList && this.OrderDetail.ProductParams.Attributes.DisplayOrderList.length > 0) {
         return {
-          Name: this.OrderDetail.ProductParams.Attributes.DisplayName,
+          Name,
           ContentList: ShowProductDetail.getDisplayContentFromPartDataByDetailData(
             this.OrderDetail.ProductParams.Attributes.DisplayOrderList, this.OrderDetail.ProductParams,
           ),
@@ -116,7 +123,7 @@ export default {
         };
       }
       return {
-        Name: this.OrderDetail?.ProductParams?.Attributes?.DisplayName || '产品名称',
+        Name,
         ContentList: [],
         Type: 'product',
       };

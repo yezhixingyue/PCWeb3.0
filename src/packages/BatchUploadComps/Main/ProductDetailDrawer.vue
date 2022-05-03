@@ -43,6 +43,7 @@
 
 <script>
 import OrderDetailDisplayItem from '@/packages/OrderDetailDisplayItem';
+import { projectType } from '@/assets/js/setup';
 
 export default {
   props: {
@@ -71,16 +72,24 @@ export default {
       },
     },
     ProductShowData() {
+      let Name = this.curDetailData?.result?.ProductParams?.Attributes?.DisplayName || '产品名称';
+      if (Array.isArray(this.curDetailData?.result?.ProductParams?.Attributes?.ClassList)) {
+        const type = projectType === 'pc' ? 2 : 1;
+        const t = this.curDetailData?.result.ProductParams.Attributes.ClassList.find(it => it.Type === type);
+        if (t && t.FirstLevel?.Name) {
+          Name = `${t.FirstLevel.Name}-${Name}`;
+        }
+      }
       if (this.curDetailData?.result?.ProductParams?.Attributes?.DisplayOrderList
        && this.curDetailData.result.ProductParams.Attributes.DisplayOrderList.length > 0) {
         return {
-          Name: this.curDetailData.result.ProductParams.Attributes.DisplayName,
+          Name,
           ContentList: this.getPartShowList(this.curDetailData.result.ProductParams.Attributes.DisplayOrderList, this.curDetailData.result.ProductParams),
           Type: 'product',
         };
       }
       return {
-        Name: this.curDetailData?.result?.ProductParams?.Attributes?.DisplayName || '产品名称',
+        Name,
         ContentList: [],
         Type: 'product',
       };

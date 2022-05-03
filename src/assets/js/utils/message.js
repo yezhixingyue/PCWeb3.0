@@ -13,6 +13,7 @@ const msgHandler = (config, msg, center = false) => {
       const content = msg
         .map(it => {
           const alignDirection = /^继续([\d|\D]+)?吗？$/.test(it) || center ? 'center' : 'left';
+          const marginTop = /^继续([\d|\D]+)?吗？$/.test(it) || center ? 'margin-top:40px;margin-bottom:0px' : 'text-indent: 1em;';
           let _content = it;
           if (it.includes('\r\n')) {
             let list = it.split('\r\n');
@@ -29,7 +30,7 @@ const msgHandler = (config, msg, center = false) => {
             });
             _content = list.join('');
           }
-          return `<li style='text-align:${alignDirection};line-height:${bool ? 20 : 18}px;margin-bottom:${bool ? 13 : 8}px'>${_content}</li>`;
+          return `<li style='text-align:${alignDirection};line-height:${bool ? 20 : 18}px;margin-bottom:${bool ? 13 : 8}px;${marginTop}'>${_content}</li>`;
         })
         .join('');
       _config.message = `<ul style='display: inline-block'>${content}</ul>`;
