@@ -185,7 +185,9 @@ export default {
       this.handleScroll();
     },
     NoticeList() {
-      this.handleScroll();
+      setTimeout(() => {
+        this.handleScroll();
+      }, 5);
     },
   },
 };

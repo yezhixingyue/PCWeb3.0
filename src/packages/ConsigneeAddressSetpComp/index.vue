@@ -199,6 +199,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    hiddenEmptyTips: { // 当可用配送方式列表为空时，是否进行提示
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     AddMapComp,
@@ -589,7 +593,11 @@ export default {
     },
     async handleUseableCompanyList(data, oldIndex, oldExpressArea) {
       this.ValidExpressLoading = true;
-      const resp = await this.api.getExpressUseableCompanyList({ ...data, OutPlateSN: this.OutPlateNo });
+      const temp = { ...data, OutPlateSN: this.OutPlateNo };
+      if (!temp.CustomerID && this.customerInfo) {
+        temp.CustomerID = this.customerInfo.CustomerID;
+      }
+      const resp = await this.api.getExpressUseableCompanyList(temp);
       this.ValidExpressLoading = false;
       if (resp.data.Status === 1000) {
         const result = resp.data.Data;
@@ -602,15 +610,22 @@ export default {
         }
       }
     },
+    handleExpressEmptyTips() {
+      if (this.ExpressValidList.length === 0) {
+        if (!this.hiddenEmptyTips) {
+          if (projectType === 'pc') {
+            this.messageBox.warnSingleError({ title: '当前地址不可送达', msg: '当前地址没有可用配送方式，请更换地址或留意配送信息公告' });
+          } else {
+            this.messageBox.warnSingleError('当前地址没有可用配送方式，请更换地址或留意配送信息公告');
+          }
+        }
+      }
+    },
   },
   watch: {
     ExpressValidList(newVal) {
       if (newVal.length === 0) {
-        if (projectType === 'pc') {
-          this.messageBox.warnSingleError({ title: '当前地址不可送达', msg: '当前地址没有可用配送方式，请更换地址或留意配送信息公告' });
-        } else {
-          this.messageBox.warnSingleError('当前地址没有可用配送方式，请更换地址或留意配送信息公告');
-        }
+        this.handleExpressEmptyTips();
         this.onRadioChange('');
         this.secondExVal = '';
         this.thirdExVal = '';
@@ -637,7 +652,8 @@ export default {
         this.onRadioChange(1);
         return;
       }
-      const t = this.localExpressList.find(it => it.useableIds.length > 0);
+      let t = this.localExpressList.find(it => it.useableIds.length > 0 && it.Type === 3);
+      if (!t) t = this.localExpressList.find(it => it.useableIds.length > 0);
       if (t) {
         this.onRadioChange(t.Type);
       } else {
@@ -646,6 +662,11 @@ export default {
     },
     async curAddIndex(newVal, oldVal) {
       if (newVal === 'new') {
+        if (this.customerInfo.Address.length === 0 && !this.NewAddressInfo.isSaved) {
+          this.ExpressValidList = [];
+          this.curAddIndex = '';
+          return;
+        }
         this.handleUseableCompanyList(this.NewAddressInfo, oldVal, null);
         return;
       }

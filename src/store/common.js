@@ -412,6 +412,13 @@ export default {
       state.customerAccountList = [];
       state.customerBalance = null;
       state.BeanNumberBalance = 0;
+      state.NoticeList = [];
+      state.ScrollInfo = { scrollTop: 0, scrollHeight: 0, offsetHeight: 0 };
+      state.isPopperVisible = false;
+      state.addressList = [];
+      state.customerAccountList = [];
+      state.customerInfo = null;
+      state.keepOrderData = false;
     },
     /* 修改默认选择地址
     -------------------------------*/

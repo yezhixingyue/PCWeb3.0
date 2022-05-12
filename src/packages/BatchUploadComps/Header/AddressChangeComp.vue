@@ -15,6 +15,7 @@
       v-show='localUseSameAddress'
       ref="oConsigneeAddressSetpComp"
       isBatchUploadUse
+      :hiddenEmptyTips="!localUseSameAddress"
       :watchClearVal="customer"
       :customerInfo="customer"
       :ExpressList="ExpressList"
@@ -79,6 +80,15 @@ export default {
     },
     handlePopperVisible(bool) {
       this.$emit('popperVisible', bool);
+    },
+  },
+  watch: {
+    UseSameAddress(bool) {
+      if (bool && this.$refs.oConsigneeAddressSetpComp) {
+        this.$nextTick(() => {
+          this.$refs.oConsigneeAddressSetpComp.handleExpressEmptyTips();
+        });
+      }
     },
   },
   mounted() {
