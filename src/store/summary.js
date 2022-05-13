@@ -28,13 +28,14 @@ export default {
       PageSize: 12,
       FieldType: 3,
 
-      ProductClass: {
-        First: '',
-        Second: '',
+      Product: {
+        ClassID: '',
+        TypeID: '',
+        ProductID: '',
       },
       Status: null,
       ProductID: '',
-      PlaceDate: {
+      ApplyDate: {
         First: '',
         Second: '',
       },
@@ -123,13 +124,14 @@ export default {
         PageSize: 12,
         FieldType: 3,
 
-        ProductClass: {
-          First: '',
-          Second: '',
+        Product: {
+          ClassID: '',
+          TypeID: '',
+          ProductID: '',
         },
         Status: null,
         ProductID: '',
-        PlaceDate: {
+        ApplyDate: {
           First: '',
           Second: '',
         },
@@ -175,13 +177,14 @@ export default {
         PageSize: 12,
         FieldType: 3,
 
-        ProductClass: {
-          First: '',
-          Second: '',
+        Product: {
+          ClassID: '',
+          TypeID: '',
+          ProductID: '',
         },
         Status: null,
         ProductID: '',
-        PlaceDate: {
+        ApplyDate: {
           First: '',
           Second: '',
         },
@@ -300,7 +303,7 @@ export default {
       commit('setDate4ConditionDate', 'condition4ServiceAfterSaleList');
       const _obj = ClassType.filter(state.condition4ServiceAfterSaleList);
       if (_obj.Date) {
-        _obj.PlaceDate = _obj.Date;
+        _obj.ApplyDate = _obj.Date;
         delete _obj.Date;
       }
       const res = await api.getOrderAfterSaleList(_obj);

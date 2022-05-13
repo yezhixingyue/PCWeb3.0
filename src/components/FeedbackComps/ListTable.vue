@@ -103,7 +103,7 @@ export default {
     toAfterSale(item) {
       if (item.AppealStatus === 0) return;
 
-      this.$router.push({ name: 'feedback', query: { isEdit: false, data: JSON.stringify(item) } });
+      this.$router.push({ name: 'feedback', query: { isEdit: 0, data: JSON.stringify(item) } });
     },
   },
 };

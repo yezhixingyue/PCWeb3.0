@@ -10,6 +10,7 @@
     :showCancel='false'
     @submit='submit'
     width='800px'
+    top='5vh'
     >
     <div slot="title" class="title">aaa</div>
     <el-form label-position="left" ref="form" :model="SeeEstimate" class="see-estimate">
@@ -24,19 +25,22 @@
           </div>
         </el-form-item>
         <el-form-item label="服务标签：">
-          <span>
+          <div class="images">
             {{SeeEstimate.LabelTitle.join()}}
-          </span>
+          </div>
         </el-form-item>
         <el-form-item label="填写评价：">
-          <span>{{SeeEstimate.EvaluateContent}}</span>
+          <div class="images" style="line-height: 32px;padding-top:4px">
+            <span>{{SeeEstimate.EvaluateContent || '未填写评价'}}</span>
+          </div>
         </el-form-item>
         <el-form-item label="评价晒图：">
-          <div class="images">
+          <div class="images" v-if="SeeEstimate.EvaluatePicList.length">
             <el-image v-for="item in SeeEstimate.EvaluatePicList" :key="item"
               :src="baseUrl + item"
               fit="cover"></el-image>
           </div>
+          <span v-else>未上传图片</span>
         </el-form-item>
       </template>
     </el-form>
@@ -102,20 +106,32 @@ export default {
 
   width: 100%;
   background-color: rgba($color: #000000, $alpha: 0.5);
+  .el-dialog__body{
+    padding: 30px;
+  }
+  .el-dialog__header{
+    padding-left: 30px;
+  }
+  .el-dialog__header::after{
+    width: calc(100% - 60px);
+    left: 30px;
+  }
   .see-estimate{
     min-height: calc(400px);
-    .el-rate{
-      margin-top: 10px;
-    }
-    .result{
-      span{
+    .el-form-item{
+      .el-form-item__label{
         font-weight: 700;
       }
+      margin-bottom: 8px;
+    }
+    .el-rate{
+      margin-top: 10px;
     }
     .images{
       display: flex;
       flex-wrap: wrap;
-        max-height: 200px;
+      box-sizing: border-box;
+      // padding-right: 50px;
       .el-image{
         width: 100px;
         height: 100px;

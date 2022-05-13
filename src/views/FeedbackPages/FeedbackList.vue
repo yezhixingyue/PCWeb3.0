@@ -24,7 +24,7 @@
             :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
             :dateValue='condition4FeedbackList.DateType'
             :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
-            label="申请时间"
+            label="下单时间"
             :dateList="dateList"
             :initDate='condition4FeedbackList.Date'
             dateType="date"
@@ -246,16 +246,16 @@ export default {
     },
   },
 
-  created() {
-    this.initConditionFromPath();
-    if (!(this.listData && !this.needFetchListData)) {
-      this.$store.dispatch('summary/getListData4Feedback', this.condition4FeedbackList.Page);
-    } else {
-      this.$store.commit('summary/setFeedbackList', [this.listData, this.listDataNumber]);
-    }
-    this.$store.commit('summary/clearCondition4Feedback');
-  },
+  // created() {
+  //   this.initConditionFromPath();
+  //   if (!(this.listData && !this.needFetchListData)) {
+  //     } else {
+  //       this.$store.commit('summary/setFeedbackList', [this.listData, this.listDataNumber]);
+  //   }
+  //   this.$store.commit('summary/clearCondition4Feedback');
+  // },
   mounted() {
+    this.$store.dispatch('summary/getListData4Feedback', this.condition4FeedbackList.Page);
     this.oApp = document.getElementById('app');
     this.$nextTick(() => {
       this.handleScroll(this.oApp);

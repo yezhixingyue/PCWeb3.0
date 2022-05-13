@@ -6,7 +6,7 @@
     @cancle="cancle"
     @open='onOpen'
     @closed='closed'
-    submitText='确定'
+    submitText='提交'
     :showCancel='false'
     @submit='submit("rulesform")'
     width='800px'
@@ -40,19 +40,20 @@
           :rows="5"
           placeholder="请填写评价"
           maxlength="300"
+          autosize
           show-word-limit>
         </el-input>
       </el-form-item>
-      <el-form-item label="评价晒图：" prop="EvaluatePicList">
+      <el-form-item label="评价晒图：">
         <div class="upload">
           <el-upload
             :action="baseUrl + '/Api/Upload/Image?type=3'"
             list-type="picture-card"
             ref="upload"
             drag
-            accept='.png,.jpeg,.jpg,.bmp'
+            accept='.png,.jpeg,.jpg,.bmp,.gif'
             :multiple='true'
-            :limit='2'
+            :limit='9'
             :before-upload='beforeUpload'
             :on-preview="handlePictureCardPreview"
             >
@@ -64,7 +65,7 @@
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
           <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-          <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M,支持bmp、gif、png、jpeg</p>
+          <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M，支持.png,.jpeg,.jpg,.bmp,.gif</p>
         </div>
       </el-form-item>
     </el-form>
@@ -130,7 +131,10 @@ export default {
           { required: true, message: '请输入具体问题描述', trigger: 'change' },
         ],
         EvaluateContent: [
-          { required: true, message: '请输入评价', trigger: 'change' },
+          { required: false, message: '请输入评价', trigger: 'change' },
+          {
+            min: 3, max: 300, message: '长度在 3 到 300 个字符', trigger: 'change',
+          },
         ],
       },
     };
@@ -146,6 +150,7 @@ export default {
     closed() {
       this.$emit('closed');
       this.$refs.rulesform.resetFields();
+      this.$refs.upload.uploadFiles = [];
       this.$refs.CheckButton.clearCheck();
     },
     submit() {
@@ -169,11 +174,6 @@ export default {
         // 服务标签
         this.messageBox.failSingleError({
           title: '评价失败', msg: '请选择服务标签',
-        });
-      } else if (!this.form.EvaluateContent) {
-        // 评价内容
-        this.messageBox.failSingleError({
-          title: '评价失败', msg: '请输入评价内容',
         });
       } else {
         const _list = this.$refs.upload.uploadFiles.map(it => {
@@ -219,6 +219,28 @@ export default {
   margin: 0;
   width: 100%;
   background-color: rgba($color: #000000, $alpha: 0.5);
+    .el-dialog__body{
+    padding: 30px;
+  }
+  .el-dialog__header{
+    padding-left: 30px;
+  }
+  .el-dialog__header::after{
+    width: calc(100% - 60px);
+    left: 30px;
+  }
+  .el-textarea{
+    textarea{
+      min-height: 100px !important;
+      padding-bottom: 13px;
+    }
+    .el-input__count{
+      background: rgba(0,0,0,0);
+      height: 12px;
+      line-height: 12px;
+      bottom: 4px;
+    }
+  }
   .estimate{
     .el-rate{
       margin-top: 10px;

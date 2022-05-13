@@ -2,12 +2,7 @@
   <section class="mp-mpzj-order-feedback-add-page-wrap">
     <section class="content">
       <header>
-        <span v-if="!canEdit" style="margin-right:20px;cursor:pointer;" @click="handleReturn">
-          <i class="el-icon-back"></i>
-          <em class="is-font-13"> 返回列表</em>
-        </span>
-        <span class="is-bold is-black">{{ canEdit ? '售后申请' : '查看售后申请'}}</span>
-        <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span>
+        <span class="is-bold is-black">申请售后</span>
       </header>
       <div>
         <el-table stripe border v-if="queryData"
@@ -50,7 +45,8 @@
                   <el-form-item prop="KindCount">
                     <el-input-number size="small"
                     :controls="false" v-model="ruleForm.KindCount"
-                    :min="1" :max="1000" label="款数">
+                    :max="queryData.KindCount"
+                    :min="1" label="款数">
                     </el-input-number>
                   </el-form-item>
                   款
@@ -60,10 +56,11 @@
                   <el-form-item prop="Number">
                     <el-input-number size="small" :controls="false"
                       v-model="ruleForm.Number" :min="1"
+                      :max="queryData.ProductAmount"
                       label="描述文字">
                     </el-input-number>
                   </el-form-item>
-                  款
+                  {{ queryData.Unit }}
                   <span>您最多可提交数量为<span>{{queryData.ProductAmount}}</span></span>
                   </div>
               </div>
@@ -77,9 +74,10 @@
                 <div class="item">
                   <el-form-item prop="RefundAmount">
                     <el-input-number
+                      @change='RefundAmountChange()'
                       size="small" :controls="false"
                       v-model="ruleForm.RefundAmount"
-                      :min="0" :max="1000" label="描述文字">
+                      :min="0" label="退款金额">
                     </el-input-number>元
                   </el-form-item>
                 </div>
@@ -102,20 +100,21 @@
 
             <el-form-item label="问题描述：" prop="QuestionRemark">
               <el-input type="textarea" v-model="ruleForm.QuestionRemark"
-              maxlength="600" show-word-limit placeholder="请输入具体问题描述"></el-input>
+              maxlength="300" autosize show-word-limit placeholder="请输入具体问题描述"></el-input>
             </el-form-item>
 
-            <el-form-item label="上传图片：" prop="QuestionPicList">
+            <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList">
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
                 list-type="picture-card"
                 ref="upload"
                 drag
-                accept='.png,.jpeg,.jpg,.bmp'
+                accept='.png,.jpeg,.jpg,.bmp,.gif'
                 :multiple='true'
-                :limit='4'
+                :limit='9'
                 :on-success='handllePictureUploaded'
                 :on-preview="handlePictureCardPreview"
+                :on-remove="handleRemove"
                 >
                 <!-- :on-success='handllePictureUploaded'
                 :on-remove="handleRemove" -->
@@ -125,7 +124,7 @@
                 <img width="100%" :src="dialogImageUrl" alt="">
               </el-dialog>
               <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M,支持bmp、gif、png、jpeg</p>
+              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M，支持bmp、gif、png、jpg、jpeg、gif</p>
             </el-form-item>
           </template>
         </el-form>
@@ -178,7 +177,7 @@
         </div>
         <span slot="footer" class="dialog-footer">
           <p>
-            <el-button type="primary" @click="submitSuccessVsible = false" >确定</el-button>
+            <el-button type="primary" @click="submitSuccessVsible = false; $router.replace('/feedbackList')" >确定</el-button>
           </p>
         </span>
       </el-dialog>
@@ -207,8 +206,11 @@ export default {
       }
     };
     const QuestionPicList = (rule, value, callback) => {
-      console.log(value);
-      if (value?.length === 0) {
+      const _list = this.$refs.upload.uploadFiles.map(it => {
+        if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
+        return '';
+      }).filter(it => it);
+      if (_list.length === 0 || _list[0] === '') {
         callback(new Error('请上传问题图片'));
       } else {
         callback();
@@ -267,17 +269,17 @@ export default {
       intentionAction: 0,
       rules: {
         QuestionTypeList: [
-          // { required: true, message: '请选择售后原因', trigger: 'change' },
+          { required: true, message: '请选择售后原因', trigger: 'change' },
           { validator: validateQuestionTypeList, trigger: 'blur' },
         ],
         QuestionRemark: [
           { required: true, message: '请输入具体问题描述', trigger: 'change' },
           {
-            min: 3, max: 599, message: '长度在 3 到 600 个字符', trigger: 'change',
+            min: 3, max: 300, message: '长度在 3 到 300 个字符', trigger: 'change',
           },
         ],
         QuestionPicList: [
-          { validator: QuestionPicList, trigger: 'blur' },
+          { validator: QuestionPicList, trigger: 'change' },
           { required: true, message: '请上传问题图片', trigger: 'change' },
         ],
         RefundAmount: [
@@ -299,6 +301,9 @@ export default {
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' },
         ],
+        QQ: [
+          { pattern: /[1-9][0-9]{4,14}/, message: 'QQ号码格式不正确', trigger: 'blur' },
+        ],
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -312,7 +317,12 @@ export default {
     ...mapState('summary', ['editFeedbackData', 'RejectReasonList']),
   },
   methods: {
+    RefundAmountChange() {
+      this.ruleForm.RefundAmount = this.ruleForm?.RefundAmount?.toString().match(/\d+\.?\d{0,2}/, '');
+    },
     async submitForm() {
+      const phomReg = /^1[3456789]\d{9}$/;
+      const QQRege = /[1-9][0-9]{4,14}/;
       this.$refs.ruleForm1.validate();
       this.$refs.ruleForm2.validate();
       if (this.ruleForm.AppealType === 0 && !this.ruleForm.RefundAmount) {
@@ -324,30 +334,39 @@ export default {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入补印数量' });
       } else if (this.ruleForm.QuestionTypeList.length === 0) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题类型' });
-      } else if (this.ruleForm.QuestionRemark === '') {
-        this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述' });
+      } else if (this.ruleForm.QuestionRemark === '' || this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300) {
+        this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述并在3到300个字符' });
       } else if (this.ruleForm.ContactName === '') {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入联系人' });
       } else if (this.ruleForm.Mobile === '') {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入联系电话' });
+      } else if (!phomReg.test(this.ruleForm.Mobile)) {
+        this.messageBox.failSingleError({ title: '提交失败', msg: '电话号码格式不正确' });
+      } else if (this.ruleForm.QQ && !QQRege.test(this.ruleForm.QQ)) {
+        this.messageBox.failSingleError({ title: '提交失败', msg: 'QQ号码格式不正确' });
       } else {
         const _list = this.$refs.upload.uploadFiles.map(it => {
           if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
           return '';
         }).filter(it => it);
-        this.ruleForm.QuestionPicList = _list || ['string'];
+        if (!_list.length) {
+          this.messageBox.failSingleError({ title: '提交失败', msg: '请上传问题图片' });
+          return;
+        }
+        this.ruleForm.QuestionPicList = _list || [];
         // this.ruleForm.QuestionPicList = ['string'];
         if (!this.$route.query.isEdit) {
           this.ruleForm.AfterSaleCode = 0;
         }
         const res = await this.api.getApplyQuestionApply(this.ruleForm);
         if (res.data.Status === 1000) {
-          this.messageBox.successSingle({
-            title: '提交成功',
-            successFunc: () => {
-              this.$router.replace('/feedbackList');
-            },
-          });
+          this.submitSuccessVsible = true;
+          // this.messageBox.successSingle({
+          //   title: '提交成功',
+          //   successFunc: () => {
+          //     this.$router.replace('/feedbackList');
+          //   },
+          // });
         }
       }
     },
@@ -360,10 +379,9 @@ export default {
         this.ruleForm.QQ = this.customerInfo.QQ;
       }
     },
-    // handleRemove(file, fileList) {
-    //   console.log(file, fileList);
-    //   console.log('handleRemove', this.fileList);
-    // },
+    handleRemove() {
+      this.$refs.ruleForm1.validateField('QuestionPicList');
+    },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
@@ -378,6 +396,7 @@ export default {
         // eslint-disable-next-line max-len
         this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
       }
+      this.$refs.ruleForm1.validateField('QuestionPicList');
     },
     handleReturn() {
       // if (!this.canEdit) this.$store.commit('summary/setNeedFetchListData', false);
@@ -420,12 +439,13 @@ export default {
     },
   },
   async mounted() {
+    const isEdit = Number(this.$route.query.isEdit);
     this.queryData = JSON.parse(this.$route.query.data);
-    if (this.$route.query.isEdit) {
+    if (isEdit) {
       this.ruleForm.AppealType = this.queryData.AppealType;
       this.ruleForm.RefundAmount = this.queryData.AppealRefundAmount;
       // this.ruleForm.QuestionTypeList = this.queryData.QuestionTypeTitleList;
-      this.ruleForm.QuestionPicList = this.queryData.QuestionPicList;
+      this.ruleForm.QuestionPicList = this.queryData.QuestionPicList || [];
       this.ruleForm.QuestionRemark = this.queryData.QuestionRemark;
       this.ruleForm.KindCount = this.queryData.AppealKindCount;
       this.ruleForm.Number = this.queryData.AppealNumber;
@@ -435,15 +455,15 @@ export default {
       this.fileList = this.ruleForm.QuestionPicList.map(path => ({ url: `${imgUrl}${path}` }));
       setTimeout(() => { this.initPicList(this.ruleForm.QuestionPicList); }, 500);
     } else {
-      this.ruleForm.Mobile = this.customerInfo.Account.Mobile;
-      this.ruleForm.ContactName = this.customerInfo.CustomerName;
-      this.ruleForm.QQ = this.customerInfo.QQ;
+      this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
+      this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
+      this.ruleForm.QQ = this.customerInfo?.QQ || '';
     }
     // 获取问题类型数据
     this.api.getApplyQuestionList().then(res => {
       if (res.data.Status === 1000) {
         this.ApplyQuestionList = res.data.Data;
-        if (this.$route.query.isEdit) {
+        if (isEdit) {
           // 查找选中的问题类型ID
           const { QuestionTypeTitleList } = this.queryData; // ?.split(',');
           this.ruleForm.QuestionTypeList = QuestionTypeTitleList.map(item => {
@@ -522,6 +542,33 @@ export default {
         .QuestionTypeList{
           .el-form-item__error{
             top: calc(100% - 30px);
+          }
+        }
+        .QuestionPicList{
+          .el-form-item__error{
+            top: calc(100% + 7px);
+          }
+          >.el-form-item__content{
+            >div{
+              // display: flex;
+              // flex-wrap: wrap;
+              min-height: 156px;
+              .el-upload-list{
+                // display: flex;
+                // flex-wrap: wrap;
+              }
+            }
+          }
+        }
+        .el-textarea{
+          textarea{
+            padding-bottom: 13px;
+          }
+          .el-input__count{
+            background: rgba(0, 0, 0, 0);
+            height: 12px;
+            line-height: 12px;
+            bottom: 4px;
           }
         }
       }

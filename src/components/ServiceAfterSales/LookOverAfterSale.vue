@@ -22,7 +22,7 @@
             <i class="iconfont icon-dianhua1"></i>
           </div>
           <div class="right">
-            <h4>联系QQ</h4>
+            <h4>联系电话</h4>
             <ul>
               <li>15639757696</li>
               <li>1111111111</li>
@@ -37,7 +37,7 @@
             <i class="iconfont icon-QQ1"></i>
           </div>
           <div class="right">
-            <h4>联系电话</h4>
+            <h4>联系QQ</h4>
             <ul>
               <li>15639757696</li>
               <li>1111111111</li>

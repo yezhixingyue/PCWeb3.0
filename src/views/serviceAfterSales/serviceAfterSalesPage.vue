@@ -8,10 +8,10 @@
             <ProductSelector
               :changePropsFunc='setCondition4ServiceAfterSaleList'
               :requestFunc='getServiceAfterSaleList'
-              :ClassID='condition4ServiceAfterSaleList.ProductClass.First'
-              :TypeID='condition4ServiceAfterSaleList.ProductClass.Second'
-              :ProductID='condition4ServiceAfterSaleList.ProductID'
-              :typeList="[['ProductClass', 'First'],['ProductClass', 'Second'],['ProductID', '']]"
+              :ClassID='condition4ServiceAfterSaleList.Product.ClassID'
+              :TypeID='condition4ServiceAfterSaleList.Product.TypeID'
+              :ProductID='condition4ServiceAfterSaleList.Product.ProductID'
+              :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
             />
           </li>
           <li class="second">
@@ -23,7 +23,7 @@
               :dateValue='condition4ServiceAfterSaleList.DateType'
               :initDate='condition4ServiceAfterSaleList.Date'
               :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
-              label="售后时间"
+              label="申请时间"
               :dateList="dateList"
               dateType="date"
             />
@@ -227,7 +227,7 @@ export default {
       // AfterSalesStatus: '',
       AfterSalesStatusList: [
         { label: '不限', value: null },
-        { label: '待处理', value: 0 },
+        { label: '待处理', value: '0' },
         { label: '处理中', value: 10 },
         { label: '退款中', value: 20 },
         { label: '处理完成', value: 30 },

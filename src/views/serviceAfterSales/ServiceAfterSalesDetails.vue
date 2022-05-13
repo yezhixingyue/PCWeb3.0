@@ -39,12 +39,15 @@
             <p class="opinion" v-if="AfterSaleInfo.Status === 40">
               <span>已驳回</span>
             </p>
+            <p class="opinion" v-if="AfterSaleInfo.SolutionType === 255">
+              <span>其他</span>
+            </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionType === 7">
               补印：数量： <span>{{AfterSaleInfo.SuccessKindCount}}</span> 款/ <span>{{AfterSaleInfo.SuccessNumber}}</span> 张
             </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionType === 2">
-              退款：退款总额：￥ <span>{{AfterSaleInfo.SuccessOriginalAmount}}</span>   退回至原支付卡：￥ <span>{{AfterSaleInfo.SuccessRefundAmount}}</span>
-              从未支付款项中减款：￥<span>{{AfterSaleInfo.SuccessOriginalAmount-AfterSaleInfo.SuccessRefundAmount}}</span>
+              退款：退款总额：<span>￥{{AfterSaleInfo.SuccessRefundTotalAmount}}</span>   退回至原支付卡：<span>￥{{AfterSaleInfo.SuccessOriginalAmount }}</span>
+              从未支付款项中减款：<span>￥{{AfterSaleInfo.UnpaidReducedAmount}}</span>
             </p>
             <div class="reprint coupon" v-if="AfterSaleInfo.SolutionType === 8">
               <div>
@@ -63,8 +66,17 @@
           <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
             <h4>处理意见</h4>
             <p class="opinion">
-              <span> {{AfterSaleInfo.ProcessingRemark}}</span>
+              {{AfterSaleInfo.ProcessingRemark}}
+              <!-- <span v-if="AfterSaleInfo.SolutionType === 255"> {{AfterSaleInfo.ProcessingRemark}}</span>
+              <span v-if="AfterSaleInfo.Status === 40">亲爱的客户，您的服务单不符合我司的售后制度，暂无法为您处理，感谢您一路以来的支持。</span>
+              <span v-if="AfterSaleInfo.SolutionType === 7">亲爱的客户，您的服务单符合公司售后制度，已为您办理补印，感谢您一路以来的支持。</span>
+              <span v-if="AfterSaleInfo.SolutionType === 2">亲爱的客户，您的服务单符合公司售后制度，已为您办理退款，感谢您一路以来的支持。</span>
+              <span v-if="AfterSaleInfo.SolutionType === 8">亲爱的客户，您的服务单符合公司售后制度，已为为您赠送优惠券，感谢您一路以来的支持。</span> -->
             </p>
+            <!-- <p class="opinion"> -->
+              <!-- 驳回原因 -->
+              <!-- <span v-if="AfterSaleInfo.Status === 40">{{AfterSaleInfo.ProcessingRemark}}</span> -->
+            <!-- </p> -->
           </template>
 
           <template v-if="AfterSaleInfo.Status < 30">
@@ -96,7 +108,7 @@
           <table class="table" v-if="AfterSaleInfo">
             <div class="tr">
               <div class="td title">问题类型：</div>
-              <div class="td content">{{AfterSaleInfo.QuestionTypeTitleList.join('，')}}</div>
+              <div class="td content texts">{{AfterSaleInfo.QuestionTypeTitleList.join('，')}}</div>
               <div class="td title">诉求意向：</div>
               <div class="td content">{{AfterSaleInfo.AppealType === 0 ? '退款' : AfterSaleInfo.AppealType === 1 ? '补印' : '其他'}}</div>
             </div>
@@ -127,7 +139,7 @@
               <div class="td content">
                 <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
                 <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
-                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ:{{AfterSaleInfo.QQ}}</span>
+                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ：{{AfterSaleInfo.QQ}}</span>
               </div>
               <div class="td title"></div>
               <div class="td content"></div>
@@ -270,10 +282,10 @@ export default {
 
   methods: {
     toAfterSale() {
-      this.$router.push({ name: 'feedback', query: { isEdit: false, data: JSON.stringify(this.productInfo) } });
+      this.$router.push({ name: 'feedback', query: { isEdit: 0, data: JSON.stringify(this.productInfo) } });
     },
     editAfterSale() {
-      this.$router.replace({ name: 'feedback', query: { isEdit: true, data: JSON.stringify({ ...this.AfterSaleInfo, ...this.productInfo }) } });
+      this.$router.push({ name: 'feedback', query: { isEdit: 1, data: JSON.stringify({ ...this.AfterSaleInfo, ...this.productInfo }) } });
     },
     cancelAfterSale(code) {
       // this.messageBox
@@ -307,10 +319,10 @@ export default {
       this.api.getOrderAfterSaleEvaluate(data).then(res => {
         if (res.data.Status === 1000) {
           this.initData();
+          this.estimateVisible = false;
+          this.AfterSaleCode = null;
         }
       });
-      this.estimateVisible = false;
-      this.AfterSaleCode = null;
     },
     // 查看评价
     seeEstimateClick(AfterSaleCode) {
@@ -322,7 +334,8 @@ export default {
       if (AfterSaleInfo.Status === 255) { // 取消
         this.stepList.push({ text: '服务单已取消', type: 255 });
       } else if (AfterSaleInfo.Status === 40) {
-        this.stepList.push({ text: '服务单已驳回', type: 255 });
+        this.stepList.push({ text: '处理中', type: 10 });
+        this.stepList.push({ text: '处理完成', type: 255 });
       } else if (AfterSaleInfo.Status === 20) { // 如果处理结果为退款
         this.stepList.push({ text: '处理中', type: 10 });
         this.stepList.push({ text: '退款中', type: 20 });
@@ -355,6 +368,10 @@ export default {
             this.stepsNumber = 3;
             this.underway = '已完成';
           }
+          break;
+        case 40: // 驳回
+          this.stepsNumber = 3;
+          this.underway = '已完成';
           break;
         default:
           this.stepsNumber = 2;
