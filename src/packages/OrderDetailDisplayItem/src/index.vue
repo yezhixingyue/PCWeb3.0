@@ -2,7 +2,12 @@
   <ul class="display-box mp-order-detail-item-comp-wrap" :class="{border: showBorder}">
     <li>
       <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称：':' '}}</span>
-      <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}</div>
+      <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}
+        <template v-if="projectType === 'erp' && ShowData.FactoryName && $route.name !== 'GetPriceRecord'">
+          <span class="label is-font-13 is-font-size-13" style="margin-left:13px;font-weight: 400; color: #888;">生产工厂：</span>
+          <span class="text is-font-13 is-font-size-13" :title="ShowData.FactoryName" style="font-weight: 400;">{{ShowData.FactoryName}}</span>
+        </template>
+      </div>
     </li>
     <li v-for="(item, lv1Index) in localContentList" :key="item.Label + item.Content + lv1Index">
       <span class="label" :class="{'opacity-0': item.Label.includes('-notFirst')}">{{item.Label.replace('-notFirst', '')}}{{item.Label ? '：' : ''}}</span>
@@ -34,6 +39,8 @@
 </template>
 
 <script>
+import { projectType } from '../../../assets/js/setup';
+
 export default {
   name: 'OrderDetailDisplayItem',
   props: {
@@ -53,6 +60,11 @@ export default {
       }
       return [];
     },
+  },
+  data() {
+    return {
+      projectType,
+    };
   },
 };
 </script>

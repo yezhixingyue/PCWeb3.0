@@ -464,12 +464,16 @@ export default {
       border-top: 1px dashed #eee;
       padding: 15px 0;
       padding-top: 12px;
-      height: 136px;
-      .mp-pc-place-order-address-show-and-change-wrap > .content > ul > li {
-        color: #999;
-        margin-top: 0px;
-        .express-box .title{
+      height: 156px;
+      .mp-pc-place-order-address-show-and-change-wrap > .content.isBatchUploadUse > ul {
+        margin: 0;
+        margin-top: 7px;
+        > li {
           color: #999;
+          margin-top: 0px;
+          .express-box .title{
+            color: #999;
+          }
         }
       }
       .el-radio-button__orig-radio:disabled:checked + .el-radio-button__inner {

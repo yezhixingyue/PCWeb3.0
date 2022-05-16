@@ -321,7 +321,7 @@ export default {
       }
     }
     .el-table__body-wrapper {
-      min-height: 465px;
+      min-height: 445px;
       .el-table__body {
         > tbody {
           > tr {
