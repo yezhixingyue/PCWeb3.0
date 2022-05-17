@@ -66,8 +66,8 @@
         <p class="content">请点击左上角 <i class="is-bold is-font-14">[ 选择文件 ]</i> 按钮选择文件 或 <i class="is-bold is-font-14">[ 拖动文件至此区域 ]</i> 进行解析并上传</p>
         <p class="remark" v-if="accept">注：1、支持的文件格式：{{accept}}</p>
         <p class="remark two">{{accept ? 2 : 1}}、文件名称需携带订单信息且符合指定格式（ 下单页面计算价格后会生成符合格式的订单信息 ）</p>
-        <p class="remark two">{{accept ? 3 : 2}}、选择文件后会覆盖上次已选择文件，请在当次选择完全部需要上传的订单文件</p>
-        <p class="remark two is-pink">3、IE9及IE9以下版本浏览器不支持使用，请升级浏览器</p>
+        <!-- <p class="remark two">{{accept ? 3 : 2}}、选择文件后会覆盖上次已选择文件，请在当次选择完全部需要上传的订单文件</p> -->
+        <p class="remark two is-pink">{{accept ? 3 : 2}}、IE9及IE9以下版本浏览器不支持使用，请升级浏览器</p>
       </div>
     </el-table>
     <ProductDetailDrawer v-model="drawer" :curDetailData='curDetailData' :ShowProductDetail='ShowProductDetail' />

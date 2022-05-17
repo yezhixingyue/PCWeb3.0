@@ -22,7 +22,25 @@ export default class BatchUpload {
    * @param {*} basicObj
    * @memberof BatchUpload
    */
-  static async getFileParingResultBySingle(file, basicObj) {
+  static async getFileParingResultBySingle(file, basicObj, existingObj) {
+    const { successedList, failedList } = existingObj;
+    let t = successedList.find(it => it.file.name === file.name);
+    if (t) {
+      return {
+        file,
+        result: '',
+        error: '已在列表中，无法重复下单',
+        errorStatus: 0,
+        existing: true, // 标明其的错误原因为已有存在的文件
+      };
+    }
+    t = failedList.find(it => it.file.name === file.name && !it.existing);
+    if (t) {
+      return {
+        ...t,
+        error: `${t.error} [ 重复下单 ]`,
+      };
+    }
     const temp = {
       ...basicObj,
       FileList: [{ Second: file.name }],
@@ -65,7 +83,7 @@ export default class BatchUpload {
    * @param {*} fileList  传入文件列表
    * @memberof BatchUpload
    */
-  static async getFileParingResult(fileList, basicObj) {
+  static async getFileParingResult(fileList, basicObj, existingObj) {
     if (!fileList || fileList.length === 0 || !basicObj) return null;
     const loadingInstance = Loading.service({
       lock: true,
@@ -73,7 +91,7 @@ export default class BatchUpload {
       spinner: 'el-icon-loading',
       background: 'rgba(255, 255, 255, 0.6)',
     });
-    const resultList = await Promise.all(fileList.map(file => this.getFileParingResultBySingle(file, basicObj))).catch(() => null);
+    const resultList = await Promise.all(fileList.map(file => this.getFileParingResultBySingle(file, basicObj, existingObj))).catch(() => null);
     loadingInstance.close();
     if (resultList) {
       const failedList = resultList.filter(it => it && it.error);
