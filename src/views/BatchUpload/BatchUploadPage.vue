@@ -49,7 +49,7 @@
           :productCost='productCost'
           :expressCost='expressCost'
           :allCost='allCost'
-          :showPrice='successedList.length > 0'
+          :count="successedList.length"
           :canSelectList='canSelectList'
           :multipleSelection='multipleSelection'
           :UseSameAddress='UseSameAddress'
@@ -68,7 +68,7 @@
             :productCost='productCost'
             :expressCost='expressCost'
             :allCost='allCost'
-            :showPrice='successedList.length > 0'
+            :count="successedList.length"
             :failedList='failedList'
             :canSelectList='canSelectList'
             :multipleSelection='multipleSelection'

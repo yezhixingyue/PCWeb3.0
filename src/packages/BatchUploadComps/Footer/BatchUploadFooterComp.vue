@@ -4,7 +4,8 @@
       <el-checkbox v-model="checked" :disabled='checkDisabled' :indeterminate="isIndeterminate">全选</el-checkbox>
     </div>
     <div class="r">
-      <template v-if="showPrice">
+      <span v-show="count > 0" class="count">共 <i class="is-pink">{{count}}</i> 个订单</span>
+      <template v-if="count > 0 && false">
         <!-- <label>产品费用：</label>
         <span class="ml-35">￥{{productCost || productCost === 0 ? productCost : '--'}}元</span>
         <label>运费：</label>
@@ -33,10 +34,6 @@ export default {
     allCost: {
       default: '',
     },
-    showPrice: { // 是否展示价格
-      type: Boolean,
-      default: false,
-    },
     isCheckedAll: { // 是否全选
       type: Boolean,
       default: false,
@@ -56,6 +53,10 @@ export default {
     address: {
       type: Object,
       default: null,
+    },
+    count: {
+      type: Number,
+      default: 0,
     },
   },
   computed: {
@@ -164,6 +165,13 @@ export default {
         }
         &.blue-span {
           margin-right: 16px;
+        }
+        &.count {
+          color: #585858;
+          margin-right: 35px;
+          i {
+            font-size: 14px;
+          }
         }
       }
     }
