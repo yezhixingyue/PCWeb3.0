@@ -62,6 +62,9 @@ export default {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(content).then(() => {
           this.copySuccess = true;
+        }).catch(() => {
+          this.copySuccess = false;
+        }).finally(() => {
           this.visible = true;
           setTimeout(() => {
             this.visible = false;
