@@ -6,7 +6,7 @@
     </ul>
     <ul v-if="ProductQuotationResult && ProductQuotationResult.PriceContent && !onlyTips" class="detail">
       <li ref="detailBox">
-        <span class="info" ref="oDetailContent">{{ProductQuotationResult.PriceContent.trim()}}</span>
+        <span class="info">{{ProductQuotationResult.PriceContent.trim()}}</span>
         <el-popover
           placement="top"
           popper-class='mp-place-order-copy-poper-box'
@@ -58,9 +58,16 @@ export default {
   },
   methods: {
     handleCopyClick() { // 复制
-      if (this.$refs.oDetailContent) {
-        // const content = this.$refs.oDetailContent.innerText;
-        const content = this.ProductQuotationResult.Content;
+      const content = this.ProductQuotationResult.Content;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(content).then(() => {
+          this.copySuccess = true;
+          this.visible = true;
+          setTimeout(() => {
+            this.visible = false;
+          }, 1000);
+        });
+      } else {
         const textarea = document.createElement('textarea');
         textarea.style.position = 'fixed';
         textarea.style.top = 0;

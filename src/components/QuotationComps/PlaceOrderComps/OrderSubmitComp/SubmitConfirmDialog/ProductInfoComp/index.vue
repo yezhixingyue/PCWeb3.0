@@ -109,6 +109,9 @@ export default {
       let Name = this.OrderDetail?.ProductParams?.Attributes?.DisplayName || '产品名称';
       if (Array.isArray(this.OrderDetail?.ProductParams?.Attributes?.ClassList)) {
         const t = this.OrderDetail.ProductParams.Attributes.ClassList.find(it => it.Type === 2);
+        if (t && t.SecondLevel?.Name) {
+          Name = `${t.SecondLevel.Name}-${Name}`;
+        }
         if (t && t.FirstLevel?.Name) {
           Name = `${t.FirstLevel.Name}-${Name}`;
         }

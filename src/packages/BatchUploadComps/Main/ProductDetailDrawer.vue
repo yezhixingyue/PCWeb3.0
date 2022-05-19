@@ -76,6 +76,9 @@ export default {
       if (Array.isArray(this.curDetailData?.result?.ProductParams?.Attributes?.ClassList)) {
         const type = projectType === 'pc' ? 2 : 1;
         const t = this.curDetailData?.result.ProductParams.Attributes.ClassList.find(it => it.Type === type);
+        if (t && t.SecondLevel?.Name) {
+          Name = `${t.SecondLevel.Name}-${Name}`;
+        }
         if (t && t.FirstLevel?.Name) {
           Name = `${t.FirstLevel.Name}-${Name}`;
         }
