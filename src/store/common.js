@@ -265,7 +265,17 @@ export default {
     subExpressList(state) {
       if (state.ExpressList.length === 0) return [];
       const _list = [];
-      state.ExpressList.forEach(level1 => {
+      let l = state.ExpressList.map(it => {
+        let i = it.Type;
+        if (it.Type === 3) i = 2;
+        if (it.Type === 2) i = 3;
+        return {
+          ...it,
+          i,
+        };
+      });
+      l = l.sort((a, b) => a.i - b.i);
+      l.forEach(level1 => {
         level1.List.forEach(level2 => {
           const _obj = { ...level2 };
           _obj.name = level2.Name;
