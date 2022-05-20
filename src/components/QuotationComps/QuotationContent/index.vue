@@ -46,7 +46,11 @@
                       <template v-else>计算价格</template>
                     </el-button>
                     <!-- 价格展示区域 -->
-                    <ComputedResultComp :ProductQuotationResult="ProductQuotationResult" :selectedCoupon="selectedCoupon" v-if="!priceGetErrMsg" />
+                    <ComputedResultComp
+                     :ProductQuotationResult="ProductQuotationResult"
+                     :showExpressCost='true'
+                     :selectedCoupon="selectedCoupon"
+                     v-if="!priceGetErrMsg" />
                     <!-- 错误 或 优惠券选择信息显示区域 -->
                     <div class="err-or-selected-coupon-info-box">
                       <span class="is-pink error-msg"  v-if="priceGetErrMsg">{{ priceGetErrMsg }}</span>
@@ -786,6 +790,9 @@ export default {
               }
             }
           }
+        }
+        .place-price-result {
+          width: 555px;
         }
       }
     }
