@@ -61,7 +61,7 @@ export const formarProductAmountFunc = data => { // 根据数据返回产品数�
     let amount = '';
     let kindCount = '';
     if (HaveNumber !== false && ProductAmount) {
-      amount = `${ProductAmount}${Unit || '个'}`;
+      amount = `${ProductAmount}${Unit || ' '}`;
     }
     if (HaveKind !== false && KindCount) {
       kindCount = `${KindCount}款`;
