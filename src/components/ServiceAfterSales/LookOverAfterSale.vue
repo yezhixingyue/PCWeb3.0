@@ -24,10 +24,10 @@
           <div class="right">
             <h4>联系电话</h4>
             <ul>
-              <li>15639757696</li>
+              <li>4006363500</li>
+              <!-- <li>钱钱钱</li>
               <li>1111111111</li>
-              <li>1111111111</li>
-              <li>1111111111</li>
+              <li>1111111111</li> -->
             </ul>
           </div>
         </div>
@@ -39,10 +39,15 @@
           <div class="right">
             <h4>联系QQ</h4>
             <ul>
-              <li>15639757696</li>
-              <li>1111111111</li>
-              <li>1111111111</li>
-              <li>1111111111</li>
+              <!-- <a :href="`tencent://message/?uin=${dataInfo.AfterSale.QQ}&Site=SuperNic&Menu=yes`" class="details" style="padding:0">
+                {{dataInfo.AfterSale.QQ}}
+              </a> -->
+              <li><a :href="`tencent://message/?uin=${800065607}&amp;Site=名片之家&amp;Menu=yes`">800065607</a></li>
+              <li><a :href="`tencent://message/?uin=${800131866}&amp;Site=名片之家&amp;Menu=yes`">800131866</a></li>
+              <li><a :href="`tencent://message/?uin=${800131899}&amp;Site=名片之家&amp;Menu=yes`">800131899</a></li>
+              <li><a :href="`tencent://message/?uin=${800131808}&amp;Site=名片之家&amp;Menu=yes`">800131808</a></li>
+              <li><a :href="`tencent://message/?uin=${800050507}&amp;Site=名片之家&amp;Menu=yes`">800050507</a></li>
+              <li><a :href="`tencent://message/?uin=${800051518}&amp;Site=名片之家&amp;Menu=yes`">800051518</a></li>
             </ul>
           </div>
         </div>
@@ -165,6 +170,12 @@ export default {
           li{
             line-height: 38px;
             width: 50%;
+            a{
+              color: #585858
+            }
+            a:hover{
+              color: #428DFA
+            }
           }
         }
       }

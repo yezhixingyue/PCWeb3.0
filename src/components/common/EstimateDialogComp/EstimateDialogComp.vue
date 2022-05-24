@@ -34,6 +34,7 @@
       </el-form-item>
       <el-form-item label="填写评价：" prop="EvaluateContent">
         <el-input
+          @input='form.EvaluateContent.length > 300 ?form.EvaluateContent=form.EvaluateContent.slice(0, 300) : form.EvaluateContent'
           style="width:590px"
           type="textarea"
           v-model="form.EvaluateContent"
@@ -56,16 +57,18 @@
             :limit='9'
             :before-upload='beforeUpload'
             :on-preview="handlePictureCardPreview"
+            :on-success='handllePictureUploaded'
+            :on-remove="handleRemove"
+            :class="{'uploadDisabled':uploadDisabled}"
             >
-            <!-- :on-remove="handleRemove" -->
-            <!-- :on-success='handllePictureUploaded' -->
+            <!--  -->
             <i class="el-icon-plus"></i>
           </el-upload>
           <el-dialog :visible.sync="dialogVisible" top="8vh" title="查看图片" append-to-body>
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
           <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-          <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M，支持.png,.jpeg,.jpg,.bmp,.gif</p>
+          <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片大小不超过5M，支持.png,.jpeg,.jpg,.bmp,.gif</p>
         </div>
       </el-form-item>
     </el-form>
@@ -76,6 +79,7 @@
 import CommonDialogComp from '@/packages/CommonDialogComp';
 import CheckButton from '@/components/common/CheckButton.vue';
 import { imgUrl } from '@/assets/js/setup';
+import { Message } from 'element-ui';
 
 export default {
   components: {
@@ -107,6 +111,7 @@ export default {
       dialogVisible: false,
       dialogImageUrl: '',
       checkList: [],
+      uploadDisabled: false,
       form: {
         AfterSaleCode: 0,
         Score: null,
@@ -152,6 +157,7 @@ export default {
       this.$refs.rulesform.resetFields();
       this.$refs.upload.uploadFiles = [];
       this.$refs.CheckButton.clearCheck();
+      this.uploadDisabled = false;
     },
     submit() {
       if (!this.AfterSaleCode) {
@@ -175,6 +181,11 @@ export default {
         this.messageBox.failSingleError({
           title: '评价失败', msg: '请选择服务标签',
         });
+      } else if (this.form.EvaluateContent && (this.form.EvaluateContent.length < 3 || this.form.EvaluateContent > 300)) {
+        // 评价内容
+        this.messageBox.failSingleError({
+          title: '评价失败', msg: '评价内容在3到300个字',
+        });
       } else {
         const _list = this.$refs.upload.uploadFiles.map(it => {
           if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
@@ -185,20 +196,45 @@ export default {
         // 图片列表
       }
     },
-    // handllePictureUploaded(file) {
-    //   console.log(file);
-    // },
+    handllePictureUploaded(response) {
+      if (response.Status !== 1000) {
+        Message({
+          showClose: true,
+          message: response.Message,
+          type: 'error',
+        });
+        // eslint-disable-next-line max-len
+        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
+      }
+      this.setUploadDisabled();
+    },
+    setUploadDisabled() {
+      const _list = this.$refs.upload?.uploadFiles?.map(it => {
+        if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
+        return '';
+      }).filter(it => it);
+      if (!_list || _list.length < 9) {
+        this.uploadDisabled = false;
+      } else {
+        this.uploadDisabled = true;
+      }
+    },
     handlePictureCardPreview(file) {
       this.dialogVisible = true;
       this.dialogImageUrl = this.baseUrl + file.response.Data.Url;
     },
-    // handleRemove(file, fileList) {
-    //   console.log(fileList);
-    // },
+    handleRemove() {
+      this.setUploadDisabled();
+    },
     beforeUpload(file) {
       const isLt5M = file.size / 1024 / 1024 < 5;
       if (!isLt5M) {
         // 文件过大上传失败
+        Message({
+          showClose: true,
+          message: '文件过大，上传失败',
+          type: 'error',
+        });
       }
       return isLt5M;
     },
@@ -219,7 +255,7 @@ export default {
   margin: 0;
   width: 100%;
   background-color: rgba($color: #000000, $alpha: 0.5);
-    .el-dialog__body{
+  .el-dialog__body{
     padding: 30px;
   }
   .el-dialog__header{
@@ -233,15 +269,26 @@ export default {
     textarea{
       min-height: 100px !important;
       padding-bottom: 13px;
+      max-height: 160px;
     }
     .el-input__count{
-      background: rgba(0,0,0,0);
+      width: calc(100% - 22px);
+      background: #fff;
       height: 12px;
       line-height: 12px;
-      bottom: 4px;
+      bottom: 1px;
+      text-align: right;
+      right: 20px;
+      padding-bottom: 3px;
     }
   }
   .estimate{
+    .el-form-item{
+      .el-form-item__label{
+        color: #585858;
+        font-weight: 700;
+      }
+    }
     .el-rate{
       margin-top: 10px;
     }
@@ -300,6 +347,17 @@ export default {
     .upload{
       display: flex;
       flex-direction: column;
+      .uploadDisabled{
+        >.el-upload--picture-card{
+          display:none
+        }
+      }
+      .el-icon-close-tip{
+        display: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      }
       .el-upload{
         width: 80px;
         height: 80px;

@@ -1,7 +1,7 @@
 <template>
   <CommonDialogComp
     class="mp-pc-service-after-sales-see-estimate-wrap"
-    title="售后评价"
+    title="评价详情"
     :visible.sync="visible"
     @cancle="cancle"
     @open='onOpen'
@@ -26,7 +26,7 @@
         </el-form-item>
         <el-form-item label="服务标签：">
           <div class="images">
-            {{SeeEstimate.LabelTitle.join()}}
+            {{SeeEstimate.LabelTitle.join('，')}}
           </div>
         </el-form-item>
         <el-form-item label="填写评价：">
@@ -36,8 +36,9 @@
         </el-form-item>
         <el-form-item label="评价晒图：">
           <div class="images" v-if="SeeEstimate.EvaluatePicList.length">
-            <el-image v-for="item in SeeEstimate.EvaluatePicList" :key="item"
-              :src="baseUrl + item"
+            <el-image :preview-src-list="SeeEstimate.EvaluatePicList" :mpCloseViewer='closeViewer'
+            v-for="item in SeeEstimate.EvaluatePicList" :key="item"
+              :src="item"
               fit="cover"></el-image>
           </div>
           <span v-else>未上传图片</span>
@@ -77,11 +78,14 @@ export default {
     cancle() {
       this.closed();
     },
+    closeViewer() {},
     closed() {
       this.$emit('closed');
+      this.SeeEstimate = null;
     },
     submit() {
       this.$emit('submit');
+      this.SeeEstimate = null;
     },
   },
   watch: {
@@ -90,6 +94,7 @@ export default {
         this.api.getOrderAfterSaleEvaluateDetail(this.AfterSaleCode).then(res => {
           if (res.data.Status === 1000) {
             this.SeeEstimate = res.data.Data;
+            this.SeeEstimate.EvaluatePicList = this.SeeEstimate.EvaluatePicList.map(it => this.baseUrl + it);
           }
         });
       }
@@ -120,6 +125,7 @@ export default {
     min-height: calc(400px);
     .el-form-item{
       .el-form-item__label{
+        color: #585858;
         font-weight: 700;
       }
       margin-bottom: 8px;

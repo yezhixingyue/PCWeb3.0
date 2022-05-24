@@ -26,19 +26,19 @@
         </template>
       </el-table-column>
       <el-table-column prop="ProductAmount" label="数量" show-overflow-tooltip width="109">
-        <template slot-scope="scope">{{ scope.row.ProductAmount }}{{scope.row.Unit}}/款 {{ scope.row.KindCount }}款</template>
+        <template slot-scope="scope">{{ scope.row.ProductAmount }}{{scope.row.Unit}}/{{ scope.row.KindCount }}款</template>
       </el-table-column>
       <el-table-column label="尺寸" show-overflow-tooltip width="109">
-        <div slot-scope="scope">
+        <span slot-scope="scope">
           <span v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
           <span v-else>--</span>
-        </div>
+        </span>
       </el-table-column>
       <el-table-column prop="CraftList" label="工艺" show-overflow-tooltip width="108">
-        <div slot-scope="scope">
+        <span slot-scope="scope">
           <span v-if="scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemCraft }}</span>
           <span v-else>--</span>
-        </div>
+        </span>
       </el-table-column>
       <el-table-column label="操作" width="190" show-overflow-tooltip>
         <!-- 有没有超过售后期 有没有申请过售后 -->

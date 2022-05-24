@@ -22,7 +22,7 @@
           </el-table-column>
           <el-table-column label="工艺" show-overflow-tooltip width="190">
             <!-- ================================== -->
-            <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemCraft } }}</span>
+            <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</span>
             <span v-else>--</span>
           </el-table-column>
         </el-table>
@@ -43,10 +43,11 @@
               <span>其他</span>
             </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionType === 7">
-              补印：数量： <span>{{AfterSaleInfo.SuccessKindCount}}</span> 款/ <span>{{AfterSaleInfo.SuccessNumber}}</span> 张
+              补印：款数：<span>{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span>{{AfterSaleInfo.SuccessNumber}}</span> 张
             </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionType === 2">
-              退款：退款总额：<span>￥{{AfterSaleInfo.SuccessRefundTotalAmount}}</span>   退回至原支付卡：<span>￥{{AfterSaleInfo.SuccessOriginalAmount }}</span>
+              退款：退款总额：<span>￥{{AfterSaleInfo.SuccessRefundTotalAmount}}</span>
+              {{AfterSaleInfo.RefundType === 1 ? '退回余额' : '退回原支付账户'}}：<span>￥{{AfterSaleInfo.SuccessOriginalAmount }}</span>
               从未支付款项中减款：<span>￥{{AfterSaleInfo.UnpaidReducedAmount}}</span>
             </p>
             <div class="reprint coupon" v-if="AfterSaleInfo.SolutionType === 8">
@@ -66,8 +67,8 @@
           <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
             <h4>处理意见</h4>
             <p class="opinion">
-              {{AfterSaleInfo.ProcessingRemark}}
-              <!-- <span v-if="AfterSaleInfo.SolutionType === 255"> {{AfterSaleInfo.ProcessingRemark}}</span>
+              {{AfterSaleInfo.OperaterRemark}}
+              <!-- <span v-if="AfterSaleInfo.SolutionType === 255"> {{AfterSaleInfo.OperaterRemark}}</span>
               <span v-if="AfterSaleInfo.Status === 40">亲爱的客户，您的服务单不符合我司的售后制度，暂无法为您处理，感谢您一路以来的支持。</span>
               <span v-if="AfterSaleInfo.SolutionType === 7">亲爱的客户，您的服务单符合公司售后制度，已为您办理补印，感谢您一路以来的支持。</span>
               <span v-if="AfterSaleInfo.SolutionType === 2">亲爱的客户，您的服务单符合公司售后制度，已为您办理退款，感谢您一路以来的支持。</span>
@@ -75,7 +76,7 @@
             </p>
             <!-- <p class="opinion"> -->
               <!-- 驳回原因 -->
-              <!-- <span v-if="AfterSaleInfo.Status === 40">{{AfterSaleInfo.ProcessingRemark}}</span> -->
+              <!-- <span v-if="AfterSaleInfo.Status === 40">{{AfterSaleInfo.OperaterRemark}}</span> -->
             <!-- </p> -->
           </template>
 
@@ -87,7 +88,7 @@
               <span v-if="AfterSaleInfo.Status === 20">亲爱的客户，您的服务单我们正在退款，请耐心等待。</span>
             </p>
             <p class="opinion" style="margin-top:10px">
-              <span> {{AfterSaleInfo.ProcessingRemark}}</span>
+              <span> {{AfterSaleInfo.OperaterRemark}}</span>
             </p>
           </template>
           <p style="margin-top:30px;color:#585858" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
@@ -117,7 +118,8 @@
               <div class="td content texts">{{AfterSaleInfo.QuestionRemark}}</div>
               <div class="td title">上传图片：</div>
               <div class="td content">
-                <el-image v-for="item in AfterSaleInfo.QuestionPicList" :key="item" :src="baseUrl + item" fit="cover" ></el-image>
+                <el-image :preview-src-list="QuestionPicList" :mpCloseViewer='closeViewer'
+                v-for="item in QuestionPicList" :key="item" :src="item" fit="cover" ></el-image>
                 <!-- {{AfterSaleInfo.QuestionPicList}} -->
               </div>
             </div>
@@ -128,18 +130,22 @@
                 `${AfterSaleInfo.AppealNumber}${productInfo.Unit}/${AfterSaleInfo.AppealKindCount}款`}}
               </div>
               <div class="td title">联系信息：</div>
-              <div class="td content">
-                <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
-                <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
-                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ：{{AfterSaleInfo.QQ}}</span>
-                </div>
+              <div class="td content texts">
+                <p>
+                  <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
+                  <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.ContactQQ">QQ：{{AfterSaleInfo.ContactQQ}}</span>
+                </p>
+              </div>
             </div>
             <div class="tr" v-else>
               <div class="td title">联系信息：</div>
-              <div class="td content">
-                <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
-                <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
-                <span style="margin-right:10px" v-if="AfterSaleInfo.QQ">QQ：{{AfterSaleInfo.QQ}}</span>
+              <div class="td content texts">
+                <p>
+                  <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
+                  <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.ContactQQ">QQ：{{AfterSaleInfo.ContactQQ}}</span>
+                </p>
               </div>
               <div class="td title"></div>
               <div class="td content"></div>
@@ -181,9 +187,7 @@
             <div class="right">
               <h4>联系电话</h4>
               <ul>
-                <li>15639757696</li>
-                <li>1111111111</li>
-                <li>1111111111</li>
+                <li v-if="AfterSaleInfo">{{AfterSaleInfo.OperaterContactWay}}</li>
               </ul>
             </div>
           </div>
@@ -195,10 +199,12 @@
             <div class="right">
               <h4>联系QQ</h4>
               <ul>
-                <li>15639757696</li>
-                <li>1111111111</li>
-                <li>1111111111</li>
-                <li>1111111111</li>
+                <li v-if="AfterSaleInfo">
+                  <a :href="`tencent://message/?uin=${AfterSaleInfo.OperaterQQ}&amp;Site=名片之家&amp;Menu=yes`"
+                    class="details" style="padding:0">{{AfterSaleInfo.OperaterQQ}}</a>
+                </li>
+
+                <!-- <li v-if="AfterSaleInfo">{{AfterSaleInfo.OperaterQQ}}</li> -->
               </ul>
             </div>
           </div>
@@ -245,7 +251,7 @@ export default {
       seeEstimateVisible: false,
       estimateVisible: false,
       AfterSaleCode: null,
-
+      QuestionPicList: [], // 保存的图片列表
       seeHandlerVisible: false,
       baseUrl: imgUrl,
       // 传入的商品信息
@@ -297,6 +303,8 @@ export default {
           this.api.getCancleApply(code).then(res => {
             if (res.data.Status === 1000) {
               this.handleReturn();
+            } else {
+              this.initData();
             }
           });
         },
@@ -329,17 +337,20 @@ export default {
       this.seeEstimateVisible = true;
       this.AfterSaleCode = AfterSaleCode;
     },
+    closeViewer() {},
     getSteps(AfterSaleInfo) {
       this.stepList = [{ text: '提交申请', type: 1 }];
       if (AfterSaleInfo.Status === 255) { // 取消
         this.stepList.push({ text: '服务单已取消', type: 255 });
-      } else if (AfterSaleInfo.Status === 40) {
-        this.stepList.push({ text: '处理中', type: 10 });
-        this.stepList.push({ text: '处理完成', type: 255 });
-      } else if (AfterSaleInfo.Status === 20) { // 如果处理结果为退款
-        this.stepList.push({ text: '处理中', type: 10 });
-        this.stepList.push({ text: '退款中', type: 20 });
-        this.stepList.push({ text: '处理完成', type: 255 });
+      } else if (AfterSaleInfo.Status === 30) {
+        if (AfterSaleInfo.SolutionType === 2) { // 如果处理结果为退款
+          this.stepList.push({ text: '处理中', type: 10 });
+          this.stepList.push({ text: '退款中', type: 20 });
+          this.stepList.push({ text: '处理完成', type: 255 });
+        } else {
+          this.stepList.push({ text: '处理中', type: 10 });
+          this.stepList.push({ text: '处理完成', type: 255 });
+        }
       } else {
         this.stepList.push({ text: '处理中', type: 10 });
         this.stepList.push({ text: '处理完成', type: 255 });
@@ -354,12 +365,12 @@ export default {
           this.stepsNumber = 2;
           this.underway = '处理中';
           break;
-        case 20:
-          if (AfterSaleInfo.SolutionType === 2) { // 退款
-            this.stepsNumber = 3;
-            this.underway = '退款中';
-          }
-          break;
+        // case 20:
+        //   if (AfterSaleInfo.SolutionType === 2) { // 退款
+        //     this.stepsNumber = 3;
+        //     this.underway = '退款中';
+        //   }
+        //   break;
         case 30: // 处理完成 并 处理结果为退款
           if (AfterSaleInfo.SolutionType === 2) { // 退款
             this.stepsNumber = 4;
@@ -382,6 +393,7 @@ export default {
       this.api.getServiceDetail(this.productInfo.AfterSaleCode).then(res => {
         if (res.data.Status === 1000) {
           this.AfterSaleInfo = res.data.Data;
+          this.QuestionPicList = res.data.Data.QuestionPicList.map(it => this.baseUrl + it);
           this.getSteps(res.data.Data);
         //
         }
@@ -410,6 +422,10 @@ export default {
     p{
       // line-height: 2em;
       color: #888888;
+      &.opinion{
+        line-height: 2em;
+        margin: -0.5em 0;
+      }
     }
     .btns{
       border-bottom: 1px dotted #EEEEEE;
@@ -576,9 +592,16 @@ export default {
           font-size: 14px;
           display: flex;
           flex-wrap: wrap;
+          margin-top: 12px;
           li{
             line-height: 24px;
             width: 50%;
+            a{
+              color: #585858
+            }
+            a:hover{
+              color: #428DFA
+            }
           }
         }
       }

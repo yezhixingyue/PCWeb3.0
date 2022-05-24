@@ -262,7 +262,7 @@ const api = {
   getApplyQuestionApply(data) { // POST /Api/OrderAfterSale/Apply  售后申请
     return instance.post('/Api/OrderAfterSale/Apply', data);
   },
-  getCancleApply(code) { // POST //Api/OrderAfterSale/CancleApply  售后申请
+  getCancleApply(code) { // POST /Api/OrderAfterSale/CancleApply  取消售后申请
     return instance.put(`/Api/OrderAfterSale/CancleApply?afterSaleCode=${code}`);
   },
   getSolutionQuestionList() { // POST /Api/OrderAfterSale/SolutionQuestionList  获取售后常见问题分类列表

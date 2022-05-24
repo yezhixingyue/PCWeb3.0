@@ -16,12 +16,10 @@
             <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}/{{ scope.row.KindCount}}款</span>
           </el-table-column>
           <el-table-column label="尺寸" show-overflow-tooltip width="229">
-            <!-- <template slot-scope="scope">{{ scope.row.SizeList | formatListItemSize }}</template> -->
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
             <span v-else>--</span>
           </el-table-column>
           <el-table-column label="工艺" show-overflow-tooltip width="190">
-            <!-- <template slot-scope="scope">{{ scope.row.CraftList | formatListItemCraft }}</template> -->
             <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</span>
             <span v-else>--</span>
           </el-table-column>
@@ -46,6 +44,8 @@
                     <el-input-number size="small"
                     :controls="false" v-model="ruleForm.KindCount"
                     :max="queryData.KindCount"
+                    :precision="0"
+                    :step="1"
                     :min="1" label="款数">
                     </el-input-number>
                   </el-form-item>
@@ -57,6 +57,8 @@
                     <el-input-number size="small" :controls="false"
                       v-model="ruleForm.Number" :min="1"
                       :max="queryData.ProductAmount"
+                      :step="1"
+                      :precision="0"
                       label="描述文字">
                     </el-input-number>
                   </el-form-item>
@@ -100,6 +102,7 @@
 
             <el-form-item label="问题描述：" prop="QuestionRemark">
               <el-input type="textarea" v-model="ruleForm.QuestionRemark"
+              @input='ruleForm.QuestionRemark.length > 300 ? ruleForm.QuestionRemark=ruleForm.QuestionRemark.slice(0, 300) : ruleForm.QuestionRemark'
               maxlength="300" autosize show-word-limit placeholder="请输入具体问题描述"></el-input>
             </el-form-item>
 
@@ -115,6 +118,8 @@
                 :on-success='handllePictureUploaded'
                 :on-preview="handlePictureCardPreview"
                 :on-remove="handleRemove"
+                :before-upload='beforeUpload'
+                :class="{'uploadDisabled':uploadDisabled}"
                 >
                 <!-- :on-success='handllePictureUploaded'
                 :on-remove="handleRemove" -->
@@ -124,7 +129,7 @@
                 <img width="100%" :src="dialogImageUrl" alt="">
               </el-dialog>
               <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片打小不超过5M，支持bmp、gif、png、jpg、jpeg、gif</p>
+              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片大小不超过5M，支持bmp、gif、png、jpg、jpeg</p>
             </el-form-item>
           </template>
         </el-form>
@@ -246,6 +251,7 @@ export default {
       ApplyQuestionList: [],
       fileList: [],
       canEdit: true,
+      uploadDisabled: false,
       ruleForm: {
 
         OrderID: 0, // 订单号
@@ -354,7 +360,6 @@ export default {
           return;
         }
         this.ruleForm.QuestionPicList = _list || [];
-        // this.ruleForm.QuestionPicList = ['string'];
         if (!this.$route.query.isEdit) {
           this.ruleForm.AfterSaleCode = 0;
         }
@@ -381,10 +386,34 @@ export default {
     },
     handleRemove() {
       this.$refs.ruleForm1.validateField('QuestionPicList');
+      this.setUploadDisabled();
+    },
+    beforeUpload(file) {
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        // 文件过大上传失败
+        Message({
+          showClose: true,
+          message: '文件过大，上传失败',
+          type: 'error',
+        });
+      }
+      return isLt5M;
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    setUploadDisabled() {
+      const _list = this.$refs.upload?.uploadFiles?.map(it => {
+        if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
+        return '';
+      }).filter(it => it);
+      if (!_list || _list.length < 9) {
+        this.uploadDisabled = false;
+      } else {
+        this.uploadDisabled = true;
+      }
     },
     handllePictureUploaded(response) {
       if (response.Status !== 1000) {
@@ -397,10 +426,9 @@ export default {
         this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
       }
       this.$refs.ruleForm1.validateField('QuestionPicList');
+      this.setUploadDisabled();
     },
     handleReturn() {
-      // if (!this.canEdit) this.$store.commit('summary/setNeedFetchListData', false);
-      // else this.$store.commit('order/setShouldGetNewListData', false);
       this.$router.back();
     },
     ApplyQuestionCheckChange(keys) {
@@ -428,7 +456,7 @@ export default {
         size: 1000,
         status: 'success',
         uid: new Date().getTime() + i,
-        url: this.baseUrl + path,
+        url: `${imgUrl}${path}`,
         // response: {
         //   Status: 1000,
         //   Data: {
@@ -450,9 +478,9 @@ export default {
       this.ruleForm.KindCount = this.queryData.AppealKindCount;
       this.ruleForm.Number = this.queryData.AppealNumber;
       this.ruleForm.ContactName = this.queryData.ContactName;
-      this.ruleForm.QQ = this.queryData.QQ;
+      this.ruleForm.QQ = this.queryData.ContactQQ;
       this.ruleForm.Mobile = this.queryData.Mobile;
-      this.fileList = this.ruleForm.QuestionPicList.map(path => ({ url: `${imgUrl}${path}` }));
+      // this.fileList = this.ruleForm.QuestionPicList.map(path => ({ url: `${imgUrl}${path}` }));
       setTimeout(() => { this.initPicList(this.ruleForm.QuestionPicList); }, 500);
     } else {
       this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
@@ -473,35 +501,6 @@ export default {
         }
       }
     });
-    // this.api.getSolutionQuestionList().then(res => {
-    //   console.log(res);
-    // });
-
-    // const Content = this.$route.params.desc;
-    // if (!this.queryData.OrderID) return;
-    // if (type === 'detail') {
-    //   this.canEdit = false;
-    //   if (this.editFeedbackData) { // 仓库提前保存好的编辑数据
-    //     let QuestionList = [];
-    //     if (this.editFeedbackData.QuestionList.length > 0) {
-    //       QuestionList = this.editFeedbackData.QuestionList.map(it => it.ID);
-    //     }
-    //     this.ruleForm = {
-    //       ...this.ruleForm,
-    //       ...JSON.parse(JSON.stringify(this.editFeedbackData)),
-    //       QuestionList,
-    //     };
-    //     // console.log(this.editFeedbackData.QuestionList);
-    //      this.fileList = this.ruleForm.QuestionPicList.map(path => ({ url: `${imgUrl}${path}` }));
-    //     // this.$store.commit('summary/setEditFeedbackData', null);
-    //   } else {
-    //     this.$router.replace('/feedbackList');
-    //     return;
-    //   }
-    // } else if (type === 'add' && this.customerInfo) {
-    //   this.ruleForm.Mobile = this.customerInfo.Account.Mobile;
-    //   this.ruleForm.QQ = this.customerInfo.QQ;
-    // }
 
     this.ruleForm.OrderID = this.queryData.OrderID;
     this.ruleForm.AfterSaleCode = this.queryData.AfterSaleCode || 0;
@@ -528,15 +527,12 @@ export default {
     box-sizing: border-box;
     margin-bottom: 80px;
     > header {
-      // padding-top: 25px;
       border-bottom: 1px dashed #EEEEEE;
       padding-bottom: 15px;
       margin-bottom: 15px;
-      // padding-left: 10px;
     }
     > div {
       width: 100%;
-      // margin-left: 80px;
       > .el-form{
         margin-top: 22px;
         .QuestionTypeList{
@@ -546,29 +542,53 @@ export default {
         }
         .QuestionPicList{
           .el-form-item__error{
-            top: calc(100% + 7px);
+            top: calc(100% - 52px);
           }
           >.el-form-item__content{
             >div{
               // display: flex;
               // flex-wrap: wrap;
-              min-height: 156px;
+              // min-height: 156px;
               .el-upload-list{
                 // display: flex;
                 // flex-wrap: wrap;
+                margin-bottom: -10px;
+                vertical-align: middle;
+                .el-upload-list__item{
+                  display: inline-block;
+                  // display: flex;
+                  // margin: 0 8px 17px;
+                }
+              }
+              .el-upload--picture-card{
+                margin-bottom: 23px;
               }
             }
+          }
+          .el-icon-close-tip{
+            display: none;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+          }
+          .upload-Remark{
+            margin-top: -1em;
           }
         }
         .el-textarea{
           textarea{
             padding-bottom: 13px;
+            max-height: 200px;
           }
           .el-input__count{
-            background: rgba(0, 0, 0, 0);
+            width: calc(100% - 22px);
+            background: #fff;
             height: 12px;
             line-height: 12px;
-            bottom: 4px;
+            bottom: 1px;
+            text-align: right;
+            right: 20px;
+            padding-bottom: 3px;
           }
         }
       }
@@ -619,12 +639,14 @@ export default {
       .make-up-for{
         display: flex;
         color: #888888;
+        height: 32px;
         .item{
           display: flex;
           margin-right: 120px;
           align-items: center;
           .el-form-item{
             .el-form-item__content{
+              line-height: 32px;
 
               color: #888888;
             }
@@ -705,9 +727,6 @@ export default {
               }
             }
           }
-          // .el-form-item__error {
-          //   padding-top: 0;
-          // }
         }
       }
       .btn-box {
@@ -732,20 +751,14 @@ export default {
       }
       .text {
         padding-left: 13px;
-        // color: #888;
         font-size: 13px;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        // font-weight: 700;
       }
       .el-upload-list__item-thumbnail {
         object-fit: cover;
       }
-      // .upload-Remark {
-      //   // line-height: 34px;
-      //   // padding-bottom: 10px;
-      // }
       .el-upload-dragger {
         width: 100%;
         height: 100%;
@@ -769,7 +782,6 @@ export default {
         > .el-dialog__wrapper {
           .el-dialog__header {
             padding: 10px 20px;
-            // height: 30px;
             .el-dialog__title {
               font-size: 17px;
             }
@@ -777,6 +789,11 @@ export default {
           .el-dialog__body {
             padding-top: 10px;
             padding-bottom: 20px;
+          }
+        }
+        .uploadDisabled{
+          >.el-upload--picture-card{
+            display:none
           }
         }
       }
