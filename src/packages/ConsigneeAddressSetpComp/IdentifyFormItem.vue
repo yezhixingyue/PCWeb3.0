@@ -261,8 +261,10 @@ export default {
       };
       let CityList = [];
       let CountyList = [];
-      const [{ addressComponent }] = result.geocodes;
-      const { province, city, district } = addressComponent;
+      const { pname, cityname, adname } = result;
+      const province = pname;
+      const city = cityname;
+      const district = adname;
       const AddressDetail = address
         .replace(province, '')
         .replace(city, '')
@@ -320,65 +322,14 @@ export default {
       };
       this.EmitAddressDetailResolved(temp);
     },
-    DetailedAddressHandler(str) { //
+    async DetailedAddressHandler(str) { //
       // 详细地址解析
       // 详细地址处理
       const { address, Mobile, Consignee } = this.handleDetailAddressStrSplit(str); // { Consignee, Mobile, address }
       if (address) {
-        if (!this.geocoder) {
-          this.$message.warning('解析插件加载失败，请刷新重试');
-        } else {
-          this.OutPlateNoLoading = true;
-          this.geocoder.getLocation(address, (status, result) => {
-            this.OutPlateNoLoading = false;
-            if (
-              status === 'complete'
-              && result
-              && result.info === 'OK'
-              && Array.isArray(result.geocodes)
-              && result.geocodes.length > 0
-            ) {
-              this.handleMapSearchedSuccess(result, address, Consignee, Mobile);
-            // eslint-disable-next-line brace-style
-            }
-            // else if (Consignee) {
-            //   this.geocoder.getLocation(Consignee, (status2, result2) => {
-            //     // 调个个儿 地区与名称互换  重新查询
-            //     if (
-            //       status2 === 'complete'
-            //       && result2
-            //       && result2.info === 'OK'
-            //       && Array.isArray(result2.geocodes)
-            //       && result2.geocodes.length > 0
-            //     ) {
-            //       this.handleMapSearchedSuccess(
-            //         result2,
-            //         Consignee,
-            //         address,
-            //         Mobile,
-            //       );
-            //     } else {
-            //       this.messageBox.failSingleError({
-            //         title: '解析失败',
-            //         msg: '未匹配到准确的省市区（县）,请重新输入或手动选择',
-            //         successFunc: this.handleErrorFunc,
-            //         failFunc: this.handleErrorFunc,
-            //       });
-            //     }
-            //   });
-            // }
-            else if (projectType === 'pc') {
-              this.messageBox.failSingleError({
-                title: '解析失败',
-                msg: '未匹配到准确的省市区（县）,请重新输入（ 手机号码放至收货人与收货地址中间有助于提高识别准确度 ）',
-                successFunc: this.handleErrorFunc,
-                failFunc: this.handleErrorFunc,
-              });
-            } else {
-              this.messageBox.failSingleError('解析失败', '未匹配到准确的省市区（县）,请重新输入（ 手机号码放至收货人与收货地址中间有助于提高识别准确度 ）',
-                this.handleErrorFunc, this.handleErrorFunc);
-            }
-          });
+        const result = await this.placeSearchByAMap(address).catch(() => null);
+        if (result) {
+          this.handleMapSearchedSuccess(result, address, Consignee, Mobile);
         }
       } else {
         const temp = {
@@ -415,6 +366,46 @@ export default {
         this.RegionalList = res.data.Data;
       }
     },
+    placeSearchByAMap(keywords) { // 使用高德地图解析关键字
+      return new Promise((resolve) => {
+        if (!this.placeSearch && window.AMap) {
+          this.placeSearch = new window.AMap.PlaceSearch({
+            extensions: 'all',
+          });
+        }
+        if (this.placeSearch) {
+          this.placeSearch.search(keywords, (status, result) => {
+            if (
+              status === 'complete'
+              && result
+              && result.info === 'OK'
+              && result.poiList
+              && result.poiList.count > 0
+              && result.poiList.pois.length > 0
+            ) {
+              const [target] = result.poiList.pois;
+              resolve(target);
+            } else {
+              if (projectType === 'pc') {
+                this.messageBox.failSingleError({
+                  title: '解析失败',
+                  msg: '未匹配到准确的省市区（县）,请重新输入（ 手机号码放至收货人与收货地址中间有助于提高识别准确度 ）',
+                  successFunc: this.handleErrorFunc,
+                  failFunc: this.handleErrorFunc,
+                });
+              } else {
+                this.messageBox.failSingleError('解析失败', '未匹配到准确的省市区（县）,请重新输入（ 手机号码放至收货人与收货地址中间有助于提高识别准确度 ）',
+                  this.handleErrorFunc, this.handleErrorFunc);
+              }
+              resolve(null);
+            }
+          });
+        } else {
+          this.$message.warning('解析插件加载失败，请刷新重试');
+          resolve(null);
+        }
+      });
+    },
   },
 };
 </script>
@@ -426,17 +417,14 @@ export default {
     .el-form-item__label {
       font-size: 14px;
       padding-right: 2px;
-      // width: 72px !important;
       color: #888;
     }
     .el-form-item__content {
-      // margin-left: 86px !important;
       width: 772px;
       input {
         line-height: 28px;
         height: 30px;
         &::placeholder {
-          // color: #cbcbcb;
           letter-spacing: 0.5px;
           font-size: 13px;
         }

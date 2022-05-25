@@ -71,7 +71,7 @@
               </div>
               <div class="add-2">
                 <el-form-item prop="AddressDetail">
-                <el-input v-model.trim="AddressDetail" maxlength="40"
+                <el-input v-model.trim="AddressDetail" maxlength="40" @input="HaveAddressContentChange = true"
                   show-word-limit placeholder="详细地址 (不包含省市区)"></el-input>
                 </el-form-item>
                 <el-button
