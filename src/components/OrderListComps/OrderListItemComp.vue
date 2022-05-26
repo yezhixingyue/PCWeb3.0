@@ -23,11 +23,11 @@
           :class="i === data.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID"
         >
-          <div :style="wStyles[0]" class="is-twelve">{{item.OrderID}}</div>
+          <div :style="wStyles[0]">{{item.OrderID}}</div>
           <div :style="wStyles[1]">
             <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.ProductName" placement="top-start">
-              <span>{{item.ProductName}}</span>
+              :content="item | getFullName" placement="top-start">
+              <span>{{item | getFullName}}</span>
             </el-tooltip>
           </div>
           <div :style="wStyles[2]">
@@ -38,37 +38,43 @@
           </div>
           <div :style="wStyles[3]">
             <el-tooltip popper-class="table-item" :enterable='false'
+              :content="item.MaterialList | formatListItemMaterial" placement="top-start">
+              <span>{{item.MaterialList | formatListItemMaterial}}</span>
+            </el-tooltip>
+          </div>
+          <div :style="wStyles[4]">
+            <el-tooltip popper-class="table-item" :enterable='false'
               :content="item.CraftList | formatListItemCraft" placement="top-start">
               <span>{{item.CraftList | formatListItemCraft}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[4]">
+          <div :style="wStyles[5]">
             <el-tooltip popper-class="table-item" :enterable='false'
               :content="item | formarProductAmount" placement="top-start">
               <span>{{item | formarProductAmount}}</span>
             </el-tooltip>
           </div>
-          <div :style="wStyles[5]" class="is-font-12 gray">
+          <div :style="wStyles[6]" class="is-font-12 gray">
             <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
               :content="item.Content" placement="top-start">
               <span>{{item.Content}}</span>
             </el-tooltip>
             <span v-else>无</span>
           </div>
-          <div :style="wStyles[6]" class="is-twelve">
+          <div :style="wStyles[7]">
             <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-          <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
-          <div :style="wStyles[8]">{{item.Funds.HavePaid}}元</div>
-          <div :style="wStyles[9]">{{item.Funds.Unpaid}}元</div>
-          <div :style="wStyles[10]">{{item.Funds.Refund}}元</div>
-          <div :style="wStyles[11]" :class="{
+          <div :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
+          <div :style="wStyles[9]">{{item.Funds.HavePaid}}元</div>
+          <div :style="wStyles[10]">{{item.Funds.Unpaid}}元</div>
+          <div :style="wStyles[11]">{{item.Funds.Refund}}元</div>
+          <div :style="wStyles[12]" :class="{
             'is-font-13': 1,
             'yellow-color': 1,
             'is-gray': [254, 255, 35].includes(item.Status),
             'is-success': item.Status === 200,
           }">{{item.Status | formatStatus}}</div>
-          <div :style="wStyles[12]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
-          <div :style="wStyles[13]" class="is-font-12 gray btn-wrap">
+          <div :style="wStyles[13]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
+          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap">
             <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
             <span class="span-title-blue" @click="goToFeedback(item)"
               v-if="item.AllowAfterSales">售后</span>

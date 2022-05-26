@@ -98,13 +98,6 @@ Vue.filter('getCouponList', ({ CouponList }) => {
   return '';
 });
 
-const formatListItemSize = SizeList => {
-  if (!Array.isArray(SizeList) || SizeList.length === 0) return '';
-  return SizeList.join('、');
-};
-Vue.filter('formatListItemSize', formatListItemSize);
-Vue.filter('formatListItemCraft', formatListItemSize); // 暂同上共用同一个方法 后续如有需要再分开
-
 Vue.filter('formatNumber', num => +((+num).toFixed(2)));
 
 export default {

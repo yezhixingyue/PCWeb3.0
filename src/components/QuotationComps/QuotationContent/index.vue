@@ -47,8 +47,9 @@
                     </el-button>
                     <!-- 价格展示区域 -->
                     <ComputedResultComp
+                     isPrice
+                     showExpressCost
                      :ProductQuotationResult="ProductQuotationResult"
-                     :showExpressCost='true'
                      :selectedCoupon="selectedCoupon"
                      v-if="!priceGetErrMsg" />
                     <!-- 错误 或 优惠券选择信息显示区域 -->

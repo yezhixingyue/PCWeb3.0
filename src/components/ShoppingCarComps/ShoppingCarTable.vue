@@ -13,49 +13,52 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" class-name="check-row" width="54" :selectable='handleSelectable'></el-table-column>
-        <el-table-column label="产品" width="130" show-overflow-tooltip>
+        <el-table-column label="产品" width="125" show-overflow-tooltip>
           <template slot-scope="scope">{{scope.row.ProductParams.Attributes | getFullName}}</template>
         </el-table-column>
         <el-table-column label="尺寸" width="70" show-overflow-tooltip>
           <template slot-scope="scope">{{getSize(scope.row)}}</template>
         </el-table-column>
-        <el-table-column label="数量" width="78" show-overflow-tooltip>
-          <template slot-scope="scope">{{ scope.row.ProductParams.Attributes | formarProductAmount }}</template>
+        <el-table-column label="物料" width="70" show-overflow-tooltip>
+          <template slot-scope="scope">{{getMaterial(scope.row.ProductParams)}}</template>
         </el-table-column>
         <el-table-column label="工艺" width="70" show-overflow-tooltip>
           <template slot-scope="scope">{{ getCraft(scope.row.ProductParams) }}</template>
         </el-table-column>
+        <el-table-column label="数量" width="73" show-overflow-tooltip>
+          <template slot-scope="scope">{{ scope.row.ProductParams.Attributes | formarProductAmount }}</template>
+        </el-table-column>
         <el-table-column label="原价" width="65" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Funds.OriginalPrice }}元</template>
         </el-table-column>
-        <el-table-column label="优惠券" show-overflow-tooltip width="65">
+        <el-table-column label="优惠券" show-overflow-tooltip width="55">
           <template slot-scope="scope"
             >{{ scope.row.Funds.CouponAmount > 0 ? '-' + +scope.row.Funds.CouponAmount.toFixed(2) : 0 }}元</template>
         </el-table-column>
         <el-table-column label="成交价" width="65" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Funds.FinalPrice }}元</template>
         </el-table-column>
-        <el-table-column label="定金" width="65" show-overflow-tooltip>
+        <el-table-column label="定金" width="60" show-overflow-tooltip>
           <template slot-scope="scope">{{ scope.row.Funds.Deposit }}元</template>
         </el-table-column>
         <el-table-column prop="Content" label="文件内容" show-overflow-tooltip>
-          <template slot-scope="scope">{{scope.row.Content || '无'}}</template>
+          <span slot-scope="scope" class="is-gray">{{scope.row.Content || '无'}}</span>
         </el-table-column>
         <el-table-column prop="Address.Address.Consignee" label="收货人" width="60" show-overflow-tooltip>
         </el-table-column>
-        <el-table-column prop="Address.Address.Mobile" label="收货人手机" width="90" show-overflow-tooltip>
+        <el-table-column prop="Address.Address.Mobile" label="收货人手机" width="85" show-overflow-tooltip>
         </el-table-column>
-        <el-table-column label="配送方式" show-overflow-tooltip width="78">
+        <el-table-column label="配送方式" show-overflow-tooltip width="73">
           <template slot-scope="scope">{{ getExpress(scope.row.Address.Express) }}</template>
         </el-table-column>
-        <el-table-column label="状态" show-overflow-tooltip width="75">
+        <el-table-column label="状态" show-overflow-tooltip width="70">
           <span
           slot-scope="scope"
           :title="scope.row._removeErrorText || ''"
           :class="{ 'is-pink': getStatus(scope.row).warn, 'is-success': getStatus(scope.row).success }"
           >{{ getStatus(scope.row).text }}</span>
         </el-table-column>
-        <el-table-column label="操作" width="150" >
+        <el-table-column label="操作" width="120" >
           <div class="menu-list" slot-scope="scope">
             <span class="span-title-blue" @click="handleSingleSubmit(scope.row)" :class="{disabled: scope.row._isOrder}">下单</span>
             <span @click="onDetailClick(scope.row)" class="span-title-blue detail">详情</span>
@@ -210,6 +213,20 @@ export default {
             _it2.CraftList.forEach(_it3 => {
               if (_it3.Attributes) arr.push(_it3.Attributes.DisplayName);
             });
+          });
+        });
+      }
+      return [...new Set(arr.filter(it => it))].join('，');
+    },
+    getMaterial({ Attributes, PartList }) {
+      const arr = [];
+      if (Attributes && Attributes.MaterialName) {
+        arr.push(Attributes.MaterialName);
+      }
+      if (Array.isArray(PartList) && PartList.length > 0) {
+        PartList.forEach(_it => {
+          _it.List.forEach(_it2 => {
+            if (_it2.Attributes && _it2.Attributes.MaterialName) arr.push(_it2.Attributes.MaterialName);
           });
         });
       }
@@ -447,7 +464,7 @@ export default {
                 > span {
                   font-size: 12px;
                   &.detail {
-                    margin: 0 15px;
+                    margin: 0 3px;
                   }
                 }
               }

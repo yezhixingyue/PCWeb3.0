@@ -59,7 +59,7 @@
         <el-button type="danger" @click="onSubmitOrder" :loading="isUploading && uploadType === 'create'"
          :disabled="isUploading && uploadType === 'car'">{{submitText}}</el-button>
         <ComputedResultComp
-          :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
+          :ProductQuotationResult='ProductQuotationResult' showExpressCost :selectedCoupon='selectedCoupon' />
       </div>
       <div class="tips-box-wrap">
         <TipsBox />

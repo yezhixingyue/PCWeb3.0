@@ -24,12 +24,12 @@
       @popperVisible='handlePopperVisible'
     />
     <div v-show='!localUseSameAddress && customer' class="is-gray remark">
-      <span class="b"><i>命名格式1：</i>“批量下单信息※【姓名 手机号 省市区详细地址】文件名”</span>
-      <span class="b"><i>命名格式2：</i>“批量下单信息※【平台单号】文件名”</span>
+      <span class="b"><i>命名格式1：</i>“批量下单信息※【姓名 手机号 省市区详细地址】印刷内容”</span>
+      <span class="b"><i>命名格式2：</i>“批量下单信息※【平台单号】印刷内容”</span>
       <span >注：使用不同地址时，需解析的文件名中携带的平台单号或地址信息，地址信息解析失败无法下单，解析平台单号需店铺授权，授权流程请向客服资讯，（支持淘宝、天猫、拼多多、京东）。</span>
     </div>
     <div v-show='localUseSameAddress' class="is-gray remark same">
-      <span>注：命名格式：批量下单信息※文件名</span>
+      <span>注：命名格式：批量下单信息※印刷内容</span>
       <span>例如：普通名片-铜版不覆膜,2盒／款,1款,双面,彩色,尺寸(90x54mm),物料[名片专用铜版]※张三名片</span>
     </div>
   </section>

@@ -15,7 +15,7 @@
       <span>{{title}}</span>
     </header>
 
-    <ul class="change-add-dia-content"  :class="openType==='tempAdd'?'tempAdd':''">
+    <ul class="change-add-dia-content"  :class="{[projectType]:projectType, tempAdd:openType==='tempAdd'}">
       <li>
         <section v-show="openType !== 'tempAdd'">
           <el-form :model="newAdd" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm" @submit.native.prevent>
@@ -37,7 +37,7 @@
               <div class="add-1">
                 <span class="title">收货地址：</span>
                 <el-form-item prop="Regional">
-                  <el-select v-model="newAdd.ExpressArea.RegionalID" @change='handleRegionalChange' size="mini">
+                  <el-select v-model="RegionalID" size="mini">
                     <el-option
                       v-for="item in RegionalList"
                       :key="item.ID"
@@ -47,8 +47,7 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item prop="City">
-                  <el-select v-model="newAdd.ExpressArea.CityID"
-                  :disabled="CityList.length === 0" @change='handleCityChange' size="mini">
+                  <el-select v-model="CityID" :disabled="CityList.length === 0" size="mini">
                     <el-option
                       v-for="item in CityList"
                       :key="item.ID"
@@ -58,8 +57,7 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item prop="County">
-                  <el-select v-model="newAdd.ExpressArea.CountyID"
-                    :disabled="CountyList.length === 0" @change='handleCountyChange' size="mini">
+                  <el-select v-model="CountyID" :disabled="CountyList.length === 0" size="mini">
                     <el-option
                       v-for="item in CountyList"
                       :key="item.ID"
@@ -71,7 +69,7 @@
               </div>
               <div class="add-2">
                 <el-form-item prop="AddressDetail">
-                <el-input v-model.trim="AddressDetail" maxlength="40" @input="HaveAddressContentChange = true"
+                <el-input v-model.trim="AddressDetail" maxlength="40"
                   show-word-limit placeholder="详细地址 (不包含省市区)"></el-input>
                 </el-form-item>
                 <el-button
@@ -97,10 +95,10 @@
       </li>
     </ul>
     <div slot="footer" class="dialog-footer">
+      <p class="tips-row">{{tipContent}}</p>
       <el-button type="primary"
        @click="handleSubmit('ruleForm')"
-       :disabled='HaveAddressContentChange'
-       :title="HaveAddressContentChange ? '省市区地址发生变动，请重新定位' : ''">确定</el-button>
+       :title="HaveAddressContentChange ? '省市区地址发生变动，请重新定位' : ''">保存</el-button>
       <el-button v-if="openType !== 'tempAdd'" @click="handleBeforeDiaClose">取消</el-button>
     </div>
   </el-dialog>
@@ -234,6 +232,8 @@ export default {
       initNum: 0,
       loadingAddInfo: false,
       HaveAddressContentChange: false,
+      HaveAddressDetailChange: false,
+      projectType,
     };
   },
   computed: {
@@ -267,6 +267,33 @@ export default {
       }
       return '';
     },
+    RegionalID: {
+      get() {
+        return this.newAdd.ExpressArea.RegionalID;
+      },
+      set(id) {
+        this.newAdd.ExpressArea.RegionalID = id;
+        this.handleRegionalChange(id);
+      },
+    },
+    CityID: {
+      get() {
+        return this.newAdd.ExpressArea.CityID;
+      },
+      set(id) {
+        this.newAdd.ExpressArea.CityID = id;
+        this.handleCityChange(id);
+      },
+    },
+    CountyID: {
+      get() {
+        return this.newAdd.ExpressArea.CountyID;
+      },
+      set(id) {
+        this.newAdd.ExpressArea.CountyID = id;
+        this.handleCountyChange(id);
+      },
+    },
     AddressDetail: {
       get() {
         return this.newAdd.AddressDetail;
@@ -274,7 +301,19 @@ export default {
       set(val) {
         this.newAdd.AddressDetail = val;
         // this.HaveAddressContentChange = true;
+        this.HaveAddressDetailChange = true;
       },
+    },
+    tipContent() {
+      let str = '';
+      if (!this.newAdd.Latitude || !this.newAdd.Longitude) {
+        str = '';
+      } else if (this.HaveAddressContentChange) {
+        str = '省市区地址发生变动，请重新设置地图定位';
+      } else if (this.HaveAddressDetailChange) {
+        str = '详细地址发生变动，请重新设置地图定位或在地图中重新选定坐标';
+      }
+      return str;
     },
   },
   methods: {
@@ -331,10 +370,21 @@ export default {
               if (projectType === 'pc') {
                 this.messageBox.failSingleError({
                   title: '尚未设置地图定位',
-                  msg: '请点击右侧 [ 地图定位 ] 按钮进行设置',
+                  msg: '请点击 [ 地图定位 ] 按钮进行设置',
                 });
               } else {
-                this.messageBox.failSingleError('尚未设置地图定位', '请点击右侧 [ 地图定位 ] 按钮进行设置');
+                this.messageBox.failSingleError('尚未设置地图定位', '请点击 [ 地图定位 ] 按钮进行设置');
+              }
+              return;
+            }
+            if (this.tipContent) {
+              if (projectType === 'pc') {
+                this.messageBox.failSingleError({
+                  title: '保存失败',
+                  msg: this.tipContent,
+                });
+              } else {
+                this.messageBox.failSingleError('保存失败', this.tipContent);
               }
               return;
             }
@@ -346,7 +396,6 @@ export default {
               return;
             }
             const res = await this.api.getCustomerAddress(_obj);
-            // // console.log(res);
             if (res.data.Status === 1000) {
               const successFunc = () => {
                 this.newAdd.AddressID = res.data.Data;
@@ -366,30 +415,37 @@ export default {
           }
         });
       } else if (this.openType === 'tempAdd') {
+        if (this.tipContent) {
+          if (projectType === 'pc') {
+            this.messageBox.failSingleError({
+              title: '保存失败',
+              msg: this.tipContent,
+            });
+          } else {
+            this.messageBox.failSingleError('保存失败', this.tipContent);
+          }
+          return;
+        }
         this.$emit('changeProps', this.newAdd);
         this.canClose = true;
-        // this.$message({
-        //   message: '已定位',
-        //   type: 'success',
-        // });
         this.handleBeforeDiaClose(true);
       } else {
         // 编辑地址
-        // if (!this.newAdd.HavePosition) {
-        //   this.messageBox.failSingleError({
-        //     title: '定位不成功',
-        //     msg: '请重新定位',
-        //   });
-        //   return;
-        // }
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
+            if (this.tipContent) {
+              if (projectType === 'pc') {
+                this.messageBox.failSingleError({
+                  title: '保存失败',
+                  msg: this.tipContent,
+                });
+              } else {
+                this.messageBox.failSingleError('保存失败', this.tipContent);
+              }
+              return;
+            }
             const _obj = JSON.parse(JSON.stringify(this.newAdd));
             if (this.isTemp) {
-              // this.$message({
-              //   message: '已定位',
-              //   type: 'success',
-              // });
               // eslint-disable-next-line max-len
               this.$emit('submit', { ..._obj, RegionalList: this.RegionalList, CityList: this.CityList, CountyList: this.CountyList });
               return;
@@ -400,7 +456,6 @@ export default {
               return;
             }
             const res = await this.api.getCustomerAddress(_obj);
-            // // console.log(res);
             if (res.data.Status === 1000) {
               const successFunc = () => {
                 this.$store.commit('common/handleAddOrEditAddressOnStore', [this.newAdd, 'edit']);
@@ -433,11 +488,13 @@ export default {
       this.newAdd.Longitude = _lng;
     },
     handleMapClick(e) {
+      this.HaveAddressDetailChange = false;
       this.setPositionIndex(e.lnglat.lng, e.lnglat.lat);
     },
     onSearchResult(pois) {
       this.mapIsLoading = false;
       this.HaveAddressContentChange = false;
+      this.HaveAddressDetailChange = false;
       if (pois.length > 0) {
         const { lng, lat } = pois[0];
         this.setPositionIndex(lng, lat);
@@ -488,6 +545,7 @@ export default {
       this.initNum = 0;
       this.lastSearchWords = '';
       this.HaveAddressContentChange = false;
+      this.HaveAddressDetailChange = false;
       this.$nextTick(() => {
         this.map = new AMap.Map('map-container', {
           center: [this.lng, this.lat],
@@ -673,6 +731,28 @@ export default {
       display: inline-block;
       text-align: right;
     }
+    .el-dialog__header {
+      padding: 16px 20px 15px;
+      position: relative;
+      > header {
+        height: 14px;
+        line-height: 14px;
+        color: #888;
+      }
+      .el-dialog__headerbtn {
+        top: 11px;
+      }
+      &::after {
+        height: 1px;
+        width: calc(100% - 20px);
+        margin: 0 10px;
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        background: whitesmoke;
+      }
+    }
     .el-dialog__body {
       padding-left: 22px;
       padding-right: 22px;
@@ -681,7 +761,7 @@ export default {
       // height: 635px;
       min-height: 188px;
       > .change-add-dia-content {
-        height: 655px;
+        // height: 630px;
         &.tempAdd {
           height: 538px;
           > .map-wrap {
@@ -747,6 +827,7 @@ export default {
                           height: 35px;
                           > .el-select {
                             line-height: 30px;
+                            width: 100%;
                             > .el-input {
                               width: 100px;
                               > input {
@@ -755,6 +836,7 @@ export default {
                                 padding-left: 12px;
                                 padding-right: 22px;
                                 line-height: 26px\0;
+                                border-radius: 3px;
                                 &::placeholder {
                                   color: #cbcbcb;
                                 }
@@ -837,16 +919,35 @@ export default {
             }
           }
         }
+        input {
+          border-radius: 4px;
+          font-size: 13px !important;
+        }
+        &.erp {
+          .el-input__suffix {
+            top: -2px;
+          }
+        }
       }
     }
     .el-dialog__footer {
       padding: 30;
       > .dialog-footer {
         text-align: center;
+        > .tips-row {
+          color: #ff3769;
+          font-size: 12px;
+          padding-bottom: 8px;
+          padding-left: 340px;
+          line-height: 20px;
+          text-align: left;
+          height: 20px;
+        }
         > button {
           height: 35px;
           padding: 0;
           width: 120px;
+          font-size: 14px;
           & + button {
             margin-left: 50px;
           }

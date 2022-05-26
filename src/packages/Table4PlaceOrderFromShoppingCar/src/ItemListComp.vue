@@ -22,7 +22,7 @@
           :class="i === data.OrderList.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID + i"
         >
-          <div :style="wStyles[0]" class="is-twelve" :title="item | getFullName">{{item | getFullName}}</div>
+          <div :style="wStyles[0]" :title="item | getFullName">{{item | getFullName}}</div>
           <div :style="wStyles[1]" :title="item | formarProductAmount">{{item | formarProductAmount}}</div>
           <div :style="wStyles[2]">{{item.Funds.OriginalPrice | formatNumber}}元</div>
           <div :style="wStyles[3]">{{item.Funds.CouponAmount ? `-${item.Funds.CouponAmount}` : item.Funds.CouponAmount}}元</div>
