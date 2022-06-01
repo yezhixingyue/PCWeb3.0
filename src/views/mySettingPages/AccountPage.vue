@@ -244,7 +244,7 @@ export default {
           return false;
         }
         if (length > 11) {
-          this.reportError('QQ号长度不应超过13位');
+          this.reportError('QQ号长度不应超过11位');
           return false;
         }
       }

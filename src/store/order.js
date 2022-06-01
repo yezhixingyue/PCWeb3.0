@@ -37,6 +37,7 @@ export default {
     /** 是否重新获取当前订单列表数据 (从详情返回不需要)
     ---------------------------------------- */
     shouldGetNewListData: true,
+    loading: false,
   },
   getters: {
     /** 合包后的订单列表信息
@@ -66,6 +67,9 @@ export default {
       state.OrderList = list;
       if (num || num === 0) state.OrderListNumber = num;
       if (count || count === 0) state.showOrderListNumber = count;
+    },
+    setLoading(state, bool) {
+      state.loading = bool;
     },
     setOrderTotalAmount(state, amount) {
       state.orderTotalAmount = amount;
@@ -119,7 +123,12 @@ export default {
           t.Funds.Refund = t.Funds.HavePaid;
           t.Funds.Unpaid = 0;
           t.Status = 254;
-          state.orderTotalAmount = +(state.orderTotalAmount - t.Funds.FinalPrice).toFixed(2);
+          let _Freight = 0;
+          const unCancelItem = _t.OrderList.find(_it => _it.OrderID !== OrderID && _it.Status !== 254);
+          if (!unCancelItem) {
+            _Freight = t.Funds.Freight;
+          }
+          state.orderTotalAmount = +(state.orderTotalAmount - t.Funds.FinalPrice - _Freight).toFixed(2);
         }
       }
     },
@@ -164,17 +173,20 @@ export default {
         return;
       }
       commit('setCondition4OrderList', [['Page', ''], page]);
-      commit('setOrderList', [[], undefined]);
       commit('setDate4ConditionDate', 'condition4OrderList');
       const _obj = CommonClassType.filter(state.condition4OrderList);
       if (_obj.Date) {
         _obj.PlaceDate = _obj.Date;
         delete _obj.Date;
       }
-      const res = await api.getCustomerOrderList(_obj);
-      if (res.data.Status === 1000) {
+      commit('setLoading', true);
+      const res = await api.getCustomerOrderList(_obj).catch(() => null);
+      commit('setLoading', false);
+      if (res && res.data.Status === 1000) {
         commit('setOrderList', [res.data.Data, res.data.DataNumber, res.data.VersionCode]);
         if (res.data.Message && page === 1) commit('setOrderTotalAmount', res.data.Message);
+      } else {
+        commit('setOrderList', [[], undefined]);
       }
     },
   },

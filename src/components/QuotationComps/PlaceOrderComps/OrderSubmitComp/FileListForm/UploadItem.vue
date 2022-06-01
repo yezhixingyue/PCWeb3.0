@@ -175,9 +175,9 @@ export default {
       } else { // 上传失败
         this.$notify.error({
           title: `${file.name}上传失败`,
-          message: res.error.message || '请检查文件或重试!',
+          message: res.error || '请检查文件或重试!',
         });
-        onError(new Error(res.error.message || '文件上传失败'));
+        onError(new Error(res.error || '文件上传失败'));
       }
     },
     submit() { // 提交 判断是否有文件需要上传（非必传文件时），如果没有则直接返回结果

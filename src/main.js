@@ -21,6 +21,7 @@ Vue.config.productionTip = false;
 Vue.prototype.validateCheck = validateCheck;
 Vue.prototype.api = api;
 Vue.prototype.utils = utils;
+Vue.prototype.$utils = utils;
 
 // Vue.use(Element);
 

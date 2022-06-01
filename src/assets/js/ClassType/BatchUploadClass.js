@@ -168,7 +168,7 @@ export default class BatchUpload {
       _item.uploadStatus = 'success'; // 上传成功 继续向后面进行
     } else {
       _item.uploadStatus = 'fail';
-      _item.error = uploadResult && uploadResult.error && uploadResult.error.message ? uploadResult.error.message : '文件上传失败';
+      _item.error = uploadResult.error || '文件上传失败';
       _item.percentage = 0;
     }
     return uploadResult;
@@ -297,9 +297,10 @@ export default class BatchUpload {
     loadingInstance.text = '文件正在上传...';
     const uploadedList = await Promise.all(list.map(it => this.getFileUploadBySingle(it)));
     // 3. 判断文件上传结果中是否存在不成功的项目，如果有则return
-    const i = uploadedList.findIndex(it => !it);
+    const i = uploadedList.findIndex(it => !it || (typeof it === 'object' && it.status === false));
     if (i > -1) {
-      messageBox.failSingleError({ title: '上传失败', msg: '存在上传失败的文件' });
+      const msg = uploadedList.length === 1 ? '文件上传失败' : '部分文件上传失败，请检查';
+      messageBox.failSingleError({ title: '上传失败', msg });
       loadingInstance.close();
       return;
     }

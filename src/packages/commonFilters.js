@@ -33,7 +33,7 @@ Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
     }
   }
   let timeStr = dayTimeStr || `${m}月${d}日`;
-  if (showTime && dayTimeStr) timeStr += ` (${m}月${d}日) `;
+  if (showTime && dayTimeStr) timeStr += ` ( ${+m}月${+d}日 ) `;
   // console.log(showTime, 'showTime', ProducePeriod, `${m}月${d}日`, fullDay);
   // const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
   const hour = ''; // 不显示具体时间

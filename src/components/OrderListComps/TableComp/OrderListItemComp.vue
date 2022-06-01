@@ -1,7 +1,8 @@
 <template>
     <div class="mp-pc-order-list-page-table-item-comp-wrap">
-      <div class="product-item-header">
-        <div class="product-item-header-left">
+      <div class="product-item-header" :class="{visible: fixedLeft || fixedRight}"
+       :style="`margin-right:${fixedLeft ? -(1198 - Object.values(this.widthObj)[0]) : 0}px`">
+        <div class="product-item-header-left" v-if="fixedLeft">
           <span class="product-item-header-amount-box gray is-font-14">产品金额：<i class="is-pink"
             >{{totalOriginalPrice}}元</i></span>
           <span class="freight-box" v-if="OutPlatNo"> <i class="gray">平台单号：</i><em class="is-font-12">{{OutPlatNo}}</em></span>
@@ -14,67 +15,72 @@
         <div class="product-item-header-right" @click="handleCollapse">
           <div :class="isActive ? 'active' : ''"></div>
         </div>
+        <span style="display:none" class="product-item-header-set-active" @click="handleActive"></span>
       </div>
       <TransitionGroupCollapse4ShopCar tag="ul" class="mp-group-collapse-for-shop"> <!-- 子列表部分 -->
         <li
           class="product-item-content has-transition"
+          :class="{hover: curHoverOrderID === item.OrderID, 'hide-border-item': i === data.length - 1}"
           v-show="isActive"
           v-for="(item, i) in data.OrderList"
-          :class="i === data.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID"
+          @mouseenter="onItemMouseEnter(item.OrderID)"
+          @mouseleave="onItemMouseLeave(item.OrderID)"
         >
-          <div :style="wStyles[0]">{{item.OrderID}}</div>
-          <div :style="wStyles[1]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item | getFullName" placement="top-start">
-              <span>{{item | getFullName}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[2]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.SizeList | formatListItemSize" placement="top-start">
-              <span>{{item.SizeList | formatListItemSize}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[3]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.MaterialList | formatListItemMaterial" placement="top-start">
-              <span>{{item.MaterialList | formatListItemMaterial}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[4]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item.CraftList | formatListItemCraft" placement="top-start">
-              <span>{{item.CraftList | formatListItemCraft}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[5]">
-            <el-tooltip popper-class="table-item" :enterable='false'
-              :content="item | formarProductAmount" placement="top-start">
-              <span>{{item | formarProductAmount}}</span>
-            </el-tooltip>
-          </div>
-          <div :style="wStyles[6]" class="is-font-12 gray">
-            <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
-              :content="item.Content" placement="top-start">
-              <span>{{item.Content}}</span>
-            </el-tooltip>
-            <span v-else>无</span>
-          </div>
-          <div :style="wStyles[7]">
-            <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-          <div :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
-          <div :style="wStyles[9]">{{item.Funds.HavePaid}}元</div>
-          <div :style="wStyles[10]">{{item.Funds.Unpaid}}元</div>
-          <div :style="wStyles[11]">{{item.Funds.Refund}}元</div>
-          <div :style="wStyles[12]" :class="{
-            'is-font-13': 1,
-            'yellow-color': 1,
-            'is-gray': [254, 255, 35].includes(item.Status),
-            'is-success': item.Status === 200,
-          }">{{item.Status | formatStatus}}</div>
-          <div :style="wStyles[13]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
-          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap">
+          <div :style="wStyles[0]" v-if="!fixedRight" :class="{hide: !fixedLeft}">{{item.OrderID}}</div>
+          <template v-if="!fixedLeft && !fixedRight">
+            <div :style="wStyles[1]">
+              <el-tooltip popper-class="table-item" :enterable='false'
+                :content="item | getFullName" placement="top-start">
+                <span>{{item | getFullName}}</span>
+              </el-tooltip>
+            </div>
+            <div :style="wStyles[2]">
+              <el-tooltip popper-class="table-item" :enterable='false'
+                :content="item.SizeList | formatListItemSize" placement="top-start">
+                <span>{{item.SizeList | formatListItemSize}}</span>
+              </el-tooltip>
+            </div>
+            <div :style="wStyles[3]">
+              <el-tooltip popper-class="table-item" :enterable='false'
+                :content="item.MaterialList | formatListItemMaterial" placement="top-start">
+                <span>{{item.MaterialList | formatListItemMaterial}}</span>
+              </el-tooltip>
+            </div>
+            <div :style="wStyles[4]">
+              <el-tooltip popper-class="table-item" :enterable='false'
+                :content="item.CraftList | formatListItemCraft" placement="top-start">
+                <span>{{item.CraftList | formatListItemCraft}}</span>
+              </el-tooltip>
+            </div>
+            <div :style="wStyles[5]">
+              <el-tooltip popper-class="table-item" :enterable='false'
+                :content="item | formarProductAmount" placement="top-start">
+                <span>{{item | formarProductAmount}}</span>
+              </el-tooltip>
+            </div>
+            <div :style="wStyles[6]" class="is-font-12 gray">
+              <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
+                :content="item.Content" placement="top-start">
+                <span>{{item.Content}}</span>
+              </el-tooltip>
+              <span v-else>无</span>
+            </div>
+            <div :style="wStyles[7]" :class="{
+              'is-font-12': 1,
+              'yellow-color': 1,
+              'is-gray': [254, 255, 35].includes(item.Status),
+              'is-success': item.Status === 200,
+            }">{{item.Status | formatStatus}}</div>
+            <div :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
+            <div :style="wStyles[9]">
+              <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
+            <div :style="wStyles[10]">{{item.Funds.HavePaid}}元</div>
+            <div :style="wStyles[11]">{{item.Funds.Unpaid}}元</div>
+            <div :style="wStyles[12]">{{item.Funds.Refund}}元</div>
+            <div :style="wStyles[13]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
+          </template>
+          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap" v-if="!fixedLeft" :class="{hide: !fixedRight}">
             <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
             <span class="span-title-blue" @click="goToFeedback(item)"
               v-if="item.AllowAfterSales">售后</span>
@@ -85,13 +91,11 @@
           </div>
         </li>
       </TransitionGroupCollapse4ShopCar>
-      <SubmitConfirmDialog :visible.sync="detailVisible" isFullType :OrderID='curOrderID4Detail' />
     </div>
 </template>
 
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
-import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -123,11 +127,22 @@ export default {
     CustomerNo: {
       type: String,
     },
+    fixedLeft: {
+      type: Boolean,
+      default: false,
+    },
+    fixedRight: {
+      type: Boolean,
+      default: false,
+    },
+    curHoverOrderID: {
+      type: Number,
+      default: null,
+    },
   },
   components: {
     // Test,
     TransitionGroupCollapse4ShopCar,
-    SubmitConfirmDialog,
   },
   computed: {
     ...mapState('shoppingCar', ['curShoppingCarDataBeforeFirstPlace']),
@@ -153,12 +168,22 @@ export default {
   data() {
     return {
       isActive: true,
-      detailVisible: false,
       curOrderID4Detail: null,
     };
   },
   methods: {
     handleCollapse() {
+      const oWraps = document.getElementsByClassName(`${this.data.ID}`);
+      console.log(oWraps);
+      if (oWraps.length > 0) {
+        oWraps.forEach(oWrap => {
+          const tDom = oWrap.getElementsByClassName('product-item-header-set-active')[0];
+          // console.log(tDom);
+          tDom.click();
+        });
+      }
+    },
+    handleActive() {
       this.isActive = !this.isActive;
     },
     // eslint-disable-next-line object-curly-newline
@@ -169,12 +194,11 @@ export default {
       _obj.Second = `（${Consignee} ${Mobile}）`;
       return _obj;
     },
-    async goToDetailPage(data) {
+    goToDetailPage(data) {
       if (!data) return;
       // this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
       // this.$router.push('/order/detail');
-      this.curOrderID4Detail = data.OrderID;
-      this.detailVisible = true;
+      this.$emit('detail', data.OrderID);
     },
     goToFeedback(item) {
       const { OrderID, Content } = item;
@@ -190,8 +214,8 @@ export default {
       });
     },
     async cancelOrder(OrderID) {
-      const res = await this.api.getOrderCancle(OrderID);
-      if (res.data.Status === 1000) {
+      const res = await this.api.getOrderCancle(OrderID).catch(() => null);
+      if (res && res.data.Status === 1000) {
         this.messageBox.successSingle({
           title: '取消成功',
           successFunc: () => {
@@ -200,6 +224,12 @@ export default {
           },
         });
       }
+    },
+    onItemMouseEnter(OrderID) {
+      this.$emit('itemHover', OrderID);
+    },
+    onItemMouseLeave(OrderID) {
+      this.$emit('itemHoverLeave', OrderID);
     },
   },
 };
@@ -221,6 +251,10 @@ export default {
     justify-content: space-between;
     border-top: 1px solid rgba($color: #000000, $alpha: 0);
     border-bottom: 1px solid #eee;
+    visibility: hidden;
+    &.visible {
+      visibility: visible;
+    }
     // width: 1150px;
     .product-item-header-left {
       height: 36px;
@@ -278,7 +312,7 @@ export default {
         left: 50%;
         transition: 0.05s !important;
         transform: translate(-50%, -50%) rotate(90deg);
-        background: url("../../assets/images/r.png") center
+        background: url("../../../assets/images/r.png") center
           no-repeat;
         background-size: 100% 100%;
         &.active {
@@ -295,7 +329,7 @@ export default {
     }
   }
   .product-item-content {
-    height: 70px;
+    height: 40px;
     // padding: 13px 0;
     box-sizing: border-box;
     vertical-align: middle;
@@ -304,7 +338,7 @@ export default {
     border-bottom: none;
     // border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
-    &:hover > div {
+    &.hover > div, &:hover > div {
       background-color: #ebf7ff;
     }
     > div {
@@ -320,10 +354,11 @@ export default {
       font-size: 12px;
       color: #585858;
       line-height: 30px;
-      padding-top: 20px;
+      padding-top: 5px;
       height: 100%;
       box-sizing: border-box;
       display: inline-block\0;
+      // transition: width 0.1s ease-in-out;
       &.yellow-color {
         color: #f4a307;
       }
@@ -333,11 +368,15 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      // &.btn-wrap {
-      //   // > .span-title-blue {
-      //   //   // margin-right: 6px;
-      //   // }
-      // }
+      &.btn-wrap {
+        > span {
+          margin: 0 1px;
+        }
+      }
+      visibility: visible;
+      &.hide {
+        visibility: hidden;
+      }
     }
   }
 }

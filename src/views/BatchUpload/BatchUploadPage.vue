@@ -387,6 +387,12 @@ export default {
     async handleBatchUploadFiles(list) { // 执行单个文件上传或批量上传 （使用同一个方法） -- 在最终下单前 在客户界面 需进行预下单弹窗确认
       // 预下单
       this.preCreateOriginDataList = [];
+      const t = list.find(it => it.uploadStatus === 'fail' && it.error === '文件找不到');
+      if (t) {
+        const msg = list.length === 1 ? '文件找不到，请删除该行并重新选择文件上传' : '部分文件找不到，请删除该行并重新选择文件上传';
+        this.messageBox.failSingleError({ title: '上传失败', msg });
+        return;
+      }
       const _PreData = await BatchUploadClass.getPreOrderCreate(list, this.basicObj);
       if (!_PreData) return;
       this.handleBalance(_PreData);

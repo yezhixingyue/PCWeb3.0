@@ -2,13 +2,14 @@
   <div class="mp-retractable-display-comp-wrap" :class="isScrollStyle? 'mp-scroll-wrap': '' ">
     <header> <!-- 顶部标题列表 -->
       <Header
-        v-for="(item,i) in titleList" :key="item + '-' + i"
-        :onWidthChange='(newWidth) => onWidthChange(newWidth, widthKeyList[i])'
+        v-for="(item,i) in localTitleList" :key="item + '-' + i"
+        :onWidthChange='(newWidth) => onWidthChange(newWidth, widthKeyList[isSingleLast ? titleList.length - 1 : i])'
         :width='widthValueList[i]' :title="item"
         :isCheck='i === 0 && isCheck ? true : false'
         v-model="checked"
         :checkDisabled='checkDisabled'
         :indeterminate='indeterminate'
+        :class="{f: i === 0, l: i === localTitleList.length - 1}"
        />
     </header>
     <main :class="isScrollStyle? 'mp-scroll-wrap': '' " :style="minWidth">
@@ -71,11 +72,28 @@ export default {
       type: Boolean,
       default: false,
     },
+    isSingleLast: {
+      type: Boolean,
+      default: false,
+    },
+    isSingleFirst: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     minWidth() {
       let num = 0;
       Object.values(this.widthObj).forEach((item) => { num += item; });
+      const vals = Object.values(this.widthObj);
+      if (this.isSingleFirst) {
+        [num] = vals;
+        return `width: ${num}px`;
+      }
+      if (this.isSingleLast) {
+        num = vals[vals.length - 1];
+        return `width: ${num}px`;
+      }
       return `minWidth: ${num - 8}px`;
     },
     widthKeyList() {
@@ -84,7 +102,14 @@ export default {
     },
     widthValueList() {
       if (!this.widthObj) return [];
-      return Object.values(this.widthObj);
+      const vals = Object.values(this.widthObj);
+      if (this.isSingleFirst) {
+        return [vals[0]];
+      }
+      if (this.isSingleLast) {
+        return [vals[vals.length - 1]];
+      }
+      return vals;
     },
     checked: {
       get() {
@@ -93,6 +118,15 @@ export default {
       set(val) {
         this.$emit('input', val);
       },
+    },
+    localTitleList() {
+      if (this.isSingleFirst) {
+        return [this.titleList[0]];
+      }
+      if (this.isSingleLast) {
+        return [this.titleList[this.titleList.length - 1]];
+      }
+      return this.titleList;
     },
   },
   mounted() {

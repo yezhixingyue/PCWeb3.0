@@ -22,7 +22,7 @@
         <span slot-scope="scope" class="is-font-size-12">{{ scope.row.result | formatProductName }}</span>
       </el-table-column>
 
-      <el-table-column show-overflow-tooltip label="数量规格" min-width="115">
+      <el-table-column show-overflow-tooltip label="数量规格" min-width="105">
         <template slot-scope="scope" class="">
           <template>{{ scope.row.result | formatProductAmount }} </template>
           <template>{{ scope.row.result | formatProductSize }} </template>
@@ -38,11 +38,11 @@
         <template slot-scope="scope">{{scope.row.result | formatOutPlateNo}}</template>
       </el-table-column>
 
-      <el-table-column label="配送地址" width="140" show-overflow-tooltip v-if="!UseSameAddress">
+      <el-table-column label="配送地址" width="135" show-overflow-tooltip v-if="!UseSameAddress">
         <template slot-scope="scope">{{scope.row.result | formatAddress}}</template>
       </el-table-column>
 
-      <el-table-column label="价格" width="110" show-overflow-tooltip>
+      <el-table-column label="价格" width="105" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.result.CurrentCost | formatCurrentCost }}</template>
       </el-table-column>
 
@@ -57,7 +57,13 @@
           </el-select>
       </el-table-column>
 
-      <el-table-column label="操作" width="260" max-width='280' label-class-name='operation'>
+      <el-table-column label="状态" width="105">
+        <template slot-scope="scope">
+          <StatusColumn :itemData='scope.row' />
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="165" max-width='280' label-class-name='operation'>
         <template slot-scope="scope">
           <ItemOperationComp :itemData='scope.row' @upload='handleItemUpload' @detail='handleDetailClick' @remove='handleItemRemove' />
         </template>
@@ -77,6 +83,7 @@
 <script>
 import ProductDetailDrawer from '@/packages/BatchUploadComps/Main/ProductDetailDrawer.vue';
 import { projectType } from '@/assets/js/setup';
+import StatusColumn from '../../../../packages/BatchUploadComps/Main/Table/StatusColumn.vue';
 import ItemOperationComp from './ItemOperationComp.vue';
 
 export default {
@@ -112,6 +119,7 @@ export default {
   components: {
     ItemOperationComp,
     ProductDetailDrawer,
+    StatusColumn,
   },
   filters: {
     formatProductName(result) { // 产品名称
@@ -308,10 +316,10 @@ export default {
         tr {
           th {
             font-size: 14px;
-            .cell.operation {
-              text-align: right;
-              padding-right: 89px !important;
-            }
+            // .cell.operation {
+            //   text-align: right;
+            //   padding-right: 89px !important;
+            // }
             &.name-item {
               text-align: left;
               padding-left: 50px;

@@ -76,9 +76,10 @@
       </li>
       <li v-if="showProducePeriod">
         <span class="label">交货工期：</span>
-        <div class="text" v-if="ProducePeriod" :class="{'is-pink': !hiddenPayTime, 'is-success': hiddenPayTime}">
+        <!-- :class="{'is-pink': !hiddenPayTime, 'is-success': hiddenPayTime}" -->
+        <div class="text is-pink" v-if="ProducePeriod">
           <template v-if="!hiddenPayTime">{{ ProducePeriod | getPayTime }} </template>
-          <template>{{ ProducePeriod | getDoneTime }}</template>
+          <template>{{ ProducePeriod | getDoneTime(hiddenPayTime) }}</template>
         </div>
         <div class="text is-gray" v-else>{{ "暂无工期" }}</div>
       </li>
