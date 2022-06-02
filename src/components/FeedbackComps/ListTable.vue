@@ -26,7 +26,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="ProductAmount" label="数量" show-overflow-tooltip width="109">
-        <template slot-scope="scope">{{ scope.row.ProductAmount }}{{scope.row.Unit}}/{{ scope.row.KindCount }}款</template>
+        <template slot-scope="scope">{{ scope.row.ProductAmount }}{{scope.row.Unit}}{{ scope.row.KindCount }}款</template>
       </el-table-column>
       <el-table-column label="尺寸" show-overflow-tooltip width="109">
         <span slot-scope="scope">
@@ -53,6 +53,7 @@
           <span v-if="scope.row.AppealStatus != 255" class="apply-for-after-sale"
             :class="{'color-aaa bgc-eee': scope.row.AppealStatus===0}"
             @click="toAfterSale(scope.row)">申请售后</span>
+          <span v-if="scope.row.AfterSaleStatus === null && scope.row.AppealStatus === 255" class="process-state color-aaa">超出售后期</span>
         </div>
       </el-table-column>
     </el-table>

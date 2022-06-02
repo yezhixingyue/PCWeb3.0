@@ -13,7 +13,7 @@
             <span v-else>--</span>
           </el-table-column>
           <el-table-column label="数量" width="229" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}/{{ scope.row.KindCount}}款</span>
+            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}{{ scope.row.KindCount}}款</span>
           </el-table-column>
           <el-table-column label="尺寸" show-overflow-tooltip width="229">
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
@@ -464,6 +464,7 @@ export default {
         //   },
         // },
       }));
+      this.setUploadDisabled();
     },
   },
   async mounted() {

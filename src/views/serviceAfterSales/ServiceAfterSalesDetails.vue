@@ -14,7 +14,7 @@
             <span v-else>--</span>
           </el-table-column>
           <el-table-column label="数量" width="229" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}/{{ scope.row.KindCount }}款</span>
+            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}{{ scope.row.KindCount }}款</span>
           </el-table-column>
           <el-table-column label="尺寸" show-overflow-tooltip width="229">
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
@@ -45,11 +45,42 @@
             <p class="reprint" v-if="AfterSaleInfo.SolutionType === 7">
               补印：款数：<span>{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span>{{AfterSaleInfo.SuccessNumber}}</span> 张
             </p>
-            <p class="reprint" v-if="AfterSaleInfo.SolutionType === 2">
-              退款：退款总额：<span>￥{{AfterSaleInfo.SuccessRefundTotalAmount}}</span>
-              {{AfterSaleInfo.RefundType === 1 ? '退回余额' : '退回原支付账户'}}：<span>￥{{AfterSaleInfo.SuccessOriginalAmount }}</span>
-              从未支付款项中减款：<span>￥{{AfterSaleInfo.UnpaidReducedAmount}}</span>
-            </p>
+            <div class="refund" v-if="AfterSaleInfo.SolutionType === 2">
+              <div class="left">
+                <p class="reprint">退款：</p>
+              </div>
+              <div class="right">
+                <p class="reprint">
+                  <i>
+                    退到余额：<span>{{AfterSaleInfo.RefundBalance}}</span> 元
+                  </i>
+                  <i v-if="AfterSaleInfo.RefundFreightType == 1">
+                    含运费：<span>{{AfterSaleInfo.RefundFreightAmount}}</span> 元
+                  </i>
+                </p>
+                <p class="reprint">
+                  <i>
+                    退印豆：<span>{{AfterSaleInfo.RefundPrintBean}}</span> 个
+                  </i>
+                  <i v-if="AfterSaleInfo.RefundFreightType == 3">
+                    含运费：<span>{{AfterSaleInfo.RefundFreightAmount}}</span> 个
+                  </i>
+                </p>
+                <p class="reprint">
+                  <i>
+                    退到扫码账户：<span>{{AfterSaleInfo.RefundThirdParty}}</span> 元
+                  </i>
+                  <i v-if="AfterSaleInfo.RefundFreightType == 2">
+                    含运费：<span>{{AfterSaleInfo.RefundFreightAmount}}</span> 元
+                  </i>
+                </p>
+                <p class="reprint">
+                  <i>
+                    售后优惠：<span>{{AfterSaleInfo.UnpaidReducedAmount}}</span> 元
+                  </i>
+                </p>
+              </div>
+            </div>
             <div class="reprint coupon" v-if="AfterSaleInfo.SolutionType === 8">
               <div>
                 赠送优惠券：
@@ -127,7 +158,7 @@
               <div class="td title">{{AfterSaleInfo.AppealType === 0 ? '退款金额：' : '补印数量：'}}</div>
               <div class="td content">
                 {{AfterSaleInfo.AppealType === 0 ? `${AfterSaleInfo.AppealRefundAmount}元` :
-                `${AfterSaleInfo.AppealNumber}${productInfo.Unit}/${AfterSaleInfo.AppealKindCount}款`}}
+                `${AfterSaleInfo.AppealNumber}${productInfo.Unit}${AfterSaleInfo.AppealKindCount}款`}}
               </div>
               <div class="td title">联系信息：</div>
               <div class="td content texts">
@@ -450,6 +481,17 @@ export default {
     .reprint{
       span{
         color: #FF3769;
+      }
+    }
+    .refund{
+      margin: -7px 0;
+      display: flex;
+      .reprint{
+        display: flex;
+        line-height: 28px;
+        >i{
+          width: 20em;
+        }
       }
     }
     .coupon{
