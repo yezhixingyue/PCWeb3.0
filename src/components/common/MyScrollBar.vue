@@ -57,22 +57,14 @@ export default {
       this.el.addEventListener('scroll', this.handleTargetScroll);
     },
     setLeftValue(val) {
-      let scrollToStart = false;
-      let scrollToEnd = false;
       let temp = val;
       if (temp <= 0) {
         temp = 0;
-        scrollToStart = true;
       }
       if (temp >= this.maxLeft) {
         temp = this.maxLeft;
-        scrollToEnd = true;
       }
       this.left = temp;
-      this.$nextTick(() => {
-        this.$emit('scrollToStart', scrollToStart);
-        this.$emit('scrollToEnd', scrollToEnd);
-      });
     },
     onMouseDown(e) {
       this.startX = e.x;
@@ -96,6 +88,8 @@ export default {
       this.startX = 0;
     },
     handleTargetScroll(e) {
+      this.$emit('scrollToStart', e.target.scrollLeft <= 0);
+      this.$emit('scrollToEnd', e.target.scrollLeft + this.originOffsetWidth >= this.originScrollWidth);
       if (this.isMoving) return;
       this.setLeftValue(e.target.scrollLeft * this.rate);
     },

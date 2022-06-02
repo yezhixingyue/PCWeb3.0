@@ -201,6 +201,7 @@ export default {
       }
     },
     handleScrollToEnd(boolean) {
+      console.log('scrollToEnd', boolean);
       this.isScrollEnd = boolean;
     },
   },
@@ -232,16 +233,20 @@ export default {
         }
       });
     },
+    showTable: {
+      handler(val) {
+        if (!val || this.tableDom || !this.$refs.oTable) return;
+        const dom = this.$refs.oTable.$el.getElementsByClassName('mp-pc-order-list-page-table-comp-wrap normal')[0];
+        if (dom) this.tableDom = dom;
+      },
+      immediate: true,
+    },
   },
   mounted() {
     this.$store.dispatch('order/getOrderList');
     this.oApp = document.getElementById('app');
     this.$nextTick(() => {
       this.handleScroll(this.oApp);
-      if (this.$refs.oTable && this.showTable && !this.tableDom) {
-        const dom = this.$refs.oTable.$el.getElementsByClassName('mp-pc-order-list-page-table-comp-wrap normal')[0];
-        if (dom) this.tableDom = dom;
-      }
     });
   },
   beforeDestroy() {
