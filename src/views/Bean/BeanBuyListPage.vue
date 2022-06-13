@@ -2,8 +2,9 @@
   <div class="mp-pc-bean-buy-list-page-wrap">
     <section>
       <header>
-        <span class="blue-v-line is-bold is-black">购买印豆</span>
-        <span class="record">( <i @click="goToHistoryPage" class="blue-span">查看购买记录</i> )</span>
+        <span class="blue-v-line is-bold is-black">充值印豆</span>
+        <span class="record">( <i @click="goToHistoryPage" class="blue-span">查看充值记录</i> )</span>
+        <span class='is-origin is-font-12' style="margin-left:20px"><i class='el-icon-info is-font-13'></i> {{PrintBeanExchangeNumber}}个印豆可抵扣1元人民币</span>
       </header>
       <main>
         <ul :class="{op: showOpacity}">
@@ -15,11 +16,17 @@
           <img src="@/assets/images/empty.png" alt="">
           <p>暂无数据</p>
         </div>
-        <BeanBuyDialog :visible.sync='visible' :curBuyItemData='curBuyItemData' @submit='beanItemBuyHandler' />
+        <BeanBuyDialog
+         :visible.sync='visible'
+         :curBuyItemData='curBuyItemData'
+         :PrintBeanExchangeNumber='PrintBeanExchangeNumber'
+         @submit='beanItemBuyHandler'
+        />
         <QrCodeForPayDialogComp
           v-model="QrCodeVisible"
           :payInfoData="payInfoData"
           @success='handlePaidSuccess'
+          @close='handleQrCodeClosed'
           showExpire
           dynamic
           showPayDescription
@@ -28,7 +35,7 @@
           showWarning
           width='550px'
           top='18vh'
-          successTitle='购买成功，请查看印豆余额'
+          successTitle='充值成功'
          >
           <div class="bean-pay-detail-box" v-if="payInfoData && curBuyItemData">
             <p>
@@ -36,11 +43,11 @@
               <span>{{curBuyItemData.BeanNumber}}个</span>
             </p>
             <p>
-              <label>购买份数：</label>
+              <label>充值份数：</label>
               <span>{{buyBeanNumber}}份</span>
             </p>
             <p>
-              <label>购买单价：</label>
+              <label>充值单价：</label>
               <span>{{curBuyItemData.Price}}元</span>
             </p>
           </div>
@@ -64,6 +71,7 @@ import BeanItemComp from '../../components/BuyBeanComps/BeanItemComp.vue';
 import BeanListClassType from '../../assets/js/ClassType/BeanListClass/BeanListClassType';
 import Count from '../../components/common/Count.vue';
 import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
+import { PrintBeanExchangeRate } from '../../assets/js/setup';
 
 export default {
   components: {
@@ -93,6 +101,9 @@ export default {
       }
       return [];
     },
+    PrintBeanExchangeNumber() {
+      return Math.round(1 / PrintBeanExchangeRate);
+    },
   },
   methods: {
     onBeanBuyClick(e) {
@@ -103,21 +114,18 @@ export default {
       const resp = await this.api.getShopPrintBeanBuy(e).catch(() => null);
       if (resp && resp.data.Status === 1000) {
         this.$store.dispatch('common/getCustomerFundBalance');
-        if (typeof this.curBuyItemData.EverydayBuyMaxNumber === 'number') {
-          this.curBuyItemData.EverydayBuyMaxNumber -= e.Number; // 修改印豆可购买数据
-        }
+        this.buyBeanNumber = e.Number;
         if (!resp.data.Data) {
           const cb = () => {
             this.visible = false;
           };
           this.messageBox.successSingle({
-            title: '购买成功',
+            title: '充值成功',
             successFunc: cb,
             failFunc: cb,
           });
           return;
         }
-        this.buyBeanNumber = e.Number;
         this.payInfoData = resp.data.Data;
         this.visible = false;
         this.QrCodeVisible = true;
@@ -127,6 +135,11 @@ export default {
       // 对印豆项目进行修改 -- 已在前面进行修改
       // 重新获取账号余额及印豆信息
       this.$store.dispatch('common/getCustomerFundBalance');
+    },
+    handleQrCodeClosed() {
+      if (typeof this.curBuyItemData.TodayBuyMaxNumber === 'number') {
+        this.curBuyItemData.TodayBuyMaxNumber -= this.buyBeanNumber; // 修改印豆可购买数据
+      }
     },
     handlePageChange(Page) { // 跳转页码
       const oApp = document.getElementById('app');

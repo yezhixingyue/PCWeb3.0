@@ -61,7 +61,7 @@ const api = {
   },
   getProductLists(data = {}) { // 获取列表头部产品第三级列表
     return instance.post('/Api/Product/List', {
-      FieldType: 2,
+      FieldType: 1,
       ...data,
       TakeOrderWay: 2,
     }, { closeLoading: true });

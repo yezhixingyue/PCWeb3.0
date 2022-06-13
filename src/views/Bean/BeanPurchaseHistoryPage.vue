@@ -3,7 +3,7 @@
     <header>
       <div class="header-content">
         <SingleSelector
-          title='购买状态'
+          title='充值状态'
           v-model="listClassData.condition.Status"
           :optionList='BillTypeList'
           :defaultProps="{label: 'Name',value: 'ID',}"
@@ -19,7 +19,7 @@
           :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
           label="创建时间"
           :dateList="dateList"
-          dateType="date"
+          dateType="daterange"
         />
       </div>
     </header>
@@ -38,11 +38,11 @@
           hiddenHeader
           width='530px'
           top='18vh'
-          successTitle='购买成功，请查看印豆余额'
+          successTitle='充值成功，请查看印豆余额'
          >
           <div class="bean-pay-detail-box" v-if="curBuyItemData">
             <p>
-              <label>购买总数量：</label>
+              <label>充值总数量：</label>
               <span>{{curBuyItemData.Number}}个</span>
             </p>
           </div>

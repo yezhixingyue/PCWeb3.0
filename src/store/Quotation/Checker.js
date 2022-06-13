@@ -16,6 +16,21 @@ const getMatchedValuesInSection = (ValueList, MinValue, MaxValue) => {
 const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit }) => {
   let isInSection = false;
   let msgArr = [];
+  const getMaxTimes = numArr => {
+    if (!Array.isArray(numArr) || numArr.length === 0) return 1;
+    const getPointDigits = num => {
+      const _numText = typeof num === 'number' ? num.toString() : num;
+      let T = _numText.indexOf('.');
+      T = T === -1 ? 0 : _numText.length - T - 1;
+      return T;
+    };
+    const _nums = numArr.map(getPointDigits);
+    let len = Math.max(..._nums);
+    const arr = new Array(len);
+    arr.fill('0');
+    len = `1${arr.join('')}`;
+    return +len;
+  };
   for (let i = 0; i < SectionList.length; i += 1) {
     const section = SectionList[i];
     const { MinValue, MaxValue, IsGeneralValue, Increment } = section;
@@ -23,12 +38,8 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
       isInSection = true;
       let temp = null;
       if (!IsGeneralValue) { // 未勾选符合常规数值
-        let T = Increment.toString().indexOf('.');
-        T = T === -1 ? 0 : Increment.toString().length - T - 1;
-        const arr = new Array(T);
-        arr.fill('0');
-        T = `1${arr.join('')}`;
-        if ((+value * T - MinValue * T) % (Increment * T) !== 0) {
+        const times = getMaxTimes([value, MinValue, Increment]);
+        if (Math.round(+value * times - MinValue * times) % Math.round((Increment * times)) !== 0) {
           temp = {
             MinValue,
             MaxValue,
@@ -101,19 +112,25 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
       if (isIncrement) {
         let _exampleBeginValue = MinValue; // 示例起始数字
         let _intersectBeginValue = MinValue; // 交集起始数字
+        const getSumResult = nums => {
+          if (!Array.isArray(nums) || nums.length === 0) return undefined;
+          const times = getMaxTimes(nums);
+          return nums.reduce((num1, num2) => Math.round(num1 * times + num2 * times) / times, 0);
+        };
         if (Increment && _value && _value > MinValue && _value < MaxValue) {
           const n = Math.floor((_value - MinValue) / Increment);
-          _exampleBeginValue = MinValue + n * Increment;
+          _exampleBeginValue = getSumResult([MinValue, n * Increment]);
         }
         if (_intersectBeginValue < min) {
           const n = Math.ceil((min - _intersectBeginValue) / Increment);
-          _intersectBeginValue += n * Increment;
+          _intersectBeginValue = getSumResult([MinValue, n * Increment]);
         }
         const examples = [];
         let _list = [0, Increment, Increment * 2, Increment * 3];
         _list.forEach(num => {
-          if (_exampleBeginValue + num <= max && _exampleBeginValue + num >= min && examples.length < 3) {
-            examples.push(_exampleBeginValue + num);
+          const sum = getSumResult([_exampleBeginValue, num]);
+          if (sum <= max && sum >= min && examples.length < 3) {
+            examples.push(sum);
           }
         });
         if (examples.length < 3) {
@@ -158,7 +175,7 @@ const checkNumberSectionList = (value, SectionList, valueList, { propName, Unit 
     }
     return it;
   });
-  const range = max < Infinity ? `${min} ≤ ${propName} ≤ ${max}${Unit.split('/')[0]}` : `${min}${Unit.split('/')[0]} ≤ ${propName}`;
+  const range = max < Infinity ? `${min} ≤ ${propName} ≤ ${max}${Unit.split('/')[0]}` : `${propName}大于等于${min}${Unit.split('/')[0]}`;
   const text = msgArr.length > 0 ? `${msgArr.filter(it => it).map(it => (typeof it === 'object' ? it.diaMsg : it)).join('\r\n')}` : '该范围不可用';
   // const arr = msgArr.map(it => (typeof it === 'object' ? it.diaMsg : it));
   const _msg = `${propName}不符合要求， \r\n${range}时：\r\n${text}`;

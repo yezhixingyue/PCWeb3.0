@@ -24,10 +24,10 @@ export function delay(duration) {
   });
 }
 
-export function animateScroll(start, end, callback, handleAnimateEnd) {
+export function animateScroll(start, end, callback, handleAnimateEnd, duration = 300) {
   let num = start;
   const tick = 16; // 每隔16毫秒完成一次变化
-  const total = 300;
+  const total = duration;
   const times = Math.ceil(total / tick); // 变化的次数
   let curTimes = 0;
   const dis = (end - start) / times; // 总距离/次数，每次运动的距离

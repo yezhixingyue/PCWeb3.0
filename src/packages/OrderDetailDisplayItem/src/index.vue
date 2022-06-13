@@ -1,8 +1,14 @@
 <template>
   <ul class="display-box mp-order-detail-item-comp-wrap" :class="{border: showBorder}">
     <li>
-      <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称':'部件'}}：</span>
-      <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product'}">{{ShowData.Name}}</div>
+      <span class="label" :class="{part:ShowData.Type==='Part', product: ShowData.Type==='product'}">{{ShowData.Type==='product'?'产品名称：':' '}}</span>
+      <div class="text is-font-14" :class="{'is-bold': ShowData.Type==='product', erp: projectType === 'erp'}">
+        <span class="n" :title="projectType === 'erp'?ShowData.Name:''">{{ShowData.Name}}</span>
+        <template v-if="projectType === 'erp' && ShowData.FactoryName && $route.name !== 'GetPriceRecord'">
+          <span class="label is-font-13 is-font-size-13" style="margin-left:13px;font-weight: 400; color: #888;">生产工厂：</span>
+          <span class="text is-font-13 is-font-size-13" :title="ShowData.FactoryName" style="font-weight: 400;">{{ShowData.FactoryName}}</span>
+        </template>
+      </div>
     </li>
     <li v-for="(item, lv1Index) in localContentList" :key="item.Label + item.Content + lv1Index">
       <span class="label" :class="{'opacity-0': item.Label.includes('-notFirst')}">{{item.Label.replace('-notFirst', '')}}{{item.Label ? '：' : ''}}</span>
@@ -34,6 +40,8 @@
 </template>
 
 <script>
+import { projectType } from '../../../assets/js/setup';
+
 export default {
   name: 'OrderDetailDisplayItem',
   props: {
@@ -54,6 +62,11 @@ export default {
       return [];
     },
   },
+  data() {
+    return {
+      projectType,
+    };
+  },
 };
 </script>
 <style lang='scss'>
@@ -67,17 +80,16 @@ export default {
       float: left;
       margin-right: 2px;
       &.part {
-        position: relative;
-        padding-left: 13px;
         &::before {
           content: '';
-          position: absolute;
+          display: inline-block;
           width: 6px;
           height: 6px;
           background: #F4A307;
           border-radius: 50%;
-          left: 0;
-          top: 8px;
+          margin-right: 5px;
+          position: relative;
+          top: -1px;
         }
       }
       &.opacity-0 {
@@ -96,6 +108,15 @@ export default {
           }
         }
         // margin-bottom: -5px;
+      }
+      &.erp {
+        > span.n {
+          display: inline-block;
+          vertical-align: top;
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
   }

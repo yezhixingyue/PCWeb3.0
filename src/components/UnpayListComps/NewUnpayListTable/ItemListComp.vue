@@ -53,7 +53,7 @@
           <ul class="package-content">
             <li v-for="item in Package.OrderList" :key="item.OrderID">
               <div :style="wStyles[0]"></div>
-              <div :style="'width:' + (widthObj.w2 + 20) + 'px' + ';text-align:left;margin-left:-22px;'">
+              <div :style="'width:' + (widthObj.w2 + 23) + 'px' + ';text-align:left;margin-left:-25px;'">
                 <el-tooltip popper-class="table-item" :enterable='false'
                   :content="item | getFullName" placement="top-start">
                   <span>{{item | getFullName}}</span>
@@ -67,8 +67,8 @@
               </div>
               <div :style="wStyles[3]">
                 <el-tooltip popper-class="table-item" :enterable='false'
-                  :content="item | formarProductAmount" placement="top-start">
-                  <span>{{item | formarProductAmount}}</span>
+                  :content="item.MaterialList | formatListItemMaterial" placement="top-start">
+                  <span>{{item.MaterialList | formatListItemMaterial}}</span>
                 </el-tooltip>
               </div>
               <div :style="wStyles[4]">
@@ -77,20 +77,26 @@
                   <span>{{item.CraftList | formatListItemCraft}}</span>
                 </el-tooltip>
               </div>
-              <div :style="wStyles[5]">{{item.Funds.OriginalPrice}}元</div>
-              <div :style="wStyles[6]" class="is-twelve">
+              <div :style="wStyles[5]">
+                <el-tooltip popper-class="table-item" :enterable='false'
+                  :content="item | formarProductAmount" placement="top-start">
+                  <span>{{item | formarProductAmount}}</span>
+                </el-tooltip>
+              </div>
+              <div class="price" :style="wStyles[6]">{{item.Funds.OriginalPrice}}元</div>
+              <div class="price" :style="wStyles[7]">
                 <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-              <div :style="wStyles[7]">{{item.Funds.FinalPrice}}元</div>
-              <div :style="wStyles[8]">{{item.Funds.Deposit}}元</div>
-              <div :style="wStyles[9]">{{Package.OutPlate ? Package.OutPlate.Second : ''}}</div>
-              <div :style="wStyles[10]" class="is-font-12 gray" style="text-align:left">
+              <div class="price" :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
+              <div class="price" :style="wStyles[9]">{{item.Funds.Deposit}}元</div>
+              <div :style="wStyles[10]">{{Package.OutPlate ? Package.OutPlate.Second : ''}}</div>
+              <div :style="wStyles[11]" class="is-font-12 gray" style="text-align:left">
                 <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
                   :content="item.Content" placement="top-start">
                   <span>{{item.Content}}</span>
                 </el-tooltip>
                 <span v-else>无</span>
               </div>
-              <div :style="wStyles[11]" class="is-font-12 gray btn-wrap">
+              <div :style="wStyles[12]" class="is-font-12 gray btn-wrap">
                 <span class="span-title-blue" @click="goToDetailPage(item)">详情</span>
               </div>
             </li>
@@ -104,7 +110,7 @@
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
 import { mapState } from 'vuex';
-import CancelDialogBox from './CancelDialogBox.vue';
+import CancelDialogBox from '../../../packages/PaymentListComps/CancelDialogBox.vue';
 
 export default {
   props: {
@@ -317,15 +323,15 @@ export default {
           height: 32px;
           width: 30px;
           position: absolute;
-          top: calc(50% + 3px);
+          top: calc(50% + 4px);
           top: calc(50% + 5px)\9;
           right: -12px;
-          transition: 0.05s !important;
-          transform: translate(-50%, -50%) rotate(90deg);
-          background: url("../../../assets/images/right-arrow.png") center no-repeat;
-          background-size: 6px 10px;
+          // transition: 0.05s !important;
+          transform: translate(-50%, -50%) rotate(90deg) scale(0.9);
+          background: url("../../../assets/images/r.png") center no-repeat;
+          background-size: 12px 12px;
           &.active {
-            transform: translate(-50%, -50%) rotate(-90deg);
+            transform: translate(-50%, -50%) rotate(-90deg) scale(0.9);
           }
         }
       }
@@ -335,7 +341,8 @@ export default {
         font-size: 14px;
         margin-left: 4px;
         &.status {
-          width: 88px;
+          width: 72px;
+          margin-left: 18px;
         }
         &.cancel {
           margin-left: 8px;
@@ -366,13 +373,13 @@ export default {
         padding: 5px 0;
         line-height: 24px;
         background-color: #f8f8f8;
-        padding-left: 22px;
+        padding-left: 19px;
         li {
           padding-left: 20px;
           display: inline-block;
           color: #888;
           &.price {
-            min-width: 128px;
+            min-width: 113px;
           }
           &.freight {
             min-width: 120px;
@@ -424,11 +431,14 @@ export default {
             }
             &.btn-wrap {
               padding-right: 0;
-              padding-left: 4px;
+              padding-left: 6px;
               font-size: 14px !important;
             }
             &:last-of-type {
               text-align: center;
+            }
+            &.price {
+              padding-left: 2px;
             }
           }
         }

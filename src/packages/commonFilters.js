@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { projectType } from '@/assets/js/setup';
 
 Vue.filter('getPayTime', ProducePeriod => {
   if (!ProducePeriod) return '';
@@ -32,7 +33,7 @@ Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
     }
   }
   let timeStr = dayTimeStr || `${m}月${d}日`;
-  if (showTime && dayTimeStr) timeStr += ` (${m}月${d}日) `;
+  if (showTime && dayTimeStr) timeStr += ` ( ${+m}月${+d}日 ) `;
   // console.log(showTime, 'showTime', ProducePeriod, `${m}月${d}日`, fullDay);
   // const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
   const hour = ''; // 不显示具体时间
@@ -48,8 +49,9 @@ export const getFullName = data => {
   const Name = DisplayName || ProductName;
   if (!Name) return '';
   if (!ClassList || ClassList.length === 0) return Name;
-  const t = ClassList.find(it => it.Type === 2);
-  return t && t.FirstLevel && t.FirstLevel.Name ? `${t.FirstLevel.Name} - ${Name}` : Name;
+  const type = projectType === 'erp' ? 1 : 2;
+  const t = ClassList.find(it => it.Type === type);
+  return t && t.SecondLevel && t.SecondLevel.Name ? `${t.SecondLevel.Name}-${Name}` : Name;
 };
 Vue.filter('getFullName', getFullName);
 
@@ -61,7 +63,7 @@ export const formarProductAmountFunc = data => { // 根据数据返回产品数�
     let amount = '';
     let kindCount = '';
     if (HaveNumber !== false && ProductAmount) {
-      amount = `${ProductAmount}${Unit || '个'}`;
+      amount = `${ProductAmount}${Unit || ' '}`;
     }
     if (HaveKind !== false && KindCount) {
       kindCount = `${KindCount}款`;
@@ -74,6 +76,14 @@ export const formarProductAmountFunc = data => { // 根据数据返回产品数�
  * 根据数据返回产品数量与款数展示内容
  */
 Vue.filter('formarProductAmount', formarProductAmountFunc);
+
+const formatListItemSize = SizeList => {
+  if (!Array.isArray(SizeList) || SizeList.length === 0) return '';
+  return SizeList.join('、');
+};
+Vue.filter('formatListItemSize', formatListItemSize);
+Vue.filter('formatListItemCraft', formatListItemSize); // 暂同上共用同一个方法 后续如有需要再分开
+Vue.filter('formatListItemMaterial', formatListItemSize); // 暂同上共用同一个方法 后续如有需要再分开
 
 export default {
   getFullName,

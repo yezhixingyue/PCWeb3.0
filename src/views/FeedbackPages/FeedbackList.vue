@@ -27,7 +27,7 @@
             label="下单时间"
             :dateList="dateList"
             :initDate='condition4FeedbackList.Date'
-            dateType="date"
+            dateType="daterange"
           />
           <search-input-comp
             title="关键词"

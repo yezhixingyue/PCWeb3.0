@@ -23,7 +23,6 @@ export default {
 <style lang='scss'>
 .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap {
   width: 100%;
-  height: 100%;
   box-shadow: 0px 3px 10px 0px rgba(88, 88, 88, 0.15);
   border-radius: 5px;
   overflow: hidden;

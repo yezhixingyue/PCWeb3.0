@@ -7,6 +7,7 @@
     @cancle="visible = false"
     @open='onOpen'
     @closed='onClosed'
+    @close='onClose'
     :class="{'hidden-header': hiddenHeader}"
     class="mp-erp-common-comps-qr-code-for-payment-comp-dialog-comp-wrap">
     <div class="close" v-if="hiddenHeader">
@@ -198,7 +199,6 @@ export default {
       this.handleExpiredTimeSet();
     },
     onClosed() {
-      this.$emit('close', this.isPaidSuccess);
       clearTimeout(this.timer);
       this.timer = null;
       clearTimeout(this.timer4Expired);
@@ -207,6 +207,9 @@ export default {
       this.loadError = false;
       this.ExpiredTimeContent = '';
       this.isPaidSuccess = false;
+    },
+    onClose() {
+      this.$emit('close', this.isPaidSuccess);
     },
     onImgLoadError(e) { // 图片下载出错
       this.loadError = true;

@@ -22,7 +22,7 @@
           :class="i === data.OrderList.length - 1 ? 'hide-border-item' : ''"
           :key="item.OrderID + i"
         >
-          <div :style="wStyles[0]" class="is-twelve" :title="item | getFullName">{{item | getFullName}}</div>
+          <div :style="wStyles[0]" :title="item | getFullName">{{item | getFullName}}</div>
           <div :style="wStyles[1]" :title="item | formarProductAmount">{{item | formarProductAmount}}</div>
           <div :style="wStyles[2]">{{item.Funds.OriginalPrice | formatNumber}}元</div>
           <div :style="wStyles[3]">{{item.Funds.CouponAmount ? `-${item.Funds.CouponAmount}` : item.Funds.CouponAmount}}元</div>
@@ -184,13 +184,13 @@ export default {
       user-select: none;
       > div {
         height: 12px;
-        width: 7px;
+        width: 12px;
         position: absolute;
         top: 50%;
         left: 50%;
         transition: 0.05s linear !important;
         transform: translate(-50%, -50%) rotate(90deg);
-        background: url("../../../assets/images/right-arrow.png") center
+        background: url("../../../assets/images/r.png") center
           no-repeat;
         background-size: 100% 100%;
         &.active {

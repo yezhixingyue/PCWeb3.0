@@ -12,7 +12,7 @@
       </div>
       <div class="set-item">
         <el-checkbox v-model="keepDataChecked">保留下单面板数据</el-checkbox>
-        <p>如果选中保留订单参数，则在提交订单并支付成功后，下单面板产品参数部分的数据不清空，保留已选择和已填写的数据</p>
+        <p>如果选中保留订单参数，则在每次成功“加入购物车”或“直接下单”后，下单面板数据不清空，保留已选择和已填写的数据</p>
       </div>
     </div>
   </section>
@@ -23,7 +23,7 @@ import { mapState } from 'vuex';
 
 export default {
   computed: {
-    ...mapState('common', ['customerInfo']),
+    ...mapState('common', ['customerInfo', 'keepOrderData']),
     isAcceptNotify: {
       get() {
         if (this.customerInfo && this.customerInfo.Config.IsAcceptNotify) return true;
@@ -42,22 +42,19 @@ export default {
     },
     keepDataChecked: {
       get() {
-        return !!this.iskeeping;
+        return this.keepOrderData;
       },
       set(newVal) {
-        localStorage.setItem('isOrderDataKeeping', newVal);
-        this.iskeeping = newVal;
+        const str = localStorage.getItem('localCacheDataByMpzj');
+        const obj = str ? JSON.parse(str) : {};
+        const key = this.customerInfo?.Account?.AccountID;
+        if (!key) return;
+        if (!obj.keepOrderData) obj.keepOrderData = {};
+        obj.keepOrderData[key] = newVal;
+        localStorage.setItem('localCacheDataByMpzj', JSON.stringify(obj));
+        this.$store.commit('common/setKeepOrderData', newVal);
       },
     },
-  },
-  data() {
-    return {
-      iskeeping: false,
-    };
-  },
-  mounted() {
-    const _bool = localStorage.getItem('isOrderDataKeeping');
-    if (_bool === 'true') this.iskeeping = true;
   },
 };
 </script>

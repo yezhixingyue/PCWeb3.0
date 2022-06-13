@@ -100,10 +100,20 @@ export default {
   > .el-dialog__header {
     padding-left: 20px;
     padding-right: 20px;
-    padding-top: 16px;
+    padding-top: 12px;
+    padding-bottom: 8px;
     // margin: 0 10px;
     // border-bottom: 1px solid #eee;
     position: relative;
+    // &::before {
+    //   content: '';
+    //   position: absolute;
+    //   left: 11px;
+    //   width: 3px;
+    //   top: 13px;
+    //   height: 20px;
+    //   background-color: #428dfa;
+    // }
     &::after {
       content: '';
       position: absolute;
@@ -119,7 +129,7 @@ export default {
       font-weight: 400;
     }
     > button {
-      top: 14px;
+      top: 12px;
       right: 18px;
       font-size: 20px;
     }
@@ -130,7 +140,7 @@ export default {
     padding-right: 6px;
     > section {
       > div {
-        max-height: 620px;
+        max-height: 640px;
         min-height: 300px;
         overflow: auto;
         &.rich-edit-content {

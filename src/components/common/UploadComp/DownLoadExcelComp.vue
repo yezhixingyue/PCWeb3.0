@@ -67,7 +67,7 @@ export default {
           } else {
             _second = Second;
           }
-          const t2 = _second ? ConvertTimeFormat(new Date(new Date(_second).getTime() - 24 * 60 * 60 * 1000)) : '';
+          const t2 = _second ? ConvertTimeFormat(new Date(new Date(_second.replace('Z', '')).getTime())) : '';
           if (f) fileName = `${this.configObj.fileDefaultName}(${f}至${t2}).xls`;
         }
       }

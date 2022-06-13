@@ -331,9 +331,9 @@ body .iconfont {
       content: '';
       position: absolute;
       width: 13px;
-      height: 14px;
-      background: url(../images/arrow.jpg) no-repeat center center/100% 100%;
-      top: 7px;
+      height: 13px;
+      background: url(../images/arrow.png) no-repeat center center/100% 100%;
+      top: 8px;
       right: 4px;
     }
   }
@@ -511,7 +511,7 @@ body .el-radio__inner, body .el-checkbox__inner {
     &.mp-order-del-pop-reverse-fail {
       display: inline-block !important;
       width: auto !important;
-      max-width: 520px !important;
+      max-width: 580px !important;
       .el-message-box__content {
         padding: 25px 30px 35px;
         min-width: 360px;
@@ -587,5 +587,21 @@ body .el-radio__inner, body .el-checkbox__inner {
 @media screen and (max-width: 1230px) {
   .floating {
     display: none;
+  }
+}
+
+
+.entry-y {
+  animation: entry-y 0.4s ease-in-out 0.3s forwards;
+}
+
+@keyframes entry-y {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
   }
 }

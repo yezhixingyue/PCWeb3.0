@@ -73,6 +73,7 @@ export default {
 };
 </script>
 <style lang='scss'>
+@import "@/assets/css/var.scss";
 .mp-order-parment-order-cancel-dialog-box-containner {
   border-radius: 5px;
   div.display-content {
@@ -104,18 +105,19 @@ export default {
   }
   .el-dialog__footer {
     padding-top: 5px;
+    padding-bottom: 25px;
     button {
       width: 100px;
       height: 36px;
       padding: 0;
       font-size: 14px;
       &.cancel-btn {
-        border-color: #428dfa;
-        color: #428dfa;
+        border-color: $--color-primary;
+        color: $--color-primary;
         margin-left: 24px;
         &:active {
-          color: #3b7fe1;
-          border-color: #3b7fe1
+          color: darken($color: $--color-primary, $amount: 15);
+          border-color: darken($color: $--color-primary, $amount: 15);
         }
       }
     }

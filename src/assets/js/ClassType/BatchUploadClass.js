@@ -22,7 +22,25 @@ export default class BatchUpload {
    * @param {*} basicObj
    * @memberof BatchUpload
    */
-  static async getFileParingResultBySingle(file, basicObj) {
+  static async getFileParingResultBySingle(file, basicObj, existingObj) {
+    const { successedList, failedList } = existingObj;
+    let t = successedList.find(it => it.file.name === file.name);
+    if (t) {
+      return {
+        file,
+        result: '',
+        error: '已在列表中，无法重复下单',
+        errorStatus: 0,
+        existing: true, // 标明其的错误原因为已有存在的文件
+      };
+    }
+    t = failedList.find(it => it.file.name === file.name && !it.existing);
+    if (t) {
+      return {
+        ...t,
+        error: `${t.error} [ 重复下单 ]`,
+      };
+    }
     const temp = {
       ...basicObj,
       FileList: [{ Second: file.name }],
@@ -65,7 +83,7 @@ export default class BatchUpload {
    * @param {*} fileList  传入文件列表
    * @memberof BatchUpload
    */
-  static async getFileParingResult(fileList, basicObj) {
+  static async getFileParingResult(fileList, basicObj, existingObj) {
     if (!fileList || fileList.length === 0 || !basicObj) return null;
     const loadingInstance = Loading.service({
       lock: true,
@@ -73,7 +91,7 @@ export default class BatchUpload {
       spinner: 'el-icon-loading',
       background: 'rgba(255, 255, 255, 0.6)',
     });
-    const resultList = await Promise.all(fileList.map(file => this.getFileParingResultBySingle(file, basicObj))).catch(() => null);
+    const resultList = await Promise.all(fileList.map(file => this.getFileParingResultBySingle(file, basicObj, existingObj))).catch(() => null);
     loadingInstance.close();
     if (resultList) {
       const failedList = resultList.filter(it => it && it.error);
@@ -150,7 +168,7 @@ export default class BatchUpload {
       _item.uploadStatus = 'success'; // 上传成功 继续向后面进行
     } else {
       _item.uploadStatus = 'fail';
-      _item.error = uploadResult && uploadResult.error && uploadResult.error.message ? uploadResult.error.message : '文件上传失败';
+      _item.error = uploadResult.error || '文件上传失败';
       _item.percentage = 0;
     }
     return uploadResult;
@@ -279,9 +297,10 @@ export default class BatchUpload {
     loadingInstance.text = '文件正在上传...';
     const uploadedList = await Promise.all(list.map(it => this.getFileUploadBySingle(it)));
     // 3. 判断文件上传结果中是否存在不成功的项目，如果有则return
-    const i = uploadedList.findIndex(it => !it);
+    const i = uploadedList.findIndex(it => !it || (typeof it === 'object' && it.status === false));
     if (i > -1) {
-      messageBox.failSingleError({ title: '上传失败', msg: '存在上传失败的文件' });
+      const msg = uploadedList.length === 1 ? '文件上传失败' : '部分文件上传失败，请检查';
+      messageBox.failSingleError({ title: '上传失败', msg });
       loadingInstance.close();
       return;
     }

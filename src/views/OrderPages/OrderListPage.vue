@@ -24,7 +24,7 @@
             :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
             label="下单时间"
             :dateList="dateList"
-            dateType="date"
+            dateType="daterange"
           />
           <search-input-comp
             title="关键词"
@@ -39,9 +39,9 @@
         </li>
       </ul>
     </section>
-    <section class="content-wrap" v-if="OrderList.length > 0 || OrderListNumber > 0">
+    <section class="content-wrap" v-show="showTable">
       <section class="content">
-        <Table4OrderList :orderData='OrderList' />
+        <TableComp :OrderList="OrderList" ref="oTable" @changeWidth="handleChangeWidth" :isScrollEnd="isScrollEnd" :class="{loading:loading}" />
         <footer>
           <Count
             :watchPage='condition4OrderList.Page'
@@ -63,6 +63,7 @@
         </footer>
         <transition name="el-fade-in-linear">
           <footer  v-show="isFootFixed" class="floating">
+            <MyScrollBar v-if="tableDom" :el="tableDom" ref="oBar" @scrollToEnd="handleScrollToEnd" />
             <div>
               <Count
                 :watchPage='condition4OrderList.Page'
@@ -86,7 +87,7 @@
         </transition>
       </section>
     </section>
-    <section class="show-empty-bg" v-else>
+    <section class="show-empty-bg" v-show="!showTable">
       <img src="../../assets/images/order-empty.png" alt="">
       <p class="is-gray">{{showDateText}}</p>
     </section>
@@ -100,9 +101,10 @@ import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.v
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import Count from '@/components/common/Count.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
-import Table4OrderList from '@/components/OrderListComps/Table4OrderList.vue';
+import TableComp from '@/components/OrderListComps/TableComp/index.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
 import CommonClassType from '../../store/CommonClassType';
+import MyScrollBar from '../../components/common/MyScrollBar.vue';
 
 export default {
   components: {
@@ -111,18 +113,21 @@ export default {
     LineDateSelectorComp,
     SearchInputComp,
     Count,
-    Table4OrderList,
+    TableComp,
+    MyScrollBar,
   },
   data() {
     return {
       isFootFixed: false,
       // eslint-disable-next-line max-len
       dateList: [{ label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      tableDom: null,
+      isScrollEnd: false,
     };
   },
   computed: {
     ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
-    ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount', 'showOrderListNumber']),
+    ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount', 'showOrderListNumber', 'loading']),
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },
@@ -175,6 +180,9 @@ export default {
           && !!this.condition4OrderList.Date.First
           && !!this.condition4OrderList.Date.Second;
     },
+    showTable() {
+      return this.OrderList.length > 0 || this.OrderListNumber > 0;
+    },
   },
   methods: {
     ...mapMutations('order', ['setCondition4OrderList', 'clearCondition4OrderList']),
@@ -187,6 +195,15 @@ export default {
       const { scrollTop, scrollHeight, offsetHeight } = oEl;
       this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
     },
+    handleChangeWidth() {
+      if (this.$refs.oBar) {
+        this.$refs.oBar.reset();
+      }
+    },
+    handleScrollToEnd(boolean) {
+      console.log('scrollToEnd', boolean);
+      this.isScrollEnd = boolean;
+    },
   },
   watch: {
     OrderList() {
@@ -195,11 +212,34 @@ export default {
         this.handleScroll(this.oApp);
       });
     },
-    scrollChange() {
-      const { scrollTop, scrollHeight, offsetHeight } = this.ScrollInfo;
-      const difference = scrollHeight - offsetHeight;
-      if (difference - 165 - scrollTop > 0) this.isFootFixed = true;
-      else this.isFootFixed = false;
+    scrollChange: {
+      handler() {
+        const { scrollTop, scrollHeight, offsetHeight } = this.ScrollInfo;
+        const difference = scrollHeight - offsetHeight;
+        if (difference - 175 - scrollTop > 0) this.isFootFixed = true;
+        else this.isFootFixed = false;
+      },
+      immediate: true,
+    },
+    isFootFixed(val) {
+      if (!val) return;
+      this.$nextTick(() => {
+        if (!this.tableDom && this.$refs.oTable && this.showTable) {
+          const dom = this.$refs.oTable.$el.getElementsByClassName('mp-pc-order-list-page-table-comp-wrap normal')[0];
+          if (dom) this.tableDom = dom;
+        }
+        if (this.$refs.oBar && this.$refs.oBar.innerWidth === 0) {
+          this.handleChangeWidth();
+        }
+      });
+    },
+    showTable: {
+      handler(val) {
+        if (!val || this.tableDom || !this.$refs.oTable) return;
+        const dom = this.$refs.oTable.$el.getElementsByClassName('mp-pc-order-list-page-table-comp-wrap normal')[0];
+        if (dom) this.tableDom = dom;
+      },
+      immediate: true,
     },
   },
   mounted() {
@@ -221,12 +261,7 @@ export default {
   > section {
     width: 100%;
     background-color: #fff;
-    // height: 120px;
     margin-bottom: 22px;
-    // &.header {
-    //   // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-    // }
-    // box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.07);
     > .header-content {
       margin: 0 auto;
       width: 1200px;
@@ -259,22 +294,28 @@ export default {
     }
     &.content-wrap {
       margin-bottom: 10px;
-      // box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.07);
-      min-height: calc(100vh - 135px - 170px - 38px);
+      // min-height: calc(100vh - 135px - 170px - 38px);
+      min-height: calc(100vh - 135px - 170px);
+      // text-align: center;
       > .content {
         margin: 0 auto;
-        width: 1200px;
         padding-top: 25px;
+        width: 1200px;
         > footer {
           height: 55px;
           padding-top: 19px;
+          > div {
+            width: 1200px;
+            margin: 0 auto;
+          }
           &.floating {
             position: fixed;
+            height: 78px;
             bottom: 0;
             left: 0;
             background-color: #fff;
             z-index: 10;
-            padding-top: 10px;
+            padding-top: 8px;
             right: 0px;
             box-shadow: 0px 0px 14px 7px rgba(136, 136, 136, 0.3);
             > div {
@@ -282,6 +323,9 @@ export default {
               margin: 0 auto;
               position: relative;
               left: -8px;
+              &.mp-common-local-scroll-bar-comp-wrap {
+                margin-bottom: 10px;
+              }
             }
           }
         }

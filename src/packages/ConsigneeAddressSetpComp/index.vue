@@ -7,7 +7,7 @@
       <header class="bg-gray"></header>
       <div class="comp-title float">
         <span class="left is-bold">收货信息</span>
-        <span class="right span-title-blue" @click="onAddressChangeClick">{{
+        <span class="right span-title-blue" :class="ValidExpressLoading?'l':''" @click="onAddressChangeClick">{{
           addCompTitle
         }}</span>
       </div>
@@ -169,7 +169,7 @@
 </template>
 
 <script>
-import { amapAppkey } from '@/assets/js/setup';
+import { amapAppkey, projectType } from '@/assets/js/setup';
 import AddMapComp from './AddMapComp.vue';
 import IdentifyFormItem from './IdentifyFormItem.vue';
 import SetupDialog from './SetupDialog.vue';
@@ -196,6 +196,10 @@ export default {
     },
     // 是否为批量上传组件使用，为其单独设置样式
     isBatchUploadUse: {
+      type: Boolean,
+      default: false,
+    },
+    hiddenEmptyTips: { // 当可用配送方式列表为空时，是否进行提示
       type: Boolean,
       default: false,
     },
@@ -414,7 +418,9 @@ export default {
     },
     /** 内容解析相关数据
     ---------------------------------------------------- */
-    onOutPlateNoResolved({ data, OutPlateNo } = {}) {
+    async onOutPlateNoResolved({ data, OutPlateNo } = {}) {
+      this.curAddIndex = '';
+      await this.$nextTick();
       if (data && OutPlateNo) {
         this.OutPlateNo = OutPlateNo;
         this.NewAddressInfo = { ...this.NewAddressInfo, ...data };
@@ -458,6 +464,7 @@ export default {
     /** 弹窗地址修改相关方法
     ---------------------------------------------------- */
     onAddressChangeClick() { // 点击更改配送地址
+      if (this.ValidExpressLoading) return;
       this.SetAddressVisible = true;
     },
     onDialogSubmit(e) { // 弹窗提交
@@ -586,14 +593,31 @@ export default {
     },
     async handleUseableCompanyList(data, oldIndex, oldExpressArea) {
       this.ValidExpressLoading = true;
-      const resp = await this.api.getExpressUseableCompanyList({ ...data, OutPlateSN: this.OutPlateNo });
+      const temp = { ...data, OutPlateSN: this.OutPlateNo };
+      if (!temp.CustomerID && this.customerInfo) {
+        temp.CustomerID = this.customerInfo.CustomerID;
+      }
+      const resp = await this.api.getExpressUseableCompanyList(temp);
       this.ValidExpressLoading = false;
       if (resp.data.Status === 1000) {
-        this.ExpressValidList = resp.data.Data;
-        if (resp.data.Data.includes(this.Express.Second)) {
+        const result = resp.data.Data;
+        // const result = [];
+        this.ExpressValidList = result;
+        if (result.includes(this.Express.Second)) {
           let oldAddExpressArea = typeof oldIndex === 'number' ? this.customerInfo.Address[oldIndex]?.ExpressArea : null;
           if (!oldAddExpressArea && oldIndex === 'new') oldAddExpressArea = oldExpressArea; // 该情况不会出现，new只有一个不会new之间切换状态
           this.judgeValidEventEmit(data.ExpressArea, oldAddExpressArea);
+        }
+      }
+    },
+    handleExpressEmptyTips() {
+      if (this.ExpressValidList.length === 0) {
+        if (!this.hiddenEmptyTips) {
+          if (projectType === 'pc') {
+            this.messageBox.warnSingleError({ title: '当前地址不可送达', msg: '当前地址没有可用配送方式，请更换地址或留意配送信息公告' });
+          } else {
+            this.messageBox.warnSingleError('当前地址没有可用配送方式，请更换地址或留意配送信息公告');
+          }
         }
       }
     },
@@ -601,7 +625,7 @@ export default {
   watch: {
     ExpressValidList(newVal) {
       if (newVal.length === 0) {
-        this.$message.warning('当前地址没有可用配送方式，请更换地址或留意配送信息公告');
+        this.handleExpressEmptyTips();
         this.onRadioChange('');
         this.secondExVal = '';
         this.thirdExVal = '';
@@ -628,7 +652,8 @@ export default {
         this.onRadioChange(1);
         return;
       }
-      const t = this.localExpressList.find(it => it.useableIds.length > 0);
+      let t = this.localExpressList.find(it => it.useableIds.length > 0 && it.Type === 3);
+      if (!t) t = this.localExpressList.find(it => it.useableIds.length > 0);
       if (t) {
         this.onRadioChange(t.Type);
       } else {
@@ -637,6 +662,11 @@ export default {
     },
     async curAddIndex(newVal, oldVal) {
       if (newVal === 'new') {
+        if (this.customerInfo.Address.length === 0 && !this.NewAddressInfo.isSaved) {
+          this.ExpressValidList = [];
+          this.curAddIndex = '';
+          return;
+        }
         this.handleUseableCompanyList(this.NewAddressInfo, oldVal, null);
         return;
       }
@@ -651,10 +681,10 @@ export default {
     customerInfo() {
       this.handleInfoChange();
     },
-    curProductID(newVal, oldVal) {
-      if (newVal && oldVal && oldVal !== newVal) {
-        this.handleInfoChange();
-      }
+    curProductID() { // 切换产品时初始化收货地址等信息
+      // if (newVal && oldVal && oldVal !== newVal) {
+      //   this.handleInfoChange();
+      // }
     },
   },
   created() {
@@ -1088,6 +1118,9 @@ export default {
   .out-place-code-content {
     display: inline-block;
     width: 253px;
+  }
+  .comp-title > span.span-title-blue.l {
+    pointer-events: none;
   }
 }
 </style>

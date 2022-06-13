@@ -4,7 +4,7 @@
       <el-radio-group v-model="localUseSameAddress" size="small" :disabled='switchUseSameAddDisabled'
        :title="switchUseSameAddDisabled?'如需切换时，请先清空文件列表再进行切换':''">
         <el-radio-button :label="false">使用不同地址</el-radio-button>
-        <el-radio-button :label="true">使用同一地址</el-radio-button>
+        <el-radio-button :label="true">使用相同地址</el-radio-button>
       </el-radio-group>
       <span class="tips-box" v-show="switchUseSameAddDisabled">
         <i class="el-icon-warning"></i>下方解析成功的文件列表为空时，才可切换地址使用方式
@@ -15,6 +15,7 @@
       v-show='localUseSameAddress'
       ref="oConsigneeAddressSetpComp"
       isBatchUploadUse
+      :hiddenEmptyTips="!localUseSameAddress"
       :watchClearVal="customer"
       :customerInfo="customer"
       :ExpressList="ExpressList"
@@ -23,8 +24,13 @@
       @popperVisible='handlePopperVisible'
     />
     <div v-show='!localUseSameAddress && customer' class="is-gray remark">
-      <span class="f">注：使用不同地址时，每个需要解析的文件中都必须携带有 <i>平台单号</i> 或 <i>地址信息</i>（平台单号优先），否则将解析失败</span>
-      <span>地址信息格式：【收货人+手机号+地址】 或 【地址+手机号+收货人】，如：张三19903970210河南省郑州市花园路国基路花园SOHO1号楼</span>
+      <span class="b"><i>命名格式1：</i>“批量下单信息※【姓名 手机号 省市区详细地址】印刷内容”</span>
+      <span class="b"><i>命名格式2：</i>“批量下单信息※【平台单号】印刷内容”</span>
+      <span >注：使用不同地址时，需解析的文件名中携带的平台单号或地址信息，地址信息解析失败无法下单，解析平台单号需店铺授权，授权流程请向客服资讯，（支持淘宝、天猫、拼多多、京东）。</span>
+    </div>
+    <div v-show='localUseSameAddress' class="is-gray remark same">
+      <span>注：命名格式：批量下单信息※印刷内容</span>
+      <span>例如：普通名片-铜版不覆膜,2盒／款,1款,双面,彩色,尺寸(90x54mm),物料[名片专用铜版]※张三名片</span>
     </div>
   </section>
 </template>
@@ -79,6 +85,15 @@ export default {
     },
     handlePopperVisible(bool) {
       this.$emit('popperVisible', bool);
+    },
+  },
+  watch: {
+    UseSameAddress(bool) {
+      if (bool && this.$refs.oConsigneeAddressSetpComp) {
+        this.$nextTick(() => {
+          this.$refs.oConsigneeAddressSetpComp.handleExpressEmptyTips();
+        });
+      }
     },
   },
   mounted() {
@@ -150,9 +165,9 @@ export default {
     }
   }
   > .remark {
-    margin-top: 11px;
+    margin-top: 9px;
     display: block;
-    line-height: 26px;
+    line-height: 30px;
     font-size: 12px;
     > span {
       display: block;
@@ -162,6 +177,23 @@ export default {
         i {
           font-weight: 700;
         }
+      }
+      &.b {
+        // color: #585858;
+        font-size: 12px;
+        margin-bottom: 1px;
+        // i {
+          // font-size: 13px;
+          // color: #999;
+          // font-weight: 700;
+        // }
+      }
+    }
+    &.same {
+      margin-top: 2px;
+      line-height: 26px;
+      > span {
+        display: inline-block;
       }
     }
   }

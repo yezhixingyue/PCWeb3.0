@@ -53,11 +53,11 @@
 </template>
 
 <script>
-import LoginComp from '@/components/LoginComps/LoginComp.vue';
 import RegisterComp from '@/components/LoginComps/RegisterComp.vue';
 import Agreement from '@/components/LoginComps/Agreement.vue';
 import UserAgreement from '@/components/LoginComps/UserAgreement.vue';
 import { homeUrl } from '@/assets/js/setup';
+import LoginComp from '../../components/LoginComps/LoginComp.vue';
 
 export default {
   components: {

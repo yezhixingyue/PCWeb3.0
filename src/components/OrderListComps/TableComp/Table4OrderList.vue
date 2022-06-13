@@ -5,17 +5,37 @@
     :widthObj="widthObj"
     :onWidthChange="onWidthChange"
     :titleList="titleList"
+    :isSingleLast="fixedRight"
+    :isSingleFirst="fixedLeft"
+    :class="{
+      fixedLeft: fixedLeft,
+      fixedRight: fixedRight,
+      normal: !fixedLeft && !fixedRight,
+    }"
   >
     <template v-if="orderData && orderData.length > 0">
       <ul>
-        <li v-for="(data, i) in orderData" :key='"orderlistitem-" + i'
-          :class="i === orderData.length - 1 ? 'hide-border' : ''" >
-          <ItemListComp :data="data" :widthObj="widthObj"
+        <li
+          v-for="(data, i) in orderData"
+          :key="data.ID + '' + i"
+          :class="{ [data.ID]: 1, 'hide-border': i === orderData.length - 1 }"
+        >
+          <ItemListComp
+            :data="data"
+            :widthObj="widthObj"
+            :fixedLeft="fixedLeft"
+            :fixedRight="fixedRight"
+            :curHoverOrderID="curHoverOrderID"
+            @detail="onDetailClick"
+            @itemHover="handleItemHover"
+            @itemHoverLeave="handleItemHoverLeave"
           />
         </li>
       </ul>
     </template>
-    <div class="no-data-show is-gray" v-else>暂无数据</div>
+    <div class="no-data-show is-gray" v-else-if="!fixedLeft && !fixedRight">
+      暂无数据
+    </div>
   </RetractableDisplayComp>
 </template>
 
@@ -31,46 +51,28 @@ export default {
   props: {
     orderData: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
-  },
-  data() {
-    return {
-      widthObj: {
-        w1: 80,
-        w2: 100,
-        w3: 80,
-        w4: 80,
-        w5: 80,
-        w6: 130,
-        w7: 55,
-        w8: 75,
-        w9: 65,
-        w10: 65,
-        w11: 65,
-        w12: 60,
-        w13: 113,
-        w14: 150,
-      },
-      titleList: [
-        '订单号',
-        '产品名称',
-        '尺寸',
-        '工艺',
-        '数量',
-        '文件内容',
-        '优惠券',
-        '成交价',
-        '已付',
-        '未付',
-        '退款',
-        '状态',
-        '付款时间',
-        '操作',
-      ],
-      curSelectedList: [],
-      unPayTableData: [],
-    };
+    fixedLeft: {
+      type: Boolean,
+      default: false,
+    },
+    fixedRight: {
+      type: Boolean,
+      default: false,
+    },
+    widthObj: {
+      type: Object,
+      default: () => ({}),
+    },
+    curHoverOrderID: {
+      type: Number,
+      default: null,
+    },
+    titleList: {
+      type: Array,
+      default: () => [],
+    },
   },
   computed: {
     itemWidthObj() {
@@ -81,7 +83,16 @@ export default {
   },
   methods: {
     onWidthChange(newW, w) {
-      this.widthObj[w] = newW;
+      this.$emit('changeWidth', [newW, w]);
+    },
+    onDetailClick(id) {
+      this.$emit('detail', id);
+    },
+    handleItemHover(OrderID) {
+      this.$emit('itemHover', OrderID);
+    },
+    handleItemHoverLeave(OrderID) {
+      this.$emit('itemHoverLeave', OrderID);
     },
   },
 };
@@ -93,7 +104,11 @@ export default {
   box-sizing: border-box;
   padding-bottom: 15px;
   border: 1px solid #eee;
-  position: relative;
+  // position: relative;
+  // display: inline-block;
+  // max-width: calc(100% - 100px);
+  // min-width: 1200px;
+  // max-width: 1200px;
   > header {
     height: 40px;
     background-color: rgb(248, 248, 248);

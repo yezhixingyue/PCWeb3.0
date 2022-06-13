@@ -21,7 +21,7 @@
             </li>
           </template>
         </ul>
-        <div class="upload-batch">
+        <div class="upload-batch" v-if="showUploadBreakBtn">
           <span class="blue-span" @click="onBatchUploadClick">
             <img src="@/assets/images/batch-upload.png" alt="">批量上传</span>
         </div>
@@ -88,10 +88,17 @@ export default {
   computed: {
     ...mapState('Quotation', ['productNames', 'curProduct', 'curProductClass']),
     ...mapGetters('Quotation', ['allProductClassify']),
+    ...mapState('common', ['customerInfo']),
     curMenus() {
       if (!this.index && this.index !== 0) return null;
       if (this.allProductClassify.length === 0) return null;
       return this.allProductClassify[this.index] || null;
+    },
+    showUploadBreakBtn() {
+      if (this.customerInfo && this.customerInfo.PermissionInfo && this.customerInfo.PermissionInfo.BatchUpload) {
+        return true;
+      }
+      return false;
     },
   },
   methods: {

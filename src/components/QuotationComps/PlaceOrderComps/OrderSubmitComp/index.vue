@@ -59,7 +59,7 @@
         <el-button type="danger" @click="onSubmitOrder" :loading="isUploading && uploadType === 'create'"
          :disabled="isUploading && uploadType === 'car'">{{submitText}}</el-button>
         <ComputedResultComp
-          :ProductQuotationResult='ProductQuotationResult' :showExpressCost='true' :selectedCoupon='selectedCoupon' />
+          :ProductQuotationResult='ProductQuotationResult' showExpressCost :selectedCoupon='selectedCoupon' />
       </div>
       <div class="tips-box-wrap">
         <TipsBox />
@@ -103,9 +103,10 @@ export default {
   },
   computed: {
     ...mapState('Quotation', [
-      'selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder', 'FileList', 'isUploading', 'curProductID', 'RiskWarningTipsTypes',
+      'selectedCoupon', 'ProductQuotationResult', 'addressInfo4PlaceOrder',
+      'FileList', 'isUploading', 'curProductID', 'RiskWarningTipsTypes', 'curProductInfo2Quotation',
     ]),
-    ...mapState('common', ['customerInfo']),
+    ...mapState('common', ['customerInfo', 'keepOrderData']),
     coupon() {
       if (!this.ProductQuotationResult) return '';
       if (!this.selectedCoupon) return '';
@@ -236,9 +237,12 @@ export default {
         this.scrollToTop();
       };
       const { fileContent, FileAuthorMobile } = this.ruleForm;
+      const callbackOnError = this.handleSubmitOrJoinCarError;
       await this.$store.dispatch('Quotation/getQuotationSave2Car', {
-        FileList, fileContent, FileAuthorMobile, callBack,
+        FileList, fileContent, FileAuthorMobile, callBack, callbackOnError,
       });
+    },
+    handleSubmitOrJoinCarError() { // 加入购物车及预下单失败（未设置）后的处理函数 暂无用 不做处理
     },
     scrollToTop() {
       this.$nextTick(() => {
@@ -347,7 +351,7 @@ export default {
     },
     AddressInfoChecker() {
       if (!this.addressInfo4PlaceOrder || !this.addressInfo4PlaceOrder.Address.Address.Consignee) return '请选择配送地址';
-      if (!this.addressInfo4PlaceOrder.Address.Express.First || !this.addressInfo4PlaceOrder.Address.Express.Second) return '未选中配送方式';
+      if (!this.addressInfo4PlaceOrder.Address.Express.First || !this.addressInfo4PlaceOrder.Address.Express.Second) return '请选择配送方式，如果没有可用配送方式时请切换配送地址';
       return '';
     },
     async OutPlateChecker() {
@@ -433,13 +437,10 @@ export default {
         });
       });
     },
-    handleSuccessFunc(goToUnPayList) {
+    handleSuccessFunc() {
       this.setRuleFormInit();
       this.$emit('clearAdd');
       this.scrollToTop();
-      if (goToUnPayList) {
-        this.$router.push('/unpay/list');
-      }
     },
     handleCodeDialogClose(isPaid) {
       if (!isPaid) {
@@ -452,6 +453,10 @@ export default {
           // showCancelButton: true,
           // confirmButtonText: '前往未付款单',
         });
+        if (!this.keepOrderData) {
+          const _obj = JSON.parse(JSON.stringify(this.curProductInfo2Quotation));
+          this.$store.commit('Quotation/setCurProductInfo2Quotation', { data: _obj, onlyClearParams: true });
+        }
       } else {
         this.handleSuccessFunc();
       }

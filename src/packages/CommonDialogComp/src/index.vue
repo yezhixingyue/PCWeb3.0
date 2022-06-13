@@ -12,7 +12,7 @@
   @close='onClose'
   @closed='onClosed'
   class="mp-img-style-header mp-erp-common-dialog-comp-wrap"
-  :class="{smallBtn: smallBtn}"
+  :class="{smallBtn: smallBtn, [projectType]: projectType}"
   :before-close="onCancleClick">
   <slot></slot>
   <span slot="footer" class="dialog-footer">
@@ -23,6 +23,7 @@
       <el-button type="primary" :loading='loading' @click="onSubmitClick" v-if="showSubmit" :disabled='disabled'>{{loading?'加载中':submitText}}</el-button>
       <el-button type="danger"  @click="onDangerClick" v-if="showDanger">{{dangerText}}</el-button>
       <el-button :type="cancelBlue ? 'primary' : 'default'" @click="onCancleClick" v-if="showCancel">{{cancelText}}</el-button>
+      <span class="clear" v-if="showClear" @click="onClearClick">{{clearText}}</span>
     </p>
   </span>
 </el-dialog>
@@ -33,6 +34,7 @@
 // <CommonDialogComp width='580px' title="测试弹窗" :visible.sync='addNewProductVisible' @submit="onTestDialogSubmit" @cancle="onTestDialogCancle" >
 //   测试弹窗组件 --- slot内容区
 // </CommonDialogComp>
+import { projectType } from '@/assets/js/setup';
 
 export default {
   name: 'CommonDialogComp',
@@ -96,6 +98,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    showClear: {
+      type: Boolean,
+      default: false,
+    },
+    clearText: {
+      type: String,
+      default: '清除',
+    },
   },
   computed: {
     dialogVisible: {
@@ -110,6 +120,7 @@ export default {
   data() {
     return {
       checkList: [],
+      projectType,
     };
   },
   methods: {
@@ -124,6 +135,9 @@ export default {
     },
     onDangerClick() {
       this.$emit('danger');
+    },
+    onClearClick() {
+      this.$emit('clear');
     },
     onOpen() {
       this.$emit('open');
@@ -152,6 +166,12 @@ export default {
       &::before {
         width: 3px !important;
         background-color: #26bcf9;
+        content: "";
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        vertical-align: -12%;
+        margin-right: 10px;
       }
     }
     border-radius: 5px 5px 0px 0;
@@ -159,6 +179,7 @@ export default {
     height: 30px !important;
     line-height: 30px !important;
     position: relative;
+    padding: 10px 20px;
     .el-dialog__headerbtn {
       top: 13px;
     }
@@ -229,6 +250,21 @@ export default {
             opacity: 1 !important;
           }
         }
+        > span.clear {
+          font-size: 12px;
+          margin-left: 32px;
+          display: inline-block;
+          padding: 4px 8px;
+          color: #ff3769 !important;
+          cursor: pointer;
+          user-select: none;
+          &:hover {
+            color: #f87394 !important;
+          }
+          &:active {
+            color: #e01649 !important;
+          }
+        }
       }
     }
   }
@@ -241,6 +277,11 @@ export default {
           }
         }
       }
+    }
+  }
+  &.pc {
+    .el-dialog__header > span::before {
+      background-color: #428dfa
     }
   }
 }

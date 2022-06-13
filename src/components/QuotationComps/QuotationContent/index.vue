@@ -46,11 +46,15 @@
                       <template v-else>计算价格</template>
                     </el-button>
                     <!-- 价格展示区域 -->
-                    <ComputedResultComp :ProductQuotationResult="ProductQuotationResult" :selectedCoupon="selectedCoupon" v-if="!priceGetErrMsg" />
+                    <ComputedResultComp
+                     isPrice
+                     showExpressCost
+                     :ProductQuotationResult="ProductQuotationResult"
+                     :selectedCoupon="selectedCoupon"
+                     v-if="!priceGetErrMsg" />
                     <!-- 错误 或 优惠券选择信息显示区域 -->
                     <div class="err-or-selected-coupon-info-box">
-                      <span class="is-pink error-msg"  v-if="priceGetErrMsg"
-                       :title="priceGetErrMsg.length > 41 ? priceGetErrMsg : ''">{{ priceGetErrMsg }}</span>
+                      <span class="is-pink error-msg"  v-if="priceGetErrMsg">{{ priceGetErrMsg }}</span>
                       <span class="gray no-cursor is-font-12"
                         v-if="selectedCoupon && !priceGetErrMsg && !ProductQuotationResult && !isGettingPrice"
                         @click.stop
@@ -286,12 +290,18 @@ export default {
       this.isGettingPrice = true;
       this.$store.commit('Quotation/setRiskWarningTips', { origin: '', tipsList: '' });
       const fileContent = this.$refs.oSubmitBox ? this.$refs.oSubmitBox.ruleForm.fileContent : '';
-      const msg = await this.getProductPrice(fileContent);
+      const res = await this.getProductPrice(fileContent);
       this.isGettingPrice = false;
-      if (msg === true) {
+      if (res === true) {
         // this.$router.push('/offerResult');
-      } else if (typeof msg === 'string') {
-        this.priceGetErrMsg = msg;
+      } else if (typeof res === 'object' && res.message) {
+        this.priceGetErrMsg = res.message;
+        // if (res.Status === 9164 && this.$refs.oConsigneeAddressSetpComp) {
+        //   const i = this.$refs.oConsigneeAddressSetpComp.curAddIndex;
+        //   this.$refs.oConsigneeAddressSetpComp.curAddIndex = '';
+        //   await this.$nextTick();
+        //   this.$refs.oConsigneeAddressSetpComp.curAddIndex = i;
+        // }
       }
     },
     handleChange(list) {
@@ -359,7 +369,8 @@ export default {
       }
     },
     handleGoToCouponCenter() {
-      window.open('/#/mySetting/couponCenter');
+      const routeData = this.$router.resolve({ path: '/mySetting/couponCenter' });
+      window.open(routeData.href, '_blank');
       this.isOpenCouponCenter = true;
     },
     async getProductAsideIntroData() {
@@ -609,8 +620,8 @@ export default {
                     display: inline-block;
                     vertical-align: top;
                     line-height: 26px;
-                    white-space: nowrap;
-                    height: 28px;
+                    // white-space: nowrap;
+                    min-height: 28px;
                     padding: 6px 0;
                     > span {
                       vertical-align: middle;
@@ -618,6 +629,9 @@ export default {
                       overflow: hidden;
                       text-overflow: ellipsis;
                       display: inline-block;
+                      &.error-msg {
+                        letter-spacing: 0.5px;
+                      }
                     }
                   }
                 }
@@ -777,6 +791,9 @@ export default {
               }
             }
           }
+        }
+        .place-price-result {
+          width: 555px;
         }
       }
     }

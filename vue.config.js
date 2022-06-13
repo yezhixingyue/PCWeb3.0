@@ -11,10 +11,8 @@ if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-devel
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-development') {
   proxyUrl = 'http://erp.ybz888.com';
 }
-// 正式环境 - 当为测试的正式环境时 修改publicPath
-if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'test-production') { // 打包测试环境的代码
-  publicPath = '/pc2';
-  // publicPath = '';
+if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'withPcPath') { // 打包测试环境的代码(路径中带/pc/)
+  publicPath = '/pc2/';
 }
 
 module.exports = {

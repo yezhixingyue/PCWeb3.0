@@ -49,7 +49,7 @@
           :productCost='productCost'
           :expressCost='expressCost'
           :allCost='allCost'
-          :showPrice='successedList.length > 0'
+          :count="successedList.length"
           :canSelectList='canSelectList'
           :multipleSelection='multipleSelection'
           :UseSameAddress='UseSameAddress'
@@ -68,7 +68,7 @@
             :productCost='productCost'
             :expressCost='expressCost'
             :allCost='allCost'
-            :showPrice='successedList.length > 0'
+            :count="successedList.length"
             :failedList='failedList'
             :canSelectList='canSelectList'
             :multipleSelection='multipleSelection'
@@ -260,18 +260,28 @@ export default {
       this.handleFileParing(fileList);
     },
     async handleFileParing(fileList) { // 处理文件解析 并生成处理成功列表 及 处理失败列表
-      const result = await BatchUploadClass.getFileParingResult(fileList, this.basicObj);
+      const temp = {
+        successedList: this.successedList,
+        failedList: this.failedList,
+      };
+      const result = await BatchUploadClass.getFileParingResult(fileList, this.basicObj, temp);
       if (!result) {
-        this.failedList = [];
-        this.successedList = [];
+        // this.failedList = [];
+        // this.successedList = [];
         return;
       }
       const { failedList, successedList } = result;
-      this.failedList = failedList;
-      this.successedList = successedList;
+
       if (failedList.length > 0) {
-        this.messageBox.warnSingleError({ title: `共有${failedList.length}个文件报价失败`, msg: '请在按钮左侧查看具体错误信息' });
+        if (successedList.length === 0 && failedList.length === 1) {
+          this.messageBox.failSingleError({ title: '解析失败', msg: failedList[0].error });
+        } else {
+          const text = temp.failedList.length > 0 || temp.successedList.length > 0 ? '本次' : '';
+          this.messageBox.warnSingleError({ title: `${text}共有${failedList.length}个文件报价失败`, msg: '请在按钮右侧查看具体错误信息' });
+        }
       }
+      this.failedList.push(...failedList);
+      this.successedList.push(...successedList);
     },
     /**
      * 下部区域： 文件上传、删除、选择等操作
@@ -307,8 +317,9 @@ export default {
             this.successedList.splice(i, 1);
           }
         });
-        this.$message.success('已清除');
+        // this.$message.success('已清除');
       }
+      this.failedList = [];
     },
     handleRemoveSelected() { // 删除选中文件
       if (this.successedList.length === 0 || this.multipleSelection.length === 0) return;
@@ -376,6 +387,12 @@ export default {
     async handleBatchUploadFiles(list) { // 执行单个文件上传或批量上传 （使用同一个方法） -- 在最终下单前 在客户界面 需进行预下单弹窗确认
       // 预下单
       this.preCreateOriginDataList = [];
+      const t = list.find(it => it.uploadStatus === 'fail' && it.error === '文件找不到');
+      if (t) {
+        const msg = list.length === 1 ? '文件找不到，请删除该行并重新选择文件上传' : '部分文件找不到，请删除该行并重新选择文件上传';
+        this.messageBox.failSingleError({ title: '上传失败', msg });
+        return;
+      }
       const _PreData = await BatchUploadClass.getPreOrderCreate(list, this.basicObj);
       if (!_PreData) return;
       this.handleBalance(_PreData);
@@ -412,6 +429,14 @@ export default {
     },
     successedList() {
       this.handlePageHeightChangeAfterDataChange();
+    },
+    customer: {
+      handler() {
+        if (this.customer?.PermissionInfo?.BatchUpload === false) {
+          this.$router.replace('/placeOrder');
+        }
+      },
+      immediate: true,
     },
   },
   async created() {
@@ -456,12 +481,16 @@ export default {
       border-top: 1px dashed #eee;
       padding: 15px 0;
       padding-top: 12px;
-      height: 136px;
-      .mp-pc-place-order-address-show-and-change-wrap > .content > ul > li {
-        color: #999;
-        margin-top: 0px;
-        .express-box .title{
+      height: 156px;
+      .mp-pc-place-order-address-show-and-change-wrap > .content.isBatchUploadUse > ul {
+        margin: 0;
+        margin-top: 7px;
+        > li {
           color: #999;
+          margin-top: 0px;
+          .express-box .title{
+            color: #999;
+          }
         }
       }
       .el-radio-button__orig-radio:disabled:checked + .el-radio-button__inner {

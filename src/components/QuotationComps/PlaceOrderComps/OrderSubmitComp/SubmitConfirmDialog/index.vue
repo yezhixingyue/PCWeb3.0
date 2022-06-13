@@ -22,7 +22,7 @@
         @tab-click="handleTableClick"
       >
         <el-tab-pane label="订单详情" name="detail" :disabled='loading'>
-          <DetailComp class='is-detail' v-loading='loading' element-loading-text="正在加载中..." :OrderDetail='OrderDetailData' />
+          <DetailComp class='is-detail' v-loading='loading' element-loading-text="正在加载中..." :OrderDetail='OrderDetailData' :canflex="canUseflex" />
         </el-tab-pane>
         <el-tab-pane label="包裹列表" name="package" :disabled='loading'>
           <OrderPackageList :PackageDataList='PackageDataList' :isListloading='loading' v-loading='loading' element-loading-text="正在加载中..." />
@@ -41,8 +41,9 @@
      :OrderPreData='OrderPreData'
      :isSubmitType='isSubmitType'
      :isCar='isCar'
+     :canflex="canUseflex"
      />
-    <footer>
+    <footer ref="oFooter">
       <template  v-if="OrderPreData && isSubmitType">
         <TipsBox onlyTips />
         <PaymentPriceDisplayComp v-model="PayInFull" :PreCreateData='OrderPreData' :UsePrintBean.sync='UsePrintBean' />
@@ -58,6 +59,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
 import OrderProgress from '@/components/OrderListComps/OrderDetail/OrderProgress.vue';
 import OrderPackageList from '@/components/OrderListComps/OrderDetail/OrderPackageList.vue';
@@ -119,6 +121,7 @@ export default {
     PaymentPriceDisplayComp,
   },
   computed: {
+    ...mapState('common', ['canUseflex']),
     localVisible: {
       get() {
         return this.visible;
@@ -293,6 +296,8 @@ export default {
         height: 490px;
         text-align: center;
         display: block;
+        display: flex;
+        justify-content: center;
         > div {
           display: inline-block;
           vertical-align: top;
@@ -300,18 +305,31 @@ export default {
           &.left {
             width: 480px;
             height: 100%;
+            .mp-place-order-panel-comp-order-submit-comfirm-dialog-panel-item-comp-wrap {
+              height: 100%;
+            }
           }
           &.right {
             width: 300px;
             margin-left: 20px;
             margin-left: 10px\0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
             > div {
               &.express {
-                height: 200px;
+                // height: auto !important;
+                height: 206px;
+                // flex: 0 1 auto;
+                min-height: 193px;
+                flex: none;
               }
               &.order {
-                height: 270px;
+                // height: auto !important;
+                height: 264px;
                 margin-top: 20px;
+                flex: 1;
+                // flex: 1 0 auto;
                 // margin-top: 15px\0;
               }
             }
@@ -355,10 +373,11 @@ export default {
           }
           > div.right > div {
             &.express {
-              height: 235px;
+              height: 215px;
+              min-height: 215px;
             }
             &.order {
-              height: 335px;
+              height: 345px;
             }
           }
         }
@@ -576,10 +595,10 @@ export default {
               }
               > div.right {
                 > div.express {
-                  height: 240px;
+                  height: 206px;
                 }
                 > div.order {
-                  height: 340px;
+                  height: 374px;
                 }
               }
             }

@@ -254,6 +254,11 @@ export default {
     ],
     NoticeList: [], // 公告列表
     // initLoading: false, // 初始下单页面 加载初始化信息loading展示
+
+    /** 下单成功后是否保存原有订单面板数据
+    ---------------------------------------- */
+    keepOrderData: false,
+    canUseflex: false, // 页面是否支持flex
   },
   getters: {
     /* 细分类 物流配送方式列表
@@ -261,7 +266,17 @@ export default {
     subExpressList(state) {
       if (state.ExpressList.length === 0) return [];
       const _list = [];
-      state.ExpressList.forEach(level1 => {
+      let l = state.ExpressList.map(it => {
+        let i = it.Type;
+        if (it.Type === 3) i = 2;
+        if (it.Type === 2) i = 3;
+        return {
+          ...it,
+          i,
+        };
+      });
+      l = l.sort((a, b) => a.i - b.i);
+      l.forEach(level1 => {
         level1.List.forEach(level2 => {
           const _obj = { ...level2 };
           _obj.name = level2.Name;
@@ -273,20 +288,40 @@ export default {
     },
   },
   mutations: {
+    setCanUseflex(state, bool) {
+      state.canUseflex = bool;
+    },
     /** 当下拉框展示时修改该状态，用以触发顶部zindex的值以适应对下拉框的覆盖
     ---------------------------------------- */
     setIsPopperVisible(state, bool) {
       state.isPopperVisible = bool;
     },
+    /** 设置保留下单面板数据状态
+    ---------------------------------------- */
+    setKeepOrderData(state, bool) {
+      state.keepOrderData = bool;
+    },
     /** 设置客户信息
     ---------------------------------------- */
     setCustomerInfo(state, [data, bool]) {
+      state.keepOrderData = false;
       if (!data) {
         state.customerInfo = null;
         return;
       }
       const Address = data.Address.map(it => ({ ...it, isSelected: it.IsDefault }));
       state.customerInfo = { ...data, Address };
+      if (!data) return;
+
+      const str = localStorage.getItem('localCacheDataByMpzj'); // 在设置客户信息的时候 设置下是否保留下单面板数据
+      if (str) {
+        const obj = JSON.parse(str);
+        const key = data.Account?.AccountID;
+        if (key && obj.keepOrderData?.[key]) {
+          state.keepOrderData = true;
+        }
+      }
+
       if (!data || !data.FundInfo) return;
       if (bool) {
         const { Amount, BeanNumber } = data.FundInfo;
@@ -388,6 +423,13 @@ export default {
       state.customerAccountList = [];
       state.customerBalance = null;
       state.BeanNumberBalance = 0;
+      state.NoticeList = [];
+      state.ScrollInfo = { scrollTop: 0, scrollHeight: 0, offsetHeight: 0 };
+      state.isPopperVisible = false;
+      state.addressList = [];
+      state.customerAccountList = [];
+      state.customerInfo = null;
+      state.keepOrderData = false;
     },
     /* 修改默认选择地址
     -------------------------------*/

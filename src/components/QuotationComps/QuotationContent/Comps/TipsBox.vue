@@ -6,19 +6,8 @@
     </ul>
     <ul v-if="ProductQuotationResult && ProductQuotationResult.PriceContent && !onlyTips" class="detail">
       <li ref="detailBox">
-        <span class="info" ref="oDetailContent">{{ProductQuotationResult.PriceContent.trim()}}</span>
-        <el-popover
-          placement="top"
-          popper-class='mp-place-order-copy-poper-box'
-          trigger="manual"
-          v-if="showCopyBtn && ProductQuotationResult.Content"
-          v-model="visible">
-          <span>{{copySuccess ? '复制成功' : '复制失败，请手动复制'}}</span>
-          <span class="blue-span" slot="reference" @click="handleCopyClick">
-            <img src="@/assets/images/copy.png" alt="">
-            提取批量下单信息
-          </span>
-        </el-popover>
+        <span class="info">{{ProductQuotationResult.PriceContent.trim()}}</span>
+        <CopyComp v-if="showCopyBtn && ProductQuotationResult.Content" :content="ProductQuotationResult.Content.trim()" />
         <span class="is-pink" v-if="showCopyBtn && !ProductQuotationResult.Content">
           <!-- <i class="el-icon-warning"></i> -->
           [ 该产品不支持批量下单 ]</span>
@@ -29,6 +18,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import CopyComp from '../../../../packages/CopyComp';
 
 export default {
   props: {
@@ -36,6 +26,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  components: {
+    CopyComp,
   },
   computed: {
     ...mapState('Quotation', ['RiskWarningTipsObj', 'ProductQuotationResult']),
@@ -48,45 +41,6 @@ export default {
         return true;
       }
       return false;
-    },
-  },
-  data() {
-    return {
-      copySuccess: true,
-      visible: false,
-    };
-  },
-  methods: {
-    handleCopyClick() { // 复制
-      if (this.$refs.oDetailContent) {
-        // const content = this.$refs.oDetailContent.innerText;
-        const content = this.ProductQuotationResult.Content;
-        const textarea = document.createElement('textarea');
-        textarea.style.position = 'fixed';
-        textarea.style.top = 0;
-        textarea.style.left = 0;
-        textarea.style.border = 'none';
-        textarea.style.outline = 'none';
-        textarea.style.resize = 'none';
-        textarea.style.background = 'transparent';
-        textarea.style.color = 'transparent';
-
-        textarea.value = content;
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-          const msg = document.execCommand('copy') ? 'success' : 'fail';
-          if (msg === 'success') this.copySuccess = true;
-          else this.copySuccess = false;
-        } catch (err) {
-          this.copySuccess = false;
-        }
-        this.visible = true;
-        document.body.removeChild(textarea);
-        setTimeout(() => {
-          this.visible = false;
-        }, 1000);
-      }
     },
   },
 };
@@ -136,15 +90,8 @@ export default {
       > span.info {
         margin-right: 25px;
       }
-      span.blue-span {
-        white-space: nowrap;
-        img {
-          vertical-align: -3px;
-          margin-right: 2px;
-        }
-      }
       span.is-pink {
-        font-size: 13px;
+        font-size: 12px;
         white-space: nowrap;
         i {
           font-size: 14px;
@@ -156,10 +103,10 @@ export default {
     }
   }
 }
-.mp-place-order-copy-poper-box {
-  min-width: 70px;
-  padding: 6px 12px;
-  text-align: center;
-  font-size: 12px;
-}
+// .mp-place-order-copy-poper-box {
+//   min-width: 70px;
+//   padding: 6px 12px;
+//   text-align: center;
+//   font-size: 12px;
+// }
 </style>

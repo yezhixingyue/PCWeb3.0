@@ -4,8 +4,9 @@
    v-show="allProductClassify.length > 0"
    :style="`top:${top}px;left:${left}px;`"
   >
+    <div class="white-space"></div>
     <el-scrollbar wrap-class="scrollbar-wrapper">
-      <ul class="menu-list">
+      <ul class="menu-list" :style="`max-height: calc(100vh - ${202 + bottomHeight}px);`">
         <li
           class="menu"
           v-for="it in allProductClassify"
@@ -18,12 +19,11 @@
             placement="right-start"
             :offset="50"
             :visible-arrow='false'
-            :close-delay='30'
+            :close-delay='0'
             @show='onShow(it)'
             @hide='onHide(it)'
             transition="none"
-            popper-class='aside-product-selector-popper-wrap'
-            width="924"
+            :popper-class="activeLv1Id===it.ID ? 'aside-product-selector-popper-wrap active' : 'aside-product-selector-popper-wrap'"
             trigger="hover">
             <ul class="content">
               <li v-for="lv2 in it.children" :key="lv2.ID">
@@ -42,12 +42,15 @@
               </li>
             </ul>
             <span class="label" slot="reference">
-              <span class="n">{{it.ClassName}}</span>
-              <i class="iconfont icon-iconfontyoujiantou"></i>
+              <span class="n">
+                <span class="content">{{it.ClassName}}
+                  <i class="iconfont icon-iconfontyoujiantou"></i>
+                </span>
+              </span>
             </span>
           </el-popover>
         </li>
-        <li class="batch-upload">
+        <li class="batch-upload" v-if="showUploadBreakBtn">
           <div @click="onBatchUploadClick">
             <span>批量上传</span>
             <img src="@/assets/images/batch-upload.png" alt="">
@@ -55,6 +58,7 @@
         </li>
       </ul>
     </el-scrollbar>
+    <div class="white-space b"></div>
   </aside>
 </template>
 
@@ -64,7 +68,7 @@ import { mapState, mapGetters } from 'vuex';
 export default {
   computed: {
     ...mapState('Quotation', ['productNames', 'curProduct', 'curProductClass']),
-    ...mapState('common', ['ScrollInfo', 'NoticeList']),
+    ...mapState('common', ['ScrollInfo', 'NoticeList', 'customerInfo']),
     ...mapGetters('Quotation', ['allProductClassify']),
     curMenus() {
       if (!this.index && this.index !== 0) return null;
@@ -89,20 +93,36 @@ export default {
       if (!this.curProductClass || !this.curProductClass.FirstLevel) return '';
       return this.curProductClass.FirstLevel.ID || '';
     },
+    showUploadBreakBtn() {
+      if (this.customerInfo && this.customerInfo.PermissionInfo && this.customerInfo.PermissionInfo.BatchUpload) {
+        return true;
+      }
+      return false;
+    },
   },
   data() {
     return {
       left: 351,
       distance: 20,
       activeLv1Id: '',
+      bottomHeight: 0,
     };
   },
   methods: {
-    selectProduct(product) {
+    async selectProduct(product) {
       if (this.curProduct && this.curProduct.ID === product.ID) return;
       this.$store.commit('Quotation/setCurProductInfo', product);
-      this.$store.dispatch('Quotation/getProductDetail');
       this.$store.commit('Quotation/setSelectedCoupon', null);
+      const doms = document.getElementsByClassName('aside-product-selector-popper-wrap');
+      doms.forEach(it => {
+        const _it = it;
+        _it.style.display = 'none';
+      });
+      const key = await this.$store.dispatch('Quotation/getProductDetail', [{ saveOldData: true }]);
+      if (!key) {
+        this.$store.commit('Quotation/clearCurProductInfo2Quotation');
+        this.$store.commit('Quotation/setCurProductInfo', null);
+      }
     },
     getFontNumber(list) {
       if (!Array.isArray(list) || list.length === 0) return 4;
@@ -119,14 +139,19 @@ export default {
     },
     getLeft() {
       const oContent = document.querySelector('.mp-quotation-product-quotation-content-wrap');
-      if (oContent) {
+      if (oContent && oContent.getBoundingClientRect) {
         const obj = oContent.getBoundingClientRect();
-        if (obj) this.left = obj.x;
+        if (obj) this.left = obj.left;
+      } else {
+        this.left = 10;
       }
     },
     handleScroll() {
+      const { scrollTop, scrollHeight, offsetHeight } = this.ScrollInfo;
+      if (offsetHeight > 0) {
+        this.bottomHeight = Math.abs(Math.min(scrollHeight - scrollTop - offsetHeight - 160, 0));
+      }
       if (this.NoticeList.length === 0) return;
-      const { scrollTop } = this.ScrollInfo;
       const d = this.NoticeHeight - scrollTop;
       this.distance = d > 20 ? d : 20;
     },
@@ -160,7 +185,9 @@ export default {
       this.handleScroll();
     },
     NoticeList() {
-      this.handleScroll();
+      setTimeout(() => {
+        this.handleScroll();
+      }, 5);
     },
   },
 };
@@ -169,63 +196,79 @@ export default {
 .mp-quotation-product-quotation-content-left-aside-product-selector-wrap {
   position: fixed;
   text-align: left;
-  padding: 14px 0;
-  background: #fff;
   border-radius: 5px;
   display: inline-block;
-  width: 244px;
+  width: 260px;
+  z-index: 9;
   .menu-list {
-    max-height: calc(100vh - 360px);
+    max-height: calc(100vh - 361px);
+    width: 244px;
+    margin-right: 16px;
     > li {
       padding: 0;
       font-size: 15px;
       line-height: 44px;
-      border-radius: 5px;
-      transition: ease-in-out 0.1s;
+      transition: ease-in-out 0.05s;
       span.n {
-        padding-left: 66px;
         display: inline-block;
         vertical-align: top;
-        width: 210px;
-        padding-right: 0px;
+        width: 244px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         box-sizing: border-box;
         color: #333;
-        transition: ease-in-out 0.1s;
+        transition: ease-in-out 0.05s;
+        position: relative;
+        margin-right: 16px;
+        background: #fff;
+        > .content {
+          display: block;
+          width: 100%;
+          height: 100%;
+          padding-left: 66px;
+          padding-right: 30px;
+          box-sizing: border-box;
+          border-radius: 5px;
+        }
       }
       i.iconfont {
         font-size: 16px;
         color: #fff;
         opacity: 0;
-        transition: ease-in-out 0.1s;
+        transition: ease-in-out 0.05s;
+        position: absolute;
+        right: 5px;
       }
       &.menu {
         span.label {
-          width: 244px;
+          width: 260px;
           display: block;
         }
         &.lvActive {
           span.n {
             color: #428dfa;
-          }
-          position: relative;
-          &::after {
-            content: '';
-            position: absolute;
-            height: 14px;
-            width: 2px;
-            background: #428dfa;
-            right: 0;
-            top: 14px;
+            > .content {
+              position: relative;
+              &::after {
+                content: '';
+                position: absolute;
+                height: 14px;
+                width: 2px;
+                background: #428dfa;
+                right: 0;
+                top: 16px;
+              }
+            }
           }
         }
         &.active,&:hover {
           background-color: #428dfa;
           color: #fff;
-          span.n {
+          span.n > .content {
             color: #fff;
+            margin-right: -20px;
+            background-color: #428dfa;
           }
           i.iconfont {
             opacity: 1;
@@ -233,19 +276,18 @@ export default {
         }
       }
       &.batch-upload {
-        border-top: 1px solid #eee;
-        margin: 0 30px;
-        margin-top: 4px;
         border-radius: 0;
+        background: #fff;
         > div {
           text-align: center;
           padding-right: 4px;
           height: 42px;
           line-height: 38px;
-          margin: 0 -30px;
-          margin-top: 8px;
+          margin: 0 30px;
+          padding-top: 8px;
           border-radius: 3px;
           user-select: none;
+          border-top: 1px solid #eee;
           > span {
             margin-right: 33px;
             font-size: 15px;
@@ -255,29 +297,42 @@ export default {
             vertical-align: -2px;
           }
           cursor: pointer;
-          transition: ease-in-out 0.1s;
+          transition: ease-in-out 0.05s;
           &:hover {
-            // background: rgba($color: #428dfa, $alpha: 0.1);
             opacity: 0.8;
           }
           &:active {
-            // background: rgba($color: #428dfa, $alpha: 0.3);
             opacity: 1;
           }
         }
       }
     }
   }
+  > .el-scrollbar {
+    width: 100%;
+    @media screen\0 {
+      .scrollbar-wrapper { // E 8 9 10 11下起作用的样式
+        margin-bottom: -21px !important;
+      }
+    }
+  }
+  > .white-space {
+    height: 14px;
+    width: 244px;
+    background: #fff;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    &.b {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+  }
 }
-// .el-menu--vertical {
-//   .el-menu--popup-right-start {
-//     width: 950px;
-//   }
-// }
 .aside-product-selector-popper-wrap {
-  // z-index: 800 !important;
   margin-top: -45px !important;
-  margin-left: 8px !important;
+  margin-left: -8px !important;
   box-shadow: 0px 2px 15px 0px rgba(20, 57, 112, 0.25);
   ul.content {
     padding-top: 8px;
@@ -306,6 +361,18 @@ export default {
           white-space: normal;
           width: 730px;
           color: #888;
+          @media screen and (max-width: 1100px) {
+            width: 650px;
+          }
+          @media screen and (max-width: 1000px) {
+            width: 600px;
+          }
+          @media screen and (max-width: 900px) {
+            width: 500px;
+          }
+          @media screen and (max-width: 800px) {
+            width: 260px;
+          }
           > span {
             display: inline-block;
             vertical-align: top;
@@ -325,6 +392,23 @@ export default {
         }
       }
     }
+  }
+  opacity: 0;
+  &.active {
+    opacity: 1;
+  }
+  width: 924px;
+  @media screen and (max-width: 1100px) {
+    width: 850px;
+  }
+  @media screen and (max-width: 1000px) {
+    width: 750px;
+  }
+  @media screen and (max-width: 900px) {
+    width: 650px;
+  }
+  @media screen and (max-width: 800px) {
+    width: 400px;
   }
 }
 </style>

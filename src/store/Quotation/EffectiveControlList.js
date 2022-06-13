@@ -75,6 +75,9 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
   } else {
     const [{ ID, Name, Value, IsOpen }] = t.CustomerInputValues;
     _Value = ID || Name || IsOpen;
+    if (_Value && !ID && Name && _El.Type === 2 && _El.OptionAttribute.IsRadio) {
+      _Value = '00000000-0000-0000-0000-000000000000';
+    }
     if (!_Value && _Value !== false) _Value = Value;
     if (isSize && ID) {
       const _t = _El.OptionAttribute.OptionList.find(it => it.ID === ID);
@@ -428,20 +431,23 @@ const getTargetPropertyValue = (Property, ProductParams, curProductInfo2Quotatio
       _ValueObj.ElOriginData = temp.ElOriginData;
       break;
     case 4: // 工艺
-      if (targetPartItem && targetPartItem.CraftList) {
-        target = targetPartItem.CraftList.find(_it => _it.CraftID === Craft.ID);
-        targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
-        if (targetOriginData) {
-          _ValueObj.label = targetOriginData.HiddenToCustomer ? '' : targetOriginData.ShowName;
+      if (targetPartItem) {
+        const CraftList = targetPartItem.CraftList || targetPartItem._CraftList;
+        if (CraftList) {
+          target = CraftList.find(_it => _it.CraftID === Craft.ID);
+          targetOriginData = targetPartData.CraftList.find(_it => _it.ID === Craft.ID);
+          if (targetOriginData) {
+            _ValueObj.label = targetOriginData.HiddenToCustomer ? '' : targetOriginData.ShowName;
+          }
+          temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem, _ValueObj.label);
+          if (!temp.CrValue && temp.CrValue !== false) temp.CrValue = 'craftIsNotExist';
+          _ValueObj.label = temp.CrName;
+          _ValueObj.value = temp.CrValue;
+          _ValueObj.ElOriginData = temp.ElOriginData;
+          _ValueObj.GroupOriginData = temp.GroupOriginData;
+          _ValueObj.CraftOriginData = temp.CraftOriginData;
         }
-        temp = getCraftTypeValue(Element, Group, FixedType, target, targetOriginData, Craft, isSubControl, ControlItem, _ValueObj.label);
       }
-      if (!temp.CrValue && temp.CrValue !== false) temp.CrValue = 'craftIsNotExist';
-      _ValueObj.label = temp.CrName;
-      _ValueObj.value = temp.CrValue;
-      _ValueObj.ElOriginData = temp.ElOriginData;
-      _ValueObj.GroupOriginData = temp.GroupOriginData;
-      _ValueObj.CraftOriginData = temp.CraftOriginData;
       break;
     case 5: // 物料
       _ValueObj.label = '物料';

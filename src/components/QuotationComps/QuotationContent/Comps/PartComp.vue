@@ -1,16 +1,20 @@
 <template>
   <ul v-if="PartData && placeData && DisplayPartData" class="mp-place-order-panel-part-form-comp-containner">
     <li v-if="PartData.List.length === 0">
-      <p class="single">
-        <label>// {{PartName}} <span class="blue-span" @click="onPartAddClick(0)">+ 添加{{PartName}}</span></label>
-      </p>
+      <div class="single p-title">
+        <label>// {{PartName}}</label>
+        <hr>
+        <p>
+          <span class="blue-span" @click="onPartAddClick(0)">+ 添加{{PartName}}</span>
+        </p>
+      </div>
     </li>
     <li v-for="(it, i) in PartData.List" :key="it.key">
-      <p>
+      <div class="p-title">
         <!-- <label>// {{PartName}}{{i > 0 ? ` - ${i + 1}` : ''}}</label> -->
         <label>// {{PartName}}{{i > 0 ? `${i + 1}` : ''}}</label>
         <HelpTipsComp :tipsData='tipsData' :title="PartName" />
-      </p>
+      </div>
       <PlaceOrderPanel :PartID='PartData.PartID' :PartIndex='i'
        :placeData='DisplayPartData' :PartBaseTips='PartBaseTips' :submitData='it' ref='oPartPanelArray' />
       <!-- <div class="ctrl" v-if="!(hiddenDelete && hiddenAdd)"> -->
@@ -110,7 +114,6 @@ export default {
     async onSubmitCheck() { // 部件提交校验
       const checkItem = (ruleForm) => new Promise((resolve) => {
         ruleForm.validate((bool, obj) => {
-          console.log(bool, obj);
           resolve(bool || this.transformErrorObj(obj));
         });
       });
@@ -120,7 +123,6 @@ export default {
         return res;
       }));
       resultList = resultList.filter(it => it !== true).reduce((prev, next) => [...prev, ...next], []);
-      console.log(resultList);
       return resultList.length === 0 ? true : resultList;
     },
   },
@@ -130,7 +132,7 @@ export default {
 .mp-place-order-panel-part-form-comp-containner {
   > li {
     padding-top: 15px;
-    > p {
+    > div.p-title {
       font-weight: 700;
       position: relative;
       line-height: 20px;
@@ -170,6 +172,19 @@ export default {
       }
       &.single {
         padding-bottom: 15px;
+        width: 100%;
+        > hr {
+          background-color: #eee;
+          border: none;
+          height: 1px;
+          margin-top: 14px;
+          margin-bottom: 10px;
+        }
+        > p {
+          text-align: right;
+          font-size: 13px;
+          font-weight: 400;
+        }
       }
     }
     > section {

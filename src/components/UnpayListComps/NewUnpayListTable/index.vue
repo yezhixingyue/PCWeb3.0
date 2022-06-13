@@ -86,7 +86,7 @@ import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vu
 import SubmitConfirmDialog from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/index.vue';
 // import { getFullName } from '@/packages/commonFilters';
 import ItemListComp from './ItemListComp.vue';
-import CancelDialogBox from './CancelDialogBox.vue';
+import CancelDialogBox from '../../../packages/PaymentListComps/CancelDialogBox.vue';
 
 export default {
   components: {
@@ -104,20 +104,22 @@ export default {
         w3: 70,
         w4: 70,
         w5: 70,
-        w6: 80,
-        w7: 60,
-        w8: 80,
-        w9: 65,
-        w10: 170,
-        w11: 222,
-        w12: 120,
+        w6: 70,
+        w7: 80,
+        w8: 60,
+        w9: 80,
+        w10: 65,
+        w11: 160,
+        w12: 170,
+        w13: 112,
       },
       titleList: [
         '全选',
         '产品',
         '尺寸',
-        '数量',
+        '物料',
         '工艺',
+        '数量',
         '原价',
         '优惠券',
         '成交价',

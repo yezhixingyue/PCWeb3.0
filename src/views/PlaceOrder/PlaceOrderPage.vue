@@ -76,7 +76,7 @@ export default {
       this.initLoading = false;
     },
     closeSuccessState() {
-      this.$store.commit('Quotation/setCurProductInfo2Quotation', this.curProductInfo2Quotation);
+      this.$store.commit('Quotation/setCurProductInfo2Quotation', { data: this.curProductInfo2Quotation });
       this.$store.commit('Quotation/setInitPageText', '');
     },
   },

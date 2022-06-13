@@ -27,8 +27,10 @@
           <!-- <p class="is-pink"><i class="is-bold is-pink is-font-22">{{customerBalance}}</i>元</p> -->
           <ul class="f">
             <li class="c">
-              <img src="@/assets/images/bean.png" alt="">
+              <img class="bean" src="@/assets/images/bean.png" alt="">
               <span>当前印豆：</span>
+              <!-- <img src="@/assets/images/wen.png" alt="">
+              <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a> -->
             </li>
             <li>
               <span class="is-bold">{{BeanNumberBalance || 0}}</span>
@@ -38,10 +40,11 @@
           <ul class="s">
             <li class="t">
               <img src="@/assets/images/wen.png" alt="">
-              <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a>
+              <!-- <a href="/#/toPrintBeanHelp" target="_blank">什么是印豆？</a> -->
+              <router-link to="/toPrintBeanHelp" target="_blank">什么是印豆？</router-link>
             </li>
-            <li>
-              <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">购买印豆</span>
+            <li class='buy-box'>
+              <!-- <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">充值印豆</span> -->
             </li>
           </ul>
         </div>
@@ -132,7 +135,7 @@ export default {
       if (!this.reCharge) {
         this.isShowTips = true;
         this.messageBox.failSingleError({
-          title: '校验错误',
+          title: '充值失败',
           msg: '请输入充值金额',
           beforeClose: () => { this.isShowTips = false; },
         });
@@ -141,7 +144,7 @@ export default {
       if (+this.reCharge === 0) {
         this.isShowTips = true;
         this.messageBox.failSingleError({
-          title: '校验错误',
+          title: '充值失败',
           msg: '充值金额必须大于0',
           beforeClose: () => { this.isShowTips = false; },
         });
@@ -152,7 +155,7 @@ export default {
       if (`${this.Amount}` === 'NaN') {
         this.isShowTips = true;
         this.messageBox.failSingleError({
-          title: '校验错误',
+          title: '充值失败',
           msg: '金额不正确',
           beforeClose: () => { this.isShowTips = false; },
         });
@@ -310,6 +313,7 @@ export default {
           text-align: right;
           > ul {
             display: inline-block;
+            vertical-align: top;
             > li {
               > .is-bold {
                 font-size: 22px;
@@ -317,21 +321,34 @@ export default {
               &.c {
                 line-height: 22px;
                 img {
+                  vertical-align: -3px;
+                  margin-right: 5px;
+                }
+                img.bean {
                   vertical-align: -5px;
                   margin-right: 8px;
                 }
                 margin-bottom: 16px;
                 margin-left: -30px;
+                a {
+                  color: #888;
+                  font-size: 12px;
+                  &:hover {
+                    color: #585858;
+                  }
+                }
               }
               &.t {
                 img {
                   vertical-align: -3px;
                   margin-right: 8px;
                 }
-                margin-bottom: 22px;
+                margin-bottom: 20px;
                 font-size: 12px;
+                height: 20px;
                 a {
                   color: #888;
+                  outline: none;
                   &:hover {
                     color: #585858;
                   }
@@ -343,8 +360,11 @@ export default {
               text-align: left;
             }
             &.s {
-              position: relative;
-              top: -1px;
+              padding-top: 4px;
+              .buy-box {
+                padding-right: 11px;
+                height: 14px;
+              }
             }
           }
           .is-disabled {
@@ -366,9 +386,9 @@ export default {
           display: inline-block;
           width: 848px;
           vertical-align: top;
-          margin-top: 104px;
+          margin-top: 102px;
           > div {
-            margin-bottom: 13px;
+            margin-bottom: 14px;
             margin-left: 18px;
             > i.iconfont {
               color: rgb(210, 210, 210);

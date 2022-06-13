@@ -422,11 +422,18 @@ export default {
           message: response.Message,
           type: 'error',
         });
-        // eslint-disable-next-line max-len
-        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
+        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.status === 'success' && it.response && it.response.Status === 1000);
       }
       this.$refs.ruleForm1.validateField('QuestionPicList');
       this.setUploadDisabled();
+    },
+    handleUploadError() {
+      Message({
+        showClose: true,
+        message: '图片上传失败',
+        type: 'error',
+      });
+      this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.status === 'success' && it.response && it.response.Status === 1000);
     },
     handleReturn() {
       this.$router.back();
@@ -711,16 +718,16 @@ export default {
         .el-form-item__content {
           // height: 40px;
           > .mp-pc-common-comps-select-comp-wrap {
-            width: 260px;
+            width: 300px;
             display: block;
             > header {
               display: none;
             }
             > .el-select {
-              width: 260px;
+              width: 300px;
               height: auto;
               .el-input__inner {
-                width: 260px;
+                width: 300px;
                 height: 40px;
               }
               .el-input__suffix .el-input__icon::before {
