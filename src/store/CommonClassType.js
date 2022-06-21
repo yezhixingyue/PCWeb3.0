@@ -1,6 +1,14 @@
 import store from '@/store';
 
 export default class ClassType {
+  _setDate(key = 'Date') {
+    ClassType.setDate(this, key);
+  }
+
+  _getFilterResult() {
+    return ClassType.filter(this, true);
+  }
+
   static setDate(obj, key = 'Date') {
     const _obj = obj;
     // console.log(obj.Date, store);
@@ -39,7 +47,6 @@ export default class ClassType {
 
   static filter(obj, bool = false) { // 布尔值用于判断是否保留value为0的键值对，为true时保留，为false不保留
     const _tempObj = {};
-    // console.log(obj);
     if (!obj) return {};
     Object.keys(obj).forEach(key => {
       if (Object.prototype.toString.call(obj[key]) !== '[object Object]') {

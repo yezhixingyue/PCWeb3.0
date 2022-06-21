@@ -43,20 +43,35 @@
         <span>{{dialogTitle}}</span>
       </header>
       <!-- 弹窗表单区域 -->
-      <el-form :model="subAccountForm" ref="subAccountForm" :rules="rules" label-width="100px" class="account-ruleForm" v-if="customerInfo">
+      <el-form :model="subAccountForm" ref="subAccountForm" :rules="rules" label-width="100px"
+       class="account-ruleForm" v-if="customerInfo" @submit.native.prevent>
         <el-form-item label="登录手机号：" prop="Mobile">
-          <!-- <el-input v-model.trim="Mobile" ></el-input> -->
-          <el-input v-model.trim="Mobile" :disabled='!subAccountForm.IsBranch || subAccountForm.AccountID === customerInfo.Account.AccountID'></el-input>
+          <el-input
+            v-banAutoComplete
+            v-model.trim="Mobile"
+            :disabled='!subAccountForm.IsBranch || subAccountForm.AccountID === customerInfo.Account.AccountID'
+          />
         </el-form-item>
         <el-form-item label="姓名：" prop="NickName">
-          <el-input v-model.trim="subAccountForm.NickName"></el-input>
+          <el-input v-banAutoComplete v-model.trim="subAccountForm.NickName"></el-input>
         </el-form-item>
         <template v-if="subAccountForm.IsBranch && (!subAccountForm.AccountID || subAccountForm.AccountID !== customerInfo.Account.AccountID) && dialogVisible">
           <el-form-item label="密码：" prop="Password">
-            <el-input type="password" :placeholder="placeholder" :disabled='!subAccountForm.IsBranch' v-model.trim="subAccountForm.Password"></el-input>
+            <el-input
+               v-banAutoComplete
+               type="password"
+              :placeholder="placeholder"
+              :disabled='!subAccountForm.IsBranch' v-model.trim="subAccountForm.Password"
+            />
           </el-form-item>
           <el-form-item label="确认密码：" prop="rePassword">
-            <el-input type="password" :placeholder="placeholder" :disabled='!subAccountForm.IsBranch' v-model.trim="subAccountForm.rePassword"></el-input>
+            <el-input
+               v-banAutoComplete
+               type="password"
+              :placeholder="placeholder"
+              :disabled='!subAccountForm.IsBranch'
+               v-model.trim="subAccountForm.rePassword"
+            />
           </el-form-item>
         </template>
       </el-form>

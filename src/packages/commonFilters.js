@@ -85,7 +85,18 @@ Vue.filter('formatListItemSize', formatListItemSize);
 Vue.filter('formatListItemCraft', formatListItemSize); // 暂同上共用同一个方法 后续如有需要再分开
 Vue.filter('formatListItemMaterial', formatListItemSize); // 暂同上共用同一个方法 后续如有需要再分开
 
+export const format2MiddleLangTypeDateFunc = date => {
+  if (!date) return '';
+  const _arr = date.split('T');
+  if (_arr.length < 2) return '';
+  const [t1, t2s] = _arr;
+  const t2 = t2s.split('.')[0].slice(0, -3);
+  return `${t1} ${t2}`;
+};
+Vue.filter('format2MiddleLangTypeDate', format2MiddleLangTypeDateFunc);
+
 export default {
   getFullName,
   formarProductAmountFunc,
+  format2MiddleLangTypeDateFunc,
 };

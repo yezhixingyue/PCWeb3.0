@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 const TerserPlugin = require('terser-webpack-plugin');
 
-let proxyUrl = 'http://192.168.3.68:8050';
+// let proxyUrl = 'http://192.168.3.68:8050';
+let proxyUrl = 'http://192.168.3.253';
 // let proxyUrl = 'http://erp.ybz888.com/';
 let publicPath = '';
 // 测试开发环境：调用92接口
@@ -11,7 +12,7 @@ if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-develo
   proxyUrl = 'http://erp.ybz888.com';
 }
 if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'withPcPath') { // 打包测试环境的代码(路径中带/pc/)
-  publicPath = '/pc/';
+  publicPath = '/pc3/';
 }
 
 module.exports = {

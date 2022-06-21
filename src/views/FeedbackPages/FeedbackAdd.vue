@@ -10,7 +10,7 @@
         <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span>
       </header>
       <div>
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" @submit.native.prevent>
           <el-form-item label="订单号：">
             <!-- <el-input v-model="ruleForm.OrderID" disabled></el-input> -->
             <p class="text">{{ruleForm.Order.OrderID}}</p>
