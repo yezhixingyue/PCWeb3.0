@@ -1,6 +1,6 @@
 <template>
   <section class="mp-invoice-combine-list-table-comp-wrap">
-    <header class="blue-v-line is-bold is-black" v-if="!onlyOpenningInfo">开票信息</header>
+    <header class="blue-v-line is-bold is-black" v-if="!onlyOpenningInfo">开票内容</header>
     <el-table
       :data="list"
       tooltip-effect="dark"
