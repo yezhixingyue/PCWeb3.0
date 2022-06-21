@@ -13,6 +13,7 @@ let _imgUrl = `${testProtocol}://192.168.3.68:8050/`; // 图片和接口地址
 let _agreementID = '60';
 let _statementID = '61';
 let _beanHelpID = '60';
+let _invoiceID = '80';
 
 /**
  * 开发 ---- 测试环境
@@ -36,6 +37,7 @@ if (mode === 'pro-development') {
   _agreementID = '4';
   _statementID = '3';
   _beanHelpID = '3';
+  _invoiceID = '80';
 }
 
 /**
@@ -55,6 +57,7 @@ if (mode === 'production') {
   _agreementID = '4';
   _statementID = '3';
   _beanHelpID = '37';
+  _invoiceID = '37';
 }
 
 export const homeUrl = _homeUrl; // 网站地址
@@ -65,6 +68,7 @@ export const imgUrl = _imgUrl; // 图片引用地址
 export const agreementID = _agreementID; // 用户协议文章ID
 export const statementID = _statementID; // 权责声明文章ID
 export const beanHelpID = _beanHelpID;
+export const invoiceID = _invoiceID;
 export const amapAppkey = 'd1de441473f06000bd61463102442b1e';
 export const projectType = 'pc';
 export const PrintBeanExchangeRate = 0.1; // 印豆对人民币比率 1个印豆可抵扣0.1元人民币
@@ -74,6 +78,7 @@ export default {
   domain,
   useCookie,
   imgUrl,
+  invoiceID,
   agreementID,
   statementID,
   beanHelpID,

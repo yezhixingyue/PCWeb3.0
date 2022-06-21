@@ -10,6 +10,8 @@
         <router-link tag="li" to="/mySetting/subAccountManage">账号管理</router-link>
         <router-link tag="li" to="/mySetting/changePwd">修改密码</router-link>
         <router-link tag="li" to="/mySetting/changeMobile">修改手机号</router-link>
+        <router-link tag="li" to="/mySetting/invoiceMakeup" :class="{disabled: $route.name==='InvoiceCombineMakeupPage'}">发票开具</router-link>
+        <router-link tag="li" to="/mySetting/invoiceSearch" :class="{disabled: $route.name==='InvoiceSearchDetailPage'}">发票查询</router-link>
         <router-link tag="li" to="/mySetting/setting">我的设置</router-link>
       </ul>
       <div class="right">
@@ -24,7 +26,11 @@
 
 <script>
 export default {
-
+  computed: {
+    _route() {
+      return this.$route;
+    },
+  },
 };
 </script>
 
@@ -43,9 +49,10 @@ export default {
       vertical-align: top;
       // height: 855px;
       border-right: 1px solid #eee;
-      height: calc(100vh - 160px - 70px - 156px);
+      // height: calc(100vh - 160px - 70px - 156px);
       min-height: 410px;
       padding-top: 10px;
+      box-sizing: border-box;
       > li {
         height: 40px;
         line-height: 40px;
@@ -64,7 +71,7 @@ export default {
           opacity: 0;
           transition: 0.2s;
         }
-        &.router-link-exact-active {
+        &.router-link-active {
           color: #428dfa;
           font-weight: 700;
           background-color: #e9f0fa;
@@ -78,10 +85,13 @@ export default {
           color: #428dfa;
           background-color: #e9f0fa;
         }
+        &.disabled {
+          pointer-events: none;
+        }
       }
     }
     > .right {
-      width: 956px;
+      width: 960px;
       vertical-align: top;
       display: inline-block;
       padding-left: 80px;

@@ -83,6 +83,7 @@
 <script>
 import ProductDetailDrawer from '@/packages/BatchUploadComps/Main/ProductDetailDrawer.vue';
 import { projectType } from '@/assets/js/setup';
+import { formarProductAmountFunc } from '@/packages/commonFilters';
 import StatusColumn from '../../../../packages/BatchUploadComps/Main/Table/StatusColumn.vue';
 import ItemOperationComp from './ItemOperationComp.vue';
 
@@ -153,12 +154,13 @@ export default {
     formatProductAmount(result) { // 数量规格
       if (result && result.ProductParams) {
         const { Attributes } = result.ProductParams;
-        const {
-          Unit, ProductAmount, KindCount, HaveNumber, HaveKind,
-        } = Attributes || {};
+        return formarProductAmountFunc(Attributes);
+        // const {
+        //   Unit, ProductAmount, KindCount, HaveNumber, HaveKind,
+        // } = Attributes || {};
 
-        const n = Attributes ? `${HaveNumber ? `${ProductAmount}${Unit || '个'}` : ''}${HaveKind ? `${KindCount}款` : ''}` : '';
-        return n;
+        // const n = Attributes ? `${HaveNumber ? `${ProductAmount}${Unit || '个'}` : ''}${HaveKind ? `${KindCount}款` : ''}` : '';
+        // return n;
       }
       return '';
     },

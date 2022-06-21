@@ -293,6 +293,82 @@ const routes = [
             },
             component: () => import('../views/mySettingPages/SettingPage.vue'),
           },
+          {
+            path: '/mySetting/invoiceMakeup',
+            name: 'InvoiceMakeup',
+            meta: {
+              requiresAuth: true,
+              y: 0,
+              title: '发票开具 - 郑州名片之家电子商务有限公司',
+            },
+            component: CommonViewPage,
+            redirect: '/mySetting/invoiceMakeup/list',
+            children: [
+              {
+                path: '/mySetting/invoiceMakeup/list',
+                name: 'InvoiceMakeupListPage',
+                meta: {
+                  requiresAuth: true,
+                  y: 0,
+                  title: '发票开具 - 郑州名片之家电子商务有限公司',
+                },
+                component: () => import('../views/mySettingPages/Invoice/Makeup/InvoiceMakeupListPage.vue'),
+              },
+              {
+                path: '/mySetting/invoiceMakeup/combine',
+                name: 'InvoiceCombineMakeupPage',
+                meta: {
+                  requiresAuth: true,
+                  y: 0,
+                  title: '合并开票 - 郑州名片之家电子商务有限公司',
+                },
+                component: () => import('../views/mySettingPages/Invoice/Makeup/InvoiceCombineMakeupPage.vue'),
+              },
+            ],
+          },
+          {
+            path: '/mySetting/invoiceSearch',
+            name: 'invoiceSearch',
+            meta: {
+              requiresAuth: true,
+              y: 0,
+              title: '发票查询 - 郑州名片之家电子商务有限公司',
+            },
+            component: CommonViewPage,
+            redirect: '/mySetting/invoiceSearch/list',
+            children: [
+              {
+                path: '/mySetting/invoiceSearch/list',
+                name: 'InvoiceSearchListPage',
+                meta: {
+                  requiresAuth: true,
+                  y: 0,
+                  title: '发票查询 - 郑州名片之家电子商务有限公司',
+                },
+                component: () => import('../views/mySettingPages/Invoice/Search/InvoiceSearchListPage.vue'),
+              },
+              {
+                path: '/mySetting/invoiceSearch/detail/:invoiceID', // 来源：1. 发票查询列表 2. 发票开具详情-专票开具审核结果页面
+                name: 'InvoiceSearchDetailPage',
+                meta: {
+                  requiresAuth: true,
+                  y: 0,
+                  title: '发票详情 - 郑州名片之家电子商务有限公司',
+                },
+                component: () => import('../views/mySettingPages/Invoice/Search/InvoiceSearchDetailPage.vue'),
+              },
+              {
+                path: '/mySetting/invoiceSearch/edit',
+                name: 'InvoiceEditPage',
+                meta: {
+                  requiresAuth: true,
+                  y: 0,
+                  title: '发票编辑 - 郑州名片之家电子商务有限公司',
+                },
+                component: () => import('../views/mySettingPages/Invoice/Makeup/InvoiceCombineMakeupPage.vue'),
+              },
+            ],
+          },
         ],
       },
       {

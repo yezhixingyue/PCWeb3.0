@@ -3,7 +3,7 @@
     <header class="is-bold">{{title}}：</header>
     <el-select v-model="selectValue" :placeholder="placeholder" :disabled='disabled' :multiple='multiple'>
       <el-option
-        v-for="item in optionList"
+        v-for="item in localOptionList"
         :key="item[defaultProps.value]"
         :label="item[defaultProps.label]"
         :value="item[defaultProps.value]">
@@ -43,12 +43,26 @@ export default {
       type: Boolean,
       default: false,
     },
+    useEmpty: {
+      type: Boolean,
+      default: false,
+    },
   },
   model: {
     prop: 'value',
     event: 'change',
   },
   computed: {
+    localOptionList() {
+      if (this.useEmpty) {
+        const temp = {
+          [this.defaultProps.label]: '不限',
+          [this.defaultProps.value]: '',
+        };
+        return [temp, ...this.optionList];
+      }
+      return this.optionList;
+    },
     selectValue: {
       get() {
         return this.value;

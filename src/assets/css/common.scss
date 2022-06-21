@@ -582,6 +582,11 @@ body .el-radio__inner, body .el-checkbox__inner {
     color: #0b58ca;
     opacity: 1;
   }
+  &.disabled {
+    color: #cbcbcb;
+    pointer-events: none;
+    cursor: default;
+  }
 }
 
 @media screen and (max-width: 1230px) {
@@ -603,5 +608,52 @@ body .el-radio__inner, body .el-checkbox__inner {
   to {
     transform: translateY(0px);
     opacity: 1;
+  }
+}
+
+@for $num from 0 through 100 {
+  .ml-#{$num} {
+    margin-left: #{$num}px
+  };
+  .mr-#{$num} {
+    margin-right: #{$num}px
+  };
+  .mt-#{$num} {
+    margin-top: #{$num}px
+  };
+  .mb-#{$num} {
+    margin-bottom: #{$num}px
+  };
+  .pl-#{$num} {
+    padding-left: #{$num}px
+  };
+  .pr-#{$num} {
+    padding-right: #{$num}px
+  };
+  .pt-#{$num} {
+    padding-top: #{$num}px
+  };
+  .pb-#{$num} {
+    padding-bottom: #{$num}px
+  };
+  .ft-#{$num} {
+    font-size: #{$num}px;
+  }
+  body .iconfont.ft-#{$num} {
+    font-size: #{$num}px;
+  }
+}
+
+.el-button.cancel-btn {
+  border-color: $--color-primary;
+  color: $--color-primary;
+  margin-left: 24px;
+  &:hover {
+    color: lighten($color: $--color-primary, $amount: 0.1);
+    border-color: lighten($color: $--color-primary, $amount: 0.1);
+  }
+  &:active {
+    color: darken($color: $--color-primary, $amount: 15);
+    border-color: darken($color: $--color-primary, $amount: 15);
   }
 }

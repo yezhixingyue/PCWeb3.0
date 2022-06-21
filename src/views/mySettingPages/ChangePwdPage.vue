@@ -2,7 +2,7 @@
   <section class="mp-pc-my-setting-page-change-pwd-page-wrap">
     <header class="blue-v-line is-bold is-black">修改当前账户密码</header>
     <div class="content">
-      <el-form :model="changePwdForm" :rules="rules" ref="changePwdForm" label-width="100px" v-if="beforeChange">
+      <el-form :model="changePwdForm" :rules="rules" ref="changePwdForm" label-width="100px" v-if="beforeChange" @submit.native.prevent>
         <el-form-item prop="OldPassword" label="旧密码：">
           <el-input type="password" clearable v-model.trim="changePwdForm.OldPassword">
           </el-input>

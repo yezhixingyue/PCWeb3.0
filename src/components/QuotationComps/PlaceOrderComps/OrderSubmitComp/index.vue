@@ -7,7 +7,7 @@
     <div class="content">
       <ul v-if="FileList && FileList.length > 0">
         <li class="file-content-box" v-show="!isSpotGoods">
-           <el-form :model="ruleForm" ref="contentValidateForm" label-width="86px"
+           <el-form :model="ruleForm" ref="contentValidateForm" label-width="86px" @submit.native.prevent
             size="mini" hide-required-asterisk :disabled='isUploading'>
             <el-form-item
               label="文件内容："

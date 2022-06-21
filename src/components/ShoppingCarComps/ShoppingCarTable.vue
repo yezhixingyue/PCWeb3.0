@@ -453,6 +453,9 @@ export default {
       }
       .el-table__body {
       tbody {
+        color: #222;
+        content-visibility: auto;
+        contain-intrinsic-size: 60px;
         tr {
           td {
             &.check-row {
