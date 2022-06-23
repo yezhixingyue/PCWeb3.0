@@ -11,7 +11,7 @@
   >
     <el-table-column label="申请单号" width="85" prop="InvoiceID" show-overflow-tooltip></el-table-column>
     <el-table-column label="开票类别" prop="InvoiceCategoryName" width="130" show-overflow-tooltip></el-table-column>
-    <el-table-column label="发票抬头" prop="InvoiceTitle" width="150" show-overflow-tooltip>
+    <el-table-column label="抬头名称" prop="InvoiceTitle" width="150" show-overflow-tooltip>
       <template slot-scope="scope">{{ scope.row | formatInvoiceTitle }}</template>
     </el-table-column>
     <el-table-column label="开票金额" width="105" show-overflow-tooltip>

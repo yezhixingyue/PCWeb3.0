@@ -13,7 +13,7 @@
       }}
     </p>
     <p class="blue-v-line invoice-form-section-title" :style="`width:${labelWidth}`" v-if="(!notThrough || !isSpecial) && !onlyEnterprise">开票信息</p>
-    <el-form-item label="发票抬头：" prop="InvoiceMainBody" v-if="!isSpecial && !onlyEnterprise">
+    <el-form-item label="抬头类型：" prop="InvoiceMainBody" v-if="!isSpecial && !onlyEnterprise">
       <ButtonRadioSelectorVue v-model="localTitle" :list="InvoiceTitleEnumList" />
     </el-form-item>
     <p class="tip is-origin" v-if="isEnterprise && !notThrough && !fetchEnterpriseDataError && !onlyEnterprise">一个账号只能关联一个企业发票资质，请务必确保相关信息的真实准确性。</p>
@@ -165,7 +165,7 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
           { required: true, message: '请选择发票类型', trigger: 'input' },
         ],
         InvoiceMainBody: [
-          { required: true, message: '请选择发票抬头', trigger: 'input' },
+          { required: true, message: '请选择抬头类型', trigger: 'input' },
         ],
         PersonalName: [
           { required: true, message: '请填写抬头名称', trigger: 'blur' },
