@@ -9,7 +9,7 @@
       <div class="center">
         <!-- <el-button type="primary"
          @click="onThroughClick" v-if="statusData.InvoiceStatus===InvoiceStatusEnums.pendingCheck.ID&&showThroughBtn">发票资质通过</el-button> -->
-        <span class="opinion"
+        <span class="opinion" :title="statusData.TipsContent.length > 36 && statusData.TipsContent"
          :class="{'is-pink': statusData.InvoiceStatus===InvoiceStatusEnums.rejected.ID}" v-if='statusData.TipsContent'>{{statusData.TipsContent}}</span>
         <template v-if="statusData.InvoiceStatus===InvoiceStatusEnums.haveToMail.ID">
           <!-- <img src="" alt=""> -->
