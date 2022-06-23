@@ -94,64 +94,69 @@ axios.interceptors.request.use(
   },
 );
 
-axios.interceptors.response.use(
-  async (response) => {
-    if (getShowLoading(response.config) && loadingInstance) handleLoadingClose();
-    const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
+const handleResponse = async (response) => {
+  if (getShowLoading(response.config) && loadingInstance) handleLoadingClose();
+  const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel'];
 
-    // IE 8-9
-    if (response.data == null && response.config.responseType === 'json' && response.request.responseText != null) {
-      try {
-        // eslint-disable-next-line no-param-reassign
-        response.data = JSON.parse(response.request.responseText);
-      } catch (e) {
-        // ignored
-      }
+  // IE 8-9
+  if (response.data == null && response.config.responseType === 'json' && response.request.responseText != null) {
+    try {
+      // eslint-disable-next-line no-param-reassign
+      response.data = JSON.parse(response.request.responseText);
+    } catch (e) {
+      // ignored
     }
+  }
 
-    const _url = response.config.url.split('?')[0];
+  const _url = response.config.url.split('?')[0];
 
-    const _statusList2NotNeed2Toast = [1000, 9062, 6225];
-    // 包含以上的状态码 或 以上的请求路径  不会弹窗报错  其余以外都会报错出来
-    const oneCondition4NotNeedToast = !([9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(response.data.Status) && ['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url));
+  const _statusList2NotNeed2Toast = [1000, 9062, 6225];
+  // 包含以上的状态码 或 以上的请求路径  不会弹窗报错  其余以外都会报错出来
+  const oneCondition4NotNeedToast = !([9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(response.data.Status) && ['/Api/Order/PreCreate', '/Api/Quotation/Save'].includes(_url));
 
-    if ([7025, 8037].includes(response.data.Status)) {
-      clearToken();
-      router.replace('/login');
-      return response;
-    }
-    if ((!_statusList2NotNeed2Toast.includes(response.data.Status) && !_list2NotNeed2Toast.includes(_url) && (!closeTip) && oneCondition4NotNeedToast) || [7025, 8037].includes(response.data.Status)) {
-      const _obj = { msg: `[ ${response.data.Message} ]` };
-      if ([7025, 8037].includes(response.data.Status)) {
-        _obj.successFunc = () => {
-          clearToken();
-          router.replace('/login');
-        };
-      } else {
-        _obj.successFunc = undefined;
-      }
-      let _msg = '操作失败';
-      if (_url === '/Api/Customer/Login') _msg = '登录失败';
-      if (_url === '/Api/Customer/Reg') _msg = '注册失败';
-      if (_url === '/Api/Sms/Send/VerificationCode') _msg = '验证失败';
-      if (_url === '/Api/FindPassword/ResetPassword') _msg = '重置密码失败';
-      if (_url === '/Api/Customer/ChangePassword') _msg = '密码修改失败';
-      if (_url === '/Api/Coupon/Activate') _msg = '激活失败';
-      if (_url === '/Api/Order/Create' || _url === '/Api/Order/PreCreate') _msg = '下单失败';
-      if (_url === '/Api/FindPassword/CheckCode') _msg = '验证码错误';
-      if (_url === '/Api/Coupon/Receive') _msg = '领取失败';
-      if (_url === '/Api/Quotation/Save') _msg = '添加失败';
-      if (_url === '/Api/Upload/File') _msg = '文件上传失败';
-      if (_url === '/Api/Calculate/ProductPrice') _msg = '报价失败';
-      if (_url === '/Api/Shop/PrintBean/Buy') _msg = '充值失败';
-
-      _obj.title = _msg;
-      messageBox.failSingleError(_obj);
-    }
-    localCancelToken.removeCancelToken(response.config);
+  if ([7025, 8037].includes(response.data.Status)) {
+    clearToken();
+    router.replace('/login');
     return response;
-  },
+  }
+  if ((!_statusList2NotNeed2Toast.includes(response.data.Status) && !_list2NotNeed2Toast.includes(_url) && (!closeTip) && oneCondition4NotNeedToast) || [7025, 8037].includes(response.data.Status)) {
+    const _obj = { msg: `[ ${response.data.Message} ]` };
+    if ([7025, 8037].includes(response.data.Status)) {
+      _obj.successFunc = () => {
+        clearToken();
+        router.replace('/login');
+      };
+    } else {
+      _obj.successFunc = undefined;
+    }
+    let _msg = '操作失败';
+    if (_url === '/Api/Customer/Login') _msg = '登录失败';
+    if (_url === '/Api/Customer/Reg') _msg = '注册失败';
+    if (_url === '/Api/Sms/Send/VerificationCode') _msg = '验证失败';
+    if (_url === '/Api/FindPassword/ResetPassword') _msg = '重置密码失败';
+    if (_url === '/Api/Customer/ChangePassword') _msg = '密码修改失败';
+    if (_url === '/Api/Coupon/Activate') _msg = '激活失败';
+    if (_url === '/Api/Order/Create' || _url === '/Api/Order/PreCreate') _msg = '下单失败';
+    if (_url === '/Api/FindPassword/CheckCode') _msg = '验证码错误';
+    if (_url === '/Api/Coupon/Receive') _msg = '领取失败';
+    if (_url === '/Api/Quotation/Save') _msg = '添加失败';
+    if (_url === '/Api/Upload/File') _msg = '文件上传失败';
+    if (_url === '/Api/Calculate/ProductPrice') _msg = '报价失败';
+    if (_url === '/Api/Shop/PrintBean/Buy') _msg = '充值失败';
+
+    _obj.title = _msg;
+    messageBox.failSingleError(_obj);
+  }
+  localCancelToken.removeCancelToken(response.config);
+  return response;
+};
+
+axios.interceptors.response.use(
+  handleResponse,
   async (error) => {
+    if (error.response && error.response.status === 200) {
+      return handleResponse(error.response);
+    }
     localCancelToken.removeCancelToken(error.config || '');
     if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
     if (error.response) {
@@ -188,7 +193,7 @@ axios.interceptors.response.use(
             if (error.response.data.Message) {
               _msg = error.response.data.Message;
             } else {
-              _msg = `系统出错，错误码：${error.response.data.Status || 505}`;
+              _msg = `系统出错，错误码：${error.response.data.Status}`;
             }
           }
           messageBox.failSingleError({ title: '操作失败', msg: _msg });
