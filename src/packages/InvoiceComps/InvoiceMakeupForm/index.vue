@@ -18,12 +18,12 @@
     </el-form-item>
     <p class="tip is-origin" v-if="isEnterprise && !notThrough && !fetchEnterpriseDataError && !onlyEnterprise">一个账号只能关联一个企业发票资质，请务必确保相关信息的真实准确性。</p>
 
-    <el-form-item label="个人名称：" prop="PersonalName" v-if="isPersonal && !onlyEnterprise">
+    <el-form-item label="抬头名称：" prop="PersonalName" v-if="isPersonal && !onlyEnterprise">
       <el-input v-model.trim="ruleForm.PersonalName" placeholder="请填写 “个人” 或您的姓名" maxlength="20"></el-input>
     </el-form-item>
-    <el-form-item label="企业名称：" prop="EnterpriseName" v-if="(!isPersonal && !notThrough && !fetchEnterpriseDataError) || onlyEnterprise">
+    <el-form-item label="抬头名称：" prop="EnterpriseName" v-if="(!isPersonal && !notThrough && !fetchEnterpriseDataError) || onlyEnterprise">
       <span class="info" v-if="isThrough && !onlyEnterprise">{{ruleForm.EnterpriseName}}</span>
-      <el-input v-else v-model.trim="ruleForm.EnterpriseName" placeholder="请填写企业名称" maxlength="100"></el-input>
+      <el-input v-else v-model.trim="ruleForm.EnterpriseName" placeholder="请填写抬头名称" maxlength="100"></el-input>
     </el-form-item>
     <el-form-item label="统一社会信用代码：" prop="CreditCode" v-if="(!isPersonal && !notThrough && !fetchEnterpriseDataError) || onlyEnterprise">
       <span class="info" v-if="isThrough && !onlyEnterprise">{{ruleForm.CreditCode}}</span>
@@ -51,7 +51,7 @@
     </el-form-item>
     <el-form-item label="收票人邮箱：" prop="ReceiverMail"
       v-if="!isSpecial && (!notThrough || isPersonal) && (!fetchEnterpriseDataError || isPersonal) && !onlyEnterprise">
-      <el-input v-model.trim="ruleForm.ReceiverMail" placeholder="请填写收票人邮箱" maxlength="20"></el-input>
+      <el-input v-model.trim="ruleForm.ReceiverMail" placeholder="请填写收票人邮箱" maxlength="255"></el-input>
     </el-form-item>
     <p class="blue-v-line invoice-form-section-title" :style="`width:${labelWidth}`"
       v-show="isSpecial && !notThrough && !fetchEnterpriseDataError && !onlyEnterprise">收票人信息</p>
@@ -69,7 +69,7 @@
       }" />
     </el-form-item>
     <el-form-item label="" prop="ReceiverAddress" v-if="isSpecial && !notThrough && !fetchEnterpriseDataError && !onlyEnterprise" class="add-detail">
-      <el-input v-model.trim="ruleForm.ReceiverAddress" placeholder="请填写收票人地址" maxlength="20"></el-input>
+      <el-input v-model.trim="ruleForm.ReceiverAddress" placeholder="请填写收票人地址" maxlength="100"></el-input>
     </el-form-item>
     <el-form-item label="收票人电话：" prop="ReceiverContactWay" v-if="isSpecial && !notThrough && !fetchEnterpriseDataError && !onlyEnterprise">
       <el-input v-model.trim="ruleForm.ReceiverContactWay" placeholder="请填写收票人联系电话或手机号码" maxlength="20"></el-input>
@@ -168,10 +168,10 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
           { required: true, message: '请选择发票抬头', trigger: 'input' },
         ],
         PersonalName: [
-          { required: true, message: '请填写个人名称', trigger: 'blur' },
+          { required: true, message: '请填写抬头名称', trigger: 'blur' },
         ],
         EnterpriseName: [
-          { required: true, message: '请填写企业名称', trigger: 'blur' },
+          { required: true, message: '请填写抬头名称', trigger: 'blur' },
         ],
         CreditCode: [
           { required: true, message: '请填写统一社会信用代码/纳税人识别号', trigger: 'blur' },
@@ -211,7 +211,7 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       },
       InvoiceTitleEnums,
       InvoiceTitleEnumList,
-      InvoiceTypeEnumList: InvoiceTypeEnumList.map(it => (it.Name === '电子普通发票' ? { ...it, Name: '电子增值税普通发票' } : it)),
+      InvoiceTypeEnumList,
       InvoiceTypeEnums,
     };
   },

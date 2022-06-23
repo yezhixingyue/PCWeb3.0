@@ -20,7 +20,7 @@ export const InvoiceMakeUpStatusEnums = {
 export const InvoiceTypeEnums = {
   normal: {
     ID: 1,
-    Name: '电子普通发票',
+    Name: '增值税电子普通发票',
   },
   special: {
     ID: 2,

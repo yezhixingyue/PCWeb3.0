@@ -97,7 +97,7 @@ export default {
       set(val) {
         if (this.condition4InvoiceMakeupList.ProductClassID === val) return;
         this.setCondition([['ProductClassID'], val]);
-        this.getList();
+        // this.getList();
       },
     },
     localOrderStatus: { // 订单状态
@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     onMultipleChange() {
-      // this.getList();
+      this.getList();
     },
     getList(notSwitch) {
       this.$nextTick(() => {

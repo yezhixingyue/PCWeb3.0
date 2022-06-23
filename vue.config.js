@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 const TerserPlugin = require('terser-webpack-plugin');
 
-// let proxyUrl = 'http://192.168.3.68:8050';
+// let proxyUrl = 'http://file.ybz888.com:4567';
 let proxyUrl = 'http://192.168.3.253';
 // let proxyUrl = 'http://erp.ybz888.com/';
 let publicPath = '';
@@ -27,6 +27,8 @@ module.exports = {
         // target: 'http://218.28.143.10:8156',
         ws: true, // 开启websockets
         changeOrigin: true, // 开启代理
+        proxyTimeout: 10 * 60 * 1000,
+        timeout: 10 * 60 * 1000,
       },
     },
   },

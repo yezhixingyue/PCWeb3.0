@@ -59,8 +59,8 @@ export default {
           title: '发票信息',
           list: [
             { label: '开票金额', value: `￥${InvoiceAmount}元`, color: '#ff3769' },
-            { label: '发票类型', value: '增值税专用发票' },
-            { label: '企业名称', value: EnterpriseName },
+            { label: '发票类型', value: InvoiceTypeEnums.special.Name },
+            { label: '抬头名称', value: EnterpriseName },
             { label: '统一社会信用代码', value: CreditCode },
             { label: '注册地址', value: RegisteredAddress },
             { label: '注册电话', value: RegisteredTelephone },
@@ -85,8 +85,8 @@ export default {
           title: '发票信息',
           list: [
             { label: '开票金额', value: `￥${InvoiceAmount}元`, color: '#ff3769' },
-            { label: '发票类型', value: '增值税普通发票' },
-            { label: '企业名称', value: EnterpriseName },
+            { label: '发票类型', value: InvoiceTypeEnums.normal.Name },
+            { label: '抬头名称', value: EnterpriseName },
             { label: '统一社会信用代码', value: CreditCode },
             { label: '注册地址', value: RegisteredAddress },
             { label: '注册电话', value: RegisteredTelephone },
@@ -104,7 +104,7 @@ export default {
           title: '发票信息',
           list: [
             { label: '开票金额', value: `￥${InvoiceAmount}元`, color: '#ff3769' },
-            { label: '发票类型', value: '增值税普通发票' },
+            { label: '发票类型', value: InvoiceTypeEnums.normal.Name },
             { label: '抬头类型', value: InvoiceTitleEnums.personal.Name },
             { label: '抬头名称', value: PersonalName },
             { label: '收票人手机', value: ReceiverContactWay },

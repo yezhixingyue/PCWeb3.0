@@ -14,7 +14,7 @@
       <!-- 内容区 -->
       <ul v-if="EnterpriseData" class="content">
         <li>
-          <label for="">企业名称：</label>
+          <label for="">抬头名称：</label>
           <span>{{EnterpriseData.EnterpriseName}}</span>
         </li>
         <li>

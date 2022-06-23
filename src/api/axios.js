@@ -154,6 +154,9 @@ axios.interceptors.response.use(
   async (error) => {
     localCancelToken.removeCancelToken(error.config || '');
     if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
+    if (error.response && error.response.status === 200) {
+      return error.response;
+    }
     if (error.response) {
       let key = false;
       let b;
@@ -184,6 +187,7 @@ axios.interceptors.response.use(
           break;
         default:
           messageBox.failSingleError({ title: '操作失败', msg: `${error.response.data && error.response.data.Message ? error.response.data.Message : error.response.statusText}` });
+          console.log(error, error.response, error.message);
           key = true;
           break;
       }
@@ -225,5 +229,6 @@ axios.interceptors.response.use(
 );
 
 // axios.defaults.baseURL = baseUrl;
+// axios.defaults.timeout = 5 * 60 * 1000;
 
 export default axios;

@@ -33,7 +33,7 @@
     <el-table-column label="订单状态" show-overflow-tooltip width="80">
       <template slot-scope="scope">{{ scope.row.OrderStatus | formatStatus }}</template>
     </el-table-column>
-    <el-table-column label="不可开票原因" min-width="85" show-overflow-tooltip>
+    <el-table-column label="备注" min-width="85" show-overflow-tooltip>
       <span class="is-gray" slot-scope="scope" v-if="!scope.row.IsAllowInvoice">{{ scope.row.NotAllowReason }}</span>
     </el-table-column>
     <div slot="empty">

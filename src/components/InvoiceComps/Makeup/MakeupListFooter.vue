@@ -111,6 +111,14 @@ export default {
       this.$store.dispatch('invoice/getInvoiceMakeupOrderList', [page, true]);
     },
     onMergeMakeupClick() {
+      const num = 10000;
+      if (this.InvoiceMakeupOrderNumber > num) {
+        this.messageBox.failSingleError({
+          title: '开票失败',
+          msg: `当前选中订单数量已超出最大数量${num},请缩小开票范围`,
+        });
+        return;
+      }
       this.$emit('margeMakeup');
     },
     handleClick(bool) {

@@ -7,8 +7,8 @@
         <span>申请单号：{{statusData.InvoiceID}}</span>
       </div>
       <div class="center">
-        <el-button type="primary"
-         @click="onThroughClick" v-if="statusData.InvoiceStatus===InvoiceStatusEnums.pendingCheck.ID&&showThroughBtn">发票资质通过</el-button>
+        <!-- <el-button type="primary"
+         @click="onThroughClick" v-if="statusData.InvoiceStatus===InvoiceStatusEnums.pendingCheck.ID&&showThroughBtn">发票资质通过</el-button> -->
         <span class="opinion"
          :class="{'is-pink': statusData.InvoiceStatus===InvoiceStatusEnums.rejected.ID}" v-if='statusData.TipsContent'>{{statusData.TipsContent}}</span>
         <template v-if="statusData.InvoiceStatus===InvoiceStatusEnums.haveToMail.ID">

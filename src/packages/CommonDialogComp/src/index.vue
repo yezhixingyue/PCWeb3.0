@@ -126,6 +126,7 @@ export default {
   methods: {
     onCancleClick() {
       this.$emit('cancle');
+      this.$emit('cancel');
     },
     onSubmitClick(evt) {
       if (!this.dialogVisible) return;

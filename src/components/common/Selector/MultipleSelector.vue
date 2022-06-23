@@ -61,7 +61,7 @@ export default {
     },
     label: {
       type: String,
-      default: '产品名称',
+      default: '产品类别',
     },
     placeholder: {
       type: String,
