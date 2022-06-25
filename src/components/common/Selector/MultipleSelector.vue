@@ -169,6 +169,7 @@ export default {
     font-weight: 700;
     color: #585858;
     text-align: right;
+    margin-right: 4px;
   }
   > header {
     display: inline-block;
@@ -254,7 +255,7 @@ export default {
     padding: 5px 10px;
     padding-right: 0;
     box-sizing: border-box;
-    left: 0;
+    left: 4px;
     display: inline-block;
     white-space: nowrap;
     max-height: 280px;
@@ -262,6 +263,7 @@ export default {
     overflow-y: overlay;
     &.has-l {
       left: 5em;
+      left: calc(5em + 4px);
     }
     > .empty {
       font-size: 12px;

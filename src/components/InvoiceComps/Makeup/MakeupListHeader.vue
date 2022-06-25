@@ -13,7 +13,7 @@
        v-model="localProductList"
        :default-props="{label: 'ClassName', value: 'ID'}"
        @change="onMultipleChange"
-       :minWidth="300"
+       :minWidth="240"
        :maxWidth="860"
        />
     </div>

@@ -65,6 +65,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isBackFromMakeup: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     onManualSelect(e) {
@@ -116,21 +120,28 @@ export default {
     },
   },
   watch: {
-    isSelectAll(bool) {
-      if (typeof bool !== 'boolean') return;
-      // 当选中全部状态进行切换时，应做如下处理：
-      // 1. 清空validList和invalidList列表
-      this.$emit('update:validList', []);
-      this.$emit('update:invalidList', []);
-      // 2. this.$refs.oTable执行clearSelection方法； 当切换状态为true时，执行toggleAllSelection方法，进行全部选中（可能需要判断当前列表中,暂不做判断）
-      if (this.$refs.oTable) {
-        this.$refs.oTable.clearSelection();
-        if (bool) {
-          this.list.forEach(row => {
-            if (row.IsAllowInvoice) this.$refs.oTable.toggleRowSelection(row);
-          });
+    isSelectAll: {
+      handler(bool) {
+        if (typeof bool !== 'boolean') return;
+        // 当选中全部状态进行切换时，应做如下处理：
+        // 1. 清空validList和invalidList列表
+        if (this.isBackFromMakeup) {
+          this.$emit('update:isBackFromMakeup', false);
+        } else {
+          this.$emit('update:validList', []);
+          this.$emit('update:invalidList', []);
         }
-      }
+        // 2. this.$refs.oTable执行clearSelection方法； 当切换状态为true时，执行toggleAllSelection方法，进行全部选中（可能需要判断当前列表中,暂不做判断）
+        if (this.$refs.oTable) {
+          this.$refs.oTable.clearSelection();
+          if (bool) {
+            this.list.forEach(row => {
+              if (row.IsAllowInvoice) this.$refs.oTable.toggleRowSelection(row);
+            });
+          }
+        }
+      },
+      immediate: false,
     },
     list: {
       handler() { // 列表数据变动时，切换选中项复选框状态

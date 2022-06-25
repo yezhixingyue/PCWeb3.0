@@ -4,7 +4,8 @@
       <span class="blue-v-line is-bold is-black">发票查询</span>
     </p>
     <div class="f">
-      <SingleSelector useEmpty v-model="localInvoiceType" :optionList='InvoiceTypeEnumList' :defaultProps="{label: 'Name',value: 'ID'}" title="发票类型" />
+      <SingleSelector class="t" useEmpty v-model="localInvoiceType" :optionList='InvoiceTypeEnumList'
+       :defaultProps="{label: 'Name',value: 'ID'}" title="发票类型" />
       <SingleSelector useEmpty v-model="localInvoiceStatus" :optionList='localInvoiceStatusEnumList' :defaultProps="{label: 'Name',value: 'ID'}" title="发票状态" />
     </div>
     <div class="s">
@@ -124,6 +125,15 @@ export default {
       }
       & + .mp-pc-common-comps-select-comp-wrap {
         margin-right: 0;
+      }
+      &.t {
+        width: 244px;
+        > div {
+          width: 168px;
+           > div.el-input > input {
+            width: 168px;
+           }
+        }
       }
     }
   }

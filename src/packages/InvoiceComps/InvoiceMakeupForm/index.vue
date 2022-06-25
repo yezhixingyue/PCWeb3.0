@@ -23,7 +23,7 @@
     </el-form-item>
     <el-form-item label="抬头名称：" prop="EnterpriseName" v-if="(!isPersonal && !notThrough && !fetchEnterpriseDataError) || onlyEnterprise">
       <span class="info" v-if="isThrough && !onlyEnterprise">{{ruleForm.EnterpriseName}}</span>
-      <el-input v-else v-model.trim="ruleForm.EnterpriseName" placeholder="请填写抬头名称" maxlength="100"></el-input>
+      <el-input v-else v-model.trim="ruleForm.EnterpriseName" placeholder="请填写抬头名称" maxlength="60"></el-input>
     </el-form-item>
     <el-form-item label="统一社会信用代码：" prop="CreditCode" v-if="(!isPersonal && !notThrough && !fetchEnterpriseDataError) || onlyEnterprise">
       <span class="info" v-if="isThrough && !onlyEnterprise">{{ruleForm.CreditCode}}</span>

@@ -16,6 +16,7 @@
         :isSelectAll="isSelectAll"
         :validList.sync="validList"
         :invalidList.sync="invalidList"
+        :isBackFromMakeup.sync="isBackFromMakeup"
       />
     </main>
     <MakeupListFooter
@@ -48,6 +49,7 @@ export default {
       isSelectAll: false, // 全选数据 及 表格内选中数据 应保存至数据仓库中，在未保证返回时还原选中结果
       validList: [], // 有效列表 -- 当isSelectAll为false时使用，存放选中的订单id
       invalidList: [], // 无效列表 -- 当isSelectAll为true时使用，存在取消选中的订单id --- 当checkAll状态改变时，该两项列表都清空
+      isBackFromMakeup: false,
     };
   },
   computed: {
@@ -110,6 +112,7 @@ export default {
         }
         const _vm = vm;
         const { isSelectAll, OrderID } = vm.curCondition4MakeupList;
+        _vm.isBackFromMakeup = true;
         _vm.isSelectAll = isSelectAll || false;
         if (isSelectAll) {
           _vm.invalidList = OrderID || [];
@@ -137,6 +140,14 @@ export default {
       self.meta.y = 0;
     }
     next();
+  },
+  watch: {
+    invalidList: {
+      handler(val) {
+        console.log(val);
+      },
+      immediate: true,
+    },
   },
 };
 </script>
