@@ -268,8 +268,9 @@ export default {
             sessionStorage.removeItem('token');
             localStorage.removeItem('token');
             Cookie.removeCookie('token');
-            this.$router.replace('/login');
+            // this.$router.replace('/login');
             // 另外再需清除状态
+            window.location.reload();
           },
         });
         return;

@@ -123,6 +123,7 @@ export default {
     isSelectAll: {
       handler(bool) {
         if (typeof bool !== 'boolean') return;
+        console.log('isSelectAll', 1, bool, this.isBackFromMakeup);
         // 当选中全部状态进行切换时，应做如下处理：
         // 1. 清空validList和invalidList列表
         if (this.isBackFromMakeup) {

@@ -11,7 +11,7 @@ import invoice from './Invoice/invoiceStore';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   strict: process.env.NODE_ENV === 'development',
   modules: {
     order,
@@ -24,3 +24,5 @@ export default new Vuex.Store({
     timeSelectModule,
   },
 });
+
+export default store;

@@ -82,6 +82,20 @@ export default {
 
       const resp = await this.api.getInvoiceMakeoutCombine(temp).catch(() => null);
       if (resp && resp.data.Status === 1000) {
+        if (!resp.data.Data) {
+          this.messageBox.failSingleError({
+            title: '合并开票失败',
+            msg: '服务器返回数据异常',
+          });
+          return;
+        }
+        if (resp.data.Data.TotalInvoiceAmount === 0) {
+          this.messageBox.failSingleError({
+            title: '合并开票失败',
+            msg: '开票金额必须大于0元',
+          });
+          return;
+        }
         this.$store.commit('invoice/setCurCondition4MakeupList', temp);
         this.$store.commit('invoice/setCurCombineResult', resp.data);
         this.$router.push('/mySetting/invoiceMakeup/combine');
@@ -112,7 +126,7 @@ export default {
         }
         const _vm = vm;
         const { isSelectAll, OrderID } = vm.curCondition4MakeupList;
-        _vm.isBackFromMakeup = true;
+        if (isSelectAll) _vm.isBackFromMakeup = true;
         _vm.isSelectAll = isSelectAll || false;
         if (isSelectAll) {
           _vm.invalidList = OrderID || [];

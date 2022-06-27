@@ -2,7 +2,7 @@
   <ul class="mp-common-steps-comp-wrap" :class="{allCompleted:allCompleted}">
     <li v-for="(it, i) in list" :key="i" :class="{completed: it.completed, active: it.active && !it.completed}">
       <div class="content">
-        <p class="top" :class="{visible: it.completed && i === list.length - 1}">{{it.activeTitle}}</p>
+        <p class="top" :class="{visible: it.completed && i === list.length - 1 && false}">{{it.activeTitle}}</p>
         <div class="icon">
           <i :class="it.icon"></i>
         </div>
@@ -10,7 +10,7 @@
         <p v-if="it.completed || it.active">{{it.date}}</p>
       </div>
       <div class="right" v-if="i < list.length - 1">
-        <span class="text" :class="{visible: it.active && !it.completed}">{{it.activeTitle}}</span>
+        <span class="text" :class="{visible: it.active && !it.completed && false}">{{it.activeTitle}}</span>
         <span class="line"></span>
       </div>
     </li>

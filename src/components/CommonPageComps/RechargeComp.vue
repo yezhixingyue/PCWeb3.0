@@ -44,7 +44,7 @@
               <router-link to="/toPrintBeanHelp" target="_blank">什么是印豆？</router-link>
             </li>
             <li class='buy-box'>
-              <!-- <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">充值印豆</span> -->
+              <span class="blue-span" @click="onBeanBuyClick" :class="{'is-disabled': loading}">充值印豆</span>
             </li>
           </ul>
         </div>
