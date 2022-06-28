@@ -14,14 +14,17 @@
         <span class="ml-50 is-bold is-pink">￥{{allCost || allCost === 0 ? allCost : '--'}}元</span>
       </template>
       <span class="blue-span" @click="onClearClick" >清除已上传订单</span>
-      <span class="span-title-pink" @click="onRemoveClick" :class="{disabled: multipleSelection.length === 0}">删除选中订单</span>
+      <span class="span-title-pink mr-9" @click="onRemoveClick" :class="{disabled: multipleSelection.length === 0}">删除选中订单</span>
+      <span class="span-title-pink" @click="onSwitchExpressClick" :class="{disabled: multipleSelection.length === 0 || UseSameAddress}">更改选中配送方式</span>
       <el-button type="primary" @click="onUploadClick" :disabled='disabled'>上传选中订单</el-button>
     </div>
+    <SwitchExpressDialog :visible.sync="switchVisible" :multipleSelection="multipleSelection" />
   </div>
 </template>
 
 <script>
 import { projectType } from '@/assets/js/setup';
+import SwitchExpressDialog from './SwitchExpressDialog.vue';
 
 export default {
   props: {
@@ -59,6 +62,9 @@ export default {
       default: 0,
     },
   },
+  components: {
+    SwitchExpressDialog,
+  },
   computed: {
     checked: {
       get() {
@@ -83,6 +89,11 @@ export default {
        || (!this.address.Address.Express.Second && this.address.Address.Express.Second !== 0));
     },
   },
+  data() {
+    return {
+      switchVisible: false,
+    };
+  },
   methods: {
     onUploadClick() {
       if (this.expressDisabled) {
@@ -100,6 +111,11 @@ export default {
     },
     onClearClick() {
       this.$emit('clearSuccess');
+    },
+    onSwitchExpressClick() {
+      if (this.multipleSelection.length === 0 || this.UseSameAddress) return;
+      console.log(this.multipleSelection, this.UseSameAddress);
+      this.switchVisible = true;
     },
   },
 };

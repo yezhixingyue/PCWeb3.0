@@ -156,6 +156,7 @@ export default {
 </script>
 <style lang='scss'>
 .mp-erp-common-dialog-comp-wrap {
+  background-color: rgba(0, 0, 0, 0.45);
   > .el-dialog {
     border-radius: 5px;
   }
@@ -282,6 +283,26 @@ export default {
   &.pc {
     .el-dialog__header > span::before {
       background-color: #428dfa
+    }
+    .el-dialog__footer > .dialog-footer > p > button {
+      &.el-button--primary {
+        background: linear-gradient(to right, #428dfa, lighten($color: #428dfa, $amount: 10));
+        border: none;
+        &:hover {
+          opacity: 0.88;
+        }
+        &:active {
+          background: linear-gradient(to right, #1266e4, #428dfa);
+        }
+      }
+      &.el-button--default {
+        border-color: #428dfa;
+        color: #428dfa;
+        &:active {
+          border-color: darken($color: #428dfa, $amount: 12);
+          color: darken($color: #428dfa, $amount: 12);
+        }
+      }
     }
   }
 }
