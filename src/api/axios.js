@@ -6,6 +6,7 @@ import messageBox from '../assets/js/utils/message';
 import Cookie from '../assets/js/Cookie';
 import { useCookie } from '../assets/js/setup';
 import LocalCancelToken from './CancelToken';
+import sendError from './sendError';
 // import { delay } from '../assets/js/utils/utils';
 
 const localCancelToken = new LocalCancelToken();
@@ -155,6 +156,8 @@ axios.interceptors.response.use(
   handleResponse,
   async (error) => {
     if (error.response && error.response.status === 200) {
+      // 未知错误
+      sendError(error, true);
       return handleResponse(error.response);
     }
     localCancelToken.removeCancelToken(error.config || '');
@@ -194,7 +197,11 @@ axios.interceptors.response.use(
               _msg = error.response.data.Message;
             } else {
               _msg = `系统出错，错误码：${error.response.data.Status}`;
+              // 未知错误
+              sendError(error);
             }
+          } else {
+            sendError(error);
           }
           messageBox.failSingleError({ title: '操作失败', msg: _msg });
           key = true;
