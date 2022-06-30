@@ -96,11 +96,11 @@ function failSingleError({
  * @param {string} [text='关闭']
  */
 function warnSingleError({
-  msg, successFunc, failFunc, title = '注意', text = '确定',
+  msg, successFunc, failFunc, title = '注意', text = '确定', dangerouslyUseHTMLString = false,
 }) {
   const config = {
     message: msg,
-    dangerouslyUseHTMLString: false,
+    dangerouslyUseHTMLString,
     customClass: 'mp-order-del-pop-reverse-warn',
   };
   msgHandler(config, msg);

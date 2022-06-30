@@ -8,103 +8,55 @@
         <router-view />
       <!-- </keep-alive> -->
       <div class="back-wrapper">
-        <div class="contact-us-wrap" @click="handleDrawerOpen">
-          <i class="iconfont icon-dianhua1"></i>
-        </div>
+        <el-popover
+          placement="left"
+          width="180"
+          trigger="hover">
+          <div class="contact-us-wrap" slot="reference">
+            <i class="iconfont icon-dianhua1"></i>
+          </div>
+          <ul class="mp-contact-us-content-wrap">
+            <li>
+              <p class="title">
+                <i class="iconfont icon-dianhua"></i>
+                <span class="is-gray">软件技术支持：</span>
+              </p>
+              <div class="content">
+                <p>0371-55672961</p>
+                <p>199-0397-0210</p>
+                <hr>
+              </div>
+            </li>
+            <li>
+              <p class="title">
+                <i class="iconfont icon-QQ1"></i>
+                <span class="is-gray">客服QQ：</span>
+              </p>
+              <div class="content">
+                <p>
+                  <a rel="nofollow" target="_blank"
+                    href="tencent://message/?uin=800051518&amp;Site=名片之家&amp;Menu=yes">
+                    <span>800051518</span>
+                  </a>
+                </p>
+                <hr>
+              </div>
+            </li>
+            <li>
+              <p class="title">
+                <i class="iconfont icon-wodekefu"></i>
+                <span class="is-gray">全国统一服务热线：</span>
+              </p>
+              <div class="content">
+                <p>4006363006</p>
+              </div>
+            </li>
+          </ul>
+        </el-popover>
         <el-backtop target="#app" :visibility-height='50'>
           <i class="iconfont icon-xiangshang"></i>
         </el-backtop>
       </div>
-      <el-drawer
-        :visible.sync="drawer"
-        :with-header="false"
-        size='350px'
-        :before-close="handleClose">
-        <section class="icon-wrap" @click="handleDrawerClose">
-          <span class="iconfont icon-yincangxiangqing"></span>
-        </section>
-        <section>
-          <header>
-            <span class="iconfont icon-dianhua"></span>
-            <span class="is-gray">软件技术支持：</span>
-          </header>
-          <div class="content">
-            <p>0371-55672961</p>
-            <p>199-0397-0210</p>
-          </div>
-        </section>
-        <section class="qq-wrap">
-          <header>
-            <span class="iconfont icon-QQ1"></span>
-            <span class="is-gray">客服QQ：</span>
-          </header>
-          <ul class="content">
-            <li class="f">
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank" href="tencent://message/?uin=800051513&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800051513（ 电商 ）</span>
-                </a>
-              </p>
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank" href="tencent://message/?uin=800065607&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800065607（ 郑州 ）</span>
-                </a>
-              </p>
-            </li>
-            <li>
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank"
-                 href="tencent://message/?uin=800051518&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800051518</span>
-                </a>
-                <!-- <span>800051518</span> -->
-              </p>
-              <p>河北、山东、陕西、其它</p>
-            </li>
-            <li>
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank" href="tencent://message/?uin=800131808&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800131808</span>
-                </a>
-              </p>
-              <p>南阳、许昌、驻马店、信阳、平顶山、漯河</p>
-            </li>
-            <li>
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank"
-                 href="tencent://message/?uin=800050507&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800050507</span>
-                </a>
-                <!-- <span>800050507</span> -->
-              </p>
-              <p>安阳、新乡、鹤壁、濮阳、邯郸、邢台</p>
-            </li>
-            <li>
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank" href="tencent://message/?uin=800131866&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800131866</span>
-                </a>
-              </p>
-              <p>开封、周口、商丘、安徽</p>
-            </li>
-            <li>
-              <p>
-                <img src="../../assets/images/qq.png" alt="">
-                <a rel="nofollow" target="_blank" href="tencent://message/?uin=800131899&amp;Site=名片之家&amp;Menu=yes">
-                  <span>800131899</span>
-                </a>
-              </p>
-              <p>焦作、运城、长治、晋城、洛阳、济源、三门峡、临汾</p>
-            </li>
-          </ul>
-        </section>
-      </el-drawer>
     </div>
     <footer>
       <BlueInfoFooter  />
@@ -122,34 +74,6 @@ export default {
     CommonHeader,
     BlueInfoFooter,
   },
-  data() {
-    return {
-      drawer: false,
-    };
-  },
-  methods: {
-    handleClose(done) {
-      // this.$confirm('确认关闭？')
-      //   .then(_ => {
-      //     done();
-      //   })
-      //   .catch(_ => {});
-      done();
-    },
-    handleDrawerOpen() {
-      this.drawer = true;
-    },
-    handleDrawerClose() {
-      this.drawer = false;
-    },
-  },
-  // mounted() {
-  //   if (window.BizQQWPA) {
-  //     window.BizQQWPA.addCustom({
-  //       aty: '0', a: '0', nameAccount: 800051518, selector: 'BizQQWPA',
-  //     });
-  //   }
-  // },
 };
 </script>
 
@@ -196,7 +120,7 @@ export default {
           background-color: #1d5ab6;
         }
       }
-      > .contact-us-wrap {
+       .contact-us-wrap {
         position: absolute;
         right: -85px !important;
         bottom: 65px;
@@ -258,111 +182,48 @@ export default {
         right: 0\0;
       }
     }
-    > .el-drawer__wrapper {
-      .el-drawer {
-        width: 350px;
-        outline: none;
-        > .el-drawer__body {
-          outline: none;
-          padding-top: 48px;
-          overflow-y: auto;
-          position: relative;
-          > section {
-            padding-left: 25px;
-            padding-right: 23px;
-            > header {
-              user-select: none;
-              padding-bottom: 23px;
-              > span.iconfont {
-                font-size: 15px;
-                width: 28px;
-                height: 28px;
-                border: 1px solid #428dfa;
-                border-radius: 50%;
-                text-align: center;
-                line-height: 28px;
-                color: #428dfa;
-                display: inline-block;
-                margin-right: 15px;
-              }
-            }
-            > div.content {
-              > p {
-                font-size: 16px;
-                line-height: 20px;
-                padding: 7px 0;
-              }
-            }
-            &.icon-wrap {
-              position: absolute;
-              top: 0;
-              left: 3px;
-              font-size: 16px;
-              color: #888;
-              padding: 7px 8px;
-              cursor: pointer;
-              border-radius: 50%;
-              transition: 0.2s;
-              &:hover {
-                color: #428dfa;
-                &:active {
-                  background: #eee;
-                }
-              }
-            }
-            &.qq-wrap {
-              padding-top: 50px;
-              > header {
-                padding-bottom: 12px;
-              }
-              > ul.content {
-                > li {
-                  > p {
-                    line-height: 38px;
-                    // padding-top: 6px;
-                    > img {
-                      vertical-align: -5%;
-                      margin-right: 8px;
-                    }
-                    > a {
-                      color: #585858;
-                      outline: none;
-                      &:hover {
-                        color: #428dfa;
-                      }
-                      > span {
-                        outline: none;
-                      }
-                    }
-                  }
-                  padding-top: 14px;
-                  border-bottom: 1px solid #eee;
-                  &.f {
-                    padding-top: 0px;
-                  }
-                }
-              }
-            }
-          }
-          &::-webkit-scrollbar {
-            width: 6px;
-            height: 8px;
-          }
-          &::-webkit-scrollbar-thumb {
-            background-color: #e6e6e6;
-            border-radius: 3px;
-            &:hover {
-              background-color: #cbcbcb;
-            }
-          }
-        }
-      }
-    }
   }
   @keyframes identifier {
     // 0% {
     //   border: 1px solid ;
     // },
+  }
+}
+ul.mp-contact-us-content-wrap {
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 4px;
+  padding-bottom: 8px;
+  > li {
+    > p.title {
+      > .iconfont {
+        color: #428dfa;
+        margin-right: 12px;
+        &.icon-wodekefu {
+          font-size: 16px;
+          margin-right: 10px;
+        }
+      }
+    }
+    > div.content {
+      padding-top: 7px;
+      letter-spacing: 0.5px;
+      > p {
+        padding: 2px 0;
+        color: #585858;
+        > a {
+          color: inherit;
+          &:hover {
+            color: #428dfa;
+          }
+        }
+      }
+      > hr {
+        border: none;
+        border-bottom: 1px dashed #ccc;
+        margin: 12px 0;
+      }
+    }
   }
 }
 </style>
