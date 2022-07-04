@@ -26,6 +26,7 @@ export default {
   },
   computed: {
     ...mapState('invoice', ['InvoiceSearchDataList', 'InvoiceSearchDataNumber', 'loading']),
+    ...mapState('common', ['customerInfo']),
   },
   methods: {
     viewDetail(item) { // 查看开票详情.
@@ -47,6 +48,16 @@ export default {
         this.$store.commit('invoice/setCondition4SearchList', [['InvoiceStatus', ''], InvoiceStatusEnums.rejected.ID]);
       }
       this.$store.dispatch('invoice/getInvoiceSearchDataList');
+    },
+  },
+  watch: {
+    customerInfo: {
+      handler() {
+        if (this.customerInfo && !this.customerInfo.PermissionInfo?.ApplyInvoice) { // 无权限 跳转至下单页面
+          this.$router.replace('/placeOrder');
+        }
+      },
+      immediate: true,
     },
   },
   beforeRouteEnter(to, from, next) {

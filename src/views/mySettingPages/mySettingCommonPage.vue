@@ -10,8 +10,10 @@
         <router-link tag="li" to="/mySetting/subAccountManage">账号管理</router-link>
         <router-link tag="li" to="/mySetting/changePwd">修改密码</router-link>
         <router-link tag="li" to="/mySetting/changeMobile">修改手机号</router-link>
-        <router-link tag="li" to="/mySetting/invoiceMakeup" :class="{disabled: $route.name==='InvoiceCombineMakeupPage'}">发票开具</router-link>
-        <router-link tag="li" to="/mySetting/invoiceSearch" :class="{disabled: $route.name==='InvoiceSearchDetailPage'}">发票查询</router-link>
+        <router-link tag="li" to="/mySetting/invoiceMakeup"
+          v-if="hasInvoicePermission" :class="{disabled: $route.name==='InvoiceCombineMakeupPage'}">发票开具</router-link>
+        <router-link tag="li" to="/mySetting/invoiceSearch"
+          v-if="hasInvoicePermission" :class="{disabled: $route.name==='InvoiceSearchDetailPage'}">发票查询</router-link>
         <router-link tag="li" to="/mySetting/setting">我的设置</router-link>
       </ul>
       <div class="right">
@@ -25,10 +27,16 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   computed: {
+    ...mapState('common', ['customerInfo']),
     _route() {
       return this.$route;
+    },
+    hasInvoicePermission() {
+      return this.customerInfo && this.customerInfo.PermissionInfo?.ApplyInvoice;
     },
   },
 };

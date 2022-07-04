@@ -113,10 +113,10 @@
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingChangeMobile'}"
                 command='changeMobile' icon="el-icon-s-order">修改手机号</el-dropdown-item>
-              <el-dropdown-item
+              <el-dropdown-item v-if="hasInvoicePermission"
                 :class="{active: ['InvoiceMakeupListPage', 'InvoiceCombineMakeupPage'].includes($route.name)}"
                 command='invoiceMakeup' icon="fapiao iconfont icon-fapiao">发票开具</el-dropdown-item>
-              <el-dropdown-item
+              <el-dropdown-item v-if="hasInvoicePermission"
                 :class="{active: ['InvoiceSearchListPage', 'InvoiceSearchDetailPage'].includes($route.name)}"
                 command='invoiceSearch' icon="fapiao iconfont icon-zaitu">发票查询</el-dropdown-item>
               <el-dropdown-item
@@ -177,6 +177,9 @@ export default {
     ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
+    },
+    hasInvoicePermission() {
+      return this.customerInfo && this.customerInfo.PermissionInfo?.ApplyInvoice;
     },
   },
   data() {

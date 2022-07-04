@@ -60,6 +60,7 @@ export default {
       'loading',
       'curCondition4MakeupList',
     ]),
+    ...mapState('common', ['customerInfo']),
     IsAllowInvoice() {
       return this.condition4InvoiceMakeupList.MakeupStatus === InvoiceMakeUpStatusEnums.canMakeup.ID;
     },
@@ -112,6 +113,16 @@ export default {
       this.onConditionChange();
     },
   },
+  watch: {
+    customerInfo: {
+      handler() {
+        if (this.customerInfo && !this.customerInfo.PermissionInfo?.ApplyInvoice) { // 无权限 跳转至下单页面
+          this.$router.replace('/placeOrder');
+        }
+      },
+      immediate: true,
+    },
+  },
   // mounted() {
   //   this.getList();
   // },
@@ -154,14 +165,6 @@ export default {
       self.meta.y = 0;
     }
     next();
-  },
-  watch: {
-    invalidList: {
-      handler(val) {
-        console.log(val);
-      },
-      immediate: true,
-    },
   },
 };
 </script>

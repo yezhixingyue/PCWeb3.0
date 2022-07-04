@@ -56,6 +56,7 @@ export default {
   },
   computed: {
     ...mapState('invoice', ['InvoiceMakeupOrderNumber', 'condition4InvoiceMakeupList', 'InvoiceMakeupOrderList']),
+    ...mapState('common', ['customerInfo']),
     localCheckAll: {
       get() {
         if (this.InvoiceMakeupOrderNumber === 0) {
@@ -90,6 +91,9 @@ export default {
       return this.condition4InvoiceMakeupList.Page > 100 && this.condition4InvoiceMakeupList.Page < allPageCount - 2;
     },
     canCombineInvoive() {
+      if (!this.customerInfo || !this.customerInfo.PermissionInfo?.ApplyInvoice) { // 无权限
+        return false;
+      }
       if (this.disabled) return false;
       if (!this.isSelectAll && this.validList.length === 0) {
         return false;
