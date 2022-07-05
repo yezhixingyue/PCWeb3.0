@@ -310,7 +310,7 @@ export default {
       const logisticItem = this.localExpressList.find(it => it.Type === 2);
       const expressItem = this.localExpressList.find(it => it.Type === 3);
       return {
-        canMpzj: this.ExpressValidList.includes(1) && !this.canMpzj, // 名片之家
+        canMpzj: this.ExpressValidList.includes(1), // 名片之家
         canExpress: expressItem && expressItem.useableIds.length > 0, // 快递
         canLogistic: logisticItem && logisticItem.useableIds.length > 0, // 物流
       };
@@ -606,11 +606,14 @@ export default {
       if (!temp.CustomerID && this.customerInfo) {
         temp.CustomerID = this.customerInfo.CustomerID;
       }
-      const resp = await this.api.getExpressUseableCompanyList(temp);
+      const resp = await this.api.getExpressUseableCompanyList(temp).catch(() => null);
       this.ValidExpressLoading = false;
-      if (resp.data.Status === 1000) {
-        const result = resp.data.Data;
+      if (resp && resp.data.Status === 1000) {
+        let result = resp.data.Data;
         // const result = [];
+        if (!this.canMpzj) {
+          result = result.filter(it => it !== 1);
+        }
         this.ExpressValidList = result;
         if (result.includes(this.Express.Second)) {
           let oldAddExpressArea = typeof oldIndex === 'number' ? this.customerInfo.Address[oldIndex]?.ExpressArea : null;
