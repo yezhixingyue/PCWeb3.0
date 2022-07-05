@@ -142,12 +142,15 @@
       ref="mapComp"
       :openType="openType"
       isTemp
+      isEmitType
       :canClose='false'
       :visible.sync="setMapVisible"
       :curEditInfo="tempDataForMapPosition.NewAddressInfo"
       :PropRegionalList='RegionalList'
       :PropCityList='CityList'
       :PropCountyList='CountyList'
+      :canMpzj="canMpzj"
+      :top="!canMpzj ? '15vh' : '7vh'"
       @handleMapSearchError="handleMapSearchError"
       @changeProps="setLatitudeLongitudeAfterPositioning"
       @submit="setLatitudeLongitudeAfterPositioning"
@@ -385,7 +388,7 @@ export default {
       const {
         Latitude, Longitude, AddressDetail, Consignee, Mobile, ExpressArea, RegionalList, CityList, CountyList,
       } = data;
-      if (!this.tempDataForMapPosition || !Latitude || !Longitude) return;
+      if (!this.tempDataForMapPosition || ((!Latitude || !Longitude) && this.canMpzj)) return;
       const { curAddIndex, OutPlateNo, NewAddressInfo } = this.tempDataForMapPosition;
       const oldIndex = this.curAddIndex;
       const oldExpressArea = oldIndex === 'new' ? this.NewAddressInfo.ExpressArea : null;
@@ -464,10 +467,12 @@ export default {
       this.RegionalList = RegionalList || null;
       // this.curAddIndex = 'new';
       // 打开地图弹窗定位
-      if (this.canMpzj) {
-        this.setMapVisible = true;
-        this.openType = 'edit';
-      }
+      // if (this.canMpzj) {
+      //   this.setMapVisible = true;
+      //   this.openType = 'edit';
+      // }
+      this.openType = 'edit';
+      this.setMapVisible = true;
       // this.$refs.ruleForm.validate();
     },
     /** 弹窗地址修改相关方法
@@ -498,9 +503,14 @@ export default {
           this.setMapVisible = true;
         }
       } else {
+        const oldIndex = this.curAddIndex;
+        const oldExpressArea = oldIndex === 'new' ? this.NewAddressInfo.ExpressArea : null;
         this.curAddIndex = curAddIndex;
         this.OutPlateNo = OutPlateNo;
         this.NewAddressInfo = JSON.parse(JSON.stringify(NewAddressInfo));
+        if (!this.canMpzj) {
+          if (curAddIndex === 'new' && oldIndex === 'new') this.handleUseableCompanyList(this.NewAddressInfo, oldIndex, oldExpressArea);
+        }
         if (this.$refs.oIdentifyFormItemOut) this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
         this.setInfo4ReqObj();
         this.SetAddressVisible = false;
@@ -915,17 +925,18 @@ export default {
     max-height: 1050px;
     box-sizing: border-box;
     .title {
-      min-width: 4em;
+      min-width: 5em;
+      margin-right: 0;
     }
     .el-dialog__header {
-      padding:  10px;
+      padding: 6px 10px;
       margin: 0 10px;
       line-height: 30px;
       border-bottom: 1px solid #eee;
       font-size: 15px;
       color: #888E99;
       .el-dialog__headerbtn {
-        top: 15px;
+        top: 11px;
       }
       // > header {
       //   &::before {

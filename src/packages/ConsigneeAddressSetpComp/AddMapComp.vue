@@ -73,6 +73,7 @@
                   show-word-limit placeholder="详细地址 (不包含省市区)"></el-input>
                 </el-form-item>
                 <el-button
+                  v-if="canMpzj"
                   type="primary" class="map-location-btn"
                   :disabled='!newAdd.ExpressArea.CountyID'
                   @click="handleMapLocationClick"
@@ -85,7 +86,7 @@
       <li v-if="openType === 'tempAdd' && addressDisplayContent">
         <span class="is-gray is-font-13">当前设置地址：{{addressDisplayContent}}</span>
       </li>
-      <li class="map-wrap">
+      <li class="map-wrap" v-if="canMpzj">
         <div class="map-content" id="map-container"
          v-show="newAdd.HavePosition || openType==='tempAdd'" v-loading="mapIsLoading">
         </div>
@@ -98,7 +99,7 @@
       <p class="tips-row">{{tipContent}}</p>
       <el-button type="primary"
        @click="handleSubmit('ruleForm')"
-       :title="HaveAddressContentChange ? '省市区地址发生变动，请重新定位' : ''">保存</el-button>
+       :title="HaveAddressContentChange ? '省市区地址发生变动，请重新定位' : ''">{{isEmitType ? '确定' : '保存'}}</el-button>
       <el-button v-if="openType !== 'tempAdd'" @click="handleBeforeDiaClose">取消</el-button>
     </div>
   </el-dialog>
@@ -115,6 +116,10 @@ export default {
     visible: {
       type: Boolean,
       default: false,
+    },
+    canMpzj: { // 是否可以使用名片之家配送， 目前电商客户除外，如果不可以则不需要定位
+      type: Boolean,
+      default: true,
     },
     openType: {
       type: String,
@@ -247,7 +252,12 @@ export default {
     },
     title() {
       if (this.openType === 'edit') {
-        if (this.isTemp) return '地图定位';
+        if (this.isTemp) {
+          if (!this.canMpzj) {
+            return '地址信息';
+          }
+          return '地图定位';
+        }
         return '编辑配送地址';
       }
       if (this.openType === 'new') {
@@ -547,6 +557,7 @@ export default {
       this.HaveAddressContentChange = false;
       this.HaveAddressDetailChange = false;
       this.$nextTick(() => {
+        if (!this.canMpzj) return;
         this.map = new AMap.Map('map-container', {
           center: [this.lng, this.lat],
           resizeEnable: true,
@@ -732,15 +743,17 @@ export default {
       text-align: right;
     }
     .el-dialog__header {
-      padding: 16px 20px 15px;
+      padding: 7px 15px !important;
       position: relative;
+      height: 30px;
+      line-height: 30px !important;
       > header {
         height: 14px;
-        line-height: 14px;
+        line-height: 30px !important;
         color: #888;
       }
       .el-dialog__headerbtn {
-        top: 11px;
+        top: 11px !important;
       }
       &::after {
         height: 1px;
