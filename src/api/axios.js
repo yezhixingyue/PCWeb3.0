@@ -109,6 +109,8 @@ const handleResponse = async (response) => {
     }
   }
 
+  // sendError({ response });
+
   const _url = response.config.url.split('?')[0];
 
   const _statusList2NotNeed2Toast = [1000, 9062, 6225];
@@ -156,29 +158,27 @@ axios.interceptors.response.use(
   handleResponse,
   async (error) => {
     if (error.response && error.response.status === 200) {
-      // 未知错误
+      // 未知错误 --- 该情况已验证 - 不会出现 - 后续可删除
       sendError(error, true);
       return handleResponse(error.response);
     }
     localCancelToken.removeCancelToken(error.config || '');
     if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
     if (error.response) {
-      let key = false;
       let b;
       let r;
       let buffterRes;
       let buffterErr = '文件导出数据过大，请缩小导出时间区间或精确筛选条件';
-      let _msg = '系统暂无响应，请重试';
+      let _msg;
+      let _title = '操作失败';
       switch (error.response.status) {
         case 401:
           clearToken();
           router.replace('/login');
-          key = true;
           break;
         case 403:
           clearToken();
           router.replace('/login');
-          key = true;
           break;
         case 413: // 处理文件导出错误
           b = new Blob([error.response.data]);
@@ -188,10 +188,29 @@ axios.interceptors.response.use(
           if (buffterRes && buffterRes.currentTarget && buffterRes.currentTarget.result) {
             buffterErr = buffterRes.currentTarget.result;
           }
-          messageBox.failSingleError({ msg: `${buffterErr}`, title: '导出失败' });
-          key = true;
+          _msg = `${buffterErr}`;
+          _title = '导出失败';
+          break;
+        case 500:
+          _msg = '服务器内部错误';
+          break;
+        case 501:
+          _msg = '服务器无法识别请求';
+          break;
+        case 502:
+          _msg = '网关错误';
+          break;
+        case 503:
+          _msg = '服务不可用';
+          break;
+        case 504:
+          _msg = '网关超时';
+          break;
+        case 505:
+          _msg = 'HTTP 版本不受支持';
           break;
         default:
+          _msg = '系统暂无响应，请重试';
           if (error.response.data) {
             if (error.response.data.Message) {
               _msg = error.response.data.Message;
@@ -203,11 +222,12 @@ axios.interceptors.response.use(
           } else {
             sendError(error);
           }
-          messageBox.failSingleError({ title: '操作失败', msg: _msg });
-          key = true;
           break;
       }
-      if (key) return Promise.reject(error.response);
+      if (_msg) {
+        messageBox.failSingleError({ title: _title, msg: _msg });
+      }
+      return Promise.reject(error.response);
     }
     if (error.message === 'Network Error') {
       Message({

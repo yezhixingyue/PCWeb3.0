@@ -1,10 +1,21 @@
 /* eslint-disable no-empty */
 import Cookie from '../assets/js/Cookie';
 
+let apiUrl = '';
+if (process.env.NODE_ENV === 'development') {
+  apiUrl = 'http://localhost:3005';
+} else if (process.env.NODE_ENV === 'production') {
+  if (!process.env.VUE_APP_BASE_URL) { // 正式
+    apiUrl = 'https://www.ybz888.com';
+  } else { // 测试生产环境
+    apiUrl = 'http://192.168.1.92:3066';
+  }
+}
+
 const handleRequestData = (error) => {
   if (!error || !error.response) return null;
   const url = error.response.config?.url?.split('?')[0] || '';
-  if (!url || JSON.stringify(error).length > 20000) return null;
+  if (!url || JSON.stringify(error).length > 30000) return null;
   let c = Cookie.getCookie('customerInfo');
   let id;
   if (c) {
@@ -20,9 +31,11 @@ const sendError = (data) => {
   try {
     const request = new XMLHttpRequest();
 
-    request.open('post', '/Api/Log/Write', true);
+    request.open('post', `${apiUrl}/Api/Log/Write`, true);
 
     request.setRequestHeader('Content-type', 'application/json');
+
+    request.withCredentials = true;
 
     request.send(JSON.stringify(temp));
   } catch (err) {

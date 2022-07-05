@@ -203,8 +203,8 @@ export default {
       'successNum',
       'isUploading',
     ]),
-    ...mapGetters('Quotation', ['curProductShowNameInfo']),
     ...mapState('common', ['customerInfo', 'ExpressList']),
+    ...mapGetters('Quotation', ['curProductShowNameInfo']),
     computedCouponCode2Add: {
       get() {
         return this.couponCode2Add;
