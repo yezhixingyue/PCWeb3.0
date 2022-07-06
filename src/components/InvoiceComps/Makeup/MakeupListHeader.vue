@@ -31,8 +31,8 @@
         dateType="daterange"
       />
       <SearchInputComp
-        title="关键词"
-        placeholder="请输入搜索关键词"
+        title="订单号"
+        placeholder="请输入订单号"
         :typeList="[['KeyWords', '']]"
         :requestFunc="getList"
         :changePropsFunc="setCondition"
