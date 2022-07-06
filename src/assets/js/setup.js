@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-// const mode = process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-production' ? 'test' : process.env.NODE_ENV;
 const mode = process.env.VUE_APP_BASE_URL || process.env.NODE_ENV;
 const testProtocol = 'http'; // 测试环境协议
 const prodProtocol = 'https'; // 正式环境协议
@@ -20,12 +18,6 @@ let _invoiceID = '80';
  */
 if (mode === 'test-development' || mode === 'withPcPath') {
   _imgUrl = `${testProtocol}://192.168.1.92:8050/`; // 图片和接口地址
-  // _homeUrl = `${prodProtocol}://www.ybz888.com/`;
-  // _domain = 'ybz888.com';
-  // _imgUrl = `${prodProtocol}://erp.ybz888.com/`;
-  // _agreementID = '4';
-  // _statementID = '3';
-  // _beanHelpID = '37';
 }
 
 /**

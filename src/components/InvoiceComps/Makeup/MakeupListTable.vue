@@ -71,18 +71,31 @@ export default {
     },
   },
   methods: {
-    onManualSelect(e) {
+    onManualSelect(e, item, outside) {
       const curIds = this.list.map(it => it.OrderID);
       if (!this.isSelectAll) {
         const temp = this.validList.filter(id => !curIds.includes(id));
         const _list = [...temp, ...e.map((it) => it.OrderID)];
+        if (outside) { // 来自页底本页复选框触发的事件处理
+          this.$refs.oTable.clearSelection();
+          this.list.forEach(row => {
+            if (row.IsAllowInvoice && _list.includes(row.OrderID)) this.$refs.oTable.toggleRowSelection(row);
+          });
+        }
         this.$emit('update:validList', _list);
       } else {
         const temp = this.invalidList.filter(id => !curIds.includes(id));
         const _allAllowIds = this.list.filter(it => it.IsAllowInvoice).map(it => it.OrderID);
         const _list = e.map(it => it.OrderID);
         const unSelectIds = _allAllowIds.filter(id => !_list.includes(id));
-        this.$emit('update:invalidList', [...temp, ...unSelectIds]);
+        const _invalidList = [...temp, ...unSelectIds];
+        if (outside) {
+          this.$refs.oTable.clearSelection();
+          this.list.forEach(row => {
+            if (row.IsAllowInvoice && !_invalidList.includes(row.OrderID)) this.$refs.oTable.toggleRowSelection(row);
+          });
+        }
+        this.$emit('update:invalidList', _invalidList);
       }
     },
     handleAllSelectable() {
@@ -123,7 +136,6 @@ export default {
     isSelectAll: {
       handler(bool) {
         if (typeof bool !== 'boolean') return;
-        console.log('isSelectAll', 1, bool, this.isBackFromMakeup);
         // 当选中全部状态进行切换时，应做如下处理：
         // 1. 清空validList和invalidList列表
         if (this.isBackFromMakeup) {
@@ -155,8 +167,11 @@ export default {
 <style lang='scss'>
 .mp-invoice-makeup-list-table-comp-wrap {
   .el-table__header {
-    .el-checkbox.is-disabled {
-      pointer-events: none;
+    .el-checkbox {
+      &.is-disabled {
+        pointer-events: none;
+      }
+      display: none;
     }
   }
   &.loading {

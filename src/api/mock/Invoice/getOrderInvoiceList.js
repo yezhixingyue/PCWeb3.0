@@ -1,7 +1,7 @@
 import Mock from 'mockjs';
 
 export default (e) => {
-  const DataNumber = 112;
+  const DataNumber = 29;
   const condition = JSON.parse(e.body);
   let count = 10;
   let OrderID = 100385916;

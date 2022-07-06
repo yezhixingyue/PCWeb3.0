@@ -11,6 +11,7 @@
       />
       <MakeupListTableVue
         v-else
+        ref="oTable"
         :list="InvoiceMakeupOrderList"
         :loading="loading"
         :isSelectAll="isSelectAll"
@@ -25,6 +26,7 @@
       :validList="validList"
       :invalidList="invalidList"
       @margeMakeup="onMergeMakeupClick"
+      @selectByPage="onSelectByPage"
     />
   </section>
 </template>
@@ -111,6 +113,10 @@ export default {
     getList(data = [1, false]) {
       this.$store.dispatch('invoice/getInvoiceMakeupOrderList', data);
       this.onConditionChange();
+    },
+    onSelectByPage(bool) {
+      const list = bool ? this.InvoiceMakeupOrderList : [];
+      if (this.$refs.oTable) this.$refs.oTable.onManualSelect(list, undefined, true);
     },
   },
   watch: {

@@ -78,12 +78,14 @@ export default {
           right: 0;
           opacity: 0;
           transition: 0.2s;
+          visibility: hidden;
         }
         &.router-link-active {
           color: #428dfa;
           font-weight: 700;
           background-color: #e9f0fa;
           position: relative;
+          visibility: visible;
           &::after {
             opacity: 1;
           }
