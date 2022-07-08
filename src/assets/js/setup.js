@@ -13,6 +13,7 @@ let _imgUrl = `${testProtocol}://192.168.3.68:8050/`; // 图片和接口地址
 let _agreementID = '60';
 let _statementID = '61';
 let _beanHelpID = '60';
+let _baseUrl;
 
 /**
  * 开发 ---- 测试环境
@@ -43,6 +44,7 @@ if (mode === 'pro-development') {
  */
 if (mode === 'test-production') {
   _imgUrl = `${testProtocol}://192.168.1.92:8050/`; // 图片和接口地址
+  _baseUrl = `${testProtocol}://192.168.1.92:8050/`;
 }
 
 /**
@@ -55,6 +57,7 @@ if (mode === 'production') {
   _agreementID = '4';
   _statementID = '3';
   _beanHelpID = '37';
+  _baseUrl = `${prodProtocol}://erp.ybz888.com/`;
 }
 
 export const homeUrl = _homeUrl; // 网站地址
@@ -62,6 +65,7 @@ export const domain = _domain; // 保存cookie时的所属域名
 // export const useCookie = process.env.NODE_ENV !== 'development'; // 使用cookie模式
 export const useCookie = true; // 使用cookie模式
 export const imgUrl = _imgUrl; // 图片引用地址
+export const baseUrl = _baseUrl;
 export const agreementID = _agreementID; // 用户协议文章ID
 export const statementID = _statementID; // 权责声明文章ID
 export const beanHelpID = _beanHelpID;
@@ -74,6 +78,7 @@ export default {
   domain,
   useCookie,
   imgUrl,
+  baseUrl,
   agreementID,
   statementID,
   beanHelpID,

@@ -330,8 +330,22 @@ export default {
     async OrderPanelChecker() { // 下单面板校验及返回页面顶部处理
       const bool = await this.getCheckResult();
       if (bool !== true) {
+        let dom = document.getElementsByClassName('el-form-item__error')[0];
+        if (dom) dom = dom.parentElement;
+        const complete = () => {
+          const oInputWrap = dom.getElementsByClassName('mp-erp-number-type-element-display-input-comp')[0];
+          if (oInputWrap) {
+            const oInputDom = oInputWrap.getElementsByClassName('el-input__inner')[0];
+            if (oInputDom) {
+              oInputDom.focus();
+            }
+          }
+        };
+        const cb = () => {
+          this.utils.handleScrollAfterGetPriceFailed(dom, 130, 0, complete);
+        };
         this.messageBox.failSingleError({
-          title: `${this.title}失败`, msg: bool, successFunc: this.utils.handleScrollAfterGetPriceFailed, failFunc: this.utils.handleScrollAfterGetPriceFailed,
+          title: `${this.title}失败`, msg: bool, successFunc: cb, failFunc: cb,
         });
         return false;
       }

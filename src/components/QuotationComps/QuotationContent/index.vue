@@ -286,8 +286,22 @@ export default {
       // 如果验证通过 执行算价
       if (res === true) this.getProductPriceLocal();
       else {
+        let dom = document.getElementsByClassName('el-form-item__error')[0];
+        if (dom) dom = dom.parentElement;
+        const complete = () => {
+          const oInputWrap = dom.getElementsByClassName('mp-erp-number-type-element-display-input-comp')[0];
+          if (oInputWrap) {
+            const oInputDom = oInputWrap.getElementsByClassName('el-input__inner')[0];
+            if (oInputDom) {
+              oInputDom.focus();
+            }
+          }
+        };
+        const cb = () => {
+          this.utils.handleScrollAfterGetPriceFailed(dom, 130, 0, complete);
+        };
         this.messageBox.failSingleError({
-          title: '报价失败', msg: res, successFunc: this.utils.handleScrollAfterGetPriceFailed, failFunc: this.utils.handleScrollAfterGetPriceFailed,
+          title: '报价失败', msg: res, successFunc: cb, failFunc: cb,
         });
       }
     },

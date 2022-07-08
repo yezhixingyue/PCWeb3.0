@@ -1,7 +1,7 @@
 /* eslint-disable object-curly-newline */
 import api from '@/api';
 import { Loading, Message } from 'element-ui';
-import { getIsOrNotHasRepeatItemInArray } from '@/assets/js/utils/utils';
+import { getIsOrNotHasRepeatItemInArray, handleScrollAfterGetPriceFailed } from '@/assets/js/utils/utils';
 import messageBox from '@/assets/js/utils/message';
 import FileTypeClass from '@/assets/js/ClassType/FileTypeClass';
 
@@ -192,7 +192,7 @@ export default class BatchUpload {
   static generateCommitData(list, basicObj, isFromPreCreate) { // 生成下单提交数据
     const { CustomerID, Address, Terminal, UsePrintBean, PayInFull, OrderType, Position, IsBatchUpload, IgnoreRiskLevel, UseSameAddress } = basicObj;
     const List = list.map(it => {
-      const { ProductParams, Content, PrintFileID } = it.result;
+      const { ProductParams, Content, PrintFileID, AnalysisID } = it.result;
       const FileList = !isFromPreCreate && (PrintFileID || PrintFileID === 0) ? [{
         ID: PrintFileID,
         List: [{
@@ -212,6 +212,7 @@ export default class BatchUpload {
       const temp = {
         ProductParams,
         Content,
+        AnalysisID,
         FileList,
         Terminal,
         Address: add,
@@ -297,10 +298,15 @@ export default class BatchUpload {
     loadingInstance.text = '文件正在上传...';
     const uploadedList = await Promise.all(list.map(it => this.getFileUploadBySingle(it)));
     // 3. 判断文件上传结果中是否存在不成功的项目，如果有则return
-    const i = uploadedList.findIndex(it => !it || (typeof it === 'object' && it.status === false));
-    if (i > -1) {
-      const msg = uploadedList.length === 1 ? '文件上传失败' : '部分文件上传失败，请检查';
-      messageBox.failSingleError({ title: '上传失败', msg });
+    // const i = uploadedList.findIndex(it => !it || (typeof it === 'object' && it.status === false));
+    const failList = uploadedList.filter(it => !it || (typeof it === 'object' && it.status === false));
+    if (failList.length > 0) {
+      const msg = uploadedList.length === 1 ? '文件上传失败' : `${failList.length}个文件上传失败，请检查`;
+      const cb = () => {
+        const dom = document.querySelector('.mp-c-batch-upload-page-main-table-status-display-column-comp-wrap .label.is-pink');
+        handleScrollAfterGetPriceFailed(dom.parentElement, 130, 60);
+      };
+      messageBox.failSingleError({ title: '上传失败', msg, successFunc: cb, failFunc: cb });
       loadingInstance.close();
       return;
     }

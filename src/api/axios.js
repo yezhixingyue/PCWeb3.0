@@ -4,7 +4,7 @@ import { Loading, Message } from 'element-ui';
 import router from '@/router';
 import messageBox from '../assets/js/utils/message';
 import Cookie from '../assets/js/Cookie';
-import { useCookie } from '../assets/js/setup';
+import { useCookie, baseUrl } from '../assets/js/setup';
 import LocalCancelToken from './CancelToken';
 import sendError from './sendError';
 // import { delay } from '../assets/js/utils/utils';
@@ -264,6 +264,6 @@ axios.interceptors.response.use(
   },
 );
 
-// axios.defaults.baseURL = baseUrl;
+if (baseUrl) axios.defaults.baseURL = baseUrl;
 
 export default axios;
