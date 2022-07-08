@@ -383,7 +383,7 @@ export default {
   }
   > .box > div > .el-tabs__header .el-tabs__item {
     padding: 0 10px;
-    width: 68px;
+    min-width: 68px;
     text-align: center;
   }
   .el-date-editor {

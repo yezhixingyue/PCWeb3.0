@@ -120,7 +120,7 @@ export default {
     return {
       isFootFixed: false,
       // eslint-disable-next-line max-len
-      dateList: [{ label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '近7天订单', value: 'last7Date' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
       tableDom: null,
       isScrollEnd: false,
     };
@@ -278,15 +278,18 @@ export default {
         }
         &.second {
           padding-top: 28px;
-          .mp-line-date-selector-wrap > .box {
-            width: 600px;
-            &::after {
-              display: none;
+          .mp-line-date-selector-wrap {
+            min-width: 750px;
+            > .box {
+              width: 650px;
+              &::after {
+                display: none;
+              }
             }
           }
           .mp-common-comps-search-box {
             vertical-align: 25px;
-            margin-left: 64px;
+            margin-left: 26px;
             // margin-right: -10px;
           }
         }
