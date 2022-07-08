@@ -72,6 +72,7 @@
             :failedList='failedList'
             :canSelectList='canSelectList'
             :multipleSelection='multipleSelection'
+            :UseSameAddress='UseSameAddress'
             @uploadSelected='handleUploadSelected'
             @removeSelected='handleRemoveSelected'
             @checkAll='handleCheckAll'

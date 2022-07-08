@@ -20,12 +20,26 @@
     <style>
       .for-ie-message-box {
         display: none;
-        /* color: #333; */
+        color: #333;
         *display: block;
         display: block\9;
         display: none\9\0;
         margin-top: 20px;
         margin-left: 12px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      @media screen and (min-width:0\0) {
+        /* IE 9 10 隐藏 */
+        #app {
+          display: none;
+        }
+      }
+
+      @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+        /* IE 10 显示 */
+        #app {
+          display: block;
+        }
       }
     </style>
   </head>
@@ -33,12 +47,12 @@
     <noscript>
       <strong>名片之家自助下单系统</strong>
     </noscript>
+    <!--[if lt IE 10]>    
+    <p class='for-ie-message-box'>
+        当前浏览器版本过低，请升级浏览器，IE浏览器已经停止维护，推荐使用chrome、Edge、火狐、360极速版等浏览器
+    </p> 
+    <![endif]-->
     <div id="app">
-      <!--[if lt IE 9]>    
-      <p class='for-ie-message-box'>
-          当前浏览器版本过低，请升级浏览器，推荐使用谷歌、Edge、火狐、360极速版等浏览器
-      </p> 
-      <![endif]-->
     </div>
     <!-- built files will be auto injected -->
   </body>

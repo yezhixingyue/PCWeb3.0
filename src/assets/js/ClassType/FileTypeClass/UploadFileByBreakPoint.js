@@ -93,6 +93,7 @@ async function breakPointUpload(data, uniqueName, onUploadProgressFunc, finalPer
     error = err;
     if (error.message === 'Network Error') error = '网络连接错误';
     if (error.message && error.message.includes('timeout')) error = '网络超时';
+    if (typeof error === 'object') error = error.message || '未知错误';
   });
   if (error) return { status: false, error };
   if (hasUploadedInfo.data.Status !== 1000) return { status: false, error: hasUploadedInfo.data.Message }; // 获取已上传信息
@@ -112,6 +113,7 @@ async function breakPointUpload(data, uniqueName, onUploadProgressFunc, finalPer
       error = err;
       if (error.message === 'Network Error') error = '网络出错';
       if (error.message && error.message.includes('timeout')) error = '网络超时';
+      if (typeof error === 'object') error = error.message || '未知错误';
     }); // 上传
     if (error) return { status: false, error };
     if (await checkIsTrue(data, uniqueName)) return { status: true, error: '' };

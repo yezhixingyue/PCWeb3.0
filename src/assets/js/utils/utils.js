@@ -146,11 +146,22 @@ export const getNameFromListByIDs = (ids, list, defaultKeys = { label: 'Name', v
   return '';
 };
 
-export const handleScrollAfterGetPriceFailed = () => {
-  const oFirstErrorDom = document.getElementsByClassName('el-form-item__error')[0];
-  if (oFirstErrorDom && oFirstErrorDom.parentElement) {
-    const { top } = oFirstErrorDom.parentElement.getBoundingClientRect();
-    if (top - 130 < 0) { // 在视野外 需要滚动至上方
+/**
+ *
+ *
+ * @param {*} dom 判断的目标元素
+ * @param {number} [topDis=130] 页面顶部被占用的高度（吊顶高度） 需要减去该高度
+ * @param {number} [bottomDis=0] 页面底部被占用的高度
+ * @param {*} complete 动画完成后的回调函数
+ */
+export const handleScrollAfterGetPriceFailed = (dom, topDis = 130, bottomDis = 0, complete) => {
+  if (dom) {
+    const { top } = dom.getBoundingClientRect(); // 距离页面顶部的高度
+    const { clientHeight } = document.body;
+    // 判断元素是否在视野外
+    // 两种情况： 1. 元素在可视区上方， 此时 top - topDis < 0  2. 元素在可视区下方， 此时top - (clientHeight - bottomDis) > 0
+    if (top - topDis < 0 || top - (clientHeight - bottomDis) > 0) { // 在视野外面
+      // 移动页面scrollTop，让目标元素出现在视野中
       const oApp = document.getElementById('app');
       if (oApp) {
         const willToTop = oApp.scrollTop + top - 200 > 0 ? oApp.scrollTop + top - 200 : 0;
@@ -160,13 +171,8 @@ export const handleScrollAfterGetPriceFailed = () => {
           duration: 400,
           easing: 'easeInOutSine',
           complete() {
-            const oInputWrap = oFirstErrorDom.parentElement.getElementsByClassName('mp-erp-number-type-element-display-input-comp')[0];
-            if (oInputWrap) {
-              const oInputDom = oInputWrap.getElementsByClassName('el-input__inner')[0];
-              if (oInputDom) {
-                oInputDom.focus();
-              }
-            }
+            console.log(0);
+            if (complete) complete();
           },
         });
       }
