@@ -10,7 +10,7 @@
     :showCancel='false'
     @submit='submit("rulesform")'
     width='800px'
-    top="5vh"
+    top="15vh"
     >
     <div slot="title" class="title">aaa</div>
     <el-form label-position="right" label-width="100px" ref="rulesform" :model="form" :rules="rules" class="estimate">
@@ -45,7 +45,7 @@
           show-word-limit>
         </el-input>
       </el-form-item>
-      <el-form-item label="评价晒图：">
+      <!-- <el-form-item label="评价晒图：">
         <div class="upload">
           <el-upload
             :action="baseUrl + '/Api/Upload/Image?type=3'"
@@ -61,16 +61,14 @@
             :on-remove="handleRemove"
             :class="{'uploadDisabled':uploadDisabled}"
             >
-            <!--  -->
             <i class="el-icon-plus"></i>
           </el-upload>
           <el-dialog :visible.sync="dialogVisible" top="8vh" title="查看图片" append-to-body>
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
-          <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
           <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片大小不超过5M，支持.png,.jpeg,.jpg,.bmp,.gif</p>
         </div>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
   </CommonDialogComp>
 </template>
@@ -79,7 +77,7 @@
 import CommonDialogComp from '@/packages/CommonDialogComp';
 import CheckButton from '@/components/common/CheckButton.vue';
 import { imgUrl } from '@/assets/js/setup';
-import { Message } from 'element-ui';
+// import { Message } from 'element-ui';
 
 export default {
   components: {
@@ -101,11 +99,11 @@ export default {
         callback(new Error('请评分'));
       }
     };
-    const checkePicList = (rule, value, callback) => {
-      if (value.length === 0) {
-        callback(new Error('请上传图片'));
-      }
-    };
+    // const checkePicList = (rule, value, callback) => {
+    //   if (value.length === 0) {
+    //     callback(new Error('请上传图片'));
+    //   }
+    // };
     return {
       baseUrl: imgUrl,
       dialogVisible: false,
@@ -114,21 +112,21 @@ export default {
       uploadDisabled: false,
       form: {
         AfterSaleCode: 0,
-        Score: null,
-        Result: '',
+        Score: 5,
+        Result: 1,
         Label: [],
         EvaluateContent: '',
-        EvaluatePicList: [],
+        // EvaluatePicList: [],
       },
       rules: {
         Score: [
           { required: true, message: '请评分', trigger: 'change' },
           { validator: checkMoney, trigger: 'change' },
         ],
-        EvaluatePicList: [
-          { required: true, message: '请评分', trigger: 'change' },
-          { validator: checkePicList, trigger: 'change' },
-        ],
+        // EvaluatePicList: [
+        //   { required: true, message: '请评分', trigger: 'change' },
+        //   { validator: checkePicList, trigger: 'change' },
+        // ],
         Result: [
           { required: true, message: '请输入具体问题描述', trigger: 'change' },
         ],
@@ -155,7 +153,7 @@ export default {
     closed() {
       this.$emit('closed');
       this.$refs.rulesform.resetFields();
-      this.$refs.upload.uploadFiles = [];
+      // this.$refs.upload.uploadFiles = [];
       this.$refs.CheckButton.clearCheck();
       this.uploadDisabled = false;
     },
@@ -181,63 +179,63 @@ export default {
         this.messageBox.failSingleError({
           title: '评价失败', msg: '请选择服务标签',
         });
-      } else if (this.form.EvaluateContent && (this.form.EvaluateContent.length < 3 || this.form.EvaluateContent > 300)) {
+      } else if (this.form.EvaluateContent && (this.form.EvaluateContent.length < 3 || this.form.EvaluateContent.length > 300)) {
         // 评价内容
         this.messageBox.failSingleError({
           title: '评价失败', msg: '评价内容在3到300个字',
         });
       } else {
-        const _list = this.$refs.upload.uploadFiles.map(it => {
-          if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
-          return '';
-        }).filter(it => it);
-        this.form.EvaluatePicList = _list || [];
+        // const _list = this.$refs.upload.uploadFiles.map(it => {
+        //   if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
+        //   return '';
+        // }).filter(it => it);
+        // this.form.EvaluatePicList = _list || [];
         this.$emit('submit', this.form);
         // 图片列表
       }
     },
-    handllePictureUploaded(response) {
-      if (response.Status !== 1000) {
-        Message({
-          showClose: true,
-          message: response.Message,
-          type: 'error',
-        });
-        // eslint-disable-next-line max-len
-        this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
-      }
-      this.setUploadDisabled();
-    },
-    setUploadDisabled() {
-      const _list = this.$refs.upload?.uploadFiles?.map(it => {
-        if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
-        return '';
-      }).filter(it => it);
-      if (!_list || _list.length < 9) {
-        this.uploadDisabled = false;
-      } else {
-        this.uploadDisabled = true;
-      }
-    },
+    // handllePictureUploaded(response) {
+    //   if (response.Status !== 1000) {
+    //     Message({
+    //       showClose: true,
+    //       message: response.Message,
+    //       type: 'error',
+    //     });
+    //     // eslint-disable-next-line max-len
+    //     this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.response && it.response.Status === 1000);
+    //   }
+    //   this.setUploadDisabled();
+    // },
+    // setUploadDisabled() {
+    //   const _list = this.$refs.upload?.uploadFiles?.map(it => {
+    //     if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
+    //     return '';
+    //   }).filter(it => it);
+    //   if (!_list || _list.length < 9) {
+    //     this.uploadDisabled = false;
+    //   } else {
+    //     this.uploadDisabled = true;
+    //   }
+    // },
     handlePictureCardPreview(file) {
       this.dialogVisible = true;
       this.dialogImageUrl = this.baseUrl + file.response.Data.Url;
     },
-    handleRemove() {
-      this.setUploadDisabled();
-    },
-    beforeUpload(file) {
-      const isLt5M = file.size / 1024 / 1024 < 5;
-      if (!isLt5M) {
-        // 文件过大上传失败
-        Message({
-          showClose: true,
-          message: '文件过大，上传失败',
-          type: 'error',
-        });
-      }
-      return isLt5M;
-    },
+    // handleRemove() {
+    //   this.setUploadDisabled();
+    // },
+    // beforeUpload(file) {
+    //   const isLt5M = file.size / 1024 / 1024 < 5;
+    //   if (!isLt5M) {
+    //     // 文件过大上传失败
+    //     Message({
+    //       showClose: true,
+    //       message: '文件过大，上传失败',
+    //       type: 'error',
+    //     });
+    //   }
+    //   return isLt5M;
+    // },
   },
   mounted() {
     this.api.getServiceLableList().then(res => {
@@ -283,6 +281,7 @@ export default {
     }
   }
   .estimate{
+        min-height: calc(300px);
     .el-form-item{
       .el-form-item__label{
         color: #585858;

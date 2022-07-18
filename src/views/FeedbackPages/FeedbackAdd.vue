@@ -7,29 +7,28 @@
       <div>
         <el-table stripe border v-if="queryData"
           :data="[queryData]" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="ProductName" label="商品名称" width="234" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="Content" label="文件内容" width="257" show-overflow-tooltip>
-            <span slot-scope="scope" v-if="scope.row.Content">{{ scope.row.Content }}</span>
-            <span v-else>--</span>
+          <el-table-column prop="OrderID" label="订单号" width="137" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="FinalPrice" label="成交金额" width="105" show-overflow-tooltip>
+            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : '--'}}</span>
           </el-table-column>
-          <el-table-column label="数量" width="229" show-overflow-tooltip>
+          <el-table-column prop="ProductName" label="商品名称" width="204" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="Content" label="文件内容" width="227" show-overflow-tooltip></el-table-column>
+          <el-table-column label="数量" width="120" show-overflow-tooltip>
             <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}{{ scope.row.KindCount}}款</span>
           </el-table-column>
-          <el-table-column label="尺寸" show-overflow-tooltip width="229">
+          <el-table-column label="尺寸" show-overflow-tooltip width="186">
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
-            <span v-else>--</span>
           </el-table-column>
-          <el-table-column label="工艺" show-overflow-tooltip width="190">
+          <el-table-column label="工艺" show-overflow-tooltip width="160">
             <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</span>
-            <span v-else>--</span>
           </el-table-column>
         </el-table>
 
         <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm1" label-width="100px" class="demo-ruleForm">
           <el-form-item label="诉求意向：" prop="AppealType">
             <div class="intention">
-              <span :class="ruleForm.AppealType===0 ? 'action' : ''" @click="ruleForm.AppealType = 0">退款</span>
-              <span :class="ruleForm.AppealType===1 ? 'action' : ''" @click="ruleForm.AppealType = 1">补印</span>
+              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退款</span>
+              <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
               <span :class="ruleForm.AppealType===255 ? 'action' : ''" @click="ruleForm.AppealType = 255">其它</span>
             </div>
           </el-form-item>
@@ -37,54 +36,7 @@
           <template v-if="ruleForm.AppealType!==null">
             <!--  -->
 
-            <el-form-item v-if="ruleForm.AppealType===1" key='AppealType===1'>
-              <div class="make-up-for">
-                <div class="item">款数：
-                  <el-form-item prop="KindCount">
-                    <el-input-number size="small"
-                    :controls="false" v-model="ruleForm.KindCount"
-                    :max="queryData.KindCount"
-                    :precision="0"
-                    :step="1"
-                    :min="1" label="款数">
-                    </el-input-number>
-                  </el-form-item>
-                  款
-                </div>
-                <div class="item">
-                  补印数量：
-                  <el-form-item prop="Number">
-                    <el-input-number size="small" :controls="false"
-                      v-model="ruleForm.Number" :min="1"
-                      :max="queryData.ProductAmount"
-                      :step="1"
-                      :precision="0"
-                      label="描述文字">
-                    </el-input-number>
-                  </el-form-item>
-                  {{ queryData.Unit }}
-                  <span>您最多可提交数量为<span>{{queryData.ProductAmount}}</span></span>
-                  </div>
-              </div>
-            </el-form-item>
-
             <!--  -->
-
-            <el-form-item v-if="ruleForm.AppealType===0" key='AppealType===0'>
-              <div class="make-up-for">
-                退款金额：
-                <div class="item">
-                  <el-form-item prop="RefundAmount">
-                    <el-input-number
-                      @change='RefundAmountChange()'
-                      size="small" :controls="false"
-                      v-model="ruleForm.RefundAmount"
-                      :min="0" label="退款金额">
-                    </el-input-number>元
-                  </el-form-item>
-                </div>
-              </div>
-            </el-form-item>
 
             <!--  -->
 
@@ -106,7 +58,7 @@
               maxlength="300" autosize show-word-limit placeholder="请输入具体问题描述"></el-input>
             </el-form-item>
 
-            <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList">
+            <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList" :required='isUpImg'>
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
                 list-type="picture-card"
@@ -129,7 +81,7 @@
                 <img width="100%" :src="dialogImageUrl" alt="">
               </el-dialog>
               <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片大小不超过5M，支持bmp、gif、png、jpg、jpeg</p>
+              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片大小不超过15M，支持bmp、gif、png、jpg、jpeg</p>
             </el-form-item>
           </template>
         </el-form>
@@ -157,9 +109,8 @@
         <div class="btn-box" v-if="ruleForm.AppealType!==null">
           <el-button type="primary" @click="submitForm()" >立即提交</el-button>
           <!-- <span class="blue-span is-font-12" style="margin: 0 60px 0 30px" @click="resetForm('ruleForm')" v-if='canEdit'>重置</span> -->
-          <el-button  @click="handleReturn">
-            <i class="el-icon-d-arrow-left is-font-15"></i>
-            <em style="margin-left: 6px">返回</em>
+          <el-button  @click="handleReturn" style="color: #428DFA; border-color: #428DFA;">
+            返回
           </el-button>
         </div>
       </div>
@@ -176,7 +127,7 @@
             提交成功
           </div>
           <div class="message">
-            <p>服务单提交后，售后人员将在 <span>30分钟</span> 内进行处理，售后专员可能与您电话沟通，请保持手机畅通。</p>
+            <p>售后人员将在工作时间 <span>30分钟</span> 内进行处理，售后专员可能与您电话沟通，请保持手机畅通。</p>
             <p>您也可以在 <span>售后记录</span> 中查询后续处理进度。</p>
           </div>
         </div>
@@ -215,37 +166,37 @@ export default {
         if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
         return '';
       }).filter(it => it);
-      if (_list.length === 0 || _list[0] === '') {
-        callback(new Error('请上传问题图片'));
+      if (this.isUpImg && (_list.length === 0 || _list[0] === '')) {
+        callback(new Error('请您上传问题证明图片（晚货/丢货无需上传）'));
       } else {
         callback();
       }
     };
-    const validateRefundAmount = (rule, value, callback) => {
-      if (value === 0) {
-        callback(new Error('退款金额不能为0'));
-      } else if (value === undefined) {
-        callback(new Error('请输入退款金额'));
-      } else {
-        callback();
-      }
-    };
-    const validateNumber = (rule, value, callback) => {
-      if (value > this.queryData.ProductAmount) {
-        callback(new Error(`不能大于'${this.queryData.ProductAmount}'`));
-      } else if (!value) {
-        callback(new Error('不能为空'));
-      } else {
-        callback();
-      }
-    };
-    const validateKindCount = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('不能为空'));
-      } else {
-        callback();
-      }
-    };
+    // const validateRefundAmount = (rule, value, callback) => {
+    //   if (value === 0) {
+    //     callback(new Error('退款金额不能为0'));
+    //   } else if (value === undefined) {
+    //     callback(new Error('请输入退款金额'));
+    //   } else {
+    //     callback();
+    //   }
+    // };
+    // const validateNumber = (rule, value, callback) => {
+    //   if (value > this.queryData.ProductAmount) {
+    //     callback(new Error(`不能大于'${this.queryData.ProductAmount}'`));
+    //   } else if (!value) {
+    //     callback(new Error('不能为空'));
+    //   } else {
+    //     callback();
+    //   }
+    // };
+    // const validateKindCount = (rule, value, callback) => {
+    //   if (!value) {
+    //     callback(new Error('不能为空'));
+    //   } else {
+    //     callback();
+    //   }
+    // };
     return {
       submitSuccessVsible: false,
       ApplyQuestionList: [],
@@ -264,9 +215,6 @@ export default {
         QuestionPicList: [ // 问题图片
           '',
         ],
-        KindCount: undefined, // 款数
-        Number: undefined, // 数量
-        RefundAmount: undefined, // 退款金额
         ContactName: '', // 联系人
         QQ: '', // QQ号码
         Mobile: '', // 电话
@@ -279,23 +227,14 @@ export default {
           { validator: validateQuestionTypeList, trigger: 'blur' },
         ],
         QuestionRemark: [
-          { required: true, message: '请输入具体问题描述', trigger: 'change' },
+          { required: true, message: '请您对问题进行简单描述', trigger: 'change' },
           {
             min: 3, max: 300, message: '长度在 3 到 300 个字符', trigger: 'change',
           },
         ],
         QuestionPicList: [
           { validator: QuestionPicList, trigger: 'change' },
-          { required: true, message: '请上传问题图片', trigger: 'change' },
-        ],
-        RefundAmount: [
-          { validator: validateRefundAmount, trigger: 'blur' },
-        ],
-        Number: [
-          { validator: validateNumber, trigger: 'blur' },
-        ],
-        KindCount: [
-          { validator: validateKindCount, trigger: 'blur' },
+          { required: false, message: '请您上传问题证明图片（晚货/丢货无需上传）', trigger: 'change' },
         ],
         AppealType: [
           { required: true, message: '请选择诉求意向', trigger: 'blur' },
@@ -321,24 +260,18 @@ export default {
   computed: {
     ...mapState('common', ['customerInfo', 'AppealList']),
     ...mapState('summary', ['editFeedbackData', 'RejectReasonList']),
+    isUpImg() {
+      const ActionQuestionList = this.ApplyQuestionList.filter(res => this.ruleForm.QuestionTypeList.find(item => item === res.ID));
+      return ActionQuestionList.filter(res => res.IsUploadPic).length !== 0;
+    },
   },
   methods: {
-    RefundAmountChange() {
-      this.ruleForm.RefundAmount = this.ruleForm?.RefundAmount?.toString().match(/\d+\.?\d{0,2}/, '');
-    },
     async submitForm() {
       const phomReg = /^1[3456789]\d{9}$/;
       const QQRege = /[1-9][0-9]{4,14}/;
       this.$refs.ruleForm1.validate();
       this.$refs.ruleForm2.validate();
-      if (this.ruleForm.AppealType === 0 && !this.ruleForm.RefundAmount) {
-        // 弹窗提示 退款金额：
-        this.messageBox.failSingleError({ title: '提交失败', msg: '请输入退款金额' });
-      } else if (this.ruleForm.AppealType === 1 && !this.ruleForm.KindCount) {
-        this.messageBox.failSingleError({ title: '提交失败', msg: '请输入补印款数' });
-      } else if (this.ruleForm.AppealType === 1 && !this.ruleForm.Number) {
-        this.messageBox.failSingleError({ title: '提交失败', msg: '请输入补印数量' });
-      } else if (this.ruleForm.QuestionTypeList.length === 0) {
+      if (this.ruleForm.QuestionTypeList.length === 0) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题类型' });
       } else if (this.ruleForm.QuestionRemark === '' || this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述并在3到300个字符' });
@@ -355,7 +288,7 @@ export default {
           if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
           return '';
         }).filter(it => it);
-        if (!_list.length) {
+        if (this.isUpImg && !_list.length) {
           this.messageBox.failSingleError({ title: '提交失败', msg: '请上传问题图片' });
           return;
         }
@@ -389,8 +322,8 @@ export default {
       this.setUploadDisabled();
     },
     beforeUpload(file) {
-      const isLt5M = file.size / 1024 / 1024 < 5;
-      if (!isLt5M) {
+      const isLt15M = file.size / 1024 / 1024 < 15;
+      if (!isLt15M) {
         // 文件过大上传失败
         Message({
           showClose: true,
@@ -398,7 +331,7 @@ export default {
           type: 'error',
         });
       }
-      return isLt5M;
+      return isLt15M;
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -441,6 +374,7 @@ export default {
     ApplyQuestionCheckChange(keys) {
       this.ruleForm.QuestionTypeList = keys;
       this.$refs.ruleForm1.validateField('QuestionTypeList');
+      this.$refs.ruleForm1.validateField('QuestionPicList');
     },
     initPicList() {
       this.$refs.upload.uploadFiles = this.ruleForm.QuestionPicList.map((path, i) => ({
@@ -479,12 +413,9 @@ export default {
     this.queryData = JSON.parse(this.$route.query.data);
     if (isEdit) {
       this.ruleForm.AppealType = this.queryData.AppealType;
-      this.ruleForm.RefundAmount = this.queryData.AppealRefundAmount;
       // this.ruleForm.QuestionTypeList = this.queryData.QuestionTypeTitleList;
       this.ruleForm.QuestionPicList = this.queryData.QuestionPicList || [];
       this.ruleForm.QuestionRemark = this.queryData.QuestionRemark;
-      this.ruleForm.KindCount = this.queryData.AppealKindCount;
-      this.ruleForm.Number = this.queryData.AppealNumber;
       this.ruleForm.ContactName = this.queryData.ContactName;
       this.ruleForm.QQ = this.queryData.ContactQQ;
       this.ruleForm.Mobile = this.queryData.Mobile;
@@ -751,9 +682,9 @@ export default {
           }
         }
         > button {
-          width: 120px;
+          width: 140px;
           & + button {
-            margin-left: 20px;
+            margin-left: 100px;
           }
         }
       }

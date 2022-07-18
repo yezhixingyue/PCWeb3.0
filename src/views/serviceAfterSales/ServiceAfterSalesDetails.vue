@@ -8,22 +8,21 @@
       <div>
         <el-table stripe border v-if="productInfo"
           :data="[productInfo]" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="ProductName" label="商品名称" width="234" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="Content" label="文件内容" width="257" show-overflow-tooltip>
-            <span slot-scope="scope" v-if="scope.row.Content">{{ scope.row.Content }}</span>
-            <span v-else>--</span>
+          <el-table-column prop="OrderID" label="订单号" width="137" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="FinalPrice" label="成交金额" width="105" show-overflow-tooltip>
+            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : '--'}}</span>
           </el-table-column>
-          <el-table-column label="数量" width="229" show-overflow-tooltip>
+          <el-table-column prop="ProductName" label="商品名称" width="204" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="Content" label="文件内容" width="227" show-overflow-tooltip></el-table-column>
+          <el-table-column label="数量" width="120" show-overflow-tooltip>
             <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}{{ scope.row.KindCount }}款</span>
           </el-table-column>
-          <el-table-column label="尺寸" show-overflow-tooltip width="229">
+          <el-table-column label="尺寸" show-overflow-tooltip width="186">
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
-            <span v-else>--</span>
           </el-table-column>
-          <el-table-column label="工艺" show-overflow-tooltip width="190">
+          <el-table-column label="工艺" show-overflow-tooltip width="160">
             <!-- ================================== -->
             <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</span>
-            <span v-else>--</span>
           </el-table-column>
         </el-table>
 
@@ -50,31 +49,31 @@
                 <p class="reprint">退款：</p>
               </div>
               <div class="right">
-                <p class="reprint">
+                <p class="reprint" v-if="AfterSaleInfo.RefundBalance">
                   <i>
                     退到余额：<span>{{AfterSaleInfo.RefundBalance}}</span> 元
                   </i>
-                  <i v-if="AfterSaleInfo.RefundFreightType == 1">
+                  <i v-if="AfterSaleInfo.RefundFreightType === 1 && AfterSaleInfo.RefundFreightAmount">
                     含运费：<span>{{AfterSaleInfo.RefundFreightAmount}}</span> 元
                   </i>
                 </p>
-                <p class="reprint">
+                <p class="reprint" v-if="AfterSaleInfo.RefundPrintBean">
                   <i>
                     退印豆：<span>{{AfterSaleInfo.RefundPrintBean}}</span> 个
                   </i>
-                  <i v-if="AfterSaleInfo.RefundFreightType == 3">
+                  <i v-if="AfterSaleInfo.RefundFreightType === 3 && AfterSaleInfo.RefundFreightAmount">
                     含运费：<span>{{AfterSaleInfo.RefundFreightAmount}}</span> 个
                   </i>
                 </p>
-                <p class="reprint">
+                <p class="reprint" v-if="AfterSaleInfo.RefundThirdParty">
                   <i>
                     退到扫码账户：<span>{{AfterSaleInfo.RefundThirdParty}}</span> 元
                   </i>
-                  <i v-if="AfterSaleInfo.RefundFreightType == 2">
+                  <i v-if="AfterSaleInfo.RefundFreightType === 2 && AfterSaleInfo.RefundFreightAmount">
                     含运费：<span>{{AfterSaleInfo.RefundFreightAmount}}</span> 元
                   </i>
                 </p>
-                <p class="reprint">
+                <p class="reprint" v-if="AfterSaleInfo.UnpaidReducedAmount">
                   <i>
                     售后优惠：<span>{{AfterSaleInfo.UnpaidReducedAmount}}</span> 元
                   </i>
@@ -118,18 +117,20 @@
               <span v-if="AfterSaleInfo.Status === 10">亲爱的客户，您的服务单我们正在努力处理，请耐心等待。</span>
               <span v-if="AfterSaleInfo.Status === 20">亲爱的客户，您的服务单我们正在退款，请耐心等待。</span>
             </p>
-            <p class="opinion" style="margin-top:10px">
-              <span> {{AfterSaleInfo.OperaterRemark}}</span>
+            <p class="opinion" style="margin-top:10px" v-if="AfterSaleInfo.OperaterRemark">
+              <span>{{AfterSaleInfo.OperaterRemark}}</span>
+              <span style="margin-left:10px" v-if="AfterSaleInfo.NextOperateType">下次处理时间：{{AfterSaleInfo.NextOperateTime | format2MiddleLangTypeDate}}</span>
+              <!-- <span style="margin-left:10px" v-else>处理时间：不确定</span> -->
             </p>
           </template>
           <p style="margin-top:30px;color:#585858" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
             <span>是否已解决您的问题？若未解决可点击再次申请售后服务</span>
           </p>
           <div class="btns" v-if="AfterSaleInfo.Status !== 255">
-            <el-button @click="toAfterSale" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">申请售后</el-button>
+            <el-button @click="toAfterSale" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255 && productInfo.AppealStatus === 1">申请售后</el-button>
             <el-button @click="seeHandlerVisible = true" v-if="AfterSaleInfo.Status >= 10 && AfterSaleInfo.Status != 255">联系处理人员</el-button>
             <!-- <el-button @click="seeHandlerVisible = true" >联系处理人员</el-button> -->
-            <template v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
+            <template v-if="AfterSaleInfo.Status === 30">
               <el-button v-if="!AfterSaleInfo.IsEvaluate" @click="estimateClick(productInfo.AfterSaleCode)">售后评价</el-button>
               <el-button v-else @click="seeEstimateClick(productInfo.AfterSaleCode)">查看评价</el-button>
             </template>
@@ -140,54 +141,54 @@
           <table class="table" v-if="AfterSaleInfo">
             <div class="tr">
               <div class="td title">问题类型：</div>
-              <div class="td content texts">{{AfterSaleInfo.QuestionTypeTitleList.join('，')}}</div>
+              <div class="td content texts">{{AfterSaleInfo.QuestionTypeTitleList.length?AfterSaleInfo.QuestionTypeTitleList.join('，'):'--'}}</div>
               <div class="td title">诉求意向：</div>
-              <div class="td content">{{AfterSaleInfo.AppealType === 0 ? '退款' : AfterSaleInfo.AppealType === 1 ? '补印' : '其他'}}</div>
+              <div class="td content">
+                {{AfterSaleInfo.AppealType === null ? '--' : AfterSaleInfo.AppealType === 2 ? '退款' : AfterSaleInfo.AppealType === 7 ? '补印' : '其他'}}
+              </div>
+            </div>
+            <div class="tr">
+              <div class="td title">联系信息：</div>
+              <div class="td content texts">
+                <p>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.ContactName">联系人：{{AfterSaleInfo.ContactName}}</span>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.Mobile">手机：{{AfterSaleInfo.Mobile}}</span>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.ContactQQ">QQ：{{AfterSaleInfo.ContactQQ}}</span>
+                  <span style="margin-right:10px" v-if="!AfterSaleInfo.ContactQQ && !AfterSaleInfo.Mobile && !AfterSaleInfo.ContactName">--</span>
+                </p>
+              </div>
+
+              <div class="td title">上传图片：</div>
+              <div class="td content image">
+                <el-image :preview-src-list="QuestionPicList" :mpCloseViewer='closeViewer'
+                v-for="(item, index) in QuestionPicList" :key="index + item" :src="item" fit="cover" ></el-image>
+                <!-- {{AfterSaleInfo.QuestionPicList}} -->
+                <span v-if="QuestionPicList.length === 0">暂无图片</span>
+              </div>
             </div>
             <div class="tr">
               <div class="td title">问题描述：</div>
-              <div class="td content texts">{{AfterSaleInfo.QuestionRemark}}</div>
-              <div class="td title">上传图片：</div>
-              <div class="td content">
-                <el-image :preview-src-list="QuestionPicList" :mpCloseViewer='closeViewer'
-                v-for="item in QuestionPicList" :key="item" :src="item" fit="cover" ></el-image>
-                <!-- {{AfterSaleInfo.QuestionPicList}} -->
-              </div>
+              <div class="td content texts" style="width:none;flex:1">{{AfterSaleInfo.QuestionRemark || '--'}}</div>
             </div>
-            <div class="tr" v-if="AfterSaleInfo.AppealType === 0 || AfterSaleInfo.AppealType === 1">
-              <div class="td title">{{AfterSaleInfo.AppealType === 0 ? '退款金额：' : '补印数量：'}}</div>
-              <div class="td content">
-                {{AfterSaleInfo.AppealType === 0 ? `${AfterSaleInfo.AppealRefundAmount}元` :
-                `${AfterSaleInfo.AppealNumber}${productInfo.Unit}${AfterSaleInfo.AppealKindCount}款`}}
-              </div>
+            <!-- <div class="tr">
               <div class="td title">联系信息：</div>
               <div class="td content texts">
                 <p>
-                  <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
-                  <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.ContactName">联系人：{{AfterSaleInfo.ContactName}}</span>
+                  <span style="margin-right:10px" v-if="AfterSaleInfo.Mobile">手机：{{AfterSaleInfo.Mobile}}</span>
                   <span style="margin-right:10px" v-if="AfterSaleInfo.ContactQQ">QQ：{{AfterSaleInfo.ContactQQ}}</span>
-                </p>
-              </div>
-            </div>
-            <div class="tr" v-else>
-              <div class="td title">联系信息：</div>
-              <div class="td content texts">
-                <p>
-                  <span style="margin-right:10px">联系人：{{AfterSaleInfo.ContactName}}</span>
-                  <span style="margin-right:10px">手机：{{AfterSaleInfo.Mobile}}</span>
-                  <span style="margin-right:10px" v-if="AfterSaleInfo.ContactQQ">QQ：{{AfterSaleInfo.ContactQQ}}</span>
+                  <span style="margin-right:10px" v-if="!AfterSaleInfo.ContactQQ && !AfterSaleInfo.Mobile && !AfterSaleInfo.ContactName">--</span>
                 </p>
               </div>
               <div class="td title"></div>
               <div class="td content"></div>
-            </div>
+            </div> -->
           </table>
         </div>
 
             <div class="btn-box">
-              <el-button  @click="handleReturn">
-                <i class="el-icon-d-arrow-left is-font-15"></i>
-                <em style="margin-left: 6px">返回</em>
+              <el-button @click="handleReturn" style="color: #428DFA; border-color: #428DFA;">
+                返回
               </el-button>
             </div>
       </div>
@@ -424,7 +425,8 @@ export default {
       this.api.getServiceDetail(this.productInfo.AfterSaleCode).then(res => {
         if (res.data.Status === 1000) {
           this.AfterSaleInfo = res.data.Data;
-          this.QuestionPicList = res.data.Data.QuestionPicList.map(it => this.baseUrl + it);
+          const temp = [...res.data.Data.QuestionPicList.map(it => this.baseUrl + it), ...res.data.Data.SolutionQuestionPicList.map(it => this.baseUrl + it)];
+          this.QuestionPicList = temp;
           this.getSteps(res.data.Data);
         //
         }
@@ -541,11 +543,21 @@ export default {
           padding: 8px 20px;
           line-height: 30px;
         }
+        &.image{
+          padding-top: 10px;
+          flex-wrap: wrap;
+          padding-right: 12px;
+          >span{
+            line-height: 32px;
+            margin-bottom: 10px;
+          }
+        }
         .el-image{
           width: 40px;
           height: 40px;
-          padding: 25px 0;
-          margin-left: 9px;
+          // padding: 25px 0;
+          margin-bottom: 10px;
+          margin-right: 8px;
         }
       }
     }
@@ -589,9 +601,9 @@ export default {
         display: flex;
         justify-content: center;
         > button {
-          width: 120px;
+          width: 140px;
           & + button {
-            margin-left: 20px;
+            margin-left: 100px;
           }
         }
       }

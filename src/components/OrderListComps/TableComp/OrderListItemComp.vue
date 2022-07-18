@@ -83,7 +83,7 @@
           <div :style="wStyles[14]" class="is-font-12 gray btn-wrap" v-if="!fixedLeft" :class="{hide: !fixedRight}">
             <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
             <span class="span-title-blue" @click="goToFeedback(item)"
-              v-if="item.AllowAfterSales">售后</span>
+              v-if="item.AllowAfterSale">售后</span>
             <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>售后</span>
             <span class="span-title-pink" @click="handleOrderCancel(item)"
               v-if="[20, 30, 35, 40].includes(item.Status)">取消</span>

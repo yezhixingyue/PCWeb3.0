@@ -10,7 +10,7 @@
     :showCancel='false'
     @submit='submit'
     width='800px'
-    top='5vh'
+    top='15vh'
     >
     <div slot="title" class="title">aaa</div>
     <el-form label-position="left" ref="form" :model="SeeEstimate" class="see-estimate">
@@ -34,7 +34,7 @@
             <span>{{SeeEstimate.EvaluateContent || '未填写评价'}}</span>
           </div>
         </el-form-item>
-        <el-form-item label="评价晒图：">
+        <!-- <el-form-item label="评价晒图：">
           <div class="images" v-if="SeeEstimate.EvaluatePicList.length">
             <el-image :preview-src-list="SeeEstimate.EvaluatePicList" :mpCloseViewer='closeViewer'
             v-for="item in SeeEstimate.EvaluatePicList" :key="item"
@@ -42,7 +42,7 @@
               fit="cover"></el-image>
           </div>
           <span v-else>未上传图片</span>
-        </el-form-item>
+        </el-form-item> -->
       </template>
     </el-form>
   </CommonDialogComp>
@@ -122,7 +122,7 @@ export default {
     left: 30px;
   }
   .see-estimate{
-    min-height: calc(400px);
+    min-height: calc(300px);
     .el-form-item{
       .el-form-item__label{
         color: #585858;

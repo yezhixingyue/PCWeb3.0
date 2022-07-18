@@ -46,7 +46,7 @@
     </header>
     <section class="content" v-if="FeedbackList.length">
       <div class="tables">
-        <ListTable v-for="FeedbackItem in FeedbackList" :key="FeedbackItem.OrderID" :dataList='[FeedbackItem]' />
+        <ListTable :dataList='FeedbackList' @updataList='updataList'/>
       </div>
       <!-- <ListTable :dataList='list' /> -->
       <footer>
@@ -110,11 +110,19 @@ export default {
       // OrderStatus: '',
       // eslint-disable-next-line max-len
       dateList: [{ label: '全部', value: 'all' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      OrderStatusList: [
+        { label: '不限', value: '' },
+        { label: '生产中', value: 55 },
+        { label: '已生产', value: 60 },
+        { label: '已入库', value: 70 },
+        { label: '已发货', value: 80 },
+        { label: '已完成', value: 200 },
+      ],
     };
   },
   computed: {
     // ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
-    ...mapState('common', ['FeedbackProgress', 'OrderStatusList', 'ScrollInfo']),
+    ...mapState('common', ['FeedbackProgress', 'ScrollInfo']),
     // eslint-disable-next-line max-len
     ...mapState('summary', ['RejectReasonList', 'listData', 'needFetchListData', 'listDataNumber', 'condition4FeedbackList', 'FeedbackList', 'FeedbackDataNumber']),
     // QuestionList() {
@@ -223,6 +231,9 @@ export default {
       if (!oEl) return;
       const { scrollTop, scrollHeight, offsetHeight } = oEl;
       this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
+    },
+    updataList() {
+      this.getListData4Feedback(this.condition4FeedbackList.Page);
     },
   },
   watch: {

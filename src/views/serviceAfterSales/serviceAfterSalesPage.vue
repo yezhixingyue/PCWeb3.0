@@ -15,18 +15,18 @@
             />
           </li>
           <li class="second">
-            <LineDateSelectorComp
-              :changePropsFunc='setCondition4ServiceAfterSaleList'
-              :requestFunc='getServiceAfterSaleList'
-              :isFull="false"
-              :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
-              :dateValue='condition4ServiceAfterSaleList.DateType'
-              :initDate='condition4ServiceAfterSaleList.Date'
-              :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
-              label="申请时间"
-              :dateList="dateList"
-              dateType="date"
-            />
+          <LineDateSelectorComp
+            :changePropsFunc='setCondition4ServiceAfterSaleList'
+            :requestFunc='getServiceAfterSaleList'
+            :isFull="false"
+            :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
+            :dateValue='condition4ServiceAfterSaleList.DateType'
+            :initDate='condition4ServiceAfterSaleList.Date'
+            :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
+            label="申请时间"
+            :dateList="dateList"
+            dateType="daterange"
+          />
             <search-input-comp
               title="关键词"
               placeholder="请输入搜索关键词"
@@ -53,7 +53,7 @@
                 <span slot-scope="scope">{{ scope.row.ProductName }}</span>
               </el-table-column>
               <el-table-column label="文件内容" show-overflow-tooltip width="171">
-                <template slot-scope="scope">{{ scope.row.Content ? scope.row.Content : '--'}}</template>
+                <template slot-scope="scope">{{ scope.row.Content }}</template>
               </el-table-column>
               <el-table-column label="申请时间" width="171" show-overflow-tooltip>
                 <template slot-scope="scope"
@@ -73,8 +73,11 @@
                     <!-- <template v-if="true"> -->
                     <template v-if="isAccomplish(scope.row.Status)">
                       <el-divider direction="vertical"></el-divider>
-                      <span class="after-sale" v-if="scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
-                      <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
+                      <span class="disabled" v-if="scope.row.Status === 40 || scope.row.Status === 255">售后评价</span>
+                      <template v-else>
+                        <span class="after-sale" v-if="scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
+                        <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
+                      </template>
                     </template>
                   </div>
                   <!-- <i>{{scope.row.Solution}}</i> -->
@@ -307,7 +310,7 @@ export default {
     estimateSubmit(data) {
       this.api.getOrderAfterSaleEvaluate(data).then(res => {
         if (res.data.Status === 1000) {
-          this.$store.dispatch('summary/getServiceAfterSaleList');
+          this.$store.dispatch('summary/getServiceAfterSaleList', this.condition4ServiceAfterSaleList.Page);
         }
       });
       this.estimateVisible = false;
@@ -333,7 +336,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('summary/getServiceAfterSaleList');
+    this.$store.dispatch('summary/getServiceAfterSaleList', this.condition4ServiceAfterSaleList.Page);
     this.oApp = document.getElementById('app');
     this.$nextTick(() => {
       this.handleScroll(this.oApp);
@@ -430,6 +433,10 @@ export default {
                 color: #FEB829;
                 cursor:pointer
               }
+              >.disabled{
+                color: #aaa;
+                cursor:not-allowed
+              }
               .el-divider{
                 margin: 0 10px;
               }
@@ -473,6 +480,7 @@ export default {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      color: #989898;
       > p {
         margin-top: 15px;
         span{
