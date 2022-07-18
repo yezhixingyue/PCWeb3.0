@@ -142,12 +142,15 @@
       ref="mapComp"
       :openType="openType"
       isTemp
+      isEmitType
       :canClose='false'
       :visible.sync="setMapVisible"
       :curEditInfo="tempDataForMapPosition.NewAddressInfo"
       :PropRegionalList='RegionalList'
       :PropCityList='CityList'
       :PropCountyList='CountyList'
+      :canMpzj="canMpzj"
+      :top="!canMpzj ? '15vh' : '7vh'"
       @handleMapSearchError="handleMapSearchError"
       @changeProps="setLatitudeLongitudeAfterPositioning"
       @submit="setLatitudeLongitudeAfterPositioning"
@@ -252,6 +255,13 @@ export default {
     };
   },
   computed: {
+    canMpzj() { // 可以使用名片之家配送（如果不可以的时候不需要地图定位，暂定下单及批量上传处生效）
+      if (this.customerInfo && this.customerInfo.Type) {
+        const { First } = this.customerInfo.Type;
+        return ![8].includes(First);
+      }
+      return true;
+    },
     localExpressList() {
       return this.ExpressList.map(it => ({
         ...it,
@@ -378,7 +388,7 @@ export default {
       const {
         Latitude, Longitude, AddressDetail, Consignee, Mobile, ExpressArea, RegionalList, CityList, CountyList,
       } = data;
-      if (!this.tempDataForMapPosition || !Latitude || !Longitude) return;
+      if (!this.tempDataForMapPosition || ((!Latitude || !Longitude) && this.canMpzj)) return;
       const { curAddIndex, OutPlateNo, NewAddressInfo } = this.tempDataForMapPosition;
       const oldIndex = this.curAddIndex;
       const oldExpressArea = oldIndex === 'new' ? this.NewAddressInfo.ExpressArea : null;
@@ -457,8 +467,12 @@ export default {
       this.RegionalList = RegionalList || null;
       // this.curAddIndex = 'new';
       // 打开地图弹窗定位
-      this.setMapVisible = true;
+      // if (this.canMpzj) {
+      //   this.setMapVisible = true;
+      //   this.openType = 'edit';
+      // }
       this.openType = 'edit';
+      this.setMapVisible = true;
       // this.$refs.ruleForm.validate();
     },
     /** 弹窗地址修改相关方法
@@ -470,7 +484,7 @@ export default {
     onDialogSubmit(e) { // 弹窗提交
       if (!e) return;
       const { curAddIndex, OutPlateNo, NewAddressInfo } = e;
-      if (curAddIndex === 'new' && !OutPlateNo) { // 弹窗定位
+      if (curAddIndex === 'new' && !OutPlateNo && this.canMpzj) { // 弹窗定位
         this.RegionalList = null;
         this.CityList = null;
         this.CountyList = null;
@@ -489,9 +503,14 @@ export default {
           this.setMapVisible = true;
         }
       } else {
+        const oldIndex = this.curAddIndex;
+        const oldExpressArea = oldIndex === 'new' ? this.NewAddressInfo.ExpressArea : null;
         this.curAddIndex = curAddIndex;
         this.OutPlateNo = OutPlateNo;
         this.NewAddressInfo = JSON.parse(JSON.stringify(NewAddressInfo));
+        if (!this.canMpzj) {
+          if (curAddIndex === 'new' && oldIndex === 'new') this.handleUseableCompanyList(this.NewAddressInfo, oldIndex, oldExpressArea);
+        }
         if (this.$refs.oIdentifyFormItemOut) this.$refs.oIdentifyFormItemOut.setValueOnOut(OutPlateNo);
         this.setInfo4ReqObj();
         this.SetAddressVisible = false;
@@ -597,11 +616,14 @@ export default {
       if (!temp.CustomerID && this.customerInfo) {
         temp.CustomerID = this.customerInfo.CustomerID;
       }
-      const resp = await this.api.getExpressUseableCompanyList(temp);
+      const resp = await this.api.getExpressUseableCompanyList(temp).catch(() => null);
       this.ValidExpressLoading = false;
-      if (resp.data.Status === 1000) {
-        const result = resp.data.Data;
+      if (resp && resp.data.Status === 1000) {
+        let result = resp.data.Data;
         // const result = [];
+        if (!this.canMpzj) {
+          result = result.filter(it => it !== 1);
+        }
         this.ExpressValidList = result;
         if (result.includes(this.Express.Second)) {
           let oldAddExpressArea = typeof oldIndex === 'number' ? this.customerInfo.Address[oldIndex]?.ExpressArea : null;
@@ -903,17 +925,18 @@ export default {
     max-height: 1050px;
     box-sizing: border-box;
     .title {
-      min-width: 4em;
+      min-width: 5em;
+      margin-right: 0;
     }
     .el-dialog__header {
-      padding:  10px;
+      padding: 6px 10px;
       margin: 0 10px;
       line-height: 30px;
       border-bottom: 1px solid #eee;
       font-size: 15px;
       color: #888E99;
       .el-dialog__headerbtn {
-        top: 15px;
+        top: 11px;
       }
       // > header {
       //   &::before {

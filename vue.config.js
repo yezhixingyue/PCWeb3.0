@@ -22,6 +22,12 @@ module.exports = {
   // publicPath: '',
   devServer: {
     proxy: {
+      '/Api/Log/Write': {
+        // target: '',
+        target: 'http://localhost:3005',
+        ws: true, // 开启websockets
+        changeOrigin: true, // 开启代理
+      },
       '/Api': {
         target: proxyUrl,
         // target: 'http://218.28.143.10:8156',

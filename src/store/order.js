@@ -19,7 +19,7 @@ export default {
         First: '',
         Second: '',
       },
-      DateType: 'today',
+      DateType: 'last7Date',
       ProductClass: {
         First: '',
         Second: '',
@@ -87,7 +87,7 @@ export default {
           First: '',
           Second: '',
         },
-        DateType: 'today',
+        DateType: 'last7Date',
         ProductClass: {
           First: '',
           Second: '',
@@ -148,7 +148,7 @@ export default {
           First: '',
           Second: '',
         },
-        DateType: 'today',
+        DateType: 'last7Date',
         ProductClass: {
           First: '',
           Second: '',

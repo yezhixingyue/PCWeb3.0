@@ -151,6 +151,7 @@
         <RechargeComp :showRechange='showRechange' @handleClose='setShowRechange' />
       </div>
     </div> -->
+    <ChangeQQTipsDialog  :visible.sync="changeQQVisible" />
   </section>
 </template>
 
@@ -158,15 +159,17 @@
 import { mapState } from 'vuex';
 import { debounce } from '@/assets/js/utils/throttle';
 import { Loading } from 'element-ui';
-import Cookie from '@/assets/js/Cookie';
 import { useCookie, homeUrl } from '@/assets/js/setup';
 import PlaceOrderProductClassifyComp from '@/components/QuotationComps/PlaceOrderProductClassifyComp.vue';
 import RechargeComp from './RechargeComp.vue';
+import ChangeQQTipsDialog from './ChangeQQTipsDialog';
+import Cookie from '../../assets/js/Cookie';
 
 export default {
   components: {
     RechargeComp,
     PlaceOrderProductClassifyComp,
+    ChangeQQTipsDialog,
   },
   computed: {
     ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance']),
@@ -187,6 +190,7 @@ export default {
       showBoxShadow: false,
       homeUrl,
       isloading: false,
+      changeQQVisible: false,
     };
   },
   methods: {
@@ -307,6 +311,23 @@ export default {
       Cookie.removeCookie('token');
       this.$router.replace('/login');
     },
+    setQQChangeTip() {
+      let lastTipTime = Cookie.getCookie('lastTipTime');
+      if (lastTipTime) {
+        lastTipTime = +lastTipTime;
+        if (lastTipTime > 0) {
+          const diff = Date.now() - lastTipTime;
+          if (diff < 24 * 60 * 60 * 1000) {
+            const ld = new Date(lastTipTime).getDate();
+            const cd = new Date().getDate();
+            if (ld === cd) return;
+          }
+        }
+      }
+      this.changeQQVisible = true;
+      lastTipTime = Date.now();
+      Cookie.setCookie('lastTipTime', lastTipTime, 24 * 60 * 60);
+    },
   },
   watch: {
     customerInfo: {
@@ -349,6 +370,7 @@ export default {
           this.$store.dispatch('common/getExpressList'),
           this.$store.dispatch('common/getNoticeList'),
         ]);
+        this.setQQChangeTip();
       }
       if (showLoading) loadingInstance.close();
       this.isloading = false;

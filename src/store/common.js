@@ -527,8 +527,11 @@ export default {
       if (state.ExpressList.length > 0) return true;
       const _list = sessionStorage.getItem('expressList');
       if (_list) {
-        commit('setExpressList', JSON.parse(_list));
-        return true;
+        const res = JSON.parse(_list);
+        if (Array.isArray(res) && res.length > 0) {
+          commit('setExpressList', res);
+          return true;
+        }
       }
       const res = await api.getExpressList();
       if (res.data.Status === 1000) {

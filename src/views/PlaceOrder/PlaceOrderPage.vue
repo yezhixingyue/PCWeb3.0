@@ -79,22 +79,25 @@ export default {
       this.$store.commit('Quotation/setCurProductInfo2Quotation', { data: this.curProductInfo2Quotation });
       this.$store.commit('Quotation/setInitPageText', '');
     },
+    setInfoLackTip() {
+      if (!this.customerInfo || this.customerInfo.AuthStatus === 2) return;
+      this.messageBox.warnCancelBox({
+        title: '企业信息未完善',
+        msg: '您尚有资料未完善，无法享受优惠价格',
+        cancelButtonText: '忽略',
+        confirmButtonText: '去完善资料',
+        successFunc: () => {
+          this.$router.push({
+            path: '/mySetting/account',
+            query: { redirect: 'placeOrder' },
+          });
+        },
+      });
+    },
   },
   mounted() {
     this.handlePathDataFetch();
-    if (!this.customerInfo || this.customerInfo.AuthStatus === 2) return;
-    this.messageBox.warnCancelBox({
-      title: '企业信息未完善',
-      msg: '您尚有资料未完善，无法享受优惠价格',
-      cancelButtonText: '忽略',
-      confirmButtonText: '去完善资料',
-      successFunc: () => {
-        this.$router.push({
-          path: '/mySetting/account',
-          query: { redirect: 'placeOrder' },
-        });
-      },
-    });
+    this.setInfoLackTip();
   },
 };
 </script>

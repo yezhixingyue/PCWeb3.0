@@ -5,9 +5,10 @@
     :rules="rules"
     ref="oIdentifyForm"
     label-width="86px"
+    @submit.native.prevent
     class="mp-place-order-address-set-comp-identify-ruleForm-containner"
   >
-    <el-form-item label="识别内容：" prop="Value" size="small" @submit.native.prevent>
+    <el-form-item label="识别内容：" prop="Value" size="small">
       <el-input
         size="small"
         ref="oInInp"

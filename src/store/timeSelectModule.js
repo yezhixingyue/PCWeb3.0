@@ -68,6 +68,14 @@ export default {
         Second: `${stringDate2}T23:59:59.997Z`,
       };
     },
+    last7Date() {
+      const BeginDate = ConvertTimeFormat(new Date(new Date() - 24 * 60 * 60 * 1000 * 6));
+      const TodayDate = ConvertTimeFormat(new Date());
+      return {
+        First: `${BeginDate}T00:00:00.000Z`,
+        Second: `${TodayDate}T23:59:59.997Z`,
+      };
+    },
     /* 财务时间选择相关
     -------------------------------*/
     financeAlltimeDate() {

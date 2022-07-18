@@ -72,6 +72,7 @@
             :failedList='failedList'
             :canSelectList='canSelectList'
             :multipleSelection='multipleSelection'
+            :UseSameAddress='UseSameAddress'
             @uploadSelected='handleUploadSelected'
             @removeSelected='handleRemoveSelected'
             @checkAll='handleCheckAll'
@@ -257,6 +258,10 @@ export default {
      */
     handleFileChange(fileList) { // 选中文件 并对其后续进行处理 （注：每次选中文件都清空掉上次选中文件）
       if (!this.canSelectFile) return;
+      if (fileList.length + this.successedList.length > 100) {
+        this.messageBox.failSingleError({ title: '文件选择失败', msg: '一次最多不能超过100个文件' });
+        return;
+      }
       this.handleFileParing(fileList);
     },
     async handleFileParing(fileList) { // 处理文件解析 并生成处理成功列表 及 处理失败列表

@@ -1,5 +1,5 @@
 <template>
-    <div class="mp-pc-order-list-page-table-item-comp-wrap">
+    <div class="mp-pc-order-list-page-table-item-comp-wrap" v-if="data">
       <div class="product-item-header" :class="{visible: fixedLeft || fixedRight}"
        :style="`margin-right:${fixedLeft ? -(1198 - Object.values(this.widthObj)[0]) : 0}px`">
         <div class="product-item-header-left" v-if="fixedLeft">
@@ -169,25 +169,36 @@ export default {
     return {
       isActive: true,
       curOrderID4Detail: null,
+      oApp: null,
     };
   },
   methods: {
     handleCollapse() {
       const oWraps = document.getElementsByClassName(`${this.data.ID}`);
-      console.log(oWraps);
       if (oWraps.length > 0) {
         oWraps.forEach(oWrap => {
           const tDom = oWrap.getElementsByClassName('product-item-header-set-active')[0];
-          // console.log(tDom);
           tDom.click();
         });
       }
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.handleScroll();
+        }, 10);
+      });
     },
     handleActive() {
       this.isActive = !this.isActive;
     },
-    // eslint-disable-next-line object-curly-newline
-    getAddress({ AddressDetail, Consignee, Mobile, ExpressArea }) {
+    handleScroll() {
+      if (!this.oApp) return;
+      const { scrollTop, scrollHeight, offsetHeight } = this.oApp;
+      this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
+    },
+    getAddress(info) {
+      const {
+        AddressDetail, Consignee, Mobile, ExpressArea,
+      } = info;
       const { RegionalName, CityName, CountyName } = ExpressArea;
       const _obj = {};
       _obj.First = `${RegionalName}${CityName}${CountyName}${AddressDetail}`;
@@ -230,6 +241,9 @@ export default {
     onItemMouseLeave(OrderID) {
       this.$emit('itemHoverLeave', OrderID);
     },
+  },
+  mounted() {
+    this.oApp = document.getElementById('app');
   },
 };
 </script>

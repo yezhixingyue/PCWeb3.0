@@ -142,6 +142,12 @@
     <div class="show-empty-bg" v-else>
       <img src="@/assets/images/placeorderisempty.png" alt="">
       <p class="is-gray">当前尚未选择产品，请通过左侧产品分类选择产品吧...</p>
+      <p class="is-gray is-font-13" style="margin-top:12px">名片之家服务升级，请您点击添加全国统一业务QQ：
+        <a rel="nofollow" target="_blank" href="tencent://message/?uin=800051518&amp;Site=名片之家&amp;Menu=yes" class='is-blue'>
+          <i class='icon-kefuqq iconfont'></i>
+          <span> 800051518</span>
+        </a>
+      </p>
     </div>
     <!-- <AsideIntroComp
      :asideAboutData='asideAboutData'
@@ -197,8 +203,8 @@ export default {
       'successNum',
       'isUploading',
     ]),
-    ...mapGetters('Quotation', ['curProductShowNameInfo']),
     ...mapState('common', ['customerInfo', 'ExpressList']),
+    ...mapGetters('Quotation', ['curProductShowNameInfo']),
     computedCouponCode2Add: {
       get() {
         return this.couponCode2Add;
@@ -280,8 +286,22 @@ export default {
       // 如果验证通过 执行算价
       if (res === true) this.getProductPriceLocal();
       else {
+        let dom = document.getElementsByClassName('el-form-item__error')[0];
+        if (dom) dom = dom.parentElement;
+        const complete = () => {
+          const oInputWrap = dom.getElementsByClassName('mp-erp-number-type-element-display-input-comp')[0];
+          if (oInputWrap) {
+            const oInputDom = oInputWrap.getElementsByClassName('el-input__inner')[0];
+            if (oInputDom) {
+              oInputDom.focus();
+            }
+          }
+        };
+        const cb = () => {
+          this.utils.handleScrollAfterGetPriceFailed(dom, 130, 0, complete);
+        };
         this.messageBox.failSingleError({
-          title: '报价失败', msg: res, successFunc: this.utils.handleScrollAfterGetPriceFailed, failFunc: this.utils.handleScrollAfterGetPriceFailed,
+          title: '报价失败', msg: res, successFunc: cb, failFunc: cb,
         });
       }
     },

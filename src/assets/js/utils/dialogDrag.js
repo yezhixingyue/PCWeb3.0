@@ -19,6 +19,9 @@ Vue.directive('dialogDrag', {
     }());
 
     dialogHeaderEl.onmousedown = (e) => {
+      if (e.target.tagName === 'I' && e.target.className.includes('el-dialog__close')) {
+        return false;
+      }
       // 鼠标按下，计算当前元素距离可视区的距离
       const disX = e.clientX - dialogHeaderEl.offsetLeft;
       const disY = e.clientY - dialogHeaderEl.offsetTop;

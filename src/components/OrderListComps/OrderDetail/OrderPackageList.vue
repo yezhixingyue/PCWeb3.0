@@ -10,7 +10,8 @@
           <span v-else class="gray is-font-12">暂未生成</span>
         </el-table-column>
         <el-table-column label="数量" :min-width="OrderID ? 140 : 92" show-overflow-tooltip>
-          <span class="gray" slot-scope="scope">{{scope.row | formarProductAmount}}</span>
+          <!-- <span class="gray" slot-scope="scope">{{scope.row.Order | formarProductAmount}}</span> -->
+          <span class="gray" slot-scope="scope">{{scope.row.ProductAmount}}{{scope.row.Order.Unit}}</span>
         </el-table-column>
         <el-table-column label="配送" :min-width="OrderID ? 180 : 92" show-overflow-tooltip>
           <span class="gray" slot-scope="scope">{{ scope.row.Logistics && scope.row.Logistics.ExpressName }}</span>

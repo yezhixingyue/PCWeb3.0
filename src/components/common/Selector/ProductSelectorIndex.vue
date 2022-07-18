@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 import SelectComp from '../SelectComp.vue';
 
 export default {
@@ -170,7 +170,7 @@ export default {
   },
   methods: {
     // ...mapActions('common', ['getproductClassify', 'getProductThird', 'getAllproductNames']),
-    ...mapActions('Quotation', ['getProductClassify']),
+    // ...mapActions('Quotation', ['getProductClassify']),
     // onMidSelect(arr) {
     //   this.setProductClass2(arr);
     //   if (arr[0]) this.getProductThird();
@@ -211,7 +211,7 @@ export default {
   mounted() {
     // this.getproductClassify();
     // this.getAllproductNames();
-    this.getProductClassify();
+    // this.getProductClassify();
   },
 };
 </script>
