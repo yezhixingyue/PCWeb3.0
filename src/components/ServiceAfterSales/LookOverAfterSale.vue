@@ -6,7 +6,7 @@
     </span>
     <span class="item">
       <i class="el-icon-warning-outline"></i>
-      <a :href='`${homeUrl}help.html`' target="_blank">售后政策</a>
+      <a :href='`${homeUrl}help/54.html`' target="_blank">售后政策</a>
     </span>
     <el-dialog
       :visible.sync="visible"
