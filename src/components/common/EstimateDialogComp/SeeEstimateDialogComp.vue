@@ -94,7 +94,7 @@ export default {
         this.api.getOrderAfterSaleEvaluateDetail(this.AfterSaleCode).then(res => {
           if (res.data.Status === 1000) {
             this.SeeEstimate = res.data.Data;
-            this.SeeEstimate.EvaluatePicList = this.SeeEstimate.EvaluatePicList.map(it => this.baseUrl + it);
+            // this.SeeEstimate.EvaluatePicList = this.SeeEstimate.EvaluatePicList.map(it => this.baseUrl + it);
           }
         });
       }

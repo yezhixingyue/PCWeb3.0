@@ -244,9 +244,10 @@ const api = {
 
   /* 售后单部分 api
    ----------------------------------------------------------------------------------- */
-  getAfterSalesList(data) { // POST /Api/AfterSales/List 获取售后单列表
-    return instance.post('/Api/AfterSales/List', data);
-  },
+  //  已弃用
+  // getAfterSalesList(data) { // POST /Api/AfterSales/List 获取售后单列表
+  //   return instance.post('/Api/AfterSales/List', data);
+  // },
   getOrderAfterSaleList(data) { // POST /Api/OrderAfterSale/List  获取售后记录
     return instance.post('/Api/OrderAfterSale/List', data);
   },
@@ -277,9 +278,10 @@ const api = {
   getOrderAfterSaleEvaluate(data) { // POST /Api/OrderAfterSale/EvaluateDetail  设置售后评价
     return instance.post('/Api/OrderAfterSale/Evaluate', data);
   },
-  getServiceListData2Excel(data) { // POST /Api/AfterSales/Excel
-    return instance.post('/Api/AfterSales/Excel', data, { responseType: 'arraybuffer' });
-  },
+  // 新售后不需要导出功能了
+  // getServiceListData2Excel(data) { // POST /Api/AfterSales/Excel
+  //   return instance.post('/Api/AfterSales/Excel', data, { responseType: 'arraybuffer' });
+  // },
 
   /* 未付款订单部分 api
    ----------------------------------------------------------------------------------- */
@@ -307,8 +309,10 @@ const api = {
   /* 问题反馈api
    ----------------------------------------------------------------------------------- */
   getQuestionList() {
-    return instance.get('/Api/AfterSales/ApplyQuestionList');
+    return instance.get('/Api/OrderAfterSale/ApplyQuestionList');
   },
+  // 已弃用 getAfterSalesApply   getAfterSalesApplyList   getAfterSalesCancle
+  /*
   getAfterSalesApply(data) { // POST /Api/AfterSales/Apply 售后申请 问题反馈
     return instance.post('/Api/AfterSales/Apply', data);
   },
@@ -318,6 +322,7 @@ const api = {
   getAfterSalesCancle(applyCode) { // PUT /Api/AfterSales/Cancle 取消问题反馈
     return instance.put(`/Api/AfterSales/Cancle?applyCode=${applyCode}`);
   },
+  */
   /* 印豆相关api
    ----------------------------------------------------------------------------------- */
   getShopPrintBeanList() { // GET /Api/Shop/PrintBean/List  商城-印豆购买列表

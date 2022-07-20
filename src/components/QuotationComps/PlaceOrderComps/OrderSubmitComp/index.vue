@@ -399,6 +399,10 @@ export default {
       ]);
       list = list.filter(it => it).map(it => (Array.isArray(it) ? it : [it])).filter(it => it.length > 0).reduce((a, b) => [...a, ...b], []); // 错误信息列表
       if (list.length > 0 && bool) {
+        if (list.length > 1) {
+          list = list.filter(it => it).map((it, i) => `${i + 1}、${it}`);
+          list.unshift('错误：');
+        }
         this.messageBox.failSingleError({ title: `${this.title}失败`, msg: list });
         return false;
       }

@@ -178,15 +178,15 @@ export default {
     scrollChange() { // 滚动条
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },
-    DownLoadConfigObj() {
-      return {
-        condition: this.condition,
-        count: this.FeedbackDataNumber,
-        fileDefaultName: '名片之家售后单',
-        fileDate: this.condition4FeedbackList,
-        downFunc: data => this.api.getServiceListData2Excel(data),
-      };
-    },
+    // DownLoadConfigObj() { // 不需要导出功能了
+    //   return {
+    //     condition: this.condition,
+    //     count: this.FeedbackDataNumber,
+    //     fileDefaultName: '名片之家售后单',
+    //     fileDate: this.condition4FeedbackList,
+    //     downFunc: data => this.api.getServiceListData2Excel(data),
+    //   };
+    // },
   },
   methods: {
     ...mapMutations('summary', ['setCondition4Feedback', 'clearCondition4Feedback']),

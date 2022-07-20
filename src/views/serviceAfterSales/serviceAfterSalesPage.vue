@@ -182,15 +182,15 @@ export default {
       }
       return _t;
     },
-    DownLoadConfigObj() {
-      return {
-        condition: this.condition,
-        count: this.ServiceAfterSaleListNumber,
-        fileDefaultName: '名片之家售后单',
-        fileDate: this.condition4ServiceAfterSaleList.Date,
-        downFunc: data => this.api.getServiceListData2Excel(data),
-      };
-    },
+    // DownLoadConfigObj() { // 不需要导出功能了
+    //   return {
+    //     condition: this.condition,
+    //     count: this.ServiceAfterSaleListNumber,
+    //     fileDefaultName: '名片之家售后单',
+    //     fileDate: this.condition4ServiceAfterSaleList.Date,
+    //     downFunc: data => this.api.getServiceListData2Excel(data),
+    //   };
+    // },
     showDateText() {
       if (this.condition4ServiceAfterSaleList && this.condition4ServiceAfterSaleList.DateType !== 'all') {
         if (this.condition4ServiceAfterSaleList.DateType) {

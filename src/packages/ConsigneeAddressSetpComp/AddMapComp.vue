@@ -86,17 +86,19 @@
       <li v-if="openType === 'tempAdd' && addressDisplayContent">
         <span class="is-gray is-font-13">当前设置地址：{{addressDisplayContent}}</span>
       </li>
+      <p class="tips-row is-pink is-font-12"
+        :class="{r: HaveAddressContentChange}"
+      style="padding-top: 8px;padding-left: 70px;padding-right: 32px;">{{tipContent}}</p>
       <li class="map-wrap" v-if="canMpzj">
-        <div class="map-content" id="map-container"
-         v-show="newAdd.HavePosition || openType==='tempAdd'" v-loading="mapIsLoading">
+        <div class="map-content" id="map-container" v-show="(newAdd.HavePosition || openType==='tempAdd') && !HaveAddressContentChange"
+         v-loading="mapIsLoading">
         </div>
       </li>
-      <li v-if="openType === 'tempAdd'">
-        <span class="is-gray is-font-13">使用新增地址时，需要在地图上定位准确的地址坐标 !</span>
+      <li style="text-align:center;padding-top: 8px" v-show="(newAdd.HavePosition || openType==='tempAdd') && !HaveAddressContentChange">
+        <span class="is-pink is-font-16">请在地图上选择准确位置，否则会造成货物无法正常配送，影响您的正常使用！</span>
       </li>
     </ul>
     <div slot="footer" class="dialog-footer">
-      <p class="tips-row">{{tipContent}}</p>
       <el-button type="primary"
        @click="handleSubmit('ruleForm')"
        :title="HaveAddressContentChange ? '省市区地址发生变动，请重新定位' : ''">{{isEmitType ? '确定' : '保存'}}</el-button>
@@ -151,7 +153,7 @@ export default {
     },
     top: {
       type: String,
-      default: '7vh',
+      default: '5vh',
     },
   },
   data() {
@@ -319,9 +321,10 @@ export default {
       if (!this.newAdd.Latitude || !this.newAdd.Longitude) {
         str = '';
       } else if (this.HaveAddressContentChange) {
-        str = '省市区地址发生变动，请重新设置地图定位';
+        str = '请点击按钮 重新定位';
       } else if (this.HaveAddressDetailChange) {
-        str = '详细地址发生变动，请重新设置地图定位或在地图中重新选定坐标';
+        // str = '详细地址发生变动，请重新设置地图定位或在地图中重新选定坐标';
+        str = '详细地址变更，请在地图中重新选定坐标 或 重新地图定位';
       }
       return str;
     },
@@ -563,6 +566,10 @@ export default {
           resizeEnable: true,
           zoom: 14,
         });
+        AMap.plugin('AMap.ToolBar', () => { // 异步加载插件
+          const toolbar = new AMap.ToolBar();
+          this.map.addControl(toolbar);
+        });
         this._PlaceSearch = new AMap.PlaceSearch(this.searchOption);
         this.marker = new AMap.Marker({
           position: [this.lng, this.lat], // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
@@ -776,7 +783,7 @@ export default {
       > .change-add-dia-content {
         // height: 630px;
         &.tempAdd {
-          height: 538px;
+          height: 542px;
           > .map-wrap {
             margin-top: 5px;
             margin-bottom: 16px;
@@ -940,6 +947,9 @@ export default {
           .el-input__suffix {
             top: -2px;
           }
+        }
+        > .tips-row.r {
+          text-align: right;
         }
       }
     }
