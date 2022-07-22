@@ -50,11 +50,17 @@ export default {
       const {
         InvoiceType, InvoiceMainBody, InvoiceAmount,
         EnterpriseName, CreditCode, RegisteredAddress, RegisteredTelephone, OpeningBank, BankAccount,
-        ReceiverContactWay, ReceiverMail, CreateTime, OperateTime, PersonalName,
+        ReceiverContactWay, ReceiverMail, CreateTime, OperateTime, PersonalName, IsPassBusinessAccount,
         ReceiverName, ReceiverProvinceName, ReceiverCityName, ReceiverCountyName, ReceiverAddress,
       } = this.detailData;
       const arr = [];
       if (InvoiceType === InvoiceTypeEnums.special.ID) { // 专票 分为2个表
+        let IsPassBusinessAccountText = '';
+        if (IsPassBusinessAccount === true) {
+          IsPassBusinessAccountText = '过公户';
+        } else if (IsPassBusinessAccount === false) {
+          IsPassBusinessAccountText = '不过公户';
+        }
         const temp1 = {
           title: '发票信息',
           list: [
@@ -67,6 +73,7 @@ export default {
             { label: '开户银行', value: OpeningBank },
             { label: '银行账号', value: formatBankCard(BankAccount) },
             { label: '申请开票时间', value: format2MiddleLangTypeDateFunc(CreateTime) },
+            { label: '是否过公户', value: IsPassBusinessAccountText },
             { label: '处理时间', value: OperateTime ? format2MiddleLangTypeDateFunc(OperateTime) : '' },
           ],
         };

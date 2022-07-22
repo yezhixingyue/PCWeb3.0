@@ -5,6 +5,11 @@
       <a :href="`${invoiceHelpUrl}`" target="_blank" rel="noopener noreferrer">
         <span class="blue-span">发票政策<i class="el-icon-d-arrow-right"></i></span>
       </a>
+      <span class="right">
+        <i class="el-icon-phone is-blue"></i>
+        <label for="">发票服务电话：</label>
+        <i>{{invoicePhone}}</i>
+      </span>
     </p>
     <div class="f">
       <!-- <SingleSelector v-model="localOrderStatus" :optionList='OrderStatusList' title="订单状态" /> -->
@@ -74,6 +79,7 @@ export default {
       InvoiceMakeUpStatusEnumList,
       dateList: [{ label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
       invoiceHelpUrl: `${homeUrl}help/${invoiceID}.html`, // 发票政策地址
+      invoicePhone: '13500002222',
     };
   },
   computed: {
@@ -139,6 +145,7 @@ export default {
 .mp-pc-invoice-make-up-list-page-header-comp-wrap {
   > .page-title {
     padding-bottom: 30px;
+    overflow: hidden;
     > .blue-v-line {
       margin-right: 25px;
       display: inline-block;
@@ -155,6 +162,17 @@ export default {
           top: 2px;
           margin-left: 2px;
         }
+      }
+    }
+    .right {
+      float: right;
+      padding-right: 4px;
+      line-height: 18px;
+      .is-blue {
+        margin-right: 3px;
+        font-size: 16px;
+        position: relative;
+        top: 0.5px;
       }
     }
   }
