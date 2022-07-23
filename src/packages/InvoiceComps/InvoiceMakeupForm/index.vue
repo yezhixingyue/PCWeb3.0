@@ -167,6 +167,14 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       callback();
     };
 
+    const checkFeildEmpty = (rule, value, callback) => {
+      if (this.localType === InvoiceTypeEnums.special.ID && !this.onlyEnterprise && value === '') {
+        callback(new Error('请填写信息'));
+        return;
+      }
+      callback();
+    };
+
     const temp = this.editData || this.originReceiverData || {};
 
     return {
@@ -189,11 +197,13 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
           { pattern: /^[0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10}$/, message: '统一社会信用代码格式不正确', trigger: 'blur' },
         ],
         RegisteredAddress: [
+          { validator: checkFeildEmpty, trigger: 'blur' },
         ],
         RegisteredTelephone: [
           { pattern: /^\d{11}$|^\d{7,12}$|^\d{3,4}-\d{6,8}$/, message: '电话格式不正确', trigger: 'blur' },
         ],
         OpeningBank: [
+          { validator: checkFeildEmpty, trigger: 'blur' },
         ],
         BankAccount: [
           { validator: checkBankCard, trigger: 'blur' },
@@ -267,10 +277,10 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
           this.$emit('switchToEnterprise');
         }
         if (val === InvoiceTypeEnums.special.ID && !this.onlyEnterprise) {
-          this.rules.RegisteredAddress.push({ required: true, message: '请填写企业注册地址', trigger: 'blur' });
-          this.rules.RegisteredTelephone.push({ required: true, message: '请填写企业注册电话', trigger: 'blur' });
-          this.rules.OpeningBank.push({ required: true, message: '请填写企业开户银行名称', trigger: 'blur' });
-          this.rules.BankAccount.push({ required: true, message: '请填写企业开户银行账号', trigger: 'blur' });
+          this.rules.RegisteredAddress.unshift({ required: true, message: '请填写企业注册地址', trigger: 'blur' });
+          this.rules.RegisteredTelephone.unshift({ required: true, message: '请填写企业注册电话', trigger: 'blur' });
+          this.rules.OpeningBank.unshift({ required: true, message: '请填写企业开户银行名称', trigger: 'blur' });
+          this.rules.BankAccount.unshift({ required: true, message: '请填写企业开户银行账号', trigger: 'blur' });
         }
         if (val !== InvoiceTypeEnums.special.ID) {
           this.rules.RegisteredAddress = this.rules.RegisteredAddress.filter(it => !it.required);

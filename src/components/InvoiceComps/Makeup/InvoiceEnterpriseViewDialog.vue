@@ -23,19 +23,19 @@
         </li>
         <li>
           <label for="">注册地址：</label>
-          <span>{{EnterpriseData.RegisteredAddress}}</span>
+          <span :class="EnterpriseData.RegisteredAddress?'':'is-gray'">{{EnterpriseData.RegisteredAddress || '未填写'}}</span>
         </li>
         <li>
           <label for="">注册电话：</label>
-          <span>{{EnterpriseData.RegisteredTelephone}}</span>
+          <span :class="EnterpriseData.RegisteredTelephone?'':'is-gray'">{{EnterpriseData.RegisteredTelephone || '未填写'}}</span>
         </li>
         <li>
           <label for="">开户银行：</label>
-          <span>{{EnterpriseData.OpeningBank}}</span>
+          <span :class="EnterpriseData.OpeningBank?'':'is-gray'">{{EnterpriseData.OpeningBank || '未填写'}}</span>
         </li>
         <li>
           <label for="">银行账号：</label>
-          <span>{{EnterpriseData.BankAccount}}</span>
+          <span :class="EnterpriseData.BankAccount?'':'is-gray'">{{EnterpriseData.BankAccount || '未填写'}}</span>
         </li>
         <li style="margin-top:18px">
           <label for="">当前状态：</label>
