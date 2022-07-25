@@ -1,9 +1,10 @@
 <template>
+  <span v-if="!InputContent && !Allow" class="mp-erp-number-type-element-display-span-comp">{{content}}</span>
   <el-input
     @focus="onFocus($event, 'inp')"
     @blur="onBlur"
     v-model.trim.lazy="content"
-    v-if="!InputContent || isNumberic"
+    v-else-if="!InputContent || isNumberic"
     size="small"
     class="mp-erp-number-type-element-display-input-comp"
     maxlength="9"
@@ -12,6 +13,7 @@
   ></el-input>
   <CanFreeCreateSelectComp
     v-else
+    ref="oSelectWrap"
     :allow-create="Allow"
     :placeholder="placeholder"
     :DisplayWidth='DisplayWidth'
@@ -110,6 +112,10 @@ export default {
 };
 </script>
 <style lang='scss'>
+.mp-erp-number-type-element-display-span-comp {
+  margin-left: 21px;
+  margin-right: 0px;
+}
 .mp-erp-number-type-element-display-input-comp {
   .el-input__inner {
     font-size: 12px;

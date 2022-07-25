@@ -2,6 +2,7 @@
   <el-input
     @focus="onFocus($event, 'inp')"
     @blur="onBlur"
+    ref="oInp"
     v-model.trim.lazy="content"
     v-if="AllowCreate && filterOptions.length === 0"
     size="small"

@@ -302,7 +302,7 @@ export default {
                   const targetCounty = CountyList.find(
                     (it) => it.Name === district,
                   );
-                  if (targetCity) {
+                  if (targetCounty) {
                     ExpressArea.CountyID = targetCounty.ID;
                     ExpressArea.CountyName = targetCounty.Name;
                   }

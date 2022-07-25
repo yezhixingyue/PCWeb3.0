@@ -9,6 +9,7 @@
     <NumberTypeItemComp
      class="element-type-content"
      contentBefore=''
+     ref="oNumBox"
      :CtrlZIndex='CtrlZIndex'
      v-if="Property.Type === 1"
      v-model.lazy="PropValue"
@@ -53,6 +54,8 @@
      @blur="onBlur" />
     <span v-if="Property.Unit">{{Property.Unit}}</span>
     <HelpTipsComp :tipsData='localTipData' :title="localTipTitle" />
+    <span class="define-intro" @click="onDefineIntroCLick"
+     v-if="Property.Type === 1 && Property.NumbericAttribute.InputContent && Property.NumbericAttribute.AllowCustomer">( 可输入自定义{{Property.Name}} )</span>
   </div>
 </template>
 
@@ -281,6 +284,15 @@ export default {
       }
       return null;
     },
+    onDefineIntroCLick() {
+      if (this.$refs.oNumBox && this.$refs.oNumBox.$refs.oSelectWrap) {
+        if (this.$refs.oNumBox.$refs.oSelectWrap.$refs.oSelect) {
+          this.$refs.oNumBox.$refs.oSelectWrap.$refs.oSelect.focus();
+        } else if (this.$refs.oNumBox.$refs.oSelectWrap.$refs.oInp) {
+          this.$refs.oNumBox.$refs.oSelectWrap.$refs.oInp.focus();
+        }
+      }
+    },
   },
   watch: {
     switchDisabledOrHidden: { // 之前使用switchDisabledOrHidden，判断不准确修改为该值
@@ -325,6 +337,11 @@ export default {
   > span {
     font-size: 12px;
     color: #888;
+
+    &.define-intro {
+      margin-left: 15px;
+      color: #bbbccc;
+    }
   }
   // .el-input.is-disabled .el-input__inner {
   //   color: rgba($color: #000000, $alpha: 0);
