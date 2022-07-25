@@ -276,18 +276,7 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
         if (val === InvoiceTypeEnums.special.ID && (!this.originEnterpriseData || this.fetchEnterpriseDataError)) {
           this.$emit('switchToEnterprise');
         }
-        if (val === InvoiceTypeEnums.special.ID && !this.onlyEnterprise) {
-          this.rules.RegisteredAddress.unshift({ required: true, message: '请填写企业注册地址', trigger: 'blur' });
-          this.rules.RegisteredTelephone.unshift({ required: true, message: '请填写企业注册电话', trigger: 'blur' });
-          this.rules.OpeningBank.unshift({ required: true, message: '请填写企业开户银行名称', trigger: 'blur' });
-          this.rules.BankAccount.unshift({ required: true, message: '请填写企业开户银行账号', trigger: 'blur' });
-        }
-        if (val !== InvoiceTypeEnums.special.ID) {
-          this.rules.RegisteredAddress = this.rules.RegisteredAddress.filter(it => !it.required);
-          this.rules.RegisteredTelephone = this.rules.RegisteredTelephone.filter(it => !it.required);
-          this.rules.OpeningBank = this.rules.OpeningBank.filter(it => !it.required);
-          this.rules.BankAccount = this.rules.BankAccount.filter(it => !it.required);
-        }
+        this.handleRulesChangeByTypeSwitch();
       },
     },
     localTitle: {
@@ -360,6 +349,21 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
     resetFormByEnterpriseData() {
       if (this.originEnterpriseData && typeof this.originEnterpriseData === 'object') {
         this.ruleForm.setEnterpriseInfo(this.originEnterpriseData);
+      }
+      this.handleRulesChangeByTypeSwitch();
+    },
+    handleRulesChangeByTypeSwitch() {
+      if (this.ruleForm.InvoiceType === InvoiceTypeEnums.special.ID && !this.onlyEnterprise) {
+        this.rules.RegisteredAddress.unshift({ required: true, message: '请填写企业注册地址', trigger: 'blur' });
+        this.rules.RegisteredTelephone.unshift({ required: true, message: '请填写企业注册电话', trigger: 'blur' });
+        this.rules.OpeningBank.unshift({ required: true, message: '请填写企业开户银行名称', trigger: 'blur' });
+        this.rules.BankAccount.unshift({ required: true, message: '请填写企业开户银行账号', trigger: 'blur' });
+      }
+      if (this.ruleForm.InvoiceType !== InvoiceTypeEnums.special.ID) {
+        this.rules.RegisteredAddress = this.rules.RegisteredAddress.filter(it => !it.required);
+        this.rules.RegisteredTelephone = this.rules.RegisteredTelephone.filter(it => !it.required);
+        this.rules.OpeningBank = this.rules.OpeningBank.filter(it => !it.required);
+        this.rules.BankAccount = this.rules.BankAccount.filter(it => !it.required);
       }
     },
   },

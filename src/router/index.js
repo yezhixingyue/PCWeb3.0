@@ -187,16 +187,16 @@ const routes = [
           // },
         ],
       },
-      {
-        path: '/serviceAfterSales',
-        name: 'serviceAfterSales',
-        meta: {
-          requiresAuth: true,
-          y: 0,
-          title: '售后单列表 - 郑州名片之家电子商务有限公司',
-        },
-        component: () => import('../views/serviceAfterSales/serviceAfterSalesPage.vue'),
-      },
+      // {
+      //   path: '/serviceAfterSales',
+      //   name: 'serviceAfterSales',
+      //   meta: {
+      //     requiresAuth: true,
+      //     y: 0,
+      //     title: '售后单列表 - 郑州名片之家电子商务有限公司',
+      //   },
+      //   component: () => import('../views/serviceAfterSales/serviceAfterSalesPage.vue'),
+      // },
       {
         path: '/bill',
         name: 'bill',
