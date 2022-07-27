@@ -12,7 +12,7 @@ if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-develo
   proxyUrl = 'http://erp.ybz888.com';
 }
 if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'withPcPath') { // 打包测试环境的代码(路径中带/pc/)
-  publicPath = '/pc2/';
+  publicPath = '/pc/';
 }
 
 module.exports = {
