@@ -273,7 +273,7 @@ export default {
         .trim();
       let fetchRegionalOK = true;
       if (this.RegionalList.length === 0) {
-        const resp = await this.api.getAddressIDList(-1).catch(() => {}); // RegionalList
+        const resp = await this.api.getAddressIDList(-1).catch(() => null); // RegionalList
         if (resp && resp.data.Status === 1000) {
           this.RegionalList = resp.data.Data;
         } else {
@@ -285,7 +285,7 @@ export default {
       if (t) {
         ExpressArea.RegionalID = t.ID;
         ExpressArea.RegionalName = t.Name;
-        const CityData = await this.api.getAddressIDList(t.ID).catch(() => {}); // CountyList
+        const CityData = await this.api.getAddressIDList(t.ID).catch(() => null); // CountyList
         if (CityData && CityData.data.Status === 1000) {
           CityList = CityData.data.Data;
           if (city) {
