@@ -271,7 +271,11 @@ export default {
       state.productClassify = list;
     },
     setProductNames(state, list) {
-      state.productNames = list;
+      console.log(list);
+      state.productNames = list.map(it => ({
+        ...it,
+        ClassName: it.ShowName,
+      }));
     },
     /* 设置报价产品类别弹窗展示状态
     -------------------------------*/
@@ -546,7 +550,7 @@ export default {
           commit('setProductClassify', classifyDate.data.Data);
         }
         if (namesDate.data.Status === 1000) {
-          commit('setProductNames', namesDate.data.Data);
+          commit('setProductNames', namesDate.data.Data || []);
         }
         if (namesDate.data.Status === 1000 && classifyDate.data.Status === 1000) return true;
         return false;

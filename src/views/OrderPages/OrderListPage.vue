@@ -4,14 +4,15 @@
       <ul class="header-content">
         <li>
           <SingleSelector v-model="OrderStatus" :optionList='OrderStatusList' title="订单状态" />
-          <ProductSelector
+          <!-- <ProductSelector
           :changePropsFunc='setCondition4OrderList'
           :requestFunc='getOrderList'
           :ClassID='condition4OrderList.ProductClass.First'
           :TypeID='condition4OrderList.ProductClass.Second'
           :ProductID='condition4OrderList.ProductID'
           :typeList="[['ProductClass', 'First'],['ProductClass', 'Second'],['ProductID', '']]"
-         />
+         /> -->
+         <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
         </li>
         <li class="second">
           <LineDateSelectorComp
@@ -97,24 +98,28 @@
 <script>
 // import { debounce } from '@/assets/js/utils/throttle';
 import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
-import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import Count from '@/components/common/Count.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
 import TableComp from '@/components/OrderListComps/TableComp/index.vue';
-import { mapState, mapMutations, mapActions } from 'vuex';
+import {
+  mapState, mapMutations, mapActions, mapGetters,
+} from 'vuex';
+// import ProductSelector from '../../components/common/Selector/ProductSelectorIndex.vue';
 import CommonClassType from '../../store/CommonClassType';
 import MyScrollBar from '../../components/common/MyScrollBar.vue';
+import EpCascader from '../../packages/EpCascader/index.vue';
 
 export default {
   components: {
     SingleSelector,
-    ProductSelector,
+    // ProductSelector,
     LineDateSelectorComp,
     SearchInputComp,
     Count,
     TableComp,
     MyScrollBar,
+    EpCascader,
   },
   data() {
     return {
@@ -128,6 +133,7 @@ export default {
   computed: {
     ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
     ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount', 'showOrderListNumber', 'loading']),
+    ...mapGetters('Quotation', ['allProductClassify']),
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },
@@ -182,6 +188,26 @@ export default {
     },
     showTable() {
       return this.OrderList.length > 0 || this.OrderListNumber > 0;
+    },
+    EpCascaderProductValue: {
+      get() {
+        const list = [
+          this.condition4OrderList.ProductClass.First,
+          this.condition4OrderList.ProductClass.Second,
+          this.condition4OrderList.ProductID,
+        ];
+        return list.filter(it => it || it === 0);
+      },
+      set(ids) {
+        const [_First, _Second, _ProductID] = ids;
+        const First = _First || _First === 0 ? _First : '';
+        const Second = _Second || _Second === 0 ? _Second : '';
+        const ProductID = _ProductID || _ProductID === 0 ? _ProductID : '';
+        this.setCondition4OrderList([['ProductClass', 'First'], First]);
+        this.setCondition4OrderList([['ProductClass', 'Second'], Second]);
+        this.setCondition4OrderList([['ProductID', ''], ProductID]);
+        this.getOrderList();
+      },
     },
   },
   methods: {

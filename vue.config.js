@@ -2,8 +2,8 @@
 const TerserPlugin = require('terser-webpack-plugin');
 
 // let proxyUrl = 'http://192.168.3.253';
-// let proxyUrl = 'http://192.168.3.68:8050';
-let proxyUrl = 'http://erp.ybz888.com/';
+let proxyUrl = 'http://192.168.3.68:8050';
+// let proxyUrl = 'http://erp.ybz888.com/';
 let publicPath = '';
 // 测试开发环境：调用92接口
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-development') proxyUrl = 'http://192.168.1.92:8050';

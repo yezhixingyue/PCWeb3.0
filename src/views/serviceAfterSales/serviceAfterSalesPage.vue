@@ -5,14 +5,15 @@
         <ul class="header-content">
           <li>
             <SingleSelector v-model="AfterSalesStatus" :optionList='AfterSalesStatusList' title="售后进度" />
-            <ProductSelector
+            <!-- <ProductSelector
               :changePropsFunc='setCondition4ServiceAfterSaleList'
               :requestFunc='getServiceAfterSaleList'
               :ClassID='condition4ServiceAfterSaleList.Product.ClassID'
               :TypeID='condition4ServiceAfterSaleList.Product.TypeID'
               :ProductID='condition4ServiceAfterSaleList.Product.ProductID'
               :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
-            />
+            /> -->
+            <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
           </li>
           <li class="second">
           <LineDateSelectorComp
@@ -140,15 +141,18 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import {
+  mapState, mapGetters, mapMutations, mapActions,
+} from 'vuex';
 import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
 import EstimateDialogComp from '@/components/common/EstimateDialogComp/EstimateDialogComp.vue';
 import SeeEstimateDialogComp from '@/components/common/EstimateDialogComp/SeeEstimateDialogComp.vue';
-import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
+// import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
 import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
 import CommonClassType from '../../store/CommonClassType';
+import EpCascader from '../../packages/EpCascader/index.vue';
 
 export default {
   components: {
@@ -157,12 +161,34 @@ export default {
     SearchInputComp,
     EstimateDialogComp,
     SeeEstimateDialogComp,
-    ProductSelector,
+    // ProductSelector,
     SingleSelector,
+    EpCascader,
   },
   computed: {
     ...mapState('common', ['ScrollInfo']),
     ...mapState('summary', ['condition4ServiceAfterSaleList', 'ServiceAfterSaleList', 'ServiceAfterSaleListNumber']),
+    ...mapGetters('Quotation', ['allProductClassify']),
+    EpCascaderProductValue: { // :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
+      get() {
+        const list = [
+          this.condition4ServiceAfterSaleList.Product.ClassID,
+          this.condition4ServiceAfterSaleList.Product.TypeID,
+          this.condition4ServiceAfterSaleList.Product.ProductID,
+        ];
+        return list.filter(it => it || it === 0);
+      },
+      set(ids) {
+        const [_First, _Second, _ProductID] = ids;
+        const First = _First || _First === 0 ? _First : '';
+        const Second = _Second || _Second === 0 ? _Second : '';
+        const ProductID = _ProductID || _ProductID === 0 ? _ProductID : '';
+        this.setCondition4ServiceAfterSaleList([['Product', 'ClassID'], First]);
+        this.setCondition4ServiceAfterSaleList([['Product', 'TypeID'], Second]);
+        this.setCondition4ServiceAfterSaleList([['Product', 'ProductID'], ProductID]);
+        this.getServiceAfterSaleList();
+      },
+    },
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
     },

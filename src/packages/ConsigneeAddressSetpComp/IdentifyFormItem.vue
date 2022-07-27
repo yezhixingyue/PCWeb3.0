@@ -293,18 +293,21 @@ export default {
             if (targetCity) {
               ExpressArea.CityID = targetCity.ID;
               ExpressArea.CityName = targetCity.Name;
-              const CountyData = await this.api
-                .getAddressIDList(targetCity.ID)
-                .catch(() => {}); // CountyList
+              const CountyData = await this.api.getAddressIDList(targetCity.ID).catch(() => {}); // CountyList
               if (CountyData && CountyData.data.Status === 1000) {
                 CountyList = CountyData.data.Data;
-                if (district) {
-                  const targetCounty = CountyList.find(
-                    (it) => it.Name === district,
-                  );
-                  if (targetCounty) {
-                    ExpressArea.CountyID = targetCounty.ID;
-                    ExpressArea.CountyName = targetCounty.Name;
+                if (CountyList.length > 0) {
+                  if (targetCity.IsVirtual) {
+                    ExpressArea.CountyID = CountyList[0].ID;
+                    ExpressArea.CountyName = CountyList[0].Name;
+                  } else if (district) {
+                    const targetCounty = CountyList.find(
+                      (it) => it.Name === district,
+                    );
+                    if (targetCounty) {
+                      ExpressArea.CountyID = targetCounty.ID;
+                      ExpressArea.CountyName = targetCounty.Name;
+                    }
                   }
                 }
               }

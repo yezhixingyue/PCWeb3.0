@@ -5,14 +5,15 @@
         <li class="top">
           <span style="display:flex">
             <SingleSelector v-model="OrderStatus" :optionList='OrderStatusList' title="订单状态" />
-            <ProductSelector
+            <!-- <ProductSelector
               :changePropsFunc='setCondition4Feedback'
               :requestFunc='getListData4Feedback'
               :ClassID='condition4FeedbackList.Product.ClassID'
               :TypeID='condition4FeedbackList.Product.TypeID'
               :ProductID='condition4FeedbackList.Product.ProductID'
               :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
-            />
+            /> -->
+            <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
           </span>
           <LookOverAfterSale></LookOverAfterSale>
         </li>
@@ -86,23 +87,27 @@
 <script>
 import ListTable from '@/components/FeedbackComps/ListTable.vue';
 import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
-import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
+// import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
 import LookOverAfterSale from '@/components/ServiceAfterSales/LookOverAfterSale.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
-import { mapState, mapMutations, mapActions } from 'vuex';
+import {
+  mapState, mapGetters, mapMutations, mapActions,
+} from 'vuex';
 import Count from '@/components/common/Count.vue';
 import CommonClassType from '../../store/CommonClassType';
+import EpCascader from '../../packages/EpCascader/index.vue';
 
 export default {
   components: {
     Count,
     ListTable,
     SingleSelector,
-    ProductSelector,
+    // ProductSelector,
     LookOverAfterSale,
     SearchInputComp,
     LineDateSelectorComp,
+    EpCascader,
   },
   data() {
     return {
@@ -123,6 +128,7 @@ export default {
   computed: {
     // ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
     ...mapState('common', ['FeedbackProgress', 'ScrollInfo']),
+    ...mapGetters('Quotation', ['allProductClassify']),
     // eslint-disable-next-line max-len
     ...mapState('summary', ['RejectReasonList', 'listData', 'needFetchListData', 'listDataNumber', 'condition4FeedbackList', 'FeedbackList', 'FeedbackDataNumber']),
     // QuestionList() {
@@ -177,6 +183,26 @@ export default {
     },
     scrollChange() { // 滚动条
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
+    },
+    EpCascaderProductValue: { // :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
+      get() {
+        const list = [
+          this.condition4FeedbackList.Product.ClassID,
+          this.condition4FeedbackList.Product.TypeID,
+          this.condition4FeedbackList.Product.ProductID,
+        ];
+        return list.filter(it => it || it === 0);
+      },
+      set(ids) {
+        const [_First, _Second, _ProductID] = ids;
+        const First = _First || _First === 0 ? _First : '';
+        const Second = _Second || _Second === 0 ? _Second : '';
+        const ProductID = _ProductID || _ProductID === 0 ? _ProductID : '';
+        this.setCondition4Feedback([['Product', 'ClassID'], First]);
+        this.setCondition4Feedback([['Product', 'TypeID'], Second]);
+        this.setCondition4Feedback([['Product', 'ProductID'], ProductID]);
+        this.getListData4Feedback();
+      },
     },
     // DownLoadConfigObj() { // 不需要导出功能了
     //   return {
