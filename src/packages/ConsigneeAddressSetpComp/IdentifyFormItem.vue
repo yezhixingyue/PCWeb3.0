@@ -385,6 +385,7 @@ export default {
         if (!this.placeSearch && window.AMap) {
           this.placeSearch = new window.AMap.PlaceSearch({
             extensions: 'all',
+            pageSize: 1,
           });
         }
         if (this.placeSearch) {
