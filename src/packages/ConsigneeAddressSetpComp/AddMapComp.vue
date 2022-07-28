@@ -94,7 +94,7 @@
          v-loading="mapIsLoading">
         </div>
       </li>
-      <li style="text-align:center;padding-top: 8px" v-show="(newAdd.HavePosition || openType==='tempAdd') && !HaveAddressContentChange">
+      <li style="text-align:center;padding-top: 8px" v-show="(newAdd.HavePosition || openType==='tempAdd') && !HaveAddressContentChange && canMpzj">
         <span class="is-pink is-font-16">请在地图上选择准确位置，否则会造成货物无法正常配送，影响您的正常使用！</span>
       </li>
     </ul>
@@ -664,6 +664,10 @@ export default {
           this.RegionalList = res.data.Data;
         }
       }
+
+      // if (!this.canMpzj) {
+      //   this.handleSubmit('ruleForm');
+      // }
     },
     handleBeforeDiaClose() {
       if ((this.openType === 'tempAdd') && !this.canClose) {

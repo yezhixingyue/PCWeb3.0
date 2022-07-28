@@ -23,6 +23,8 @@
       <el-button
         size="mini"
         type="primary"
+        style="height: 28px"
+        :loading="OutPlateNoLoading"
         @click="submitForm('oIdentifyForm')"
         :disabled="
           OutPlateNoLoading ||
@@ -273,7 +275,9 @@ export default {
         .trim();
       let fetchRegionalOK = true;
       if (this.RegionalList.length === 0) {
+        this.OutPlateNoLoading = true;
         const resp = await this.api.getAddressIDList(-1).catch(() => null); // RegionalList
+        this.OutPlateNoLoading = false;
         if (resp && resp.data.Status === 1000) {
           this.RegionalList = resp.data.Data;
         } else {
@@ -285,7 +289,9 @@ export default {
       if (t) {
         ExpressArea.RegionalID = t.ID;
         ExpressArea.RegionalName = t.Name;
+        this.OutPlateNoLoading = true;
         const CityData = await this.api.getAddressIDList(t.ID).catch(() => null); // CountyList
+        this.OutPlateNoLoading = false;
         if (CityData && CityData.data.Status === 1000) {
           CityList = CityData.data.Data;
           if (city) {
@@ -293,7 +299,9 @@ export default {
             if (targetCity) {
               ExpressArea.CityID = targetCity.ID;
               ExpressArea.CityName = targetCity.Name;
+              this.OutPlateNoLoading = true;
               const CountyData = await this.api.getAddressIDList(targetCity.ID).catch(() => {}); // CountyList
+              this.OutPlateNoLoading = false;
               if (CountyData && CountyData.data.Status === 1000) {
                 CountyList = CountyData.data.Data;
                 if (CountyList.length > 0) {
@@ -331,7 +339,9 @@ export default {
       // 详细地址处理
       const { address, Mobile, Consignee } = this.handleDetailAddressStrSplit(str); // { Consignee, Mobile, address }
       if (address) {
+        this.OutPlateNoLoading = true;
         const result = await this.placeSearchByAMap(address).catch(() => null);
+        this.OutPlateNoLoading = false;
         if (result) {
           this.handleMapSearchedSuccess(result, address, Consignee, Mobile);
         }
