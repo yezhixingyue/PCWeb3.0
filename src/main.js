@@ -8,6 +8,7 @@ import api from './api/index';
 import '@/assets/js/utils/dialogDrag';
 import '@/assets/js/utils/filter';
 import './packages/commonFilters';
+import './packages/directive';
 import './assets/css/common.scss';
 import './assets/css/summary.scss';
 import './assets/css/iconfont/iconfont.css';
@@ -16,6 +17,8 @@ import utils from './assets/js/utils/utils';
 import './assets/js/filters/filters';
 import './assets/js/utils/loadElement';
 import validateCheck from './assets/js/validator/validateCheck';
+
+import './api/mock';
 
 Vue.config.productionTip = false;
 Vue.prototype.validateCheck = validateCheck;

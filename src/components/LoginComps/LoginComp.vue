@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="ruleForm" :rules="rules" :disabled='formDisabled'
+  <el-form :model="ruleForm" :rules="rules" :disabled='formDisabled' @submit.native.prevent
     ref="ruleForm" label-width="0px" class="demo-ruleForm">
     <el-form-item prop="Mobile">
       <el-input placeholder="请输入手机号码" clearable v-model.trim="Mobile">

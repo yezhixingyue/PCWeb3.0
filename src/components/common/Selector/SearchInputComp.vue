@@ -2,15 +2,12 @@
   <section class="mp-common-comps-search-box">
     <span class="text">{{title}}：</span>
     <input
-      @keydown.enter="onKeyWordSubmit"
+      @keyup.enter="onKeyWordSubmit"
       v-model.trim='inpVal'
       spellcheck="false"
       :placeholder="placeholder"
       type="text"
     />
-    <!-- <button class="mp-search-box-btn" @click="onKeyWordSubmit">
-      <i></i>
-    </button> -->
     <el-button icon="el-icon-search" type="primary" @click="onKeyWordSubmit"></el-button>
     <button
      class="order-header-reset-btn" v-if="showResetBtn" @click="onResetBtn">{{resetWords}}</button>
@@ -58,32 +55,17 @@ export default {
       default: 0,
     },
   },
-  // computed: {
-  //   inpValue: {
-  //     get() {
-  //       return this.word;
-  //     },
-  //     set(newVal) {
-  //       this.changePropsFunc([this.typeList[0], newVal]);
-  //     },
-  //   },
-  // },
   data() {
     return {
       inpVal: '',
     };
   },
   methods: {
-    onKeyWordSubmit() {
+    onKeyWordSubmit(e) {
       const _keywords = this.inpVal;
       this.changePropsFunc([this.typeList[0], _keywords]);
-      // if (this.inpVal) {
-      // this.$emit('reset');
-      // this.changePropsFunc([this.typeList[0], _keywords]);
       this.handleThrottleFunc();
-      // } else {
-      //   this.onResetBtn();
-      // }
+      e.target.blur();
     },
     onResetBtn() {
       this.$emit('reset');
@@ -111,9 +93,6 @@ export default {
   padding-top: 2px;
   text-align: right;
   font-size: 14px;
-  // @media screen and (max-width: 1600px) {
-  //   padding-right: 30px;
-  // }
   display: inline-block;
   > span:first-of-type {
     font-weight: 600;
@@ -139,6 +118,10 @@ export default {
     font-size: 12px;
     border-radius: 4px;
     transition: 0.3s;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    &:hover {
+      border-color: #aaa;
+    }
     &:focus {
       border-color: #428dfa;
     }
@@ -156,21 +139,10 @@ export default {
     color: #fff;
     user-select: none;
     cursor: pointer;
-    // border-radius: 2px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
-    // background-color: $--color-primary;
-    // border: 1px solid #26bcf9 !important;
-    // &:hover {
-    //   background-color: $--color-text-btn-hover;
-    //   border-color: #009EF9 !important;
-    // }
-    // &:active {
-    //   background-color: $--color-primary-light;
-    //   border-color: #35dff9 !important;
-    // }
   }
   > .order-header-reset-btn {
     user-select: none;
@@ -185,8 +157,6 @@ export default {
     border-radius: 2px;
     &:hover {
       background-color: $--color-white;
-      // color: $--color-white;
-      // transform: scale(1.1);
       box-shadow: 0 0px 1px 1px rgba(38, 188, 249, 0.2);
     }
     &:active {
@@ -194,7 +164,6 @@ export default {
       background-color: rgba(168, 168, 168, 0.1);
     }
     color: $--color-primary;
-    // border: 1px solid $--color-primary;
     height: 30px;
     cursor: pointer;
   }
@@ -206,7 +175,6 @@ export default {
     display: block;
     height: 20px;
     width: 100%;
-    // background: url("../../assets/images/search.png") center center no-repeat;
   }
   > button.order-header-reset-btn {
     line-height: 26px !important;

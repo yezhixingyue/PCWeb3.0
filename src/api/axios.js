@@ -159,11 +159,11 @@ const handleResponse = async (response) => {
 axios.interceptors.response.use(
   handleResponse,
   async (error) => {
-    if (error.response && error.response.status === 200) {
-      // 未知错误 --- 该情况已验证 - 不会出现 - 后续可删除
-      sendError(error, true);
-      return handleResponse(error.response);
-    }
+    // if (error.response && error.response.status === 200) {
+    //   // 未知错误 --- 该情况已验证 - 不会出现 - 后续可删除
+    //   sendError(error, true);
+    //   return handleResponse(error.response);
+    // }
     localCancelToken.removeCancelToken(error.config || '');
     if (getShowLoading(error.config) && loadingInstance) handleLoadingClose();
     if (error.response) {
@@ -267,5 +267,7 @@ axios.interceptors.response.use(
 );
 
 if (baseUrl) axios.defaults.baseURL = baseUrl;
+// axios.defaults.baseURL = baseUrl;
+// axios.defaults.timeout = 5 * 60 * 1000;
 
 export default axios;

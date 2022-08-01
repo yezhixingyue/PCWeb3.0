@@ -366,12 +366,12 @@ export default {
     position: relative;
     &::after {
       content: '';
-      height: 2px;
+      height: 3px;
       width: 100%;
       position: absolute;
       background-color: #428DFA;
       bottom: 0px;
-      left: -100%;
+      left: -101%;
       transition: 0.2s;
     }
     overflow: hidden;
