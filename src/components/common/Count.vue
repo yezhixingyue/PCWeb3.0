@@ -1,20 +1,21 @@
 <template>
   <div class="count-wrap">
-        <slot></slot>
-        <div class="mp-pagination-wrap">
-          <el-pagination
-            @current-change="handleCurrentChange"
-            :current-page.sync="currentPage"
-            hide-on-single-page
-            :page-size="pageSize"
-            :pager-count='5'
-            layout="prev, pager, next, jumper"
-            :total="count">
-          </el-pagination>
-        </div>
-        <span class="count" :class="DownLoadConfigObj?'exc':''"
-          >共检索出<i class="is-pink is-font-16">{{showCount || count}}</i>{{rightContent}}</span>
-        <DownLoadExcelComp :configObj="DownLoadConfigObj" v-if="DownLoadConfigObj" />
+    <slot></slot>
+    <div class="mp-pagination-wrap">
+      <el-pagination
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage"
+        hide-on-single-page
+        :page-size="pageSize"
+        :pager-count='5'
+        layout="prev, pager, next, jumper"
+        :total="count">
+      </el-pagination>
+    </div>
+    <span class="count" :class="DownLoadConfigObj?'exc':''"
+      >共检索出<i class="is-pink is-font-16">{{showCount || count}}</i>{{rightContent}}</span>
+    <DownLoadExcelComp :configObj="DownLoadConfigObj" v-if="DownLoadConfigObj" class="load" />
+    <slot name="right"></slot>
 </div>
 </template>
 
@@ -145,7 +146,7 @@ export default {
       right: 182px;
     }
   }
-  > button {
+  > button.load {
     position: absolute;
     right: 0;
     top: 2px;

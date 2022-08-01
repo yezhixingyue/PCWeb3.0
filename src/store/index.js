@@ -7,14 +7,16 @@ import unpayList from './unpayList';
 import shoppingCar from './shoppingCar';
 import timeSelectModule from './timeSelectModule';
 import Quotation from './Quotation/Quotation';
+import invoice from './Invoice/invoiceStore';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   strict: process.env.NODE_ENV === 'development',
   modules: {
     order,
     common,
+    invoice,
     summary,
     Quotation,
     unpayList,
@@ -22,3 +24,5 @@ export default new Vuex.Store({
     timeSelectModule,
   },
 });
+
+export default store;

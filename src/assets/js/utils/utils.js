@@ -180,6 +180,18 @@ export const handleScrollAfterGetPriceFailed = (dom, topDis = 130, bottomDis = 0
   }
 };
 
+let oApp;
+export const scrollToTop = (top = 0) => {
+  if (!oApp) {
+    oApp = document.getElementById('app');
+  }
+  if (oApp) {
+    setTimeout(() => {
+      oApp.scrollTop = top;
+    }, 0);
+  }
+};
+
 export default {
   isEqual,
   isGreatThen,
@@ -197,4 +209,5 @@ export default {
   getIsOrNotHasRepeatItemInArray,
   getNameFromListByIDs,
   handleScrollAfterGetPriceFailed,
+  scrollToTop,
 };

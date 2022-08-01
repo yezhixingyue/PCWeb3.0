@@ -93,7 +93,7 @@
               <span class="m">{{formatCustomerSN(customerInfo.CustomerSN)}}</span>
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
-            <el-dropdown-menu slot="dropdown" class="mp-pc-my-set-drop-down-wrap">
+            <el-dropdown-menu slot="dropdown" class="mp-pc-my-set-drop-down-wrap mp-scroll-wrap">
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingAccount'}"
                 command='account' icon="el-icon-user-solid">企业信息</el-dropdown-item>
@@ -115,6 +115,12 @@
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingChangeMobile'}"
                 command='changeMobile' icon="el-icon-s-order">修改手机号</el-dropdown-item>
+              <el-dropdown-item v-if="hasInvoicePermission"
+                :class="{active: ['InvoiceMakeupListPage', 'InvoiceCombineMakeupPage'].includes($route.name)}"
+                command='invoiceMakeup' icon="fapiao iconfont icon-fapiao">发票开具</el-dropdown-item>
+              <el-dropdown-item v-if="hasInvoicePermission"
+                :class="{active: ['InvoiceSearchListPage', 'InvoiceSearchDetailPage'].includes($route.name)}"
+                command='invoiceSearch' icon="fapiao iconfont icon-zaitu">发票查询</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingPage'}"
                 command='setup' icon="el-icon-s-tools">我的设置</el-dropdown-item>
@@ -176,6 +182,9 @@ export default {
     ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
+    },
+    hasInvoicePermission() {
+      return this.customerInfo && this.customerInfo.PermissionInfo?.ApplyInvoice;
     },
   },
   data() {
@@ -268,8 +277,9 @@ export default {
             sessionStorage.removeItem('token');
             localStorage.removeItem('token');
             Cookie.removeCookie('token');
-            this.$router.replace('/login');
+            // this.$router.replace('/login');
             // 另外再需清除状态
+            window.location.reload();
           },
         });
         return;
@@ -297,13 +307,25 @@ export default {
         case 'changeMobile':
           _path = '/mySetting/changeMobile';
           break;
+        case 'invoiceMakeup':
+          _path = '/mySetting/invoiceMakeup';
+          // if (this.$route.name === 'InvoiceCombineMakeupPage') {
+          //   _path = '';
+          // }
+          break;
+        case 'invoiceSearch':
+          _path = '/mySetting/invoiceSearch';
+          // if (this.$route.name === 'InvoiceSearchDetailPage') {
+          //   _path = '';
+          // }
+          break;
         case 'setup':
           _path = '/mySetting/setting';
           break;
         default:
           break;
       }
-      if (this.$route.path !== _path) this.$router.push(_path);
+      if (_path && this.$route.path !== _path) this.$router.push(_path);
     },
     onErrorLoginCLick() {
       sessionStorage.removeItem('token');
@@ -791,6 +813,11 @@ export default {
       font-size: 16px;
       margin-right: 8px;
       vertical-align: -8%;
+      &.fapiao {
+        font-size: 17px;
+        vertical-align: -1px;
+        font-weight: 300;
+      }
     }
     > span {
       font-size: 17px;
@@ -805,5 +832,8 @@ export default {
       }
     }
   }
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  overflow-y: overlay;
 }
 </style>

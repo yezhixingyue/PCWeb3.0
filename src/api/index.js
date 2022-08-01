@@ -340,6 +340,36 @@ const api = {
   getPrintBeanRechargeCancle(payCode) { // Delate请求 /Api/PrintBean/Recharge/Cancle 参数：payCode//付款单号  取消印豆购买条目
     return instance.delete('/Api/PrintBean/Recharge/Cancle', { params: { payCode } });
   },
+  /* 发票相关 api
+   ----------------------------------------------------------------------------------- */
+  getOrderInvoiceList(condition) { // POST /Api/OrderInvoice/List  获取开票订单列表
+    return instance.post('/Api/OrderInvoice/List', condition);
+  },
+  // getInvoiceOrderSelect(data) { // POST /Api/Invoice/OrderSelect  提交发票开具订单
+  //   return instance.post('/Api/Invoice/OrderSelect', data);
+  // },
+  getInvoiceMakeoutCombine(data) { // 'POST /Api/Invoice/UseCategory'  合并开票 --- 临时使用 -- 接口地址会更改
+    return instance.post('/Api/Invoice/UseCategory', data);
+  },
+  getInvoiceEnterpriseDetail() { // GET /Api/InvoiceEnterprise/Detail  发票企业信息 -- 包含审核状态
+    return instance.get('/Api/InvoiceEnterprise/Detail');
+  },
+  getInvoiceHistoryDetail() { // GET /Api/InvoiceHistory/Detail  获取历史开票收票人信息
+    return instance.get('/Api/InvoiceHistory/Detail');
+  },
+  getInvoiceSave(data) { // POST /Api/Invoice/Save   提交发票开具
+    return instance.post('/Api/Invoice/Save', data);
+  },
+  getInvoiceList(condition) { // POST /Api/Invoice/List  发票查询列表数据
+    return instance.post('/Api/Invoice/List', condition);
+  },
+  getInvoiceDetail(invoiceID) { // GET /Api/Invoice/Detail    发票详情
+    return instance.get('/Api/Invoice/Detail', { params: { invoiceID } });
+  },
+  // getInvoiceCancel(invoiceID) { // GET /Api/Invoice/Cancel  取消
+  //   return instance.get('/Api/Invoice/Cancel', { params: { invoiceID } });
+  // },
+
 };
 
 export default api;

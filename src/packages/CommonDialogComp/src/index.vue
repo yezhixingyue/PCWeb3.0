@@ -126,6 +126,7 @@ export default {
   methods: {
     onCancleClick() {
       this.$emit('cancle');
+      this.$emit('cancel');
     },
     onSubmitClick(evt) {
       if (!this.dialogVisible) return;
@@ -284,23 +285,21 @@ export default {
     .el-dialog__header > span::before {
       background-color: #428dfa
     }
-    .el-dialog__footer > .dialog-footer > p > button {
-      &.el-button--primary {
-        background: linear-gradient(to right, #428dfa, lighten($color: #428dfa, $amount: 10));
-        border: none;
-        &:hover {
-          opacity: 0.88;
-        }
-        &:active {
-          background: linear-gradient(to right, #1266e4, #428dfa);
-        }
-      }
+    &.mp-erp-common-dialog-comp-wrap .el-dialog__footer > .dialog-footer > p > button {
       &.el-button--default {
         border-color: #428dfa;
         color: #428dfa;
         &:active {
-          border-color: darken($color: #428dfa, $amount: 12);
-          color: darken($color: #428dfa, $amount: 12);
+          border-color: darken($color: #428dfa, $amount: 20);
+          color: darken($color: #428dfa, $amount: 20);
+        }
+      }
+      &.el-button--primary {
+        background: linear-gradient(to right, #428dfa, #26bcf9);
+        background: #428dfa;
+        &:active {
+          background: linear-gradient(to right, darken($color: #428dfa, $amount: 20), darken($color: #26bcf9, $amount: 20));
+          background: darken($color: #428dfa, $amount: 20);
         }
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="ruleForm" label-width="0" :model="{}">
+  <el-form ref="ruleForm" label-width="0" :model="{}" @submit.native.prevent>
     <UploadItem
       v-for="it in FileList"
       :key="it.key"
