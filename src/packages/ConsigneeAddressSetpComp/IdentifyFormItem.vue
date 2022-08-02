@@ -385,7 +385,6 @@ export default {
         if (!this.placeSearch && window.AMap) {
           this.placeSearch = new window.AMap.PlaceSearch({
             extensions: 'all',
-            pageSize: 1,
           });
         }
         if (this.placeSearch) {
@@ -398,7 +397,7 @@ export default {
               && result.poiList.count > 0
               && result.poiList.pois.length > 0
             ) {
-              const [target] = result.poiList.pois;
+              const target = this.getFilterResultFromPois(result.poiList.pois, keywords);
               resolve(target);
             } else {
               if (projectType === 'pc') {
@@ -420,6 +419,24 @@ export default {
           resolve(null);
         }
       });
+    },
+    getFilterResultFromPois(pois, keywords) { // 对高德地图获取到的结果进行筛选
+      if (!Array.isArray(pois) || pois.length === 0) return null;
+
+      const words = keywords.replace(/\s/g, '');
+      const filter = (list, key) => {
+        const _list = list.filter(it => {
+          const str = it[key];
+          return words.includes(str);
+        });
+        return _list.length > 0 ? _list : list;
+      };
+
+      let arr = filter(pois, 'pname');
+      arr = filter(arr, 'cityname');
+      arr = filter(arr, 'adname');
+
+      return arr.length > 0 ? arr[0] : null;
     },
   },
 };

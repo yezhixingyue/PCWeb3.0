@@ -59,6 +59,9 @@
             </el-form-item>
 
             <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList" :required='isUpImg'>
+              <label for="QuestionPicList" slot="label" class="el-form-item__label">上传图片：
+                <span class="remark">拍照时请将成品10份以上呈平铺或扇形展开，并对产品的包装、标签、整体、问题局部特写等多角度拍摄，为您带来麻烦，深表歉意！</span>
+              </label>
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
                 list-type="picture-card"
@@ -705,6 +708,12 @@ export default {
       }
       .el-form-item__label {
         font-weight: 700;
+        .remark {
+          font-weight: 400;
+          font-weight: 500;
+          font-size: 12px;
+          color: #ff3769;
+        }
       }
       .is-disabled + .el-upload {
         display: none;
