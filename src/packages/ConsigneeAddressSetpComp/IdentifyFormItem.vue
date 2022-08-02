@@ -398,6 +398,7 @@ export default {
               && result.poiList.pois.length > 0
             ) {
               const target = this.getFilterResultFromPois(result.poiList.pois, keywords);
+              console.log(target);
               resolve(target);
             } else {
               if (projectType === 'pc') {
@@ -432,9 +433,11 @@ export default {
         return _list.length > 0 ? _list : list;
       };
 
-      let arr = filter(pois, 'pname');
+      let arr = filter(pois, 'adname');
+      if (arr.length === 1) {
+        return arr[0];
+      }
       arr = filter(arr, 'cityname');
-      arr = filter(arr, 'adname');
 
       return arr.length > 0 ? arr[0] : null;
     },
