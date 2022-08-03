@@ -9,6 +9,13 @@ import LocalCancelToken from './CancelToken';
 import sendError from './sendError';
 // import { delay } from '../assets/js/utils/utils';
 
+const getRelativePath = (config) => {
+  if (!config || !config.url) return '';
+  let str = config.url.replace(config.baseURL, '');
+  if (str[0] !== '/') str = `/${str}`;
+  return str ? str.split('?')[0] : str;
+};
+
 const localCancelToken = new LocalCancelToken();
 
 const clearToken = () => {
@@ -25,8 +32,9 @@ const getShowLoading = (config) => { // 查看当前请求是否需要展示弹�
   let showLoading = true;
   const arr = ['/Api/PaymentOrder/PayResult', '/Api/Upload/File', '/Api/FileType/List']; // 不需要展示loading的api地址
   if (config && config.url) {
+    const _url = getRelativePath(config);
     for (let i = 0; i < arr.length; i += 1) {
-      if (config.url.split('?')[0].includes(arr[i]) || config.closeLoading) {
+      if (_url.includes(arr[i]) || config.closeLoading) {
         showLoading = false;
       }
     }
@@ -47,20 +55,20 @@ axios.interceptors.request.use(
 
     if (!token && !useCookie) token = localStorage.getItem('token');
     closeTip = curConfig.closeTip;
-    const url = curConfig.url.split('?')[0];
+    const _url = getRelativePath(config);
     const arrWithOutToken = ['/Api/Customer/Reg', '/Api/Customer/Login'];
-    if (token && !arrWithOutToken.includes(url)) curConfig.headers.common.Authorization = `Bearer ${token}`;
-    if (url === '/Api/Sms/Send/VerificationCode') {
+    if (token && !arrWithOutToken.includes(_url)) curConfig.headers.common.Authorization = `Bearer ${token}`;
+    if (_url === '/Api/Sms/Send/VerificationCode') {
       curConfig.headers.common.SessionID = Cookie.getCookie('SessionID');
     }
     if (getShowLoading(curConfig)) {
       let _color = 'rgba(255, 255, 255, 0.5)';
       let _text = '加载中';
       let _customClass = 'mp-general-loading-box opAnimate';
-      if (url === '/Api/Quotation/Save' || url === '/Api/Order/Create') {
+      if (_url === '/Api/Quotation/Save' || _url === '/Api/Order/Create') {
         _color = 'rgba(0, 0, 0, 0.7)';
         _text = '文件上传成功，正在提交...';
-        if (url === '/Api/Order/Create') {
+        if (_url === '/Api/Order/Create') {
           _text = '正在提交...';
         } else if (Array.isArray(config.data?.FileList)) {
           const t = config.data.FileList.find(it => it.List && it.List.length > 0);
@@ -68,11 +76,11 @@ axios.interceptors.request.use(
         }
         _customClass = 'mp-general-loading-box';
       }
-      if (url === '/Api/Customer/CouponList') _text = '优惠券信息获取中...';
-      if (url === '/Api/Express/ValidList') _text = '获取可用配送方式列表...';
-      if (url === '/Api/Product/Detail') _text = '请稍候，正在获取产品信息...';
-      if (url === '/Api/Quotation/List') _text = '正在获取购物车信息...';
-      if (url === '/Api/Product/List') _text = '获取产品列表信息...';
+      if (_url === '/Api/Customer/CouponList') _text = '优惠券信息获取中...';
+      if (_url === '/Api/Express/ValidList') _text = '获取可用配送方式列表...';
+      if (_url === '/Api/Product/Detail') _text = '请稍候，正在获取产品信息...';
+      if (_url === '/Api/Quotation/List') _text = '正在获取购物车信息...';
+      if (_url === '/Api/Product/List') _text = '获取产品列表信息...';
 
       requestNum += 1;
       loadingInstance = Loading.service({
@@ -111,7 +119,7 @@ const handleResponse = async (response) => {
 
   // sendError({ response });
 
-  const _url = response.config.url.split('?')[0];
+  const _url = getRelativePath(response.config);
 
   const _statusList2NotNeed2Toast = [1000, 9062, 6225];
   // 包含以上的状态码 或 以上的请求路径  不会弹窗报错  其余以外都会报错出来
