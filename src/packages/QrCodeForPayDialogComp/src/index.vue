@@ -246,13 +246,11 @@ export default {
       this.visible = false;
     },
     setExpiredTime() { // 设置付款时间 或 倒计时 时间
-      console.log('aaa');
       if (!this.showExpire || !this.payInfoData || !this.payInfoData.ExpiredTime) return;
       const date = new Date(this.payInfoData.ExpiredTime);
       const targetYear = date.getFullYear();
       const targetMonth = date.getMonth();
       const targetDay = date.getDate();
-      console.log(date);
       const targetHour = date.getHours();
       const targetMinute = date.getMinutes();
       const curYear = new Date().getFullYear();

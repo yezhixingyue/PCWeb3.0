@@ -398,7 +398,6 @@ export default {
               && result.poiList.pois.length > 0
             ) {
               const target = this.getFilterResultFromPois(result.poiList.pois, keywords);
-              console.log(target);
               resolve(target);
             } else {
               if (projectType === 'pc') {

@@ -34,7 +34,6 @@ Vue.filter('getDoneTime', (ProducePeriod, showTime = false) => {
   }
   let timeStr = dayTimeStr || `${m}月${d}日`;
   if (showTime && dayTimeStr) timeStr += ` ( ${+m}月${+d}日 ) `;
-  // console.log(showTime, 'showTime', ProducePeriod, `${m}月${d}日`, fullDay);
   // const hour = TotalTime.split('T')[1].split('+')[0].slice(0, 5); // 显示具体时间（时 分 秒）
   const hour = ''; // 不显示具体时间
   return `预计${timeStr}${hour}${str}`;
@@ -60,7 +59,6 @@ export const formarProductAmountFunc = data => { // 根据数据返回产品数�
     const {
       ProductAmount, Unit, KindCount, HaveKind, HaveNumber,
     } = data;
-    // console.log(data);
     let amount = '';
     let kindCount = '';
     if (HaveNumber !== false && ProductAmount) {

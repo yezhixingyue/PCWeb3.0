@@ -371,7 +371,6 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       this.$refs.ruleForm.clearValidate();
     },
     resetFormByEnterpriseData() {
-      console.log(0.5);
       if (this.originEnterpriseData && typeof this.originEnterpriseData === 'object') {
         if (this.ruleForm) this.ruleForm.setEnterpriseInfo(this.originEnterpriseData);
       }

@@ -114,7 +114,6 @@ export default {
     },
     onSwitchExpressClick() {
       if (this.multipleSelection.length === 0 || this.UseSameAddress) return;
-      console.log(this.multipleSelection, this.UseSameAddress);
       this.switchVisible = true;
     },
   },

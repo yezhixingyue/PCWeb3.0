@@ -14,6 +14,9 @@
   class="mp-img-style-header mp-erp-common-dialog-comp-wrap"
   :class="{smallBtn: smallBtn, [projectType]: projectType}"
   :before-close="onCancleClick">
+  <span class="el-dialog__title" slot="title" v-if="$slots['title']">
+    <slot name="title"></slot>
+  </span>
   <slot></slot>
   <span slot="footer" class="dialog-footer">
     <div v-if="$slots['foot-tip']">

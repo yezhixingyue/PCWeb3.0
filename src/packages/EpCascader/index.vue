@@ -240,9 +240,7 @@ export default {
     box-sizing: border-box;
     line-height: 26px;
     padding: 0 26px 0 13px;
-    transition: border-color 0.5s !important;
     height: 30px;
-    background: #fff;
     &::after {
       content: "";
       position: absolute;
@@ -263,12 +261,13 @@ export default {
       border-radius: 2px;
     }
     &:hover {
-      border-color: #aaa;
+      border-color: #C0C4CC;
       background: #fff;
     }
     &.active {
       border-color: $--color-primary;
     }
+
     > span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -285,6 +284,8 @@ export default {
       border-right: none;
       border-top: none;
       border-radius: 0;
+      background: #fff;
+      transition: border-color 0.5s !important;
       line-height: 22px;
       padding: 0 7px 0 5px;
       padding-right: 19px;
