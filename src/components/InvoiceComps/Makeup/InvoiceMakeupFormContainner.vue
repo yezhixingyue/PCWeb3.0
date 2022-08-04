@@ -8,7 +8,7 @@
      @goback="goback"
      @view="onView"
      @submit="submit"
-     @switchToEnterprise="switchToEnterprise"
+     :switchToEnterprise="switchToEnterprise"
      :class="{loading: loading}"
      key="1"
     />

@@ -133,6 +133,10 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       type: Object,
       default: null,
     },
+    switchToEnterprise: {
+      type: Function,
+      default: () => {},
+    },
   },
   components: {
     ButtonRadioSelectorVue,
@@ -277,7 +281,7 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       get() {
         return this.ruleForm.InvoiceType;
       },
-      set(val) {
+      async set(val) {
         if (this.ruleForm.InvoiceType === val) return;
         this.ruleForm.InvoiceType = val;
         this.$refs.ruleForm.clearValidate();
@@ -285,23 +289,25 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
           this.ruleForm.ReceiverContactWay = '';
         }
         if (val === InvoiceTypeEnums.special.ID && (!this.originEnterpriseData || this.fetchEnterpriseDataError)) {
-          this.$emit('switchToEnterprise');
+          await this.switchToEnterprise();
         }
         this.handleRulesChangeByTypeSwitch();
+        this.initForm();
       },
     },
     localTitle: {
       get() {
         return this.ruleForm.InvoiceMainBody;
       },
-      set(val) {
+      async set(val) {
         if (this.ruleForm.InvoiceMainBody === val) return;
         this.$refs.ruleForm.clearValidate();
         this.ruleForm.InvoiceMainBody = val;
         // 处理个人普票和企业普票信息切换 或着 切换表单
         if (val === InvoiceTitleEnums.enterprise.ID && (!this.originEnterpriseData || this.fetchEnterpriseDataError)) {
-          this.$emit('switchToEnterprise');
+          await this.switchToEnterprise();
         }
+        this.initForm();
       },
     },
     localConsigneeAddress: {
@@ -351,6 +357,13 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
         }
       });
     },
+    initForm() {
+      const temp = this.ruleForm;
+      this.ruleForm = null;
+      this.$nextTick(() => {
+        this.ruleForm = new InvoiceFormClass({ ...temp });
+      });
+    },
     goback() {
       this.$emit('goback');
     },
@@ -358,12 +371,16 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       this.$refs.ruleForm.clearValidate();
     },
     resetFormByEnterpriseData() {
+      console.log(0.5);
       if (this.originEnterpriseData && typeof this.originEnterpriseData === 'object') {
-        this.ruleForm.setEnterpriseInfo(this.originEnterpriseData);
+        if (this.ruleForm) this.ruleForm.setEnterpriseInfo(this.originEnterpriseData);
       }
       this.handleRulesChangeByTypeSwitch();
     },
     handleRulesChangeByTypeSwitch() {
+      if (!this.ruleForm) {
+        return;
+      }
       if (this.ruleForm.InvoiceType === InvoiceTypeEnums.special.ID && !this.onlyEnterprise) {
         this.rules.RegisteredAddress.unshift({ required: true, message: '请填写企业注册地址', trigger: 'blur' });
         this.rules.RegisteredTelephone.unshift({ required: true, message: '请填写企业注册电话', trigger: 'blur' });
