@@ -88,8 +88,15 @@
     <el-form-item class="btns" v-if="!onlyEnterprise">
       <p class="no-through-tips" v-if="notThrough && !isPersonal && !fetchEnterpriseDataError">您的企业发票资质{{curStatusText}}，需等资质审核通过，才可再次开具企业发票</p>
       <p class="no-through-tips" v-if="fetchEnterpriseDataError && !isPersonal">企业信息加载失败，请尝试重新切换获取！</p>
-      <el-button type="primary" :disabled="fetchEnterpriseDataError" @click="submitForm()">{{notThrough && !isPersonal ? '点击查看' : '提交' }}</el-button>
+      <div class="confirm" v-if="!notThrough || isPersonal">
+        <el-checkbox v-model="invoiceReceived"></el-checkbox>
+        <span class="n" @click="confirmVisible=true">同意《 发票开具确认书 》</span>
+      </div>
+      <el-button type="primary"
+       :disabled="(fetchEnterpriseDataError && !isPersonal) || !invoiceReceived"
+       @click="submitForm()">{{notThrough && !isPersonal ? '点击查看' : '提交' }}</el-button>
       <el-button @click="goback">返回</el-button>
+      <InvoiceConfirmDialog :visible.sync="confirmVisible" @submit="invoiceReceived = true" />
     </el-form-item>
   </el-form>
 </template>
@@ -97,6 +104,7 @@
 <script>
 import ButtonRadioSelectorVue from '../../CommonComps/ButtonRadioSelector.vue';
 import AreaSelector from '../../CommonComps/AreaSelector.vue';
+import InvoiceConfirmDialog from '../../../components/InvoiceComps/Makeup/InvoiceConfirmDialog';
 import { formatBankCard } from '../utils';
 import InvoiceFormClass from './InvoiceFormClass';
 import {
@@ -129,6 +137,7 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
   components: {
     ButtonRadioSelectorVue,
     AreaSelector,
+    InvoiceConfirmDialog,
   },
   data() {
     const checkBankCard = (rule, value, callback) => { // 公户账号位数及规则凌乱，仅判断长度9-24即符合规则
@@ -230,6 +239,8 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       InvoiceTitleEnumList,
       InvoiceTypeEnumList,
       InvoiceTypeEnums,
+      invoiceReceived: false, // 是否已确认发票开具确认书
+      confirmVisible: false,
     };
   },
   computed: {
@@ -378,6 +389,7 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
 };
 </script>
 <style lang='scss'>
+@import '@/assets/css/var.scss';
 .mp-invoice-make-up-rule-Form-wrap {
   // margin-left: -10px;
   .tip {
@@ -416,11 +428,11 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       // margin-left: 50px;
       & + .el-button {
         margin-left: 50px;
-        color: #428dfa;
-        border-color: #428dfa;
+        color: $--color-primary;
+        border-color: $--color-primary;
         &:active {
-          color: darken($color: #428dfa, $amount: 15);
-          border-color: darken($color: #428dfa, $amount: 15);
+          color: darken($color: $--color-primary, $amount: 15);
+          border-color: darken($color: $--color-primary, $amount: 15);
         }
       }
     }
@@ -462,6 +474,29 @@ export default { // 企业普票和专票 还有一种形式：已有值的情�
       padding-bottom: 25px;
       padding-top: 98px;
       padding-bottom: 20px;
+    }
+    .confirm {
+      // margin-top: 15px;
+      text-align: left;
+      .el-checkbox {
+        margin-right: 10px;
+      }
+      .n {
+        color: $--color-primary;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.05s ease-in-out;
+        font-size: 13px;
+        &:hover {
+          text-decoration: underline;
+        }
+        &:active {
+          color: darken($color: $--color-primary, $amount: 15);
+        }
+      }
+    }
+    .el-button {
+      margin-top: 20px;
     }
   }
   .add-detail .el-form-item__content .el-input {

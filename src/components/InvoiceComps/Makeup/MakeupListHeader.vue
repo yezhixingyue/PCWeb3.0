@@ -3,13 +3,14 @@
     <p class="page-title">
       <span class="blue-v-line is-bold is-black">发票开具</span>
       <!-- <a :href="`${invoiceHelpUrl}`" target="_blank" rel="noopener noreferrer">
-        <span class="blue-span">发票政策<i class="el-icon-d-arrow-right"></i></span>
-      </a>
+        <span class="blue-span">开票政策<i class="el-icon-d-arrow-right"></i></span>
+      </a> -->
+      <span class="blue-span" @click="visible = true">开票政策<i class="el-icon-d-arrow-right"></i></span>
       <span class="right">
         <i class="el-icon-phone is-blue"></i>
         <label for="">发票服务电话：</label>
         <i>{{invoicePhone}}</i>
-      </span> -->
+      </span>
     </p>
     <div class="f">
       <!-- <SingleSelector v-model="localOrderStatus" :optionList='OrderStatusList' title="订单状态" /> -->
@@ -55,6 +56,7 @@
       <el-tab-pane v-for="it in InvoiceMakeUpStatusEnumList" :key="it.ID" :label="it.Name" :name="`${it.ID}`">
       </el-tab-pane>
     </el-tabs>
+    <InvoicePolicyDialog :visible.sync="visible" />
   </header>
 </template>
 
@@ -64,6 +66,7 @@ import { mapState, mapGetters } from 'vuex';
 import MultipleSelectorVue from '../../common/Selector/MultipleSelector.vue';
 import LineDateSelectorComp from '../../common/Selector/LineDateSelectorComp.vue';
 import SearchInputComp from '../../common/Selector/SearchInputComp.vue';
+import InvoicePolicyDialog from './InvoicePolicyDialog.vue';
 import { InvoiceMakeUpStatusEnumList } from '../../../packages/InvoiceComps/enums';
 import { homeUrl, invoiceID } from '../../../assets/js/setup';
 
@@ -73,13 +76,15 @@ export default {
     MultipleSelectorVue,
     LineDateSelectorComp,
     SearchInputComp,
+    InvoicePolicyDialog,
   },
   data() {
     return {
       InvoiceMakeUpStatusEnumList,
       dateList: [{ label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
       invoiceHelpUrl: `${homeUrl}help/${invoiceID}.html`, // 发票政策地址
-      invoicePhone: '13500002222',
+      invoicePhone: '0371-55672961',
+      visible: false,
     };
   },
   computed: {
@@ -162,6 +167,16 @@ export default {
           top: 2px;
           margin-left: 2px;
         }
+      }
+    }
+    > .blue-span {
+      position: relative;
+      top: -3px;
+      > i {
+        font-size: 18px;
+        position: relative;
+        top: 2px;
+        margin-left: 2px;
       }
     }
     .right {
