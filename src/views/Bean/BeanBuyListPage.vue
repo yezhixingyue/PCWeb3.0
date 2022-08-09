@@ -117,6 +117,7 @@ export default {
         this.buyBeanNumber = e.Number;
         if (!resp.data.Data) {
           const cb = () => {
+            this.handleQrCodeClosed();
             this.visible = false;
           };
           this.messageBox.successSingle({
