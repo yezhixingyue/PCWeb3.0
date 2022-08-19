@@ -37,7 +37,6 @@
       <template slot-scope="scope">
         <span
           class="blue-span"
-          :class="{disabled: [InvoiceStatusEnums.canceled.ID].includes(scope.row.InvoiceStatus)}"
           @click="onViewDetailClick(scope.row)"
           >查看</span>
         <!-- <span

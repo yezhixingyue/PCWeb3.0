@@ -1,16 +1,17 @@
-const getEnumList = (EnumsObj, moreKeys = []) => {
+const getEnumList = (EnumsObj, withAll = false) => {
   const list = [];
   Object.keys(EnumsObj).forEach(key => {
+    if (typeof EnumsObj[key] !== 'object') return;
+    if (withAll) {
+      const temp = JSON.parse(JSON.stringify(EnumsObj[key]));
+      list.push(temp);
+      return;
+    }
     const { Name, ID } = EnumsObj[key];
     const temp = {
       ID,
       Name,
     };
-    if (moreKeys && moreKeys.length > 0) {
-      moreKeys.forEach(_key => {
-        temp[_key] = EnumsObj[key][_key];
-      });
-    }
     list.push(temp);
   });
   return list;
