@@ -6,6 +6,13 @@
   "description": "mpzj前台下单网站图标集合",
   "glyphs": [
     {
+      "icon_id": "31357626",
+      "name": "发票  已取消",
+      "font_class": "a-fapiaoyiquxiao",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
       "icon_id": "708166",
       "name": "客服",
       "font_class": "wodekefu",
