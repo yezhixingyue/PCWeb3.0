@@ -16,7 +16,7 @@
             <i class="iconfont icon-dianhua1"></i>
           </div>
           <ul class="mp-contact-us-content-wrap">
-            <li>
+            <!-- <li>
               <p class="title">
                 <i class="iconfont icon-dianhua"></i>
                 <span class="is-gray">软件技术支持：</span>
@@ -26,7 +26,7 @@
                 <p>199-0397-0210</p>
                 <hr>
               </div>
-            </li>
+            </li> -->
             <li>
               <p class="title">
                 <i class="iconfont icon-QQ1"></i>
@@ -190,7 +190,7 @@ export default {
   }
 }
 ul.mp-contact-us-content-wrap {
-  padding-left: 12px;
+  padding-left: 8px;
   padding-right: 12px;
   padding-top: 4px;
   padding-bottom: 8px;
@@ -207,6 +207,7 @@ ul.mp-contact-us-content-wrap {
     }
     > div.content {
       padding-top: 7px;
+      padding-left: 26px;
       letter-spacing: 0.5px;
       > p {
         padding: 2px 0;
