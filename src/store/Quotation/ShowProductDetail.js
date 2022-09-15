@@ -99,8 +99,8 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList, isD
   }
   const { IsNameHidden } = Element;
   const _EleName = IsNameHidden || !isDetail ? '' : Element.Name;
-  const list = ['长', '宽', '高'];
-  const EleName = list.includes(Element.Name) ? Element.Name : _EleName; // 移除名称 不再显示
+  const list = ['长', '短', '宽', '高'];
+  const EleName = list.includes(Element.Name) || list.find(field => Element.Name.includes(field)) ? Element.Name : _EleName; // 移除名称 不再显示
   if (!CustomerInputValues || CustomerInputValues.length === 0) return '';
   if (CustomerInputValues.length === 1) {
     // eslint-disable-next-line object-curly-newline
@@ -180,16 +180,21 @@ const getElementValueText = (CustomerInputValues, Element, AffectedPropList, isD
 
 const handleCraftContentCombine = list => {
   const list1 = list.filter(it => it.includes('：')).map(it => it.split('：')[1]);
-  if (list1.length <= 1) return list;
+  if (list1.length <= 1) return list.map(it => (it.includes('：') ? it.split('：')[1].replace(/\s/g, '') : it));
+  const i = list.findIndex(it => it.includes('：'));
   let combineContent = list1.join(' x ');
   const units = list1.map(it => it.split(' ')[1]).filter(it => it);
   const values = list1.map(it => it.split(' ')[0]).filter(it => it);
   const list2 = list.filter(it => !it.includes('：'));
-  if (units.length === list1.length) {
+  if (units.length === list1.length) { // 添加单位
     const len = [...new Set(units)].length;
     if (len === 1) {
       combineContent = `${values.join(' x ')}${units[0]}`;
     }
+  }
+  if (i > -1) {
+    list2.splice(i, 0, combineContent);
+    return list2;
   }
   return [combineContent, ...list2].filter(it => it);
 };
