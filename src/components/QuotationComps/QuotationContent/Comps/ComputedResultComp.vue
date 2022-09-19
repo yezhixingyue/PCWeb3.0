@@ -46,7 +46,10 @@
         "
       >
         <span style="margin-right: 2px" v-if="!isPrice">(</span>
-        <span>原价：<i>{{ ProductQuotationResult.OriginalCost  | formatNumber }}元</i></span>
+        <span>原价：<i>
+          <template>{{ ProductQuotationResult.OriginalCost + (ProductQuotationResult.ExpressCost||0)  | formatNumber }}元</template>
+          <template>（含货款{{ ProductQuotationResult.OriginalCost  | formatNumber }}元</template>
+          </i>）</span>
         <span v-if="promotePrice > 0">活动：<i class="is-pink">{{ "-" + promotePrice }}元</i></span>
         <span v-if="coupon >= 0">
           <template>优惠券：</template>
