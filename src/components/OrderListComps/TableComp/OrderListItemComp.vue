@@ -176,7 +176,7 @@ export default {
     handleCollapse() {
       const oWraps = document.getElementsByClassName(`${this.data.ID}`);
       if (oWraps.length > 0) {
-        oWraps.forEach(oWrap => {
+        [...oWraps].forEach(oWrap => {
           const tDom = oWrap.getElementsByClassName('product-item-header-set-active')[0];
           tDom.click();
         });

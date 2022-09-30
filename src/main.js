@@ -1,6 +1,7 @@
 import './public-path';
 import Vue from 'vue';
 // import Element from 'element-ui';
+import Clickoutside from 'element-ui/lib/utils/clickoutside';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -26,6 +27,9 @@ Vue.prototype.api = api;
 Vue.prototype.utils = utils;
 Vue.prototype.$utils = utils;
 
+console.log(Clickoutside);
+
+Vue.directive('clickoutside', Clickoutside);
 // Vue.use(Element);
 
 new Vue({

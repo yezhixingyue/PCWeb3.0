@@ -114,7 +114,7 @@ export default {
       this.$store.commit('Quotation/setCurProductInfo', product);
       this.$store.commit('Quotation/setSelectedCoupon', null);
       const doms = document.getElementsByClassName('aside-product-selector-popper-wrap');
-      doms.forEach(it => {
+      [...doms].forEach(it => {
         const _it = it;
         _it.style.display = 'none';
       });

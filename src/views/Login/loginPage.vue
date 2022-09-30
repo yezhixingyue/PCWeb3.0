@@ -11,7 +11,7 @@
               <a :href="homeUrl" target="_blank">首页</a>
             </li>
             <li>
-              <a :href="`${homeUrl}/about.html`" target="_blank">关于我们</a>
+              <a :href="`${homeUrl}about.html`" target="_blank">关于我们</a>
             </li>
           </ul>
         </div>
