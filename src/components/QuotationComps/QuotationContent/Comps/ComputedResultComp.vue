@@ -57,7 +57,7 @@
           <i v-else-if="!selectedCoupon || coupon === 0">{{ coupon }}元</i>
         </span>
         <span v-if="ProductQuotationResult.Weight > 0">
-          <template>重量：</template>
+          <template>理论重量：</template>
           <i>{{ ProductQuotationResult.Weight }}kg</i>
         </span>
         <span class="mg-left"  v-if="!isPrice"> )</span>

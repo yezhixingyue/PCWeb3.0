@@ -28,7 +28,7 @@
           </el-tooltip>
         </p>
         <p>
-          <span>印品重量：
+          <span>理论重量：
             <template
              v-if="info4OrderSummary.Weight || info4OrderSummary.Weight === 0">{{info4OrderSummary.Weight}}kg</template>
           </span>
