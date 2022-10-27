@@ -16,7 +16,7 @@
     <main>
       <div class="content">
         <div class="upload-btn-box">
-          <FileSelectComp @change="handleFileChange" :disabled='!canSelectFile' :accept='accept' :selectTitle='selectTitle' ref="oFileBox" />
+          <FileSelectComp @change="handleFileChange" v-show="customer" :disabled="!canSelectFile" :accept='accept' :selectTitle='selectTitle' ref="oFileBox" />
           <FailListComp :failedList='failedList' />
         </div>
         <MainTableComp
@@ -159,7 +159,9 @@ export default {
     },
     canSelectFile() { // 是否允许选择产品（）
       if (!this.Product.ProductID && this.Product.isSingle) return false;
-      if (!this.customer || !this.customer.CustomerID || !this.address || !this.address.Address) return false;
+      if (!this.customer || !this.customer.CustomerID) return false;
+      if (!this.UseSameAddress) return true;
+      if (!this.address || !this.address.Address) return false;
       const { Address, AddressID, Express } = this.address.Address;
       if (!Express || (!Express.First && Express.First !== 0) || (!Express.Second && Express.Second !== 0)) return false;
       if (!AddressID) {
