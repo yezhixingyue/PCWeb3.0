@@ -7,6 +7,7 @@
 <script>
 import { mapState } from 'vuex';
 import { useCookie } from '@/assets/js/setup';
+import { generateGetKeySrc } from '@/packages/ConsigneeAddressSetpComp/AMapLoader';
 
 export default {
   computed: {
@@ -30,6 +31,9 @@ export default {
         else this.$router.push('/login');
       }
     },
+  },
+  created() {
+    generateGetKeySrc();
   },
   mounted() {
     if (document.attachEvent) {
