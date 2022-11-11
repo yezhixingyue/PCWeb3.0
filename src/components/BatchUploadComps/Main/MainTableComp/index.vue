@@ -18,11 +18,11 @@
 
       <el-table-column type="selection" width="55" class-name='check-item' :selectable='handleSelectable'></el-table-column>
 
-      <el-table-column show-overflow-tooltip label="产品" min-width="140" class-name='name-item'>
+      <el-table-column show-overflow-tooltip label="产品" min-width="135" class-name='name-item'>
         <span slot-scope="scope" class="is-font-size-12">{{ scope.row.result | formatProductName }}</span>
       </el-table-column>
 
-      <el-table-column show-overflow-tooltip label="数量规格" min-width="105">
+      <el-table-column show-overflow-tooltip label="数量规格" min-width="100">
         <template slot-scope="scope" class="">
           <template>{{ scope.row.result | formatProductAmount }} </template>
           <template>{{ scope.row.result | formatProductSize }} </template>
@@ -38,12 +38,16 @@
         <template slot-scope="scope">{{scope.row.result | formatOutPlateNo}}</template>
       </el-table-column>
 
-      <el-table-column label="配送地址" width="135" show-overflow-tooltip v-if="!UseSameAddress">
+      <el-table-column label="配送地址" width="125" show-overflow-tooltip v-if="!UseSameAddress">
         <template slot-scope="scope">{{scope.row.result | formatAddress}}</template>
       </el-table-column>
 
-      <el-table-column label="价格" width="105" show-overflow-tooltip>
+      <el-table-column label="价格" width="100" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.result.CurrentCost | formatCurrentCost }}</template>
+      </el-table-column>
+
+      <el-table-column label="理论重量" :width="UseSameAddress ? '100' : '70'" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.result.Weight | formatWeight }}</template>
       </el-table-column>
 
       <el-table-column label="配送方式" width="125" show-overflow-tooltip v-if="!UseSameAddress">
@@ -57,13 +61,13 @@
           </el-select>
       </el-table-column>
 
-      <el-table-column label="状态" width="105">
+      <el-table-column label="状态" width="95">
         <template slot-scope="scope">
           <StatusColumn :itemData='scope.row' />
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="165" max-width='280' label-class-name='operation'>
+      <el-table-column label="操作" width="140" max-width='280' label-class-name='operation'>
         <template slot-scope="scope">
           <ItemOperationComp :itemData='scope.row' @upload='handleItemUpload' @detail='handleDetailClick' @remove='handleItemRemove' />
         </template>
@@ -208,6 +212,12 @@ export default {
     formatCurrentCost(cost) { // 价格
       if (cost || cost === 0) {
         return `￥${+(+cost).toFixed(2)}元`;
+      }
+      return '';
+    },
+    formatWeight(weight) { // 重量
+      if (weight || weight === 0) {
+        return `${+(+weight).toFixed(2)}kg`;
       }
       return '';
     },
