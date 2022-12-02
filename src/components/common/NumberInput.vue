@@ -32,7 +32,7 @@ export default {
         return this.value;
       },
       set(val) {
-        const _val = `${val}`.replaceAll(/\D/g, '');
+        const _val = `${val}`.replace(/\D/g, '');
         this.$emit('input', _val);
       },
     },
