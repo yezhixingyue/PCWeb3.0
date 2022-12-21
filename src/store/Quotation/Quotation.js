@@ -271,7 +271,6 @@ export default {
       state.productClassify = list;
     },
     setProductNames(state, list) {
-      console.log(list);
       state.productNames = list.map(it => ({
         ...it,
         ClassName: it.ShowName,

@@ -11,6 +11,10 @@ const api = {
   getSmsCode(Mobile, Type = 0) {
     return instance.post('/Api/Sms/Send', { Mobile, Type });
   },
+  // /Api/Address/Search GET请求，参数address
+  getAddressSearch(address) {
+    return instance.get('/Api/Address/Search', { params: { address } });
+  },
   getCaptcha(data) { // 图片验证码
     // eslint-disable-next-line object-curly-newline
     const { closeLoading, width, height, fontSize } = data;
