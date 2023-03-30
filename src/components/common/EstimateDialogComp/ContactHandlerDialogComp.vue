@@ -12,7 +12,6 @@
         @submit='visible = false'
         width='800px'
         >
-        <div slot="title" class="title">aaa</div>
         <el-form label-position="left" ref="form" :model="form" class="estimate">
           <el-form-item label="服务评分：">
             <el-rate  show-text :texts="['非常差', '差', '一般', '好', '非常好',]"></el-rate>

@@ -12,7 +12,6 @@
     width='800px'
     top="15vh"
     >
-    <div slot="title" class="title">aaa</div>
     <el-form label-position="right" label-width="100px" ref="rulesform" :model="form" :rules="rules" class="estimate">
       <el-form-item label="服务评分：" prop="Score">
         <el-rate v-model="form.Score" show-text :texts="['非常差', '差', '一般', '好', '非常好',]"></el-rate>

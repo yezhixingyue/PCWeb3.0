@@ -12,7 +12,6 @@
     width='800px'
     top='15vh'
     >
-    <div slot="title" class="title">aaa</div>
     <el-form label-position="left" ref="form" :model="SeeEstimate" class="see-estimate">
       <template v-if="SeeEstimate">
         <el-form-item label="服务评分：">

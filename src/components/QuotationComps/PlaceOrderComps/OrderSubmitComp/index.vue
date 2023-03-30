@@ -315,7 +315,7 @@ export default {
       const asyncInputchecker = await this.asyncInputchecker();
       if (!asyncInputchecker) return '有内容未识别，请先识别或清除';
       if (this.addressInfo4PlaceOrder.OutPlate && this.addressInfo4PlaceOrder.OutPlate.Second) {
-        const reg = /(^\d{18}$)|(^\d{19}$)|(^\d{6}-\d{15}$)/;
+        const reg = /(^\d{18}$)|(^\d{19}$)|(^\d{6}-\d{15}$)|(^\d{12}$)/;
         if (!reg.test(this.addressInfo4PlaceOrder.OutPlate.Second)) {
           return '平台单号格式不正确';
         }
@@ -372,7 +372,7 @@ export default {
       const asyncInputchecker = await this.asyncInputchecker();
       if (!asyncInputchecker) return '[ 识别内容 ] 中，有内容未识别，请先识别或清除';
       if (this.addressInfo4PlaceOrder.OutPlate && this.addressInfo4PlaceOrder.OutPlate.Second) {
-        const reg = /(^\d{18}$)|(^\d{19}$)|(^\d{6}-\d{15}$)/;
+        const reg = /(^\d{18}$)|(^\d{19}$)|(^\d{6}-\d{15}$)|(^\d{12}$)/;
         if (!reg.test(this.addressInfo4PlaceOrder.OutPlate.Second)) {
           return '平台单号格式不正确';
         }
