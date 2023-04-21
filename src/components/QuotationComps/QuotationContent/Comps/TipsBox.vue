@@ -61,6 +61,7 @@ export default {
       font-size: 12px;
       // color: #F4A307;
       color: #ff3769;
+      letter-spacing: 0.5px;
       padding: 2px 0 2px 96px;
       &.icon {
         position: absolute;
