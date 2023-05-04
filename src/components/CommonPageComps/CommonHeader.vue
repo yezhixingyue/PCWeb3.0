@@ -392,7 +392,7 @@ export default {
           this.$store.dispatch('common/getExpressList'),
           this.$store.dispatch('common/getNoticeList'),
         ]);
-        this.setQQChangeTip();
+        // this.setQQChangeTip(); // 取消qq弹窗提示
       }
       if (showLoading) loadingInstance.close();
       this.isloading = false;
