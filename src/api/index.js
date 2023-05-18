@@ -80,7 +80,8 @@ const api = {
     return instance.get(`/Api/Product/Introduce?productID=${productID}`, { closeLoading: true });
   },
   getProductPrice(data) { // 价格信息计算  POST /Api/Calculate/ProductPrice
-    return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { closeLoading: true });
+    // return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { closeLoading: true });
+    return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data });
   },
   getOrderPreCreate(data) { // POST /Api/Order/PreCreate  直接下单 - 预下单
     const { closeTip } = data;
