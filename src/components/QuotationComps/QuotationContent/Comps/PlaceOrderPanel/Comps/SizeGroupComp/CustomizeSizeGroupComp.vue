@@ -144,6 +144,8 @@ export default {
   display: inline-block;
   margin-right: 20px;
   min-height: 30px;
+  line-height: 32px;
+  margin-top: -4px;
   // margin-top: -12px;
   > li {
     display: inline-block;
