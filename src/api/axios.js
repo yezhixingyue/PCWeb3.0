@@ -81,6 +81,7 @@ axios.interceptors.request.use(
       if (_url === '/Api/Product/Detail') _text = '请稍候，正在获取产品信息...';
       if (_url === '/Api/Quotation/List') _text = '正在获取购物车信息...';
       if (_url === '/Api/Product/List') _text = '获取产品列表信息...';
+      if (_url === '/Api/Calculate/ProductPrice') _text = '请稍候,价格正在计算中...';
 
       requestNum += 1;
       loadingInstance = Loading.service({
