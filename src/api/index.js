@@ -141,6 +141,10 @@ const api = {
   getCustomerApplyAuthentication(data) { // POST /Api/Customer/ApplyAuthentication 申请认证
     return instance.post('/Api/Customer/ApplyAuthentication', data);
   },
+  // 申请认证(新)
+  authenticationApply(data) {
+    return instance.post('/Api/Company/Authentication/Apply', data);
+  },
   getCustomerRecharge(data) { // POST /Api/Customer/Recharge 客户充值
     return instance.post('/Api/Customer/Recharge', data);
   },
@@ -370,6 +374,11 @@ const api = {
   getInvoiceDetail(invoiceID) { // GET /Api/Invoice/Detail    发票详情
     return instance.get('/Api/Invoice/Detail', { params: { invoiceID } });
   },
+  // 获取认证信息 (新)
+  getAuthenticationInfo(ID) {
+    return instance.get(`/Api/Company/Authentication/Info?customerID=${ID}`);
+  },
+
   // getInvoiceCancel(invoiceID) { // GET /Api/Invoice/Cancel  取消
   //   return instance.get('/Api/Invoice/Cancel', { params: { invoiceID } });
   // },

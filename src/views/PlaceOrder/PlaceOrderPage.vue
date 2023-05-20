@@ -80,7 +80,7 @@ export default {
       this.$store.commit('Quotation/setInitPageText', '');
     },
     setInfoLackTip() {
-      if (!this.customerInfo || this.customerInfo.AuthStatus === 2) return;
+      if (!this.customerInfo || this.customerInfo.QQ) return;
       this.messageBox.warnCancelBox({
         title: '企业信息未完善',
         msg: '您尚有资料未完善，无法享受优惠价格',

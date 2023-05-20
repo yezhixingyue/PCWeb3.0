@@ -84,6 +84,19 @@
             </span>
           </span>
           <el-button round @click.stop="setShowRechange">在线充值</el-button>
+          <el-tooltip v-if="!this.customerInfo.Account.IsBranch"
+          :disabled="customerInfo.AuthStatus !== 0" effect="dark" content="您还未认证，完成企业认证，可享受更多福利优惠，点击认证。" placement="bottom">
+            <router-link class="authentication"
+            tag="span" :class="getStates(customerInfo.AuthStatus).class" to="/mySetting/authentication">{{getStates(customerInfo.AuthStatus).msg}}</router-link>
+          </el-tooltip>
+          <el-tooltip v-else :disabled="customerInfo.AuthStatus !== 0" effect="dark" content="您还未认证，请登录主账号进行验证。" placement="bottom">
+            <span  class="authentication" :class="getStates(customerInfo.AuthStatus).class">{{getStates(customerInfo.AuthStatus).msg}}</span>
+          </el-tooltip>
+          <span v-if="customerInfo.IsUpDown" @click="toMemberCenter" class="member-level" tag="span"  to="/MemberCenter" >
+            <img :src="require(`@/assets/images/v/v${customerInfo.Grade.Third}.png`)" alt="">
+          </span>
+          <!-- <span class="member-level">
+          </span> -->
           <el-dropdown trigger="click" @command='onCommand'>
             <!-- <span @click="handleCustomerNameDetail">{{customerInfo.CustomerName}} </span> -->
             <span class="el-dropdown-link">
@@ -97,6 +110,12 @@
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingAccount'}"
                 command='account' icon="el-icon-user-solid">企业信息</el-dropdown-item>
+              <el-dropdown-item v-if="!this.customerInfo.Account.IsBranch"
+                :class="{active: $route.name === 'mySettingAuthentication'}"
+                command='authentication' icon="iconfont icon-qiyerenzheng">企业认证</el-dropdown-item>
+              <el-dropdown-item v-if="showMember && customerInfo.IsUpDown"
+                :class="{active: $route.name === 'MemberCenter'}"
+                command='MemberCenter' icon="iconfont icon-huiyuan">会员中心</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingAddress'}"
                 command='address' icon="el-icon-location">收货地址</el-dropdown-item>
@@ -178,7 +197,7 @@ export default {
     ChangeQQTipsDialog,
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance']),
+    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance', 'showMember']),
     ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
@@ -203,6 +222,29 @@ export default {
     };
   },
   methods: {
+    getStates(status) {
+      const _obj = {};
+      switch (status) {
+        case 1:
+          _obj.msg = '认证中';
+          _obj.class = 'unreviewed';
+          break;
+        case 2:
+          _obj.msg = '已认证';
+          _obj.class = 'verified';
+          break;
+        case 3:
+          _obj.msg = '未通过';
+          _obj.class = 'not-pass';
+          break;
+
+        default:
+          _obj.msg = '未认证';
+          _obj.class = '';
+          break;
+      }
+      return _obj;
+    },
     formatMobile(mobile) {
       if (!mobile || mobile.length !== 11) return '';
       const _arr = mobile.split('');
@@ -248,6 +290,10 @@ export default {
     onImgClick() {
       if (this.$route.name !== 'placeOrder') this.$router.push('/placeOrder');
     },
+    toMemberCenter() {
+      if (!this.showMember) return;
+      this.$router.push('/MemberCenter');
+    },
     onMouseEnter() {
       this.showClassify = true;
       if (this.timer) {
@@ -288,6 +334,12 @@ export default {
       switch (command) {
         case 'account':
           _path = '/mySetting/account';
+          break;
+        case 'authentication':
+          _path = '/mySetting/authentication';
+          break;
+        case 'MemberCenter':
+          _path = '/MemberCenter';
           break;
         case 'address':
           _path = '/mySetting/address';
@@ -548,7 +600,7 @@ export default {
           margin-top: 16px;
           margin-bottom: 16px;
           box-sizing: border-box;
-          margin-right: 15px;
+          // margin-right: 15px;
           cursor: pointer;
           > i {
             font-size: 19px;
@@ -576,7 +628,7 @@ export default {
             // position: relative;
             padding: 0;
             margin: 0;
-            margin-right: 20px;
+            // margin-right: 20px;
             height: 70px;
             width: 80px;
             > div {
@@ -625,9 +677,43 @@ export default {
         float: right;
         color: #888;
         line-height: 65px;
-        max-width: 500px;
+        max-width: 570px;
         text-align: right;
         white-space: nowrap;
+        >.authentication{
+          // margin-left: 20px;
+          margin-right: 10px;
+          line-height: 19px;
+          border: 1px solid #ff3769;
+          font-size: 12px;
+          border-radius: 10px;
+          padding: 0 6px;
+          color: #ff3769;
+          &.unreviewed{
+            border-color: #f4a307;
+            color: #f4a307;
+          }
+          &.verified{
+            border-color: #52c41a;
+            color: #52c41a;
+          }
+          &.not-pass{
+            border-color: #ff3769;
+            color: #ff3769;
+          }
+        }
+        >.member-level{
+          margin-right: 8px;
+          width: 23px;
+          display: inline-block;
+          padding-bottom: 2px;
+          box-sizing: border-box;
+          img{
+           vertical-align: middle;
+           height: 18px;
+           margin-top: -2px;
+          }
+        }
         > span.price-box {
           font-size: 12px;
           display: inline-block;

@@ -9,8 +9,7 @@
          v-model="AuthenInfo4Submit.AuthenInfo.CompanyName"  title='企业全称' placeholder='须与营业执照上的名称一致' />
       </div>
       <div class="second">
-        <InputComp :disabled='!AllowEdit' v-model="TaxID"  title='纳税人识别号' placeholder='营业执照上的纳税人识别号' />
-        <InputComp :disabled='!AllowEdit' v-model="QQ"  title='QQ' />
+        <InputComp :disabled='!AllowEdit' v-model="QQ"  title='QQ' placeholder='联系QQ' required/>
       </div>
       <div class="address-wrap">
         <div class="add-1" v-loading='loadingAddInfo'>
@@ -49,7 +48,6 @@
         </div>
       </div>
     </div>
-    <LicensePathPhotoComp v-model="LicensePath" :AllowEdit='AllowEdit' />
     <footer>
       <span class="is-pink" v-if="customerInfo&&customerInfo.RefuseTips&&!AllowEdit">{{customerInfo.RefuseTips}}</span>
       <el-button type="primary" :disabled='!AllowEdit' @click="handleSubmit">保存</el-button>
@@ -60,29 +58,14 @@
 <script>
 import InputComp from '@/components/common/InputComp.vue';
 import { mapState } from 'vuex';
-import { imgUrl } from '@/assets/js/setup';
-import LicensePathPhotoComp from '@/components/MySettingComps/LicensePathPhotoComp';
 
 export default {
   // 修改企业信息后要重新获取企业信息数据和账号数据 (2个接口  需在获取前设置旧数据为null) 其它情况, 如充值后也需要重新获取账号信息
   components: {
     InputComp,
-    LicensePathPhotoComp,
   },
   computed: {
     ...mapState('common', ['customerInfo']),
-    imgSrc() {
-      if (!this.AuthenInfo4Submit || !this.AuthenInfo4Submit.AuthenInfo.LicensePath) return '';
-      return `${imgUrl}${this.AuthenInfo4Submit.AuthenInfo.LicensePath}`;
-    },
-    LicensePath: {
-      get() {
-        return this.imgSrc;
-      },
-      set(url) {
-        this.AuthenInfo4Submit.AuthenInfo.LicensePath = url;
-      },
-    },
     AllowEdit() {
       return this.AuthenInfo4Submit.AllowEdit;
     },
@@ -92,14 +75,6 @@ export default {
       },
       set(newVal) {
         this.AuthenInfo4Submit.QQ = newVal.replace(/^0/, '').replace(/[^\d]/g, '');
-      },
-    },
-    TaxID: {
-      get() {
-        return this.AuthenInfo4Submit.AuthenInfo.TaxID;
-      },
-      set(newVal) {
-        this.AuthenInfo4Submit.AuthenInfo.TaxID = newVal.replace(/[^\w]/g, '');
       },
     },
   },
@@ -112,7 +87,6 @@ export default {
       AuthenInfo4Submit: {
         AuthenInfo: {
           CompanyName: '',
-          TaxID: '',
           SellArea: {
             RegionalID: '',
             RegionalName: '',
@@ -156,8 +130,10 @@ export default {
         { strategy: 'isNotEmpty', errorMsg: '请选择县/区' },
         { strategy: 'isNotZero', errorMsg: '请选择县/区' },
       ],
-      TaxIDRules: [
-        { strategy: 'hasNotSpace', errorMsg: '纳税人识别号中不能有空格' },
+      QQRules: [
+        { strategy: 'isNotEmpty', errorMsg: '请输入QQ' },
+        { strategy: 'maxLength:11', errorMsg: 'QQ号长度不应超过11位' },
+
       ],
       loadingAddInfo: false,
     };
@@ -212,7 +188,6 @@ export default {
       const {
         SellArea,
         DetailAddress,
-        TaxID,
       } = this.AuthenInfo4Submit.AuthenInfo;
       if (!SellArea) {
         this.reportError('请选择地址!');
@@ -221,18 +196,12 @@ export default {
       const { RegionalID, CityID, CountyID } = SellArea;
       const { CustomerName, QQ } = this.AuthenInfo4Submit;
       if (!this.validateCheck(CustomerName, this.simpNameRules, this.reportError)) return false; // 企业简称校验
+      if (!this.validateCheck(QQ, this.QQRules, this.reportError)) return false; // QQ
       if (!this.validateCheck(RegionalID, this.RegionalRules, this.reportError)) return false; // 省校验
       if (!this.validateCheck(CityID, this.CityRules, this.reportError)) return false; // 市校验
       if (!this.validateCheck(CountyID, this.CountyRules, this.reportError)) return false; // 县区校验
       if (!this.validateCheck(DetailAddress, this.detailRules, this.reportError)) return false; // 详细地址校验
-      if (TaxID) {
-        const { length } = TaxID;
-        if (length !== 15 && length !== 17 && length !== 18 && length !== 20) {
-          this.reportError('纳税人识别号长度不正确,应为15、17、18、20位数字或字母');
-          return false;
-        }
-        if (!this.validateCheck(TaxID, this.TaxIDRules, this.reportError)) return false; // 详细地址校验
-      }
+
       if (QQ) {
         const { length } = QQ;
         if (length < 5) {
@@ -275,15 +244,12 @@ export default {
         const { CustomerName, AuthenInfo, AllowEdit, QQ } = newVal;
         if (!AuthenInfo) return;
         // eslint-disable-next-line object-curly-newline
-        const { CompanyName, DetailAddress, LicensePath, TaxID, SellArea } = AuthenInfo;
+        const { CompanyName, DetailAddress, SellArea } = AuthenInfo;
         this.AuthenInfo4Submit.CustomerName = CustomerName;
         this.AuthenInfo4Submit.QQ = QQ;
         this.AuthenInfo4Submit.AllowEdit = AllowEdit;
-        this.AuthenInfo4Submit.AuthenInfo.TaxID = TaxID;
         this.AuthenInfo4Submit.AuthenInfo.CompanyName = CompanyName;
         this.AuthenInfo4Submit.AuthenInfo.DetailAddress = DetailAddress;
-        this.AuthenInfo4Submit.AuthenInfo.LicensePath = LicensePath;
-        if (LicensePath) this.hasUploadedImg = true;
         if (SellArea) this.AuthenInfo4Submit.AuthenInfo.SellArea = { ...SellArea };
         if (SellArea) {
           const { RegionalID, CityID } = SellArea;

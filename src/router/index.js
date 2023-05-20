@@ -218,6 +218,16 @@ const routes = [
         component: () => import('../views/Bill/BillPage.vue'),
       },
       {
+        path: '/MemberCenter',
+        name: 'MemberCenter',
+        meta: {
+          requiresAuth: true,
+          y: 0,
+          title: '会员中心 - 郑州名片之家电子商务有限公司',
+        },
+        component: () => import('../views/MemberCenterPage.vue'),
+      },
+      {
         path: '/mySetting',
         name: 'mySetting',
         component: () => import('../views/mySettingPages/mySettingCommonPage.vue'),
@@ -232,6 +242,16 @@ const routes = [
               title: '企业信息 - 郑州名片之家电子商务有限公司',
             },
             component: () => import('../views/mySettingPages/AccountPage.vue'),
+          },
+          {
+            path: '/mySetting/authentication',
+            name: 'mySettingAuthentication',
+            meta: {
+              requiresAuth: true,
+              y: 0,
+              title: '企业认证 - 郑州名片之家电子商务有限公司',
+            },
+            component: () => import('../views/mySettingPages/AuthenticationPage.vue'),
           },
           {
             path: '/mySetting/address',

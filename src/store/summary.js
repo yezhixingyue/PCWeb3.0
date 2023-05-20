@@ -13,6 +13,8 @@ export default {
     ---------------------------------------- */
     FundBillList: [], // --------- 账单信息列表
     FundBillListNumber: 0,
+    Recharge: 0,
+    Consume: 0,
     condition4FundBillList: new ConditionForBillList(),
     /** 售后单页面相关
     ---------------------------------------- */
@@ -95,6 +97,11 @@ export default {
     setFundBillList(state, [list, num]) {
       state.FundBillList = list;
       if (num || num === 0) state.FundBillListNumber = num;
+    },
+    // 设置充值/支出
+    setRechargeConsume(state, { Recharge, Consume }) {
+      state.Recharge = Recharge;
+      state.Consume = Consume;
     },
     setCondition4FundBillList(state, [[key1, key2], value]) {
       if (key2) state.condition4FundBillList[key1][key2] = value;
@@ -292,7 +299,11 @@ export default {
       const _obj = ClassType.filter(state.condition4FundBillList, true);
       const res = await api.getCustomerFundBill(_obj);
       if (res.data.Status === 1000) {
-        commit('setFundBillList', [res.data.Data, res.data.DataNumber]);
+        commit('setFundBillList', [res.data.Data.CustomerFundBills, res.data.DataNumber]);
+        commit('setRechargeConsume', {
+          Recharge: res.data.Data.TotalRechargeAmount,
+          Consume: res.data.Data.TotalConsumeAmount,
+        });
       }
     },
     /** 售后记录页面相关

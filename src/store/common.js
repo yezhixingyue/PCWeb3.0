@@ -10,6 +10,7 @@ export default {
   namespaced: true,
   state: {
     isPopperVisible: false,
+    showMember: true, // 是否显示会员相关
     /** 单位类型列表
     ---------------------------------------- */
     UnitTypeList: [
@@ -470,32 +471,32 @@ export default {
   actions: {
     async getCustomerDetail({ state, commit }, key = false) { // 获取账号基本信息
       if (state.customerInfo && !key) return;
-      if (key) {
-        commit('setCustomerInfo', [null, false]);
-      } else {
-        const sessionCust = useCookie ? Cookie.getCookie('customerInfo') : sessionStorage.getItem('customerInfo');
-        if (sessionCust) {
-          let user;
-          try {
-            user = JSON.parse(sessionCust);
-          // eslint-disable-next-line no-empty
-          } catch (error) {
-          }
-          if (user) {
-            const token = Cookie.getCookie('token');
-            if (user.Account.Token === token) {
-              commit('setCustomerInfo', [user, false]);
-              return;
-            }
-          }
-        }
-      }
+      // if (key) {
+      //   commit('setCustomerInfo', [null, false]);
+      // } else {
+      //   const sessionCust = useCookie ? Cookie.getCookie('customerInfo') : sessionStorage.getItem('customerInfo');
+      //   if (sessionCust) {
+      //     let user;
+      //     try {
+      //       user = JSON.parse(sessionCust);
+      //     // eslint-disable-next-line no-empty
+      //     } catch (error) {
+      //     }
+      //     if (user) {
+      //       const token = Cookie.getCookie('token');
+      //       if (user.Account.Token === token) {
+      //         commit('setCustomerInfo', [user, false]);
+      //         return;
+      //       }
+      //     }
+      //   }
+      // }
       const res = await api.getCustomerDetail();
       if (res.data.Status === 1000) {
         commit('setCustomerInfo', [res.data.Data, true]);
         if (useCookie) Cookie.setCookie('customerInfo', JSON.stringify(res.data.Data), 'Session');
         else sessionStorage.setItem('customerInfo', JSON.stringify(res.data.Data));
-        if (res.data.Data.AuthStatus !== 2) {
+        if (!res.data.Data.QQ && key) {
           massage.warnCancelBox({
             title: '企业信息未完善',
             msg: '您尚有资料未完善，无法享受优惠价格',

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import order from './order';
+import Authentication from './Authentication';
 import common from './common';
 import summary from './summary';
 import unpayList from './unpayList';
@@ -22,6 +23,7 @@ const store = new Vuex.Store({
     unpayList,
     shoppingCar,
     timeSelectModule,
+    Authentication,
   },
 });
 
