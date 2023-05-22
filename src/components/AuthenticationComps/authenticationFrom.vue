@@ -4,7 +4,7 @@
       <div class="not-pass" v-if="authCompanyInfo && authCompanyInfo.Status === 3">
         <p class="cause">
           <span>未通过原因：</span>
-          <span style="color:red"
+          <span style="color:red;line-height: 1.2em;"
             >{{authCompanyInfo.Remark}}</span
           >
         </p>
@@ -44,6 +44,7 @@
           <p>①请上传清晰彩色完整的原件照片，证件各项信息清晰可见容易识别。 <el-button type="text" @click="samplingDialog = true">正确示范</el-button></p>
           <p>②照片支持上传png、jpg、jpeg、bmg格式。</p>
           <p>③最多上传2张照片，单张照片大小不超过20M。</p>
+          <p>④提交证件资料后，系统会自动添加水印“此证件仅用于名片之家公用认证信息”</p>
           <el-dialog :visible.sync="samplingDialog" top="1vh" title="正确示范"
             width="1200px" custom-class="mp-sampling-dialog-comp-wrap">
             <p>
@@ -222,7 +223,7 @@ export default {
         return false;
       }
       if (!ensure) {
-        this.reportError('请阅读并同意《权责声明》');
+        this.reportError('请勾选同意此证件“仅用于名片之家平台公用认证信息”。');
         return false;
       }
       return true;
@@ -367,6 +368,10 @@ export default {
             &:first-of-type{
               margin-top: 10px;
             }
+            .el-button{
+              height: 24px;
+              padding: 0;
+            }
           }
           .upload{
             overflow: hidden;
@@ -447,6 +452,9 @@ export default {
             .el-upload-list__item+.el-upload-list__item{
               margin-right: 0;
             }
+          }
+          .el-upload--picture-card{
+            background-color: #fff;
           }
         }
       }

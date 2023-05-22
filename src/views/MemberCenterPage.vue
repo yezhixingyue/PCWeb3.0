@@ -18,7 +18,7 @@
               <img :src="require(`@/assets/images/member-banner/member-v${item.index}.png`)" alt="">
               <div class="current-level" v-if="customerInfo">
                 <div class="user-name">
-                  <p>
+                  <p :title="customerInfo.CustomerName">
                     {{customerInfo.CustomerName}}
                   </p>
                   <img :src="require(`@/assets/images/member-banner/v${item.index}-crown.png`)" alt="">

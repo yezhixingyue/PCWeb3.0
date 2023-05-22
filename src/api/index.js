@@ -160,7 +160,8 @@ const api = {
   },
   /* 图片与文件上传api
    ----------------------------------------------------------------------------------- */
-  uploadImage(data) { // 图片上传  POST /Api/Upload/Image
+  // type 图片类型 为1时为营业执照会打水印
+  uploadImage(data, type) { // 图片上传  POST /Api/Upload/Image
     const formData = new FormData();
     formData.append('file', data);
     const config = {
@@ -168,7 +169,7 @@ const api = {
         'Content-Type': 'multipart/form-data',
       },
     };
-    return instance.post('/Api/Upload/Image?type=1', formData, config);
+    return instance.post(`/Api/Upload/Image?type=${type}`, formData, config);
   },
   UploadBigImgNormal(data, uniqueName, onUploadProgressFunc) { // 非断点上传方式上传文件
     const formData = new FormData();

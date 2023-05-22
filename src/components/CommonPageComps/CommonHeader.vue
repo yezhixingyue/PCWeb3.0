@@ -177,6 +177,7 @@
       </div>
     </div> -->
     <ChangeQQTipsDialog  :visible.sync="changeQQVisible" />
+    <AuthenticationTipsDialog  :visible.sync="AuthenticationVisible" />
   </section>
 </template>
 
@@ -188,6 +189,7 @@ import { useCookie, homeUrl } from '@/assets/js/setup';
 import PlaceOrderProductClassifyComp from '@/components/QuotationComps/PlaceOrderProductClassifyComp.vue';
 import RechargeComp from './RechargeComp.vue';
 import ChangeQQTipsDialog from './ChangeQQTipsDialog';
+import AuthenticationTipsDialog from './AuthenticationTipsDialog';
 import Cookie from '../../assets/js/Cookie';
 
 export default {
@@ -195,6 +197,7 @@ export default {
     RechargeComp,
     PlaceOrderProductClassifyComp,
     ChangeQQTipsDialog,
+    AuthenticationTipsDialog,
   },
   computed: {
     ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance', 'showMember']),
@@ -219,6 +222,7 @@ export default {
       homeUrl,
       isloading: false,
       changeQQVisible: false,
+      AuthenticationVisible: false,
     };
   },
   methods: {
@@ -402,6 +406,25 @@ export default {
       lastTipTime = Date.now();
       Cookie.setCookie('lastTipTime', lastTipTime, 24 * 60 * 60);
     },
+    // 未认证弹框 每天一次
+    setAuthenticationTip() {
+      let lastTipTime = Cookie.getCookie('lastAuthenticationTipTime');
+      if (lastTipTime) {
+        lastTipTime = +lastTipTime;
+        if (lastTipTime > 0) {
+          const diff = Date.now() - lastTipTime;
+          if (diff < 24 * 60 * 60 * 1000) {
+            const ld = new Date(lastTipTime).getDate();
+            const cd = new Date().getDate();
+            console.log(ld, cd);
+            if (ld === cd) return;
+          }
+        }
+      }
+      this.AuthenticationVisible = true;
+      lastTipTime = Date.now();
+      Cookie.setCookie('lastAuthenticationTipTime', lastTipTime, 24 * 60 * 60);
+    },
   },
   watch: {
     customerInfo: {
@@ -445,6 +468,9 @@ export default {
           this.$store.dispatch('common/getNoticeList'),
         ]);
         // this.setQQChangeTip(); // 取消qq弹窗提示
+        if (!this.customerInfo.AuthStatus) {
+          this.setAuthenticationTip();
+        }
       }
       if (showLoading) loadingInstance.close();
       this.isloading = false;

@@ -5,11 +5,11 @@
       <span class="is-font-12">（ 每月可修改 <i class="is-pink is-font-16">1</i> 次 ）</span>
       <div>
         <InputComp :disabled='!AllowEdit' v-model="AuthenInfo4Submit.CustomerName"  title='企业简称' required />
-        <InputComp :disabled='!AllowEdit'
-         v-model="AuthenInfo4Submit.AuthenInfo.CompanyName"  title='企业全称' placeholder='须与营业执照上的名称一致' />
+        <!-- <InputComp :disabled='!AllowEdit'
+         v-model="AuthenInfo4Submit.AuthenInfo.CompanyName"  title='企业全称' placeholder='须与营业执照上的名称一致' /> -->
+         <InputComp :disabled='!AllowEdit' v-model="QQ"  title='QQ' placeholder='联系QQ' required/>
       </div>
       <div class="second">
-        <InputComp :disabled='!AllowEdit' v-model="QQ"  title='QQ' placeholder='联系QQ' required/>
       </div>
       <div class="address-wrap">
         <div class="add-1" v-loading='loadingAddInfo'>
@@ -244,11 +244,11 @@ export default {
         const { CustomerName, AuthenInfo, AllowEdit, QQ } = newVal;
         if (!AuthenInfo) return;
         // eslint-disable-next-line object-curly-newline
-        const { CompanyName, DetailAddress, SellArea } = AuthenInfo;
+        const { DetailAddress, SellArea } = AuthenInfo;
         this.AuthenInfo4Submit.CustomerName = CustomerName;
         this.AuthenInfo4Submit.QQ = QQ;
         this.AuthenInfo4Submit.AllowEdit = AllowEdit;
-        this.AuthenInfo4Submit.AuthenInfo.CompanyName = CompanyName;
+        // this.AuthenInfo4Submit.AuthenInfo.CompanyName = CompanyName;
         this.AuthenInfo4Submit.AuthenInfo.DetailAddress = DetailAddress;
         if (SellArea) this.AuthenInfo4Submit.AuthenInfo.SellArea = { ...SellArea };
         if (SellArea) {

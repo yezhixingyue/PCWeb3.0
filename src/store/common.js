@@ -10,7 +10,7 @@ export default {
   namespaced: true,
   state: {
     isPopperVisible: false,
-    showMember: true, // 是否显示会员相关
+    showMember: false, // 是否显示会员相关
     /** 单位类型列表
     ---------------------------------------- */
     UnitTypeList: [

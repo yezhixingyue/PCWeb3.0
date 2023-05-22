@@ -196,6 +196,7 @@ export default {
       >i {
         width: 63px;
         height: 63px;
+        min-width: 63px;
         margin-right: 20px;
       }
     }
