@@ -12,7 +12,7 @@
       <el-form label-width="120px" label-position="top">
         <el-form-item label="企业全称：">
           <el-input v-model.trim="submitData.CompanyName"
-            placeholder="请输入企业或店铺名称" />
+            placeholder="请填写与营业执照或电商店铺证明中完全一致的名称" />
         </el-form-item>
         <el-form-item label="证件号：">
           <el-input v-model.trim="submitData.CreditCode"
@@ -28,6 +28,8 @@
             :multiple='true'
             :limit='2'
             :on-success='handllePictureUploaded'
+            :on-error='handllePictureError'
+            :http-request='Uploaded'
             :on-preview="handlePictureCardPreview"
             :on-remove="handleRemove"
             :before-upload='beforeUpload'
@@ -36,15 +38,14 @@
             <i class="el-icon-plus"></i>
           </el-upload>
           <el-image-viewer
-             v-if="showViewer"
-             :on-close="() => showViewer = false"
-             :url-list="PreviewSrc"
+            :showViewer.sync='showViewer'
+            :PreviewSrc="PreviewSrc"
           />
 
           <p>①请上传清晰彩色完整的原件照片，证件各项信息清晰可见容易识别。 <el-button type="text" @click="samplingDialog = true">正确示范</el-button></p>
           <p>②照片支持上传png、jpg、jpeg、bmg格式。</p>
           <p>③最多上传2张照片，单张照片大小不超过20M。</p>
-          <p>④提交证件资料后，系统会自动添加水印“此证件仅用于名片之家公用认证信息”</p>
+          <p>④提交证件资料后，系统会自动添加水印。</p>
           <el-dialog :visible.sync="samplingDialog" top="1vh" title="正确示范"
             width="1200px" custom-class="mp-sampling-dialog-comp-wrap">
             <p>
@@ -116,7 +117,7 @@ import { mapState, mapActions } from 'vuex';
 import api from '@/api';
 import { imgUrl } from '@/assets/js/setup';
 import { Message } from 'element-ui';
-import ElImageViewer from 'element-ui/packages/image/src/image-viewer';
+import ElImageViewer from '@/components/common/ImageViewer.vue';
 
 export default {
   components: {
@@ -154,27 +155,29 @@ export default {
   computed: {
     ...mapState('Authentication', ['authCompanyInfo']),
     ...mapState('common', ['customerInfo']),
-    // uploadDisabled() {
-    //   const a = this.$refs.upload?.uploadFiles.length || 1;
-    //   console.log(a);
-    //   if (a >= 2) {
-    //     return true;
-    //   }
-    //   return false;
-    // },
   },
   methods: {
     ...mapActions('Authentication', ['getAuthCompanyInfo']),
     handllePictureUploaded(response) {
-      if (response.Status !== 1000) {
-        Message({
-          showClose: true,
-          message: response.Message,
-          type: 'error',
-        });
+      if (response && response.Status !== 1000) {
+        // Message({
+        //   showClose: true,
+        //   message: response.Message,
+        //   type: 'error',
+        // });
         this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.status === 'success' && it.response && it.response.Status === 1000);
       }
       this.setUploadDisabled();
+    },
+    handllePictureError() {
+      this.messageBox.warnSingleError({
+        title: '上传失败',
+        msg: '',
+      });
+    },
+    async Uploaded(data) {
+      const res = await this.api.uploadImage(data.file, 1).catch(() => null);
+      return res.data;
     },
     handlePictureCardPreview(file) {
       const tempList = this.$refs.upload.uploadFiles.map(it => it.url);
@@ -399,6 +402,9 @@ export default {
               width: 373px;
               height: 263px;
               margin-bottom: 0;
+              img{
+                object-fit: cover;
+              }
               .el-upload-list__item-status-label{
                 display: none;
               }

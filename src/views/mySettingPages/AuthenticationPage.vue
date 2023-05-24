@@ -3,7 +3,7 @@
     <div class="basic-info">
       <span class="blue-v-line is-bold is-black">企业认证</span>
       <p><img src="@/assets/images/cancelWarning.png" alt="">您所提供的信息，仅限平台认证审核使用，名片之家将绝对保密。</p>
-      <template v-if="isLoadding">
+      <template v-if="isLoadding && customerInfo">
         <!-- 表单 -->
         <authenticationFrom
           v-if="showWayComponent"
@@ -38,6 +38,7 @@ export default {
   },
   computed: {
     ...mapState('Authentication', ['authCompanyInfo']),
+    ...mapState('common', ['customerInfo']),
     showWayComponent() {
       if (!this.authCompanyInfo || this.isEdit) return true;
       return false;
@@ -46,8 +47,20 @@ export default {
   methods: {
     ...mapActions('Authentication', ['getAuthCompanyInfo']),
     async AuthCompanyInit() {
-      await this.getAuthCompanyInfo();
+      if (this.customerInfo) {
+        if (this.customerInfo.Account.IsBranch) {
+          this.$router.push('/placeOrder');
+        } else {
+          await this.getAuthCompanyInfo();
+        }
+      }
       this.isLoadding = true;
+    },
+  },
+  watch: {
+    customerInfo() {
+      this.isLoadding = false;
+      this.AuthCompanyInit();
     },
   },
   mounted() {

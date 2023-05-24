@@ -4,7 +4,7 @@
     <div class="content">
       <ul class="aside">
         <router-link tag="li" to="/mySetting/account">企业信息</router-link>
-        <router-link tag="li" to="/mySetting/authentication" v-if="!this.customerInfo.Account.IsBranch">企业认证</router-link>
+        <router-link tag="li" to="/mySetting/authentication" v-if="this.customerInfo && !this.customerInfo.Account.IsBranch">企业认证</router-link>
         <router-link tag="li" to="/MemberCenter" v-if="showMember && customerInfo.IsUpDown">会员中心</router-link>
         <router-link tag="li" to="/mySetting/address">收货地址</router-link>
         <router-link tag="li" to="/mySetting/couponCenter">领券中心</router-link>

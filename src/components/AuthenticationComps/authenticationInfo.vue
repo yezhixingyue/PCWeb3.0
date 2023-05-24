@@ -29,14 +29,14 @@
             <el-image
               :src="imgUrl+it"
               alt=""
+              fit="cover"
             />
             <span @click="handlePicturePreview(imgUrl+it)">查看</span>
           </div>
           <el-image-viewer
-             v-if="showViewer"
-             :on-close="() => showViewer = false"
-             :url-list="PreviewSrc"
-        />
+            :showViewer.sync='showViewer'
+            :PreviewSrc="PreviewSrc"
+          />
         </div>
       </div>
       <div class="form-item">
@@ -61,7 +61,7 @@
 <script>
 import { mapState } from 'vuex';
 import { imgUrl } from '@/assets/js/setup';
-import ElImageViewer from 'element-ui/packages/image/src/image-viewer';
+import ElImageViewer from '@/components/common/ImageViewer.vue';
 
 export default {
   props: {

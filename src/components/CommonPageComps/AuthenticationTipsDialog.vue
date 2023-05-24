@@ -97,10 +97,11 @@ export default {
           }
           > p {
             margin-top: 25px;
-            font-size: 17px;
+            font-size: 16px;
             letter-spacing: 0.5px;
             padding: 0 70px 0 24px ;
-            line-height: 1.2em;
+            line-height: 1.5em;
+            text-indent: 2em;
           }
         }
         > footer {

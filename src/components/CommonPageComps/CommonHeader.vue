@@ -85,14 +85,14 @@
           </span>
           <el-button round @click.stop="setShowRechange">在线充值</el-button>
           <el-tooltip v-if="!this.customerInfo.Account.IsBranch"
-          :disabled="customerInfo.AuthStatus !== 0" effect="dark" content="您还未认证，完成企业认证，可享受更多福利优惠，点击认证。" placement="bottom">
-            <router-link class="authentication"
+          :disabled="customerInfo.AuthStatus !== 0" effect="dark" content="您还未认证，完成企业认证，可享受更多福利优惠。" placement="bottom">
+            <router-link class="authentication pointer"
             tag="span" :class="getStates(customerInfo.AuthStatus).class" to="/mySetting/authentication">{{getStates(customerInfo.AuthStatus).msg}}</router-link>
           </el-tooltip>
           <el-tooltip v-else :disabled="customerInfo.AuthStatus !== 0" effect="dark" content="您还未认证，请登录主账号进行验证。" placement="bottom">
             <span  class="authentication" :class="getStates(customerInfo.AuthStatus).class">{{getStates(customerInfo.AuthStatus).msg}}</span>
           </el-tooltip>
-          <span v-if="customerInfo.IsUpDown" @click="toMemberCenter" class="member-level" tag="span"  to="/MemberCenter" >
+          <span v-if="customerInfo.IsUpDown" @click="toMemberCenter" class="member-level" :class="{pointer: showMember}"  to="/MemberCenter" >
             <img :src="require(`@/assets/images/v/v${customerInfo.Grade.Third}.png`)" alt="">
           </span>
           <!-- <span class="member-level">
@@ -499,6 +499,9 @@ export default {
   background-color: #428dfa;
   width: 100%;
   z-index: 1000;
+  .pointer{
+    cursor: pointer;
+  }
   > header {
     width: 1200px;
     height: 60px;
