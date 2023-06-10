@@ -40,7 +40,10 @@ export default {
     richContent() {
       if (this.tipsData && this.tipsData.Content) {
         // eslint-disable-next-line max-len
-        const _content = this.tipsData.Content.replace(/<img src="\//g, `<img src="${imgUrl}/`).replace(/src="\/Image/g, `src="${imgUrl}/Image`);
+        const _content = this.tipsData.Content
+          .replace(/<img src="\//g, `<img src="${imgUrl}/`)
+          .replace(/src="\/Image/g, `src="${imgUrl}/Image`)
+          .replace(/href="\/Home\/Download/g, `href="${imgUrl}/Home/Download`);
         return _content;
       }
       return '';
