@@ -21,3 +21,17 @@ export function ConvertTimeFormat(date) {
 export function getSecondTime(data) {
   return ConvertTimeFormat(new Date(data.getTime() + 1000 * 60 * 60 * 24));
 }
+/**
+ * 传入一个时间，获取其第二天的时间并转换其时间格式
+ *
+ * @export
+ * @param {*} data
+ * @returns 返回第二天时间，格式类型："2020-01-12 12:12:12"
+ */
+export const format2LangTypeDateFunc = date => {
+  if (!date) return '';
+  const _arr = date.split('T');
+  const [t1, t2s] = _arr;
+  const t2 = t2s.split('.')[0];
+  return `${t1} ${t2}`;
+};

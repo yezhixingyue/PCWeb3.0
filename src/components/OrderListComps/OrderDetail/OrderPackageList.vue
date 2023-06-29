@@ -69,6 +69,7 @@
 
 <script>
 import MiniProgressItem from '@/components/common/MiniProgressItem.vue';
+import { format2LangTypeDateFunc } from '@/assets/js/utils/ConvertTimeFormat';
 
 export default {
   props: {
@@ -117,7 +118,7 @@ export default {
         if (i === this.dataList.length - 1) obj.isNewest = true;
         if (it.Description) obj.expressDetail = it.Description;
         if (it.OperateTime) {
-          const [year, afterTime] = it.OperateTime.split('T');
+          const [year, afterTime] = format2LangTypeDateFunc(it.OperateTime).split(' ');
           obj.afterTime = afterTime;
           obj.year = year;
         }

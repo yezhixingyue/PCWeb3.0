@@ -52,6 +52,7 @@ export default {
 </script>
 <style lang='scss'>
 .mp-authentication-tips-dialog-comp-wrap {
+  z-index: 999;
   > .el-dialog {
     background: rgba($color: #000000, $alpha: 0);
     box-shadow: none;

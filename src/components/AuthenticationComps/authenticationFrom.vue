@@ -43,7 +43,7 @@
           />
 
           <p>①请上传清晰彩色完整的原件照片，证件各项信息清晰可见容易识别。 <el-button type="text" @click="samplingDialog = true">正确示范</el-button></p>
-          <p>②照片支持上传png、jpg、jpeg、bmg格式。</p>
+          <p>②照片支持上传png、jpg、jpeg、bmp格式。</p>
           <p>③最多上传2张照片，单张照片大小不超过20M。</p>
           <p>④提交证件资料后，系统会自动添加水印。</p>
           <el-dialog :visible.sync="samplingDialog" top="1vh" title="正确示范"
