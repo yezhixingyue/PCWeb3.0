@@ -7,28 +7,48 @@
       <div>
         <el-table stripe border v-if="queryData"
           :data="[queryData]" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="OrderID" label="订单号" width="137" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="FinalPrice" label="成交金额" width="105" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : '--'}}</span>
+          <el-table-column prop="ProductName" label="商品名称" width="156" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="ProductName" label="物料" width="168" show-overflow-tooltip>
+            <span slot-scope="scope">{{scope.row.MaterialList | formatListItemMaterial}}</span>
           </el-table-column>
-          <el-table-column prop="ProductName" label="商品名称" width="204" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="Content" label="文件内容" width="227" show-overflow-tooltip></el-table-column>
-          <el-table-column label="数量" width="120" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}{{ scope.row.KindCount}}款</span>
-          </el-table-column>
-          <el-table-column label="尺寸" show-overflow-tooltip width="186">
+          <el-table-column label="尺寸" show-overflow-tooltip width="148">
             <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
           </el-table-column>
-          <el-table-column label="工艺" show-overflow-tooltip width="160">
+          <el-table-column label="数量" width="68" show-overflow-tooltip>
+            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}</span>
+          </el-table-column>
+          <el-table-column label="款数" width="48" show-overflow-tooltip>
+            <span slot-scope="scope">{{ scope.row.KindCount }}款</span>
+          </el-table-column>
+          <el-table-column label="工艺" show-overflow-tooltip width="64">
+            <!-- ================================== -->
             <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</span>
+          </el-table-column>
+          <el-table-column prop="Content" label="文件内容" width="146" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="FinalPrice" label="成交价" width="85" show-overflow-tooltip>
+            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : ''}}</span>
+          </el-table-column>
+          <el-table-column prop="OrderID" label="运费" width="58" show-overflow-tooltip>
+            <span slot-scope="scope">{{scope.row.Freight}}元</span>
+          </el-table-column>
+          <el-table-column prop="OrderID" label="总计" width="88" show-overflow-tooltip>
+            <span slot-scope="scope">
+              <b class="is-pink">
+                {{scope.row.Freight + scope.row.FinalPrice}}元
+              </b>
+            </span>
+          </el-table-column>
+          <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
+            <span slot-scope="scope">{{scope.row.AfterSaleAmount || 0}}元</span>
           </el-table-column>
         </el-table>
 
         <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm1" label-width="100px" class="demo-ruleForm">
           <el-form-item label="诉求意向：" prop="AppealType">
             <div class="intention">
-              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退款</span>
               <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
+              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退款2</span>
+              <span :class="ruleForm.AppealType===3 ? 'action' : ''" @click="ruleForm.AppealType = 3">退款3</span>
               <span :class="ruleForm.AppealType===255 ? 'action' : ''" @click="ruleForm.AppealType = 255">其它</span>
             </div>
           </el-form-item>
@@ -146,7 +166,7 @@
 
 <script>
 // import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
-import CheckButton from '@/components/common/CheckButton.vue';
+import CheckButton from '@/components/FeedbackComps/CheckButton.vue';
 import { imgUrl } from '@/assets/js/setup';
 import { mapState } from 'vuex';
 import { Message } from 'element-ui';
@@ -631,12 +651,22 @@ export default {
           margin: 0px 30px 30px 0;
           text-align: center;
           color: #888888;
-        }
-        li:hover{
-          cursor:pointer;
-          color: #428DFA;
-          border-color: #428dfa;
-          background-color: #EBF0FE;
+          position: relative;
+          >div:hover{
+            cursor:pointer;
+            color: #428DFA;
+            border-color: #428dfa;
+            background-color: #EBF0FE;
+          }
+          >i{
+            position: absolute;
+            top: 0;
+            right: -20px;
+            cursor:pointer;
+            &:hover{
+              color: #428DFA;
+            }
+          }
         }
       }
       // 联系人

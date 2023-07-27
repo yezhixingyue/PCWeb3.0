@@ -47,41 +47,50 @@
 
             <el-table stripe border
               :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
-              <el-table-column prop="AfterSaleCode" label="售后服务单号" width="197" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="OrderID" label="订单编号" width="171" show-overflow-tooltip>
+              <el-table-column prop="AfterSaleCode" label="服务单号" width="81" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="OrderID" label="订单号" width="92" show-overflow-tooltip>
               </el-table-column>
-              <el-table-column label="商品名称" width="171" show-overflow-tooltip>
+              <el-table-column label="产品名称" width="116" show-overflow-tooltip>
                 <span slot-scope="scope">{{ scope.row.ProductName }}</span>
               </el-table-column>
-              <el-table-column label="文件内容" show-overflow-tooltip width="171">
+              <el-table-column label="文件内容" show-overflow-tooltip width="116">
                 <template slot-scope="scope">{{ scope.row.Content }}</template>
               </el-table-column>
-              <el-table-column label="申请时间" width="171" show-overflow-tooltip>
+              <el-table-column label="数量/款数" show-overflow-tooltip width="85">
+                <template slot-scope="scope">
+                  {{ scope.row.ProductAmount }}{{ scope.row.Unit }} {{ scope.row.KindCount }}款
+                </template>
+              </el-table-column>
+              <el-table-column label="尺寸" show-overflow-tooltip width="108">
+                <template slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</template>
+              </el-table-column>
+              <el-table-column label="工艺" show-overflow-tooltip width="128">
+                <template slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</template>
+              </el-table-column>
+              <el-table-column label="处理结果" show-overflow-tooltip width="107">
+                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              </el-table-column>
+              <el-table-column label="申请时间" width="135" show-overflow-tooltip>
                 <template slot-scope="scope"
                 >{{scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
               </el-table-column>
-              <el-table-column label="售后进度" width="170" show-overflow-tooltip>
+              <el-table-column label="售后进度" width="76" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <span :class="{
                     'coloraaa': isAccomplish(scope.row.Status),
                     }">{{getAfterSaleStatusText(scope.row.Status)}}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="148" show-overflow-tooltip>
+              <el-table-column label="操作" width="155" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <div class="operate">
                     <span @click="$router.push( { name: 'serviceAfterSalesDetails', query: {data: JSON.stringify(scope.row)} })">查看</span>
-                    <!-- <template v-if="true"> -->
-                    <template v-if="isAccomplish(scope.row.Status)">
-                      <el-divider direction="vertical"></el-divider>
-                      <span class="disabled" v-if="scope.row.Status === 40 || scope.row.Status === 255">售后评价</span>
-                      <template v-else>
-                        <span class="after-sale" v-if="scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
-                        <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
-                      </template>
+                    <template v-if="isAccomplish(scope.row.Status) && scope.row.Status !== 255">
+                      <span class="after-sale" v-if="scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
+                      <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
                     </template>
+                    <span class="view-more" v-if="scope.row.Status===0" @click="cancelAfterSale(scope.row.AfterSaleCode)">取消服务单</span>
                   </div>
-                  <!-- <i>{{scope.row.Solution}}</i> -->
                 </template>
               </el-table-column>
             </el-table>
@@ -270,6 +279,27 @@ export default {
   methods: {
     ...mapMutations('summary', ['setCondition4ServiceAfterSaleList', 'clearCondition4ServiceAfterSaleList']),
     ...mapActions('summary', ['getServiceAfterSaleList']),
+    getSolutions(SolutionTypes) {
+      let str = '';
+      SolutionTypes.forEach((element, index) => {
+        if (index) {
+          str += '，';
+        }
+        if (element === 2) {
+          str += '退款';
+        }
+        if (element === 7) {
+          str += '补印';
+        }
+        if (element === 8) {
+          str += '赠送优惠券';
+        }
+        if (element === 255) {
+          str += '其他';
+        }
+      });
+      return str;
+    },
     getAfterSaleStatusText(status) {
       let str = '';
       switch (status) {
@@ -346,6 +376,21 @@ export default {
     seeEstimateClick(AfterSaleCode) {
       this.seeEstimateVisible = true;
       this.AfterSaleCode = AfterSaleCode;
+    },
+    cancelAfterSale(code) {
+      // this.messageBox
+      this.messageBox.warnCancelBox({
+        msg: '您确定取消本次申请吗？',
+        title: '操作确认',
+        successFunc: () => {
+          // 发送取消请求
+          this.api.getCancleApply(code).then(res => {
+            if (res.data.Status === 1000) {
+              this.$store.dispatch('summary/getServiceAfterSaleList', this.condition4ServiceAfterSaleList.Page);
+            }
+          });
+        },
+      });
     },
   },
   watch: {
@@ -448,9 +493,13 @@ export default {
               color: #AAAAAA;
             }
             .operate{
+              color: #428DFA;
+              text-align: left;
+              >span{
+                cursor: pointer;
+              }
               span:nth-child(1){
-                color: #428DFA;
-                cursor:pointer
+                margin-right: 20px;
               }
               span:nth-child(1):active{
                 color: #26BCF9;

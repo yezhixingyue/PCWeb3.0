@@ -58,10 +58,6 @@
             <span class="view-more disabled">申请售后</span>
           </el-tooltip>
           <span v-else class="view-more" @click="toAfterSale(scope.row)">申请售后</span>
-
-          <span class="view-more disabled" v-if="scope.row.AfterSaleStatus!==0">取消服务单</span>
-          <span class="view-more" v-else @click="cancelAfterSale(scope.row.AfterSaleCode)">取消服务单</span>
-
         </div>
       </el-table-column>
     </el-table>
@@ -137,22 +133,6 @@ export default {
       if (item.AppealStatus === 0) return;
 
       this.$router.push({ name: 'feedback', query: { isEdit: 0, data: JSON.stringify(item) } });
-    },
-    cancelAfterSale(code) {
-      // this.messageBox
-      this.messageBox.warnCancelBox({
-        msg: '您确定取消本次申请吗？',
-        title: '操作确认',
-        successFunc: () => {
-          // 发送取消请求
-          this.api.getCancleApply(code).then(res => {
-            if (res.data.Status === 1000) {
-              this.$emit('updataList');
-              // this.$store.dispatch('summary/getListData4Feedback', this.condition4FeedbackList.Page);
-            }
-          });
-        },
-      });
     },
   },
 };
