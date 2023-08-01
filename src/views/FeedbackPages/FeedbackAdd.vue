@@ -2,7 +2,7 @@
   <section class="mp-mpzj-order-feedback-add-page-wrap">
     <section class="content">
       <header>
-        <span class="is-bold is-black">申请售后</span>
+        <span class="is-bold is-black">订单号：{{queryData.OrderID}}</span>
       </header>
       <div>
         <el-table stripe border v-if="queryData"
@@ -26,20 +26,20 @@
           </el-table-column>
           <el-table-column prop="Content" label="文件内容" width="146" show-overflow-tooltip></el-table-column>
           <el-table-column prop="FinalPrice" label="成交价" width="85" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : ''}}</span>
+            <span slot-scope="scope">{{scope.row.Funds.FinalPrice ? `${scope.row.Funds.FinalPrice}元` : ''}}</span>
           </el-table-column>
           <el-table-column prop="OrderID" label="运费" width="58" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.Freight}}元</span>
+            <span slot-scope="scope">{{scope.row.Funds.Freight}}元</span>
           </el-table-column>
           <el-table-column prop="OrderID" label="总计" width="88" show-overflow-tooltip>
             <span slot-scope="scope">
               <b class="is-pink">
-                {{scope.row.Freight + scope.row.FinalPrice}}元
+                {{scope.row.Funds.Freight + scope.row.Funds.FinalPrice}}元
               </b>
             </span>
           </el-table-column>
           <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.AfterSaleAmount || 0}}元</span>
+            <span slot-scope="scope">{{scope.row.Funds.Refund || 0}}元</span>
           </el-table-column>
         </el-table>
 
@@ -47,8 +47,8 @@
           <el-form-item label="诉求意向：" prop="AppealType">
             <div class="intention">
               <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
-              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退款2</span>
-              <span :class="ruleForm.AppealType===3 ? 'action' : ''" @click="ruleForm.AppealType = 3">退款3</span>
+              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退货/退款</span>
+              <span :class="ruleForm.AppealType===3 ? 'action' : ''" @click="ruleForm.AppealType = 3">优惠减款</span>
               <span :class="ruleForm.AppealType===255 ? 'action' : ''" @click="ruleForm.AppealType = 255">其它</span>
             </div>
           </el-form-item>
@@ -67,6 +67,7 @@
                 :ActiveList="ruleForm.QuestionTypeList"
                 LabelKey="Title"
                 ValueKey="ID"
+                @DialogClick="DialogClick"
               ></CheckButton>
             </el-form-item>
 
@@ -80,7 +81,7 @@
 
             <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList" :required='isUpImg'>
               <label for="QuestionPicList" slot="label" class="el-form-item__label">上传图片：
-                <span class="remark">拍照时请将成品10份以上呈平铺或扇形展开，并对产品的包装、标签、整体、问题局部特写等多角度拍摄，为您带来麻烦，深表歉意！</span>
+                <!-- <span class="remark">拍照时请将成品10份以上呈平铺或扇形展开，并对产品的包装、标签、整体、问题局部特写等多角度拍摄，为您带来麻烦，深表歉意！</span> -->
               </label>
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
@@ -104,7 +105,12 @@
                 <img width="100%" :src="dialogImageUrl" alt="">
               </el-dialog>
               <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
-              <p class="is-font-12 gray upload-Remark">最多可上传9张图片，每张图片大小不超过15M，支持bmp、gif、png、jpg、jpeg</p>
+              <div class="upload-Remark">
+                <p class="is-font-12 gray">1、拍照时请将成品10份以上呈平铺或扇形展开，并对产品的包装、标签、整体、问题局部特写等多角度拍摄，为您带来麻烦，深表歉意！</p>
+                <p class="is-font-12 gray">2、照片支持bmp、gif、png、jpg、jpeg，最多可上传9张图片，每张图片大小不超过15M。</p>
+                <p class="is-font-12 gray">3、上传凭证说明:为快速为您解决售后问题，请上传“问题细节、问题多张、产品整体”等建议三张图片及以上。</p>
+                <p class="is-font-12 gray">4、若服务方式为第三方“快递或快运”类订单需补充“快递面单、货物标签、第三方交易详情”等相关凭证;</p>
+              </div>
             </el-form-item>
           </template>
         </el-form>
@@ -138,6 +144,24 @@
         </div>
       </div>
 
+      <el-dialog
+        :visible.sync="DescribeShow"
+        @cancle="DescribeShow = false"
+        submitText='确定'
+        title="问题类型描述"
+        width='472px'
+        top="30vh"
+        class="question-type-desc"
+        >
+        <div>
+          {{Describe}}
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <p>
+            <el-button @click="DescribeShow = false;" >关闭</el-button>
+          </p>
+        </span>
+      </el-dialog>
       <el-dialog
         :visible.sync="submitSuccessVsible"
         @cancle="submitSuccessVsible = false"
@@ -222,6 +246,8 @@ export default {
     // };
     return {
       submitSuccessVsible: false,
+      Describe: '',
+      DescribeShow: false,
       ApplyQuestionList: [],
       fileList: [],
       canEdit: true,
@@ -430,10 +456,16 @@ export default {
       }));
       this.setUploadDisabled();
     },
+    DialogClick(Describe) {
+      this.Describe = Describe;
+      this.DescribeShow = true;
+      console.log(Describe);
+    },
   },
   async mounted() {
     const isEdit = Number(this.$route.query.isEdit);
     this.queryData = JSON.parse(this.$route.query.data);
+    console.log(this.queryData);
     if (isEdit) {
       this.ruleForm.AppealType = this.queryData.AppealType;
       // this.ruleForm.QuestionTypeList = this.queryData.QuestionTypeTitleList;
@@ -472,6 +504,38 @@ export default {
 </script>
 
 <style lang='scss'>
+.question-type-desc{
+  .el-dialog{
+    .el-dialog__header{
+      padding: 11px;
+      margin: 0 10px;
+      border-bottom: 1px solid #EEEEEE;
+      .el-dialog__title{
+        padding-left: 10px;
+        border-left: 3px solid #26BCF9;
+        text-indent: 2em;
+        font-size: 14px;
+        line-height: 16px;
+      }
+      .el-dialog__headerbtn{
+        top: 10px;
+      }
+    }
+    .el-dialog__body{
+      padding: 15px 32px;
+      font-weight: 400;
+      color: #888888;
+      line-height: 1.3em;
+      font-size: 14px;
+    }
+    .dialog-footer{
+      .el-button{
+        color: #26BCF9;
+        border-color: #26BCF9;
+      }
+    }
+  }
+}
 .mp-mpzj-order-feedback-add-page-wrap {
   width: 100%;
   margin-top: 25px;
@@ -504,7 +568,7 @@ export default {
         }
         .QuestionPicList{
           .el-form-item__error{
-            top: calc(100% - 52px);
+            top: calc(100% - 95px);
           }
           >.el-form-item__content{
             >div{
@@ -534,7 +598,8 @@ export default {
             overflow: hidden;
           }
           .upload-Remark{
-            margin-top: -1em;
+            // margin-top: -1em;
+            line-height: 1.3em;
           }
         }
         .el-textarea{

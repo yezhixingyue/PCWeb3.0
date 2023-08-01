@@ -4,7 +4,7 @@
       <div
       :class="isAction(ValueKey?item[ValueKey]:index)?'action':''"
       @click="onChange(ValueKey?item[ValueKey]:index)">{{item[LabelKey]}}</div>
-      <i class="iconfont icon-zhushi"></i>
+      <i class="iconfont icon-zhushi" @click="DialogClick(item.Describe)"></i>
     </li>
   </ul>
 </template>
@@ -47,6 +47,9 @@ export default {
     },
     clearCheck() {
       this.checkKey = [];
+    },
+    DialogClick(Describe) {
+      this.$emit('DialogClick', Describe);
     },
   },
   watch: {

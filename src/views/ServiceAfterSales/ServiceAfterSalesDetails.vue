@@ -111,6 +111,12 @@
             </div>
           </template>
 
+          <template v-if="AfterSaleInfo.SolutionTypes.find(it => it === 255)">
+            <h4>其他费用：</h4>
+            <p class="opinion">
+              {{AfterSaleInfo.OtherSolutionRemark}}
+            </p>
+          </template>
           <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
             <h4>处理意见</h4>
             <p class="opinion">
@@ -141,13 +147,22 @@
             </p>
           </template>
           <p style="margin-top:30px;color:#585858" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
-            <span>是否已解决您的问题？若未解决可点击再次申请售后服务</span>
+            <span>是否已解决您的问题？若未解决{{productInfo.AppealStatus===3?'可联系处理人员': '可点击再次申请售后服务'}}</span>
           </p>
           <div class="btns" v-if="AfterSaleInfo.Status !== 255">
-            <el-button @click="toAfterSale" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255 && productInfo.AppealStatus === 1">申请售后</el-button>
+            <template v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
+              <el-button @click="toAfterSale" v-if="productInfo.AppealStatus === 1">申请售后</el-button>
+              <el-tooltip v-else
+                effect="dark" :content="getAppealStatusText(productInfo.AppealStatus)" placement="top">
+                <span style="margin-right: 10px;">
+                  <el-button disabled style="color: #999; border-color: #999;">申请售后</el-button>
+                </span>
+              </el-tooltip>
+            </template>
+
             <el-button @click="seeHandlerVisible = true" v-if="AfterSaleInfo.Status >= 10 && AfterSaleInfo.Status != 255">联系处理人员</el-button>
             <!-- <el-button @click="seeHandlerVisible = true" >联系处理人员</el-button> -->
-            <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
+            <template v-if="AfterSaleInfo.Status === 30">
               <el-button v-if="!AfterSaleInfo.IsEvaluate" @click="estimateClick(productInfo.AfterSaleCode)">售后评价</el-button>
               <el-button v-else @click="seeEstimateClick(productInfo.AfterSaleCode)">查看评价</el-button>
             </template>
@@ -162,10 +177,10 @@
               <div class="td title">诉求意向：</div>
               <div class="td content">
                 <template v-if="AfterSaleInfo.AppealType === 2">
-                  退款
+                  退货/退款
                 </template>
                 <template v-if="AfterSaleInfo.AppealType === 3">
-                  退款3
+                  优惠减款
                 </template>
                 <template v-if="AfterSaleInfo.AppealType === 7">
                   补印
@@ -348,6 +363,26 @@ export default {
   },
 
   methods: {
+    getAppealStatusText(status) {
+      let str = '';
+      switch (status) {
+        case 0:
+          str = '订单未完成';
+          break;
+        case 2:
+          str = '正在售后';
+          break;
+        case 3:
+          str = '已退全款或全部补印';
+          break;
+        case 255:
+          str = '超出售后期';
+          break;
+        default:
+          break;
+      }
+      return str;
+    },
     toAfterSale() {
       this.$router.push({ name: 'feedback', query: { isEdit: 0, data: JSON.stringify(this.productInfo) } });
     },
