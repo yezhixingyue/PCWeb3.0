@@ -86,7 +86,7 @@
                   <div class="operate">
                     <span @click="$router.push( { name: 'serviceAfterSalesDetails', query: {data: JSON.stringify(scope.row)} })">查看</span>
                     <template v-if="scope.row.AfterSaleStatus === 30">
-                      <span class="after-sale" v-if="scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
+                      <span class="after-sale" v-if="!scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
                       <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
                     </template>
                     <span class="view-more" v-if="scope.row.AfterSaleStatus===0" @click="cancelAfterSale(scope.row.AfterSaleCode)">取消服务单</span>

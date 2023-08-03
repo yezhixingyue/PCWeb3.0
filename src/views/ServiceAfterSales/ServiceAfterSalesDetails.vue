@@ -1,8 +1,8 @@
 <template>
   <section class="mp-mpzj-order-feedback-add-page-wrap">
     <section class="content">
-      <header>
-        <span class="is-bold is-black">申请服务详情</span>
+      <header v-if="productInfo">
+        <span class="is-bold is-black">订单号：{{productInfo.OrderID}}</span>
         <!-- <span v-if="canEdit" class="is-font-12"> （ 该订单如有售后等问题需要反馈，请填写该页面信息并提交，工作人员会在查收到后第一时间进行处理 ）</span> -->
       </header>
       <div>
@@ -40,7 +40,7 @@
             </span>
           </el-table-column>
           <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.AfterSaleAmount || 0}}元</span>
+            <span slot-scope="scope">{{scope.row.RefundCashAmount || 0}}元</span>
           </el-table-column>
         </el-table>
         <div class="info" v-if="AfterSaleInfo">
@@ -59,7 +59,11 @@
               <span>其他</span>
             </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 7)">
-              补印：款数：<span>{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span>{{AfterSaleInfo.SuccessNumber}}</span> 张
+              补印：款数：<span class="is-pink">{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span class="is-pink">{{AfterSaleInfo.SuccessNumber}}</span> 张
+              <span style="margin-left: 20px;">补印订单号：{{ AfterSaleInfo.ReprintOrderID }}
+                <i @click="copy(AfterSaleInfo.ReprintOrderID)">复制</i>
+                可在订单中查看进度
+              </span>
             </p>
             <div class="refund" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 2)">
               <div class="left">
@@ -383,6 +387,16 @@ export default {
       }
       return str;
     },
+    copy(copyData) {
+      const copyInput = document.createElement('input');// 创建input元素
+      document.body.appendChild(copyInput);// 向页面底部追加输入框
+      copyInput.setAttribute('value', copyData);// 添加属性，将url赋值给input元素的value属性
+      copyInput.select();// 选择input元素
+      document.execCommand('Copy');// 执行复制命令
+      this.$message.success('复制成功！');// 弹出提示信息，不同组件可能存在写法不同
+      // 复制之后再删除元素，否则无法成功赋值
+      copyInput.remove();// 删除动态创建的节点
+    },
     toAfterSale() {
       this.$router.push({ name: 'feedback', query: { isEdit: 0, data: JSON.stringify(this.productInfo) } });
     },
@@ -499,6 +513,7 @@ export default {
   },
   mounted() {
     this.productInfo = JSON.parse(this.$route.query.data);
+    console.log(this.productInfo, 'productInfo');
     this.initData();
   },
 };
@@ -533,7 +548,7 @@ export default {
         padding:0 10px;
         line-height:30px;
         border:1px solid #428dfa;
-        color:#428dfa
+        color:#428dfa;
       }
       .safety{
         background-color: #428dfa;
@@ -546,8 +561,12 @@ export default {
     }
     .reprint{
       margin-bottom: 10px;
-      span{
-        color: #FF3769;
+      // span{
+      //   color: #FF3769;
+      // }
+      i{
+        cursor: pointer;
+        color: #428dfa;
       }
     }
     .refund{

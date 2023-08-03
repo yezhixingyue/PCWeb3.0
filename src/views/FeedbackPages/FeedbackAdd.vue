@@ -1,6 +1,6 @@
 <template>
   <section class="mp-mpzj-order-feedback-add-page-wrap">
-    <section class="content">
+    <section class="content" v-if="queryData">
       <header>
         <span class="is-bold is-black">订单号：{{queryData.OrderID}}</span>
       </header>
@@ -26,20 +26,20 @@
           </el-table-column>
           <el-table-column prop="Content" label="文件内容" width="146" show-overflow-tooltip></el-table-column>
           <el-table-column prop="FinalPrice" label="成交价" width="85" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.Funds.FinalPrice ? `${scope.row.Funds.FinalPrice}元` : ''}}</span>
+            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : ''}}</span>
           </el-table-column>
           <el-table-column prop="OrderID" label="运费" width="58" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.Funds.Freight}}元</span>
+            <span slot-scope="scope">{{scope.row.Freight}}元</span>
           </el-table-column>
           <el-table-column prop="OrderID" label="总计" width="88" show-overflow-tooltip>
             <span slot-scope="scope">
               <b class="is-pink">
-                {{scope.row.Funds.Freight + scope.row.Funds.FinalPrice}}元
+                {{scope.row.Freight + scope.row.FinalPrice}}元
               </b>
             </span>
           </el-table-column>
           <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.Funds.Refund || 0}}元</span>
+            <span slot-scope="scope">{{scope.row.RefundCashAmount || 0}}元</span>
           </el-table-column>
         </el-table>
 
@@ -120,7 +120,7 @@
           :rules="rules" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
           <div class="linkman">
             <el-form-item label="联系人：" prop="ContactName">
-              <el-input v-model="ruleForm.ContactName" maxlength="11" :disabled='!canEdit'
+              <el-input v-model="ruleForm.ContactName" maxlength="20" :disabled='!canEdit'
                 show-word-limit placeholder="请输入联系人"></el-input>
             </el-form-item>
 
@@ -499,6 +499,18 @@ export default {
     this.ruleForm.OrderID = this.queryData.OrderID;
     this.ruleForm.AfterSaleCode = this.queryData.AfterSaleCode || 0;
     this.$store.dispatch('summary/getRejectReasonList');
+  },
+  watch: {
+    customerInfo: {
+      handler(newVal) {
+        if (newVal && !this.ruleForm.Mobile) {
+          this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
+          this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
+          this.ruleForm.QQ = this.customerInfo?.QQ || '';
+        }
+      },
+      immediate: true,
+    },
   },
 };
 </script>

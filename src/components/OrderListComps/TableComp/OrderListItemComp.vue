@@ -212,7 +212,11 @@ export default {
       this.$emit('detail', data.OrderID);
     },
     goToFeedback(item) {
-      this.$router.push({ name: 'feedback', query: { data: JSON.stringify(item) } });
+      const _obj = { ...item };
+      _obj.FinalPrice = item.Funds.FinalPrice;
+      _obj.Freight = item.Funds.Freight;
+      _obj.RefundCashAmount = item.Funds.Refund;
+      this.$router.push({ name: 'feedback', query: { data: JSON.stringify(_obj) } });
     },
     handleOrderCancel({ OrderID }) {
       this.messageBox.warnCancelBox({
