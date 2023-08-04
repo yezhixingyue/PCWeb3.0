@@ -55,9 +55,6 @@
             <p class="opinion" v-if="AfterSaleInfo.Status === 40">
               <span>已驳回</span>
             </p>
-            <p class="opinion" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 255)">
-              <span>其他</span>
-            </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 7)">
               补印：款数：<span class="is-pink">{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span class="is-pink">{{AfterSaleInfo.SuccessNumber}}</span> 张
               <span style="margin-left: 20px;">补印订单号：{{ AfterSaleInfo.ReprintOrderID }}
@@ -113,14 +110,11 @@
                 </li>
               </ul>
             </div>
-          </template>
-
-          <template v-if="AfterSaleInfo.SolutionTypes.find(it => it === 255)">
-            <h4>其他费用：</h4>
-            <p class="opinion">
-              {{AfterSaleInfo.OtherSolutionRemark}}
+            <p class="opinion" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 255)">
+              <span>其他</span>
             </p>
           </template>
+
           <template v-if="AfterSaleInfo.Status === 30 || AfterSaleInfo.Status === 40">
             <h4>处理意见</h4>
             <p class="opinion">

@@ -302,6 +302,11 @@ export default {
     setKeepOrderData(state, bool) {
       state.keepOrderData = bool;
     },
+    /** 修改认证状态
+    ---------------------------------------- */
+    setAuthStatus(state, status) {
+      state.customerInfo.AuthStatus = status;
+    },
     /** 设置客户信息
     ---------------------------------------- */
     setCustomerInfo(state, [data, bool]) {

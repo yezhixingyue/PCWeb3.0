@@ -257,6 +257,7 @@ export default {
         OrderID: 0, // 订单号
         AfterSaleCode: null,
         Source: 2, // 下单类型
+        ChannelType: 0, // 售后渠道
         AppealType: null, // 诉求意向
         QuestionTypeList: [ // 问题类型数组
         ],
