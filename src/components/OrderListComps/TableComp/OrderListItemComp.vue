@@ -215,7 +215,8 @@ export default {
       const _obj = { ...item };
       _obj.FinalPrice = item.Funds.FinalPrice;
       _obj.Freight = item.Funds.Freight;
-      _obj.RefundCashAmount = item.Funds.Refund;
+      _obj.Refund = item.Funds.Refund;
+      _obj.RefundFreight = this.data.RefundFreight;
       this.$router.push({ name: 'feedback', query: { data: JSON.stringify(_obj) } });
     },
     handleOrderCancel({ OrderID }) {

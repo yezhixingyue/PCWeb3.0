@@ -40,7 +40,7 @@
             </span>
           </el-table-column>
           <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.RefundCashAmount || 0}}元</span>
+            <span slot-scope="scope">{{scope.row.Refund +  scope.row.RefundFreight}}元</span>
           </el-table-column>
         </el-table>
         <div class="info" v-if="AfterSaleInfo">

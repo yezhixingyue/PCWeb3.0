@@ -29,7 +29,7 @@
             <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : ''}}</span>
           </el-table-column>
           <el-table-column prop="OrderID" label="运费" width="58" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.Freight}}元</span>
+            <span slot-scope="scope">{{scope.row.IsUnion ? '-' : scope.row.Freight}}元</span>
           </el-table-column>
           <el-table-column prop="OrderID" label="总计" width="88" show-overflow-tooltip>
             <span slot-scope="scope">
@@ -39,7 +39,7 @@
             </span>
           </el-table-column>
           <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.RefundCashAmount || 0}}元</span>
+            <span slot-scope="scope">{{scope.row.Refund +  scope.row.RefundFreight}}元</span>
           </el-table-column>
         </el-table>
 
