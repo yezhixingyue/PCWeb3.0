@@ -313,7 +313,7 @@ export default {
           str = '退款中';
           break;
         case 30:
-          str = '处理成功';
+          str = '处理完成';
           break;
         case 40:
           str = '已驳回';
@@ -330,7 +330,7 @@ export default {
       let bool = false;
       switch (status) {
         case 30:
-          bool = '处理成功';
+          bool = '处理完成';
           break;
         case 40:
           bool = '已驳回';
