@@ -242,7 +242,7 @@ export default {
       const res = await this.api.getOrderPackageList(this.curOrderID, true).catch(() => null);
       this.loading = false;
       if (res && res.data.Status === 1000) {
-        const _list = [...res.data.Data];
+        const _list = res.data.Data;
         this.PackageDataList = _list;
       }
     },
