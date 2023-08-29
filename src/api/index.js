@@ -223,6 +223,9 @@ const api = {
   getOrderPackageList(OrderID, closeLoading = false) { // GET /Api/Order/PackageList  包裹列表
     return instance.get('/Api/Order/PackageList', { params: { OrderID }, closeLoading });
   },
+  getOrderPackages(OrderID, closeLoading = false) { // GET /Api/Order/Packages 包裹列表(新)
+    return instance.get('/Api/Order/Packages', { params: { OrderID }, closeLoading });
+  },
   getOrderDetail(OrderID, closeLoading = false) { // GET /Api/Order/Detail  获取订单详情
     return instance.get('/Api/Order/Detail', { params: { OrderID }, closeLoading });
   },
@@ -233,8 +236,8 @@ const api = {
   getCustomerOrderList4Excel(data) { // 导出客户订单列表 POST /Api/Customer/OrderExcel
     return instance.post('/Api/Customer/OrderExcel', data, { responseType: 'arraybuffer' });
   },
-  getPackageProgress(packageID, expressID) { // GET /Api/Package/Progress 通过包裹号查询包裹配送进度
-    return instance.get(`/Api/Package/Progress?packageID=${packageID}&expressID=${expressID}`, { closeLoading: true });
+  getPackageProgress(packageID, expressID) { // GET /Api/Package/ExpressProgress 通过包裹号查询包裹配送进度
+    return instance.get(`/Api/Package/ExpressProgress?packageID=${packageID}&expressID=${expressID}`, { closeLoading: true });
   },
 
   /* 文件批量上传api

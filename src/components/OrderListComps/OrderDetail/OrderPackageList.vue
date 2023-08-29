@@ -263,7 +263,7 @@ export default {
   },
   async mounted() {
     if (!this.OrderID) return;
-    const res = await this.api.getOrderPackageList(this.OrderID);
+    const res = await this.api.getOrderPackages(this.OrderID);
     this.$emit('setPackDataCompleted', true);
     if (res.data.Status === 1000) {
       const _list = res.data.Data;
