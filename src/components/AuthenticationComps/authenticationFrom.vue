@@ -113,7 +113,7 @@
 
 <script>
 // import CommonDialogComp from '@/packages/CommonDialogComp';
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
 import api from '@/api';
 import { imgUrl } from '@/assets/js/setup';
 import { Message } from 'element-ui';
@@ -158,6 +158,7 @@ export default {
   },
   methods: {
     ...mapActions('Authentication', ['getAuthCompanyInfo']),
+    ...mapMutations('common', ['setAuthStatus']),
     handllePictureUploaded(response) {
       if (response && response.Status !== 1000) {
         // Message({
@@ -238,6 +239,7 @@ export default {
         if (res.data.Status === 1000) {
           const cb = () => {
             this.getAuthCompanyInfo();
+            this.setAuthStatus(1);
             this.cancel();
           };
           this.messageBox.successSingle({

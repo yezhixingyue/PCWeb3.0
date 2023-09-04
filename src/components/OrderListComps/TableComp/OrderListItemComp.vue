@@ -86,7 +86,7 @@
               v-if="item.AllowAfterSale">售后</span>
             <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>售后</span>
             <span class="span-title-pink" @click="handleOrderCancel(item)"
-              v-if="[20, 30, 35, 40].includes(item.Status)">取消</span>
+              v-if="[20, 30, 35, 40].includes(item.Status) && !item.OriginalID">取消</span>
             <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>取消</span>
           </div>
         </li>
@@ -212,7 +212,12 @@ export default {
       this.$emit('detail', data.OrderID);
     },
     goToFeedback(item) {
-      this.$router.push({ name: 'feedback', query: { data: JSON.stringify(item) } });
+      const _obj = { ...item };
+      _obj.FinalPrice = item.Funds.FinalPrice;
+      _obj.Freight = item.Funds.Freight;
+      _obj.Refund = item.Funds.Refund;
+      _obj.RefundFreight = this.data.RefundFreight;
+      this.$router.push({ name: 'feedback', query: { data: JSON.stringify(_obj) } });
     },
     handleOrderCancel({ OrderID }) {
       this.messageBox.warnCancelBox({

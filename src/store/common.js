@@ -249,7 +249,7 @@ export default {
     FeedbackProgress: [
       { label: '已提交', value: 0 },
       { label: '处理中', value: 1 },
-      { label: '处理成功', value: 2 },
+      { label: '处理完成', value: 2 },
       { label: '已拒绝', value: 3 },
       { label: '已取消', value: 255 },
     ],
@@ -301,6 +301,11 @@ export default {
     ---------------------------------------- */
     setKeepOrderData(state, bool) {
       state.keepOrderData = bool;
+    },
+    /** 修改认证状态
+    ---------------------------------------- */
+    setAuthStatus(state, status) {
+      state.customerInfo.AuthStatus = status;
     },
     /** 设置客户信息
     ---------------------------------------- */
