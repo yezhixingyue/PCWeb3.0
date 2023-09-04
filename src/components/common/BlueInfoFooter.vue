@@ -16,6 +16,9 @@
           <span>服务热线：4006363006/4006363500</span>
           <!-- <span>售后专线：4006363500</span> -->
           <a href="https://beian.miit.gov.cn/" target="_blank">豫ICP备2021018916号-1</a>
+          <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=41010502005836" target='_blank'>
+            <img src='@/assets/images/gongan.png' /> 豫公网安备 41010502005836号
+          </a>
         </p>
       </li>
       <li class="img-code-box">
@@ -120,9 +123,14 @@ export default {
           &:hover {
             text-decoration: underline;
           }
+
+          img {
+            vertical-align: -4px;
+            margin-left: 20px;
+          }
         }
         > span {
-          margin-right: 47px;
+          margin-right: 20px;
         }
       }
     }
