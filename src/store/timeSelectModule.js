@@ -68,6 +68,17 @@ export default {
         Second: `${stringDate2}T23:59:59.997Z`,
       };
     },
+    threeMonthDate() {
+      const stringDate1 = ConvertTimeFormat(new Date(
+        new Date().setMonth(new Date().getMonth() - 3) + 24 * 60 * 60 * 1000,
+      ));
+
+      const stringDate2 = ConvertTimeFormat(new Date());
+      return {
+        First: `${stringDate1}T00:00:00.000Z`,
+        Second: `${stringDate2}T23:59:59.997Z`,
+      };
+    },
     last7Date() {
       const BeginDate = ConvertTimeFormat(new Date(new Date() - 24 * 60 * 60 * 1000 * 6));
       const TodayDate = ConvertTimeFormat(new Date());

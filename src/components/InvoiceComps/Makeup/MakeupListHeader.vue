@@ -81,7 +81,7 @@ export default {
   data() {
     return {
       InvoiceMakeUpStatusEnumList,
-      dateList: [{ label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }, { label: '近三月', value: 'threeMonth' }],
       invoiceHelpUrl: `${homeUrl}help/${invoiceID}.html`, // 发票政策地址
       invoicePhone: '0371-55672961',
       visible: false,

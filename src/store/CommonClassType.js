@@ -36,6 +36,10 @@ export default class ClassType {
         _obj[key].First = store.getters['timeSelectModule/lastMonthDate'].First;
         _obj[key].Second = store.getters['timeSelectModule/lastMonthDate'].Second;
         break;
+      case 'threeMonth':
+        _obj[key].First = store.getters['timeSelectModule/threeMonthDate'].First;
+        _obj[key].Second = store.getters['timeSelectModule/threeMonthDate'].Second;
+        break;
       default:
         if (store.getters[`timeSelectModule/${obj.DateType}`]) {
           _obj[key].First = store.getters[`timeSelectModule/${obj.DateType}`].First;
