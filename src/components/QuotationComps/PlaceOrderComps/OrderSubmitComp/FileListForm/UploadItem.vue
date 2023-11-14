@@ -212,6 +212,7 @@ export default {
       });
     },
     clearFiles() {
+      if (this.disabled) return;
       this.$refs.upload.clearFiles();
       this.fileList = [];
       this.lastFileList = [];
@@ -517,6 +518,17 @@ export default {
       .el-upload-dragger {
         border-color: rgba($color: #000000, $alpha: 0) !important;
         background-color: #f8f8f8 !important;
+        cursor: not-allowed;
+
+        > .header {
+          > img {
+            filter: grayscale(1);
+            opacity: 0.3;
+          }
+          > .title {
+            color: #bbb !important;
+          }
+        }
       }
     }
     &.em {

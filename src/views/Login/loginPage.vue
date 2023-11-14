@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <Agreement v-model="agreementvisible" />
+      <LegalAgreementDialog v-model="agreementvisible" />
       <UserAgreement v-model="userAgreementvisible" />
     </section>
   </div>
@@ -54,8 +54,8 @@
 
 <script>
 import RegisterComp from '@/components/LoginComps/RegisterComp.vue';
-import Agreement from '@/components/LoginComps/Agreement.vue';
-import UserAgreement from '@/components/LoginComps/UserAgreement.vue';
+import LegalAgreementDialog from '@/components/common/AgreementComps/LegalAgreementDialog.vue';
+import UserAgreement from '@/components/common/AgreementComps/UserAgreement.vue';
 import { homeUrl } from '@/assets/js/setup';
 import LoginComp from '../../components/LoginComps/LoginComp.vue';
 
@@ -63,7 +63,7 @@ export default {
   components: {
     LoginComp,
     RegisterComp,
-    Agreement,
+    LegalAgreementDialog,
     UserAgreement,
   },
   data() {
