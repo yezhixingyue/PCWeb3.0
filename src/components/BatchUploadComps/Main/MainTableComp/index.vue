@@ -69,7 +69,7 @@
 
       <el-table-column label="操作" width="140" max-width='280' label-class-name='operation'>
         <template slot-scope="scope">
-          <ItemOperationComp :itemData='scope.row' @upload='handleItemUpload' @detail='handleDetailClick' @remove='handleItemRemove' />
+          <ItemOperationComp :disabled="disabled" :itemData='scope.row' @upload='handleItemUpload' @detail='handleDetailClick' @remove='handleItemRemove' />
         </template>
       </el-table-column>
       <div slot="empty">

@@ -1,13 +1,13 @@
 <template>
   <ul v-if="itemData" class="mp-c-batch-upload-page-main-table-operation-item-comp-wrap">
     <li @click="onUploadClick">
-      <span class="label blue-span" :class="{disabled: itemData.orderStatus==='success'}">下单</span>
+      <span class="label blue-span" :class="{disabled: itemData.orderStatus==='success' || disabled}">下单</span>
     </li>
     <li @click="onDetailClick">
       <span class="label blue-span">详情</span>
     </li>
     <li @click="onRemoveClick">
-      <span class="label del" :class="{disabled: itemData.uploadStatus === 'uploading'}">删除</span>
+      <span class="label del" :class="{disabled: itemData.uploadStatus === 'uploading' || disabled}">删除</span>
     </li>
   </ul>
 </template>
@@ -18,6 +18,10 @@ export default {
     itemData: {
       type: Object,
       default: () => ({}),
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -42,14 +46,14 @@ export default {
   },
   methods: {
     onUploadClick() {
-      if (this.itemData.orderStatus === 'success') return;
+      if (this.itemData.orderStatus === 'success' || this.disabled) return;
       this.$emit('upload', this.itemData);
     },
     onDetailClick() {
       this.$emit('detail', this.itemData);
     },
     onRemoveClick() {
-      if (this.itemData.uploadStatus === 'uploading') return;
+      if (this.itemData.uploadStatus === 'uploading' || this.disabled) return;
       this.$emit('remove', this.itemData);
     },
   },
