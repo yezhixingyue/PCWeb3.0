@@ -37,7 +37,7 @@ export default {
   computed: {
     dialogVisible: {
       get() {
-        return true;
+        return this.visible;
       },
       set(val) {
         this.$emit('update:visible', val);
