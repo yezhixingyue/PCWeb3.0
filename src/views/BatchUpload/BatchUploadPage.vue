@@ -16,7 +16,10 @@
     <main>
       <div class="content">
         <div class="upload-btn-box">
-          <FileSelectComp @change="handleFileChange" v-show="customer" :disabled="!canSelectFile" :accept='accept' :selectTitle='selectTitle' ref="oFileBox" />
+          <FileSelectComp @change="handleFileChange" v-show="customer" :disabled="!canSelectFile || !isLegal" :accept='accept'
+           :selectTitle='selectTitle' ref="oFileBox" />
+          <el-checkbox v-show="customer" class="legal" v-model="isLegal" label="">印刷内容合法</el-checkbox>
+          <span v-show="customer" class="blue-span agreement" @click="legalVisible = true">查看“承印品协议书”</span>
           <FailListComp :failedList='failedList' />
         </div>
         <MainTableComp
@@ -29,6 +32,7 @@
           :subExpressList='subExpressList'
           :UseSameAddress='UseSameAddress'
           :ShowProductDetail='ShowProductDetail'
+          :disabled="!isLegal"
           @itemRemove='handleItemRemove'
           @itemUpload='handleItemUpload'
           @multipleSelect='handleMultipleSelect'
@@ -51,7 +55,7 @@
           :allCost='allCost'
           :count="successedList.length"
           :canSelectList='canSelectList'
-          :multipleSelection='multipleSelection'
+          :multipleSelection='isLegal ? multipleSelection : []'
           :UseSameAddress='UseSameAddress'
           @uploadSelected='handleUploadSelected'
           @removeSelected='handleRemoveSelected'
@@ -71,7 +75,7 @@
             :count="successedList.length"
             :failedList='failedList'
             :canSelectList='canSelectList'
-            :multipleSelection='multipleSelection'
+            :multipleSelection='isLegal ? multipleSelection : []'
             :UseSameAddress='UseSameAddress'
             @uploadSelected='handleUploadSelected'
             @removeSelected='handleRemoveSelected'
@@ -82,6 +86,7 @@
         </div>
       </footer>
     </transition>
+    <LegalAgreementDialog v-model="legalVisible"  />
   </section>
 </template>
 
@@ -98,6 +103,7 @@ import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
 import { mapState, mapGetters } from 'vuex';
 import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
 import PreCreateDialog from '../../packages/PreCreateDialog';
+import LegalAgreementDialog from '../../components/common/AgreementComps/LegalAgreementDialog.vue';
 
 export default {
   name: 'OrderBatchUploadPage',
@@ -121,6 +127,7 @@ export default {
     QrCodeForPayDialogComp,
 
     PreCreateDialog, // 预下单弹窗
+    LegalAgreementDialog,
   },
   data() {
     return {
@@ -148,6 +155,8 @@ export default {
       PreCreateData: null, // 预下单数据（服务器返回数据）
       UseSameAddress: false,
       ShowProductDetail,
+      isLegal: true,
+      legalVisible: false,
     };
   },
   computed: {
@@ -259,7 +268,7 @@ export default {
      * 中上部区域： 文件选择相关
      */
     handleFileChange(fileList) { // 选中文件 并对其后续进行处理 （注：每次选中文件都清空掉上次选中文件）
-      if (!this.canSelectFile) return;
+      if (!this.canSelectFile || !this.isLegal) return;
       if (fileList.length + this.successedList.length > 100) {
         this.messageBox.failSingleError({ title: '文件选择失败', msg: '一次最多不能超过100个文件' });
         return;
@@ -294,6 +303,7 @@ export default {
      * 下部区域： 文件上传、删除、选择等操作
      */
     handleMultipleSelect(val) { // 表格中复选框选中文件
+      if (!this.isLegal) return;
       this.multipleSelection = val;
     },
     onDroped(e) {
@@ -302,6 +312,7 @@ export default {
       }
     },
     handleCheckAll(bool) { // 处理底部复选框选中事件
+      if (!this.isLegal) return;
       if (this.$refs.oTableWrap && this.$refs.oTableWrap.$refs.multipleTable) {
         if (bool) { // 全选
           this.$refs.oTableWrap.$refs.multipleTable.toggleAllSelection();
@@ -329,7 +340,7 @@ export default {
       this.failedList = [];
     },
     handleRemoveSelected() { // 删除选中文件
-      if (this.successedList.length === 0 || this.multipleSelection.length === 0) return;
+      if (this.successedList.length === 0 || this.multipleSelection.length === 0 || !this.isLegal) return;
       this.messageBox.warnCancelBox({
         title: '确定删除选中订单吗 ?',
         msg: '删除后不可恢复',
@@ -523,6 +534,20 @@ export default {
           &.upload-btn {
             margin-right: 20px;
           }
+        }
+
+        .legal {
+          .el-checkbox__label {
+            font-size: 13px;
+            color: #585858;
+          }
+        }
+
+        .agreement {
+          margin: 0 15px;
+          font-size: 13px;
+          text-decoration: underline;
+          margin-right: 25px;
         }
       }
       > .table {

@@ -9,7 +9,7 @@
       style="width: 100%"
       :checkAllDisabled='handleCheckAllDisabled'
       :class="{
-        'is-dragover': dragover,
+        'is-dragover': dragover && !disabled,
       }"
       @drop.native.prevent="onDrop"
       @dragover.native.prevent="onDragover"
@@ -119,6 +119,10 @@ export default {
     },
     ShowProductDetail: {
       type: Function,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -275,7 +279,7 @@ export default {
       this.$emit('itemRemove', item);
     },
     handleSelectable(data) { // 判断当前行是否可以被勾选
-      if (data.orderStatus === 'success' || !data.result.HavePrice) return false;
+      if (data.orderStatus === 'success' || !data.result.HavePrice || this.disabled) return false;
       return true;
     },
     handleCheckAllDisabled() {
@@ -286,6 +290,7 @@ export default {
     },
     onDrop(e) {
       this.dragover = false;
+      if (this.disabled) return;
       this.$emit('droped', e);
     },
     getExpressOptions(validExpressIds, subExpressList, item) {
