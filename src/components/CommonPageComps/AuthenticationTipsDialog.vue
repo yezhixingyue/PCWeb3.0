@@ -9,7 +9,9 @@
       <div class="text-area">
         <h2>认证通知</h2>
         <p>
-          为维护广告图文印刷行业从业者的合法权益和社会公共利益，加强文件合法性管理，请您在2023年12月31日前提供“营业执照”、“电商经营证明”等有效证件进行账户认证，超时未认证的将影响正常下单，请悉知。(注:认证信息仅用于存档使用)
+          为维护广告图文印刷行业从业者的合法权益和社会公共利益，加强文件合法性管理，请您在<span
+          class="is-pink">2023年12月31日</span>前提供“营业执照”、“电商经营证明”等有效证件进行账户认证，<span
+          class="is-pink">超时未认证的将影响正常下单</span>，请悉知。(注:认证信息仅用于存档使用)
         </p>
       </div>
       <footer>
@@ -35,7 +37,7 @@ export default {
   computed: {
     dialogVisible: {
       get() {
-        return this.visible;
+        return true;
       },
       set(val) {
         this.$emit('update:visible', val);
