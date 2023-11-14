@@ -1,14 +1,16 @@
 <template>
   <section class="mp-pc-place-order-upload-and-submit-comp-wrap">
     <header class="bg-gray"></header>
-    <div class="comp-title float" v-show="!(isSpotGoods && FileList.length === 0)">
+    <div class="comp-title float print-content" v-show="!(isSpotGoods && FileList.length === 0)">
       <span class="left is-bold">印刷内容</span>
+      <el-checkbox class="legal ft-13" v-model="isLegal" label="">印刷内容合法</el-checkbox>
+      <span class="blue-span" @click="legalVisible = true">查看“承印品协议书”</span>
     </div>
     <div class="content">
       <ul v-if="FileList && FileList.length > 0">
         <li class="file-content-box" v-show="!isSpotGoods">
            <el-form :model="ruleForm" ref="contentValidateForm" label-width="86px" @submit.native.prevent
-            size="mini" hide-required-asterisk :disabled='isUploading'>
+            size="mini" hide-required-asterisk :disabled='isUploading || !isLegal'>
             <el-form-item
               label="文件内容："
               prop="fileContent"
@@ -25,13 +27,13 @@
                 show-word-limit
                 placeholder="1.请填写文件中“具有明显特征”的名称；2.此名称不作为最终制作要求，请正确点选制作要求；"></el-input>
               <div class="design-document" v-show="!isSpotGoods">
-                <DesignDocumentPopoverComp :disabled='isUploading' />
+                <DesignDocumentPopoverComp :disabled='isUploading  || !isLegal' />
               </div>
             </el-form-item>
             <el-form-item
               label="传稿人电话："
               prop="FileAuthorMobile"
-              :disabled='isUploading'
+              :disabled='isUploading  || !isLegal'
               :rules="[
                 { pattern: phoneRegxp, message: '传稿人电话格式不正确'},
               ]"
@@ -44,20 +46,21 @@
           </el-form>
         </li>
         <!-- <li class="design-document" v-show="!isSpotGoods">
-          <DesignDocumentPopoverComp :disabled='isUploading' />
+          <DesignDocumentPopoverComp :disabled='isUploading  || !isLegal' />
         </li> -->
         <li class="file-list-box">
-          <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' :disabled='isUploading' :CustomerID='CustomerID' />
+          <FileListForm :FileList='FileList' ref="FileForm" @fillFileContent='fillFileContent' :disabled='isUploading  || !isLegal' :CustomerID='CustomerID' />
         </li>
       </ul>
       <div class="submit-btn-wrap">
-        <el-button class="button-title-pink" @click="onSave2TheCar" :loading="isUploading && uploadType === 'car'"
-         :disabled="isUploading && uploadType === 'create'">
+        <el-button class="button-title-pink" :class="{disabled:!isLegal || (isUploading && uploadType === 'create')}"
+         @click="onSave2TheCar" :loading="isUploading && uploadType === 'car'"
+         :disabled="!isLegal || (isUploading && uploadType === 'create')">
           <template v-if="!(isUploading && uploadType === 'car')"><i class="iconfont icon-jiarugouwuche" ></i>加入购物车</template>
           <span v-else class="l">文件上传中...</span>
         </el-button>
         <el-button type="danger" @click="onSubmitOrder" :loading="isUploading && uploadType === 'create'"
-         :disabled="isUploading && uploadType === 'car'">{{submitText}}</el-button>
+         :disabled="!isLegal || (isUploading && uploadType === 'car')">{{submitText}}</el-button>
         <ComputedResultComp
           :ProductQuotationResult='ProductQuotationResult' showExpressCost :selectedCoupon='selectedCoupon' />
       </div>
@@ -67,6 +70,7 @@
       <SubmitConfirmDialog :visible.sync="visible" :OrderPreData='OrderPreData' top="2%"
        isSubmitType :requestObj='requestObj' :FileCount='FileCount' @submit="handleSubmit" />
       <Dialog2Pay @close='handleCodeDialogClose' />
+      <LegalAgreementDialog v-model="legalVisible"  />
     </div>
   </section>
 </template>
@@ -81,6 +85,7 @@ import ComputedResultComp from '@/components/QuotationComps/QuotationContent/Com
 import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
 import FileListForm from './FileListForm/index.vue';
 import SubmitConfirmDialog from './SubmitConfirmDialog/index.vue';
+import LegalAgreementDialog from '../../../common/AgreementComps/LegalAgreementDialog.vue';
 
 export default {
   components: {
@@ -90,6 +95,7 @@ export default {
     SubmitConfirmDialog,
     Dialog2Pay,
     TipsBox,
+    LegalAgreementDialog,
   },
   props: {
     asyncInputchecker: {
@@ -151,6 +157,8 @@ export default {
         fileContent: '',
         FileAuthorMobile: '',
       },
+      isLegal: true, // 印刷内容是合法的
+      legalVisible: false,
     };
   },
   methods: {
@@ -636,6 +644,12 @@ export default {
         &:last-of-type {
           margin-right: 32px;
         }
+
+        &.button-title-pink.disabled {
+          background-color: #fff !important;
+          color: #ff9bb4 !important;
+          border-color: #ff9bb4 !important;
+        }
       }
       // > div {
       //  position: absolute;
@@ -647,6 +661,26 @@ export default {
     > .tips-box-wrap {
       padding-top: 20px;
       padding-bottom: 60px;
+    }
+  }
+
+  .print-content {
+    position: relative;
+    .legal {
+      margin: 0 15px;
+      position: relative;
+      top: 1px;
+      margin-left: 38px;
+      .el-checkbox__label {
+        font-size: 13px;
+        color: #585858;
+      }
+    }
+    .blue-span {
+      position: relative;
+      top: 1px;
+      font-size: 13px;
+      text-decoration: underline;
     }
   }
 }
