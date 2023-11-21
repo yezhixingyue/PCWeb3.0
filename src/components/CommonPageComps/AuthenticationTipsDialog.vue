@@ -105,6 +105,7 @@ export default {
             padding: 0 70px 0 24px ;
             line-height: 1.5em;
             text-indent: 2em;
+            text-align: justify;
           }
         }
         > footer {

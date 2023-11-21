@@ -24,6 +24,9 @@
         <li>
           <a :href='`${homeUrl}help.html`' target="_blank">帮助中心</a>
         </li>
+        <li>
+          <a :href='`${homeUrl}template.html`' target="_blank">模板中心</a>
+        </li>
       </ul>
       <!-- <span v-if="customerInfo"><i></i>{{customerInfo.CustomerName}}</span> -->
     </header>
