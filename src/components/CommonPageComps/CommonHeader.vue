@@ -203,7 +203,7 @@ export default {
     AuthenticationTipsDialog,
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance', 'showMember']),
+    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance', 'showMember', 'isNextYear']),
     ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
@@ -419,7 +419,6 @@ export default {
           if (diff < 24 * 60 * 60 * 1000) {
             const ld = new Date(lastTipTime).getDate();
             const cd = new Date().getDate();
-            console.log(ld, cd);
             if (ld === cd) return;
           }
         }
@@ -473,6 +472,18 @@ export default {
         // this.setQQChangeTip(); // 取消qq弹窗提示
         if (!this.customerInfo.AuthStatus) {
           this.setAuthenticationTip();
+        }
+        // 是否是2024年 并且未认证
+        if (this.isNextYear && !this.customerInfo.AuthStatus) {
+          console.log('是否是2024年 并且未认证');
+        }
+        // 是否是2024年 并且认证中
+        if (this.isNextYear && this.customerInfo.AuthStatus === 1) {
+          console.log('是否是2024年 并且认证中');
+        }
+        // 是否是2024年 并且未通过
+        if (this.isNextYear && this.customerInfo.AuthStatus === 3) {
+          console.log('是否是2024年 并且未通过');
         }
       }
       if (showLoading) loadingInstance.close();

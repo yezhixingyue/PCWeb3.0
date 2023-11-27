@@ -43,7 +43,9 @@
           </el-table-column>
         </el-table>
 
-        <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm1" label-width="100px" class="demo-ruleForm">
+        <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm1" label-width="100px" class="demo-ruleForm"
+          style="min-height: calc(100vh - 115px - 22px - 350px);"
+        >
           <el-form-item label="诉求意向：" prop="AppealType">
             <div class="intention">
               <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
@@ -54,12 +56,6 @@
           </el-form-item>
 
           <template v-if="ruleForm.AppealType!==null">
-            <!--  -->
-
-            <!--  -->
-
-            <!--  -->
-
             <el-form-item class="QuestionTypeList" label="问题类型：" prop="QuestionTypeList" style="margin-bottom:0">
               <CheckButton
                 @CheckChange="ApplyQuestionCheckChange"
@@ -135,8 +131,8 @@
           </div>
 
         </el-form>
-        <div class="btn-box" v-if="ruleForm.AppealType!==null">
-          <el-button type="primary" @click="submitForm()" >立即提交</el-button>
+        <div class="btn-box">
+          <el-button v-if="ruleForm.AppealType!==null" type="primary" @click="submitForm()" >立即提交</el-button>
           <!-- <span class="blue-span is-font-12" style="margin: 0 60px 0 30px" @click="resetForm('ruleForm')" v-if='canEdit'>重置</span> -->
           <el-button  @click="handleReturn" style="color: #428DFA; border-color: #428DFA;">
             返回

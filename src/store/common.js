@@ -260,6 +260,8 @@ export default {
     ---------------------------------------- */
     keepOrderData: false,
     canUseflex: false, // 页面是否支持flex
+
+    isNextYear: new Date().getFullYear() > 2023,
   },
   getters: {
     /* 细分类 物流配送方式列表
