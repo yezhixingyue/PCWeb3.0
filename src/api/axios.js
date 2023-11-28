@@ -167,7 +167,6 @@ const handleResponse = async (response) => {
   localCancelToken.removeCancelToken(response.config);
 
   if (response.config.tracking === true) {
-    console.log('response.config Tracking', response.config.tracking, response.config.url, response.config);
     trackinghandler.uploadTracking(response.config);
   }
 
