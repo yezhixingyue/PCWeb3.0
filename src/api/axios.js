@@ -7,6 +7,7 @@ import Cookie from '../assets/js/Cookie';
 import { useCookie, baseUrl } from '../assets/js/setup';
 import LocalCancelToken from './CancelToken';
 import sendError from './sendError';
+import trackinghandler from './trackinghandler';
 // import { delay } from '../assets/js/utils/utils';
 
 const getRelativePath = (config) => {
@@ -93,6 +94,8 @@ axios.interceptors.request.use(
       });
     }
 
+    if (config.tracking === true) curConfig.timerStart = Date.now();
+
     localCancelToken.setCancelToken(config);
 
     return curConfig;
@@ -162,6 +165,12 @@ const handleResponse = async (response) => {
     messageBox.failSingleError(_obj);
   }
   localCancelToken.removeCancelToken(response.config);
+
+  if (response.config.tracking === true) {
+    console.log('response.config Tracking', response.config.tracking, response.config.url, response.config);
+    trackinghandler.uploadTracking(response.config);
+  }
+
   return response;
 };
 
@@ -235,10 +244,13 @@ axios.interceptors.response.use(
           }
           break;
       }
-      if (_msg) {
+      if (_msg && error.config.url !== '/Api/SaveRecord') {
         messageBox.failSingleError({ title: _title, msg: _msg });
       }
       return Promise.reject(error.response);
+    }
+    if (error.config.closeTip) {
+      return Promise.reject(error);
     }
     if (error.message === 'Network Error') {
       Message({

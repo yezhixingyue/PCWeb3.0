@@ -11,6 +11,9 @@ const api = {
   getSmsCode(Mobile, Type = 0) {
     return instance.post('/Api/Sms/Send', { Mobile, Type });
   },
+  getApiSaveRecord(data) { // 埋点记时上报
+    return instance.post('/Api/SaveRecord', data, { closeLoading: true, closeTip: true }); // 该接口不应配置tracking为true
+  },
   // /Api/Address/Search GET请求，参数address
   getAddressSearch(address) {
     return instance.get('/Api/Address/Search', { params: { address } });
@@ -81,7 +84,7 @@ const api = {
   },
   getProductPrice(data) { // 价格信息计算  POST /Api/Calculate/ProductPrice
     // return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { closeLoading: true });
-    return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data });
+    return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { tracking: true });
   },
   getOrderPreCreate(data) { // POST /Api/Order/PreCreate  直接下单 - 预下单
     const { closeTip } = data;
@@ -91,7 +94,7 @@ const api = {
     return instance.post('/Api/Quotation/Save', { Terminal: 1, ...data });
   },
   CreateOrderFromPreCreate(data, config = { closeLoading: true, closeTip: true }) { // POST /Api/Order/Create
-    return instance.post('/Api/Order/Create', { Terminal: 1, ...data }, config);
+    return instance.post('/Api/Order/Create', { Terminal: 1, ...data }, { ...config, tracking: true });
   },
   getPayResult(payCode, type) { // GET /Api/PaymentOrder/PayResult 查询付款结果
     if (!type) return instance.get(`/Api/PaymentOrder/PayResult?payCode=${payCode}`);
@@ -215,7 +218,7 @@ const api = {
   /* 订单部分 api
    ----------------------------------------------------------------------------------- */
   getCustomerOrderList(data) { // POST /Api/Customer/OrderList 获取订单列表
-    return instance.post('/Api/Customer/OrderList', data);
+    return instance.post('/Api/Customer/OrderList', data, { tracking: true });
   },
   getOrderProgress(OrderID, closeLoading = false) { // GET /Api/Order/Progress  订单进度
     return instance.get('/Api/Order/Progress', { params: { OrderID }, closeLoading });
@@ -249,7 +252,7 @@ const api = {
     return instance.get('/Api/File/SuffixList', { closeLoading: true });
   },
   getOrderCreate(data, closeLoading = true) { // POST /Api/Order/Create 提交下单
-    return instance.post('/Api/Order/Create', data, { closeLoading });
+    return instance.post('/Api/Order/Create', data, { closeLoading, tracking: true });
   },
   getFreightCalculate(data) { // POST /Api/Freight/Calculate 有效地址或配送方式发生变化时重新计算解析条目的运费价格
     return instance.post('/Api/Freight/Calculate', data, { closeLoading: true, closeTip: true });
