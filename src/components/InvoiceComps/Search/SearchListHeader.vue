@@ -52,7 +52,7 @@ export default {
   data() {
     return {
       InvoiceTypeEnumList,
-      dateList: [{ label: '全部', value: 'all' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '近七天', value: 'last7Date' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
       localInvoiceStatusEnumList: InvoiceStatusEnumList.filter(it => it.ID !== InvoiceStatusEnums.canceled.ID),
     };
   },

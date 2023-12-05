@@ -29,6 +29,7 @@
           :handlePageChange='handlePageChange'
           :count='FundBillListNumber'
           :pageSize='12'
+          :DownLoadConfigObj='DownLoadConfigObj'
           class="float"
          />
       </div>
@@ -47,6 +48,7 @@ import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
 import { BillTypeEnumList, BillTypeEnums } from '@/assets/js/ClassType/Summary/ConditionForBillList';
+import CommonClassType from '../../store/CommonClassType';
 
 export default {
   components: {
@@ -98,12 +100,28 @@ export default {
       const t = this.utils.getNameFromListByIDs(this.nextBillType, BillTypeEnumList);
       return t || '';
     },
+    DownLoadConfigObj() {
+      return {
+        condition: this.condition,
+        count: this.FundBillListNumber,
+        fileDefaultName: '名片之家账单列表',
+        fileDate: this.condition4FundBillList.Date,
+        downFunc: data => this.api.getCustomerFundBillExcel(data),
+      };
+    },
+    condition() {
+      if (!this.condition4FundBillList) return {};
+      let _t = JSON.parse(JSON.stringify(this.condition4FundBillList));
+      CommonClassType.setDate(_t);
+      _t = CommonClassType.filter(_t);
+      return _t;
+    },
   },
   data() {
     return {
       billValue: '',
       // eslint-disable-next-line max-len
-      dateList: [{ label: '全部', value: 'all' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '近七天账单', value: 'last7Date' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
     };
   },
   methods: {

@@ -114,7 +114,7 @@ export default {
       isFootFixed: false,
       // OrderStatus: '',
       // eslint-disable-next-line max-len
-      dateList: [{ label: '全部', value: 'all' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      dateList: [{ label: '近七天', value: 'last7Date' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
       OrderStatusList: [
         { label: '不限', value: '' },
         { label: '生产中', value: 55 },

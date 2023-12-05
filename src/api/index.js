@@ -158,6 +158,9 @@ const api = {
   getExpressUseableCompanyList(data) { // POST /Api/Express/UseableCompanyList  获取可用快递和物流公司列表
     return instance.post('/Api/Express/UseableCompanyList', data, { closeLoading: true });
   },
+  getExpressTip() { // POST /Api/Express/Tip  获取物流公司可用快递
+    return instance.get('/Api/Express/Tip');
+  },
   getFileTypeList() { // /Api/FileType/List 获取文件对应列表
     return instance.get('/Api/FileType/List');
   },
@@ -214,7 +217,9 @@ const api = {
   getCustomerFundBill(data) { // /Api/Customer/FundBill 获取账单流水
     return instance.post('/Api/Customer/FundBill', data);
   },
-
+  getCustomerFundBillExcel(data) { // /Api/Customer/FundBill 获取账单流水
+    return instance.post('/Api/Customer/FundBillExcel', data, { responseType: 'arraybuffer' });
+  },
   /* 订单部分 api
    ----------------------------------------------------------------------------------- */
   getCustomerOrderList(data) { // POST /Api/Customer/OrderList 获取订单列表

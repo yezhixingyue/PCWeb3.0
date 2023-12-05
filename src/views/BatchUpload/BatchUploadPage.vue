@@ -3,6 +3,7 @@
     <header>
       <div class="content">
         <AddressChangeComp
+          :ExpressTip='ExpressTip'
           :customer='customer'
           :UseSameAddress='UseSameAddress'
           :switchUseSameAddDisabled='canSelectList.length > 0'
@@ -157,6 +158,7 @@ export default {
       ShowProductDetail,
       isLegal: true,
       legalVisible: false,
+      ExpressTip: '',
     };
   },
   computed: {
@@ -296,8 +298,9 @@ export default {
           this.messageBox.warnSingleError({ title: `${text}共有${failedList.length}个文件报价失败`, msg: '请在按钮右侧查看具体错误信息' });
         }
       }
+      const _successedList = successedList.map(it => ({ ...it, Express: it.result.Express || it.Express }));
       this.failedList.push(...failedList);
-      this.successedList.push(...successedList);
+      this.successedList.push(..._successedList);
     },
     /**
      * 下部区域： 文件上传、删除、选择等操作
@@ -437,6 +440,12 @@ export default {
       }
       return '';
     },
+    async getExpressTip() {
+      const resp = await this.api.getExpressTip().catch(() => null);
+      if (resp && resp.data.Status === 1000) {
+        this.ExpressTip = resp.data.Data;
+      }
+    },
   },
   watch: {
     scrollChange() {
@@ -458,6 +467,7 @@ export default {
     },
   },
   async created() {
+    this.getExpressTip();
     const accept = await BatchUploadClass.getFileSuffixList();
     if (accept) this.accept = accept;
   },
@@ -499,7 +509,7 @@ export default {
       border-top: 1px dashed #eee;
       padding: 15px 0;
       padding-top: 12px;
-      height: 156px;
+      height: 200px;
       .mp-pc-place-order-address-show-and-change-wrap > .content.isBatchUploadUse > ul {
         margin: 0;
         margin-top: 7px;
