@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     ...mapState('Authentication', ['authCompanyInfo']),
-    ...mapState('common', ['customerInfo']),
+    ...mapState('common', ['customerInfo', 'isNextYear']),
     showWayComponent() {
       if (!this.authCompanyInfo || this.isEdit) return true;
       return false;
@@ -63,9 +63,17 @@ export default {
       this.AuthCompanyInit();
     },
   },
+  created() {
+    this.$store.commit('common/setTipVisible', false);
+  },
   mounted() {
     this.isLoadding = false;
     this.AuthCompanyInit();
+  },
+  destroyed() {
+    if (this.isNextYear && this.customerInfo.AuthStatus !== 2) {
+      this.$store.commit('common/setTipVisible', true);
+    }
   },
 };
 </script>

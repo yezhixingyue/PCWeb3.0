@@ -261,7 +261,8 @@ export default {
     keepOrderData: false,
     canUseflex: false, // 页面是否支持flex
 
-    isNextYear: new Date().getFullYear() > 2023,
+    isNextYear: new Date().getFullYear() > 2022,
+    AuthenticationCompVisible: false,
   },
   getters: {
     /* 细分类 物流配送方式列表
@@ -291,6 +292,9 @@ export default {
     },
   },
   mutations: {
+    setTipVisible(state, bool) {
+      state.AuthenticationCompVisible = bool;
+    },
     setCanUseflex(state, bool) {
       state.canUseflex = bool;
     },

@@ -181,6 +181,7 @@
     </div> -->
     <ChangeQQTipsDialog  :visible.sync="changeQQVisible" />
     <AuthenticationTipsDialog  :visible.sync="AuthenticationVisible" />
+    <AuthenticationTipsDialogConp v-if="customerInfo" :visible.sync="AuthenticationCompVisible" />
   </section>
 </template>
 
@@ -193,6 +194,7 @@ import PlaceOrderProductClassifyComp from '@/components/QuotationComps/PlaceOrde
 import RechargeComp from './RechargeComp.vue';
 import ChangeQQTipsDialog from './ChangeQQTipsDialog';
 import AuthenticationTipsDialog from './AuthenticationTipsDialog';
+import AuthenticationTipsDialogConp from './AuthenticationTipsDialogConp';
 import Cookie from '../../assets/js/Cookie';
 
 export default {
@@ -201,9 +203,11 @@ export default {
     PlaceOrderProductClassifyComp,
     ChangeQQTipsDialog,
     AuthenticationTipsDialog,
+    AuthenticationTipsDialogConp,
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo', 'isPopperVisible', 'BeanNumberBalance', 'showMember', 'isNextYear']),
+    ...mapState('common', ['customerInfo', 'customerBalance', 'ScrollInfo',
+      'isPopperVisible', 'BeanNumberBalance', 'showMember', 'isNextYear', 'AuthenticationCompVisible']),
     ...mapState('Quotation', ['initPageText', 'curProductID']),
     scrollTop() {
       return this.ScrollInfo.scrollTop;
@@ -226,6 +230,8 @@ export default {
       isloading: false,
       changeQQVisible: false,
       AuthenticationVisible: false,
+      // AuthenticationCompVisible: false,
+      TipTime: '',
     };
   },
   methods: {
@@ -322,7 +328,6 @@ export default {
       this.$router.push('/mySetting/account');
     },
     onCommand(command) {
-      // console.log(command);
       if (command === 'loginOut') {
         this.messageBox.warnCancelNullMsg({
           title: '确定退出登录吗?',
@@ -411,24 +416,65 @@ export default {
     },
     // 未认证弹框 每天一次
     setAuthenticationTip() {
-      let lastTipTime = Cookie.getCookie('lastAuthenticationTipTime');
-      if (lastTipTime) {
-        lastTipTime = +lastTipTime;
-        if (lastTipTime > 0) {
-          const diff = Date.now() - lastTipTime;
-          if (diff < 24 * 60 * 60 * 1000) {
-            const ld = new Date(lastTipTime).getDate();
-            const cd = new Date().getDate();
-            if (ld === cd) return;
-          }
-        }
-      }
+      // let lastTipTime = Cookie.getCookie('lastAuthenticationTipTime');
+      // if (lastTipTime) {
+      //   lastTipTime = +lastTipTime;
+      //   if (lastTipTime > 0) {
+      //     const diff = Date.now() - lastTipTime;
+      //     if (diff < 24 * 60 * 60 * 1000) {
+      //       const ld = new Date(lastTipTime).getDate();
+      //       const cd = new Date().getDate();
+      //       if (ld === cd) return;
+      //     }
+      //   }
+      // }
       this.AuthenticationVisible = true;
-      lastTipTime = Date.now();
-      Cookie.setCookie('lastAuthenticationTipTime', lastTipTime, 24 * 60 * 60);
+      this.setTipTime();
+      // lastTipTime = Date.now();
+      // Cookie.setCookie('lastAuthenticationTipTime', lastTipTime, 24 * 60 * 60);
+    },
+    isToday() {
+      if (!this.TipTime) {
+        this.TipTime = Cookie.getCookie('TipTime');
+      }
+      if (this.TipTime) {
+        this.TipTime = Number(this.TipTime);
+        const nowDate = new Date();
+        const nowMonth = nowDate.getMonth();
+        const nowDay = nowDate.getDate();
+        if (new Date(this.TipTime).getDate() !== nowDay) {
+          return false;
+        }
+        if (new Date(this.TipTime).getMonth() !== nowMonth) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    },
+    setTipTime() {
+      const lastTipTime = Date.now();
+      Cookie.setCookie('TipTime', lastTipTime, 24 * 60 * 60);
+    },
+    // 未认证弹框
+    showTip() {
+      // this.AuthenticationCompVisible = true;
+      if (this.$route.name !== 'mySettingAuthentication') {
+        this.$store.commit('common/setTipVisible', true);
+      }
+      // this.setTipTime();
     },
   },
   watch: {
+    AuthenticationCompVisible: {
+      handler() {
+        // 是否是2024年 并且未认证
+        if (this.isNextYear && this.customerInfo.AuthStatus !== 2) {
+          this.showTip();
+        }
+      },
+      deep: true,
+    },
     customerInfo: {
       handler(newVal) {
         if (useCookie) Cookie.setCookie('customerInfo', JSON.stringify(newVal), 'Session');
@@ -470,20 +516,12 @@ export default {
           this.$store.dispatch('common/getNoticeList'),
         ]);
         // this.setQQChangeTip(); // 取消qq弹窗提示
-        if (!this.customerInfo.AuthStatus) {
+        if (!this.customerInfo.AuthStatus && !this.isNextYear && !this.isToday()) {
           this.setAuthenticationTip();
         }
         // 是否是2024年 并且未认证
-        if (this.isNextYear && !this.customerInfo.AuthStatus) {
-          console.log('是否是2024年 并且未认证');
-        }
-        // 是否是2024年 并且认证中
-        if (this.isNextYear && this.customerInfo.AuthStatus === 1) {
-          console.log('是否是2024年 并且认证中');
-        }
-        // 是否是2024年 并且未通过
-        if (this.isNextYear && this.customerInfo.AuthStatus === 3) {
-          console.log('是否是2024年 并且未通过');
+        if (this.isNextYear && this.customerInfo.AuthStatus !== 2) {
+          this.showTip();
         }
       }
       if (showLoading) loadingInstance.close();

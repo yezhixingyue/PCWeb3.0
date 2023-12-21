@@ -49,7 +49,7 @@ export default {
   },
   computed: {
     ...mapState('Quotation', ['curProductInfo2Quotation', 'initPageText', 'productNames']),
-    ...mapState('common', ['customerInfo', 'NoticeList']),
+    ...mapState('common', ['customerInfo', 'NoticeList', 'AuthenticationCompVisible']),
   },
   data() {
     return {
@@ -81,18 +81,21 @@ export default {
     },
     setInfoLackTip() {
       if (!this.customerInfo || this.customerInfo.QQ) return;
-      this.messageBox.warnCancelBox({
-        title: '企业信息未完善',
-        msg: '您尚有资料未完善，无法享受优惠价格',
-        cancelButtonText: '忽略',
-        confirmButtonText: '去完善资料',
-        successFunc: () => {
-          this.$router.push({
-            path: '/mySetting/account',
-            query: { redirect: 'placeOrder' },
-          });
-        },
-      });
+      // console.log(this.AuthenticationCompVisible);
+      if (!this.AuthenticationCompVisible) {
+        this.messageBox.warnCancelBox({
+          title: '企业信息未完善',
+          msg: '您尚有资料未完善，无法享受优惠价格',
+          cancelButtonText: '忽略',
+          confirmButtonText: '去完善资料',
+          successFunc: () => {
+            this.$router.push({
+              path: '/mySetting/account',
+              query: { redirect: 'placeOrder' },
+            });
+          },
+        });
+      }
     },
   },
   mounted() {
