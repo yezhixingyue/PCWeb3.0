@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Cookie from '@/assets/js/Cookie';
 import { useCookie } from '@/assets/js/setup';
+import WxCodeHandler from '@/assets/js/ClassType/WxCodeHandler';
 import CommonViewPage from '../views/Common/CommonViewPage.vue';
 
 Vue.use(VueRouter);
@@ -469,15 +470,30 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  // 处理微信授权回调页面的相关处理，此处进行任务分配，区分登录和绑定，进行相应跳转，在对应页面中进行下一步的处理
+  if (WxCodeHandler.handleRouterBeforeEach(to, next)) return;
+  if (to.query.code && to.query.state && to.query.state !== to.name) { // 兼容性处理微信回调时可用到 区分登录和绑定
+    next({
+      name: to.query.state,
+      query: to.query,
+    });
+    return;
+  }
+
   if (to.path === '/pathFromClient') {
     const { url, token } = to.query;
     if (url && token) {
       sessionStorage.removeItem('couponCenterData');
       const oneDay = 24 * 60 * 60;
       Cookie.setCookie('token', token, 30 * oneDay);
+
+      const _query = { ...to.query };
+      delete _query.url;
+      delete _query.token;
+
       next({
         path: url,
-        query: {},
+        query: _query,
       });
       return;
     }
@@ -497,26 +513,30 @@ router.beforeEach(async (to, from, next) => {
   // 判断该路由是否需要登录权限
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (to.name === 'login') {
-      if (_auth) next({ path: '/placeOrder' });
+      if (_auth) next({ path: '/placeOrder', query: to.query });
       else next();
     } else if (to.name === 'placeOrder' && to.query.token) {
       if (!useCookie) localStorage.setItem('token', to.query.token);
       else Cookie.setItem('token', to.query.token, 24 * 60 * 60); // 该情况将不存在
+
+      const _query = { ...to.query };
+      delete _query.token;
+
       next({
         path: '/placeOrder',
-        query: { id: to.query.id },
+        query: _query,
       });
     } else if (to.name === 'placeOrder' && to.query.id && !_auth && !to.query.token) {
       next({
         path: '/login',
-        query: { id: to.query.id },
+        query: to.query,
       });
     } else if (_auth) {
       next();
     } else {
       next({
         path: '/login',
-        query: { redirect: to.path },
+        query: { ...to.query, redirect: to.path },
       });
     }
   } else {

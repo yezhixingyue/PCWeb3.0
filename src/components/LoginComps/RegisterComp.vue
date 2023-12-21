@@ -53,6 +53,12 @@
 import Cookie from '../../assets/js/Cookie';
 
 export default {
+  props: {
+    ThridAuthList: {
+      type: Array,
+      default: null,
+    },
+  },
   data() {
     const validateMobile = (rule, value, callback) => {
       if (this.validateCheck(value, this.defineRules.Mobile, callback)) callback();
@@ -190,6 +196,9 @@ export default {
             VertifyCode,
             Terminal: 1,
           };
+
+          if (this.ThridAuthList) _obj.ThridAuthList = this.ThridAuthList;
+
           this.$emit('setPanelLoading', [true, '正在注册中...']);
           const res = await this.api.getReg(_obj);
           this.$emit('setPanelLoading', [false, '']);

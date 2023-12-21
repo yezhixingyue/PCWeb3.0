@@ -478,6 +478,16 @@ export default {
     setNoticeList(state, list) {
       state.NoticeList = list;
     },
+    /** 三方绑定后的客户信息相关操作
+    ---------------------------------------- */
+    handleThirdBind(state, { isBind, info }) {
+      if (!state.customerInfo) return;
+      if (isBind) {
+        state.customerInfo.Account.ThridAuthList.push(info);
+      } else {
+        state.customerInfo.Account.ThridAuthList = state.customerInfo.Account.ThridAuthList.filter(it => it.ThirdType !== info.ThirdType);
+      }
+    },
   },
   actions: {
     async getCustomerDetail({ state, commit }, key = false) { // 获取账号基本信息
