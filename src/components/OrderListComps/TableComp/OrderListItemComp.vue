@@ -72,7 +72,7 @@
               'is-gray': [253, 254, 255, 35].includes(item.Status),
               'is-success': item.Status === 200,
             }">
-              <el-tooltip popper-class="table-item" :enterable='false' :disabled="item.Status !== 42"
+              <el-tooltip popper-class="table-item" :enterable='false' :disabled="item.Status !== 42 && item.Status !== 43"
                 :content="item.Status | formatStatus" placement="top">
                 <span>{{item.Status | formatStatus}}</span>
               </el-tooltip>
