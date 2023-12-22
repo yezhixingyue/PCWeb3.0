@@ -23,9 +23,9 @@
       <el-button type="primary" :disabled='!disableLogin' @click="submitForm('ruleForm')">登录</el-button>
       <p class="text-btns">
         <span class="span-title-blue" key="se" @click="() => this.$emit('changePanel', 'second')">新用户注册</span>
-        <i class="separation"></i>
+        <!-- <i class="separation"></i>
         <span class="span-title-blue wechat" key="wx" @click.self.stop="onWxLoginClick"> <img
-            src="@/assets/images/wechat.png" alt=""> 微信扫码登录</span>
+            src="@/assets/images/wechat.png" alt="">微信扫码登录</span> -->
       </p>
     </el-form-item>
   </el-form>
@@ -279,20 +279,21 @@ export default {
 .text-btns {
   font-size: 13px;
   .separation {
-    margin: 0 10px;
-    margin-left: 15px;
+    margin: 0 21px;
+    margin-left: 22px;
     width: 1px;
     display: inline-block;
-    height: 18px;
+    height: 20px;
     background-color: #ddd;
-    vertical-align: -2px;
+    vertical-align: -4px;
   }
 
   .wechat {
     img {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       vertical-align: -4px;
+      margin-right: 10px;
     }
 
   }

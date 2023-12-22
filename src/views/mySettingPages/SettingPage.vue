@@ -18,7 +18,7 @@
       </div>
     </section>
 
-    <section class="third-bind-setup">
+    <!-- <section class="third-bind-setup">
       <header>
         <span class="blue-v-line is-bold is-black">微信绑定</span>
       </header>
@@ -30,7 +30,7 @@
           <span v-else class="blue-span ml-10" @click="onUnbindClick">解绑</span>
         </li>
       </ul>
-    </section>
+    </section> -->
     <WechatBindDialog v-if="!wechatBindInfo" :visible.sync="visible" />
   </article>
 </template>

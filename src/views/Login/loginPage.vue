@@ -24,7 +24,7 @@
         >
           <el-tabs v-model="activeName" stretch>
             <el-tab-pane label="用户登录" name="first"></el-tab-pane>
-            <el-tab-pane label="用户注册" name="second"></el-tab-pane>
+            <el-tab-pane label="新用户注册" name="second"></el-tab-pane>
           </el-tabs>
           <div class="panel-content">
             <div class="hi">
