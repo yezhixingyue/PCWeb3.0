@@ -267,7 +267,7 @@ export default {
     keepOrderData: false,
     canUseflex: false, // 页面是否支持flex
 
-    isNextYear: new Date().getFullYear() > 2022,
+    isNextYear: new Date().getFullYear() > 2023,
     AuthenticationCompVisible: false,
   },
   getters: {
