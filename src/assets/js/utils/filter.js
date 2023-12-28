@@ -44,6 +44,7 @@ Vue.filter('formatStatus', (status) => {
   if (status === 10) return '未付款';
   const arr = OrderStatusList.find((item) => item.value === status);
   if (arr) return arr.label.trim();
+  if (status === 253) return '已取消';
   return status;
 });
 
@@ -54,6 +55,7 @@ Vue.filter('formatStatus4PackageList', status => {
   if (status === 10) return '未付款';
   const arr = OrderStatusList4PackageList.find(item => item.value === status);
   if (arr) return arr.label.trim();
+  if (status === 253) return '已取消';
   return status;
 });
 
