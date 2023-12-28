@@ -28,7 +28,13 @@
     <!-- <p>{{ msg }}</p> -->
     <el-form-item>
       <el-button type="primary" :disabled='!disableLogin' @click="submitForm('ruleForm')">登录</el-button>
-      <p><span class="span-title-blue" @click="() => this.$emit('changePanel', 'second')">新用户注册</span></p>
+      <p>
+        <span class="span-title-blue" @click="() => this.$emit('changePanel', 'second')">新用户注册</span>
+        <i class="mr-15 ml-15 gray">|</i>
+        <span class="span-title-blue" @click="() => messageBox.failSingleError({
+          msg: '正在开发中，请稍候...', title: '功能尚未上线'})">
+          <img src="@/assets/images/qq.png" style="width: 18px;vertical-align: -4px;" class="mr-3"> QQ登录</span>
+      </p>
     </el-form-item>
   </el-form>
 </template>
