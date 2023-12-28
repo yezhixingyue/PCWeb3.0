@@ -9,7 +9,8 @@
 </template>
 
 <script>
-import WxCodeHandler from '@/assets/js/ClassType/WxCodeHandler';
+
+import ThirdCodeHandler from '@/assets/js/ClassType/ThirdCodeHandler';
 
 export default {
   props: {
@@ -35,7 +36,7 @@ export default {
     },
   },
   async mounted() {
-    WxCodeHandler.appendScriptLink();
+    ThirdCodeHandler.appendScriptLink();
 
     let state = this.type;
     if (this.$route.fullPath.includes('?')) {
@@ -46,8 +47,8 @@ export default {
     }
 
     this.loading = true;
-    await WxCodeHandler.createWxLoginInstance(state);
-    await WxCodeHandler.delay(100);
+    await ThirdCodeHandler.createWxLoginInstance(state);
+    await ThirdCodeHandler.delay(100);
     this.loading = false;
   },
 };

@@ -489,9 +489,9 @@ export default {
     handleThirdBind(state, { isBind, info }) {
       if (!state.customerInfo) return;
       if (isBind) {
-        state.customerInfo.Account.ThridAuthList.push(info);
+        state.customerInfo.Account.ThirdAuthList.push(info);
       } else {
-        state.customerInfo.Account.ThridAuthList = state.customerInfo.Account.ThridAuthList.filter(it => it.ThirdType !== info.ThirdType);
+        state.customerInfo.Account.ThirdAuthList = state.customerInfo.Account.ThirdAuthList.filter(it => it.ThirdType !== info.ThirdType);
       }
     },
   },

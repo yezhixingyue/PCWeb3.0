@@ -14,8 +14,8 @@ const api = {
   getThirdLoginBind(data) { // POST /Api/ThirdLogin/Bind 绑定
     return instance.post('/Api/ThirdLogin/Bind', data);
   },
-  getThirdLoginUnBind() { // PUT /Api/ThirdLogin/UnBind 解绑
-    return instance.put('/Api/ThirdLogin/UnBind');
+  getThirdLoginUnBind(thirdType) { // PUT /Api/ThirdLogin/UnBind 解绑
+    return instance.put('/Api/ThirdLogin/UnBind', null, { params: { thirdType } });
   },
   getSmsCode(Mobile, Type = 0) {
     return instance.post('/Api/Sms/Send', { Mobile, Type });

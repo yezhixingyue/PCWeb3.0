@@ -110,12 +110,12 @@
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown" class="mp-pc-my-set-drop-down-wrap mp-scroll-wrap">
-              <el-dropdown-item
+              <!-- <el-dropdown-item
                 :class="{active: $route.name === 'mySettingAccount'}"
                 command='account' icon="el-icon-user-solid">企业信息</el-dropdown-item>
               <el-dropdown-item v-if="!this.customerInfo.Account.IsBranch"
                 :class="{active: $route.name === 'mySettingAuthentication'}"
-                command='authentication' icon="iconfont icon-qiyerenzheng">企业认证</el-dropdown-item>
+                command='authentication' icon="iconfont icon-qiyerenzheng">企业认证</el-dropdown-item> -->
               <el-dropdown-item v-if="showMember && customerInfo.IsUpDown"
                 :class="{active: $route.name === 'MemberCenter'}"
                 command='MemberCenter' icon="iconfont icon-huiyuan">会员中心</el-dropdown-item>
@@ -130,13 +130,13 @@
                 command='myCoupons' icon="el-icon-s-claim">我的优惠券</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'subAccountManage'}"
-                command='subAccountManage' icon="el-icon-menu">账号管理</el-dropdown-item>
-              <el-dropdown-item
+                command='subAccountManage' icon="el-icon-menu">子账号管理</el-dropdown-item>
+              <!-- <el-dropdown-item
                 :class="{active: $route.name === 'mySettingChangePwd'}"
                 command='changePwd' icon="el-icon-s-help">修改密码</el-dropdown-item>
               <el-dropdown-item
                 :class="{active: $route.name === 'mySettingChangeMobile'}"
-                command='changeMobile' icon="el-icon-s-order">修改手机号</el-dropdown-item>
+                command='changeMobile' icon="el-icon-s-order">修改手机号</el-dropdown-item> -->
               <el-dropdown-item v-if="hasInvoicePermission"
                 :class="{active: ['InvoiceMakeupListPage', 'InvoiceCombineMakeupPage'].includes($route.name)}"
                 command='invoiceMakeup' icon="fapiao iconfont icon-fapiao">发票开具</el-dropdown-item>
@@ -144,8 +144,17 @@
                 :class="{active: ['InvoiceSearchListPage', 'InvoiceSearchDetailPage'].includes($route.name)}"
                 command='invoiceSearch' icon="fapiao iconfont icon-zaitu">发票查询</el-dropdown-item>
               <el-dropdown-item
+                :class="{active: [
+                  'accountAndSecurity',
+                  'mySettingAccount',
+                  'mySettingAuthentication',
+                  'mySettingChangePwd',
+                  'mySettingChangeMobile',
+                  ].includes($route.name)}"
+                command='accountAndSecurity' icon="el-icon-s-help">账号与安全</el-dropdown-item>
+              <el-dropdown-item
                 :class="{active: $route.name === 'mySettingPage'}"
-                command='setup' icon="el-icon-s-tools">我的设置</el-dropdown-item>
+                command='setup' icon="el-icon-s-tools">其他设置</el-dropdown-item>
               <el-dropdown-item command='loginOut'>
                 <span class="iconfont icon-084tuichu"></span>退出登录</el-dropdown-item>
             </el-dropdown-menu>
@@ -385,6 +394,9 @@ export default {
           break;
         case 'setup':
           _path = '/mySetting/setting';
+          break;
+        case 'accountAndSecurity':
+          _path = '/mySetting/accountAndSecurity';
           break;
         default:
           break;

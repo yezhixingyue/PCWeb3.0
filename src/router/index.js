@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Cookie from '@/assets/js/Cookie';
+import ThirdCodeHandler from '@/assets/js/ClassType/ThirdCodeHandler';
 import { useCookie } from '@/assets/js/setup';
-import WxCodeHandler from '@/assets/js/ClassType/WxCodeHandler';
 import CommonViewPage from '../views/Common/CommonViewPage.vue';
 
 Vue.use(VueRouter);
@@ -290,7 +290,7 @@ const routes = [
             meta: {
               requiresAuth: true,
               y: 0,
-              title: '账号管理 - 郑州名片之家电子商务有限公司',
+              title: '子账号管理 - 郑州名片之家电子商务有限公司',
             },
             component: () => import('../views/mySettingPages/SubAccountManagePage.vue'),
           },
@@ -320,9 +320,19 @@ const routes = [
             meta: {
               requiresAuth: true,
               y: 0,
-              title: '我的设置 - 郑州名片之家电子商务有限公司',
+              title: '其他设置 - 郑州名片之家电子商务有限公司',
             },
             component: () => import('../views/mySettingPages/SettingPage.vue'),
+          },
+          {
+            path: '/mySetting/accountAndSecurity',
+            name: 'accountAndSecurity',
+            meta: {
+              requiresAuth: true,
+              y: 0,
+              title: '账号与安全 - 郑州名片之家电子商务有限公司',
+            },
+            component: () => import('../views/mySettingPages/AccountAndSecurity/AccountAndSecurity.vue'),
           },
           {
             path: '/mySetting/invoiceMakeup',
@@ -471,7 +481,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   // 处理微信授权回调页面的相关处理，此处进行任务分配，区分登录和绑定，进行相应跳转，在对应页面中进行下一步的处理
-  if (WxCodeHandler.handleRouterBeforeEach(to, next)) return;
+  if (ThirdCodeHandler.handleRouterBeforeEach(to, next)) return;
   if (to.query.code && to.query.state && to.query.state !== to.name) { // 兼容性处理微信回调时可用到 区分登录和绑定
     next({
       name: to.query.state,

@@ -54,7 +54,7 @@ import Cookie from '../../assets/js/Cookie';
 
 export default {
   props: {
-    ThridAuthList: {
+    ThirdAuthList: {
       type: Array,
       default: null,
     },
@@ -197,7 +197,7 @@ export default {
             Terminal: 1,
           };
 
-          if (this.ThridAuthList) _obj.ThridAuthList = this.ThridAuthList;
+          if (this.ThirdAuthList) _obj.ThirdAuthList = this.ThirdAuthList;
 
           this.$emit('setPanelLoading', [true, '正在注册中...']);
           const res = await this.api.getReg(_obj);

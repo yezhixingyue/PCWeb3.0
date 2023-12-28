@@ -22,10 +22,14 @@
     <el-form-item>
       <el-button type="primary" :disabled='!disableLogin' @click="submitForm('ruleForm')">登录</el-button>
       <p class="text-btns">
-        <span class="span-title-blue" key="se" @click="() => this.$emit('changePanel', 'second')">新用户注册</span>
-        <!-- <i class="separation"></i>
-        <span class="span-title-blue wechat" key="wx" @click.self.stop="onWxLoginClick"> <img
-            src="@/assets/images/wechat.png" alt="">微信扫码登录</span> -->
+        <span class="span-title-blue third-icon" @click="() => this.$emit('changePanel', 'second')"><img
+            src="@/assets/images/xinyonghu.png" alt="">新用户注册</span>
+        <i class="separation"></i>
+        <span class="span-title-blue third-icon" @click.stop="onWxLoginClick"> <img
+            src="@/assets/images/wechat.png" alt="">微信登录</span>
+        <i class="separation"></i>
+        <span class="span-title-blue third-icon" @click.stop="onQQLoginClick"> <img
+            src="@/assets/images/QQIcon.png" alt="">QQ登录</span>
       </p>
     </el-form-item>
   </el-form>
@@ -36,12 +40,12 @@ import { Base64 } from 'js-base64';
 // eslint-disable-next-line object-curly-newline
 import { homeUrl, useCookie, domain } from '@/assets/js/setup';
 import Cookie from '@/assets/js/Cookie';
+import ThirdCodeHandler from '@/assets/js/ClassType/ThirdCodeHandler';
 import messageBox from '@/assets/js/utils/message';
-import WxCodeHandler from '@/assets/js/ClassType/WxCodeHandler';
 
 export default {
   props: {
-    ThridAuthList: {
+    ThirdAuthList: {
       type: Array,
       default: null,
     },
@@ -183,7 +187,7 @@ export default {
         this.$emit('setPanelLoading', [true, '正在登录中...']);
         let key = true;
 
-        if (this.ThridAuthList) obj.ThridAuthList = this.ThridAuthList;
+        if (this.ThirdAuthList) obj.ThirdAuthList = this.ThirdAuthList;
 
         const res = await this.api.getLogin(obj).catch(() => { key = false; });
         this.$emit('setPanelLoading', [false, '']);
@@ -225,6 +229,9 @@ export default {
     onWxLoginClick() {
       this.$emit('wxLogin');
     },
+    onQQLoginClick() {
+      ThirdCodeHandler.onLoginByQQClick(this.$route);
+    },
   },
   watch: {
     Mobile(newVal, oldVal) {
@@ -255,15 +262,14 @@ export default {
       this.repath = this.$route.query.redirect;
     }
 
-    /** 处理微信回调登录 */
-    const result = await WxCodeHandler.authByWxCode(this.$route.query);
+    /** 处理三方登录回调 */
+    const result = await ThirdCodeHandler.authByThirdCode(this.$route.query);
 
     if (result) {
       if (result.query) {
         this.$router.replace({ query: result.query });
       }
       if (result.authData) {
-        // this.authData = result.authData;
         this.$emit('setAuthData', result.authData);
 
         if (result.authData.Token) { // 授权获取到token
@@ -278,9 +284,10 @@ export default {
 <style lang="scss">
 .text-btns {
   font-size: 13px;
+  margin: 0 -10px;
   .separation {
-    margin: 0 21px;
-    margin-left: 22px;
+    margin: 0 8px;
+    margin-left: 13px;
     width: 1px;
     display: inline-block;
     height: 20px;
@@ -288,12 +295,12 @@ export default {
     vertical-align: -4px;
   }
 
-  .wechat {
+  .third-icon {
     img {
       width: 20px;
       height: 20px;
       vertical-align: -4px;
-      margin-right: 10px;
+      margin-right: 8px;
     }
 
   }

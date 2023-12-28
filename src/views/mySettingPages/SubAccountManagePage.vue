@@ -1,7 +1,7 @@
 <template>
   <section class="mp-pc-my-setting-page-sub-account-page-wrap">
     <header>
-      <span class="blue-v-line is-bold is-black">账号管理</span>
+      <span class="blue-v-line is-bold is-black">子账号管理</span>
       <span class="is-font-12">（ 共检测出<i class="is-pink is-font-16"> {{customerAccountList.length}} </i>条记录 ）</span>
     </header>
     <ul class="content" v-if="customerInfo">
