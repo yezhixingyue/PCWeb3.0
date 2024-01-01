@@ -96,7 +96,7 @@ export default class ThirdCodeHandler {
       appid: PC_WX_SETTINGS_INFO.appid,
       scope: PC_WX_SETTINGS_INFO.scope,
       redirect_uri: encodeURIComponent(redirectUri),
-      state: `${state}${ThirdTypeEnum.wechat.ID}`,
+      state,
       href: PC_WX_SETTINGS_INFO.cssHref,
     });
   }

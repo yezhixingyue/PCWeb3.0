@@ -10,7 +10,7 @@
 
 <script>
 
-import ThirdCodeHandler from '@/assets/js/ClassType/ThirdCodeHandler';
+import ThirdCodeHandler, { ThirdTypeEnum } from '@/assets/js/ClassType/ThirdCodeHandler';
 
 export default {
   props: {
@@ -38,7 +38,7 @@ export default {
   async mounted() {
     ThirdCodeHandler.appendScriptLink();
 
-    let state = this.type;
+    let state = `${this.type}${ThirdTypeEnum.wechat.ID}`;
     if (this.$route.fullPath.includes('?')) {
       const str = this.$route.fullPath.split('?')[1];
       if (str) {
