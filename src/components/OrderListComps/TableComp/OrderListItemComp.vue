@@ -69,9 +69,15 @@
             <div :style="wStyles[7]" :class="{
               'is-font-12': 1,
               'yellow-color': 1,
-              'is-gray': [254, 255, 35].includes(item.Status),
+              'is-gray': [253, 254, 255, 35].includes(item.Status),
               'is-success': item.Status === 200,
-            }">{{item.Status | formatStatus}}</div>
+            }">
+              <el-tooltip popper-class="table-item" :enterable='false' :disabled="item.Status !== 42 && item.Status !== 43"
+                :content="item.Status | formatStatus" placement="top">
+                <span>{{item.Status | formatStatus}}</span>
+              </el-tooltip>
+              <!-- {{item.Status | formatStatus}} -->
+            </div>
             <div :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
             <div :style="wStyles[9]">
               <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>

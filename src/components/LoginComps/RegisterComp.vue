@@ -54,7 +54,7 @@ import Cookie from '../../assets/js/Cookie';
 
 export default {
   props: {
-    ThridAuthList: {
+    ThirdAuthList: {
       type: Array,
       default: null,
     },
@@ -197,7 +197,7 @@ export default {
             Terminal: 1,
           };
 
-          if (this.ThridAuthList) _obj.ThridAuthList = this.ThridAuthList;
+          if (this.ThirdAuthList) _obj.ThirdAuthList = this.ThirdAuthList;
 
           this.$emit('setPanelLoading', [true, '正在注册中...']);
           const res = await this.api.getReg(_obj);
@@ -205,7 +205,10 @@ export default {
           if (res.data.Status === 1000) {
             this.messageBox.successSingle({
               title: '注册成功,请登录',
-              successFunc: () => this.$emit('changePanel', 'first'),
+              successFunc: () => {
+                this.$emit('changePanel', 'first');
+                this.$emit('setAuthData', null);
+              },
             });
           } else {
             this.getImgCode();

@@ -29,7 +29,7 @@
           <div class="panel-content">
             <div class="hi">
               <span v-if="authData && !authData.Token">
-                {{ authData.NickName }} ，您尚未绑定名片之家账号，现在{{ activeName === 'first' ? '登录' : '注册' }}完成绑定，即可使用微信扫码登录
+                {{ authData.NickName }} ，您尚未绑定名片之家账号，现在{{ activeName === 'first' ? '登录' : '注册' }}完成绑定，即可使用{{ ThirdTypeName }}扫码登录
               </span>
             </div>
             <keep-alive>
@@ -39,7 +39,7 @@
                 @changePanel="setActiveName"
                 @setAuthData="setAuthData"
                 @wxLogin="onWxLoginClick(true)"
-                :ThridAuthList="ThridAuthList"
+                :ThirdAuthList="ThirdAuthList"
               />
             </keep-alive>
             <keep-alive>
@@ -49,11 +49,12 @@
                 @setUserAgreeView='setUserAgreeView'
                 @setPanelLoading="setPanelLoading"
                 @changePanel="setActiveName"
-                :ThridAuthList="ThridAuthList"
+                @setAuthData="setAuthData"
+                :ThirdAuthList="ThirdAuthList"
               />
             </keep-alive>
           </div>
-          <WxLoginComp v-show="isWxLogin" @close="onWxLoginClick(false)" showClose  />
+          <WxLoginComp v-if="isWxLogin" @close="onWxLoginClick(false)" showClose  />
         </div>
       </div>
       <LegalAgreementDialog v-model="agreementvisible" />
@@ -63,12 +64,16 @@
 </template>
 
 <script>
+
 import RegisterComp from '@/components/LoginComps/RegisterComp.vue';
 import LegalAgreementDialog from '@/components/common/AgreementComps/LegalAgreementDialog.vue';
 import UserAgreement from '@/components/common/AgreementComps/UserAgreement.vue';
 import { homeUrl } from '@/assets/js/setup';
-import LoginComp from '../../components/LoginComps/LoginComp.vue';
+import { ThirdTypeEnum } from '@/assets/js/ClassType/ThirdCodeHandler';
+import { getNameFromListByIDs } from '@/assets/js/utils/utils';
+import getEnumList from '@/assets/js/utils/getEnumList';
 import WxLoginComp from '../../components/LoginComps/WxLoginComp.vue';
+import LoginComp from '../../components/LoginComps/LoginComp.vue';
 
 export default {
   components: {
@@ -91,11 +96,20 @@ export default {
     };
   },
   computed: {
-    /** 转换authData为ThridAuthList 用于登录和注册提交 */
-    ThridAuthList() {
+    /** 转换authData为ThirdAuthList 用于登录和注册提交 */
+    ThirdAuthList() {
       if (!this.authData) return null;
 
       return [this.authData];
+    },
+    ThirdTypeName() {
+      if (this.authData) {
+        const { ThirdType } = this.authData;
+        const ThirdTypeEnumList = getEnumList(ThirdTypeEnum);
+        return getNameFromListByIDs(ThirdType, ThirdTypeEnumList);
+      }
+
+      return '';
     },
   },
   methods: {
@@ -197,7 +211,7 @@ export default {
       }
     }
     > div.content {
-      width: 460px;
+      width: 475px;
       height: calc(100% - 105px);
       margin: 0 auto;
       position: relative;

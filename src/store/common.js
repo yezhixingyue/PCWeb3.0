@@ -200,6 +200,8 @@ export default {
       { label: '待分发', value: 20 },
       { label: '已分发', value: 30 },
       { label: '已审稿', value: 40 },
+      { label: '内容已审核', value: 42 },
+      { label: '已发至工厂', value: 43 },
       { label: '拼版中', value: 45 },
       { label: '已拼版', value: 50 },
       { label: '生产中', value: 55 },
@@ -207,6 +209,7 @@ export default {
       { label: '已入库', value: 70 },
       { label: '已发货', value: 80 },
       { label: '已完成', value: 200 },
+      // { label: '已取消', value: 253 },
       { label: '已取消', value: 254 },
       { label: '已过期', value: 255 },
       { label: '问题件', value: 35 },
@@ -218,6 +221,8 @@ export default {
       { label: '待分发', value: 20 },
       { label: '已分发', value: 30 },
       { label: '已审稿', value: 40 },
+      { label: '内容已审核', value: 42 },
+      { label: '已发至工厂', value: 43 },
       { label: '拼版中', value: 45 },
       { label: '已拼版', value: 50 },
       { label: '生产中', value: 55 },
@@ -225,6 +230,7 @@ export default {
       { label: '已入库', value: 70 },
       { label: '已发货', value: 80 },
       { label: '已完成', value: 200 },
+      // { label: '已取消', value: 253 },
       { label: '已取消', value: 254 },
       { label: '已过期', value: 255 },
       { label: '问题件', value: 35 },
@@ -261,7 +267,7 @@ export default {
     keepOrderData: false,
     canUseflex: false, // 页面是否支持flex
 
-    isNextYear: new Date().getFullYear() > 2022,
+    isNextYear: new Date().getFullYear() > 2023,
     AuthenticationCompVisible: false,
   },
   getters: {
@@ -483,9 +489,9 @@ export default {
     handleThirdBind(state, { isBind, info }) {
       if (!state.customerInfo) return;
       if (isBind) {
-        state.customerInfo.Account.ThridAuthList.push(info);
+        state.customerInfo.Account.ThirdAuthList.push(info);
       } else {
-        state.customerInfo.Account.ThridAuthList = state.customerInfo.Account.ThridAuthList.filter(it => it.ThirdType !== info.ThirdType);
+        state.customerInfo.Account.ThirdAuthList = state.customerInfo.Account.ThirdAuthList.filter(it => it.ThirdType !== info.ThirdType);
       }
     },
   },

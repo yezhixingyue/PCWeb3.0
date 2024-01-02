@@ -192,6 +192,16 @@ export const scrollToTop = (top = 0) => {
   }
 };
 
+export const formatMobile = (mobile) => {
+  if (!mobile || mobile.length !== 11) return '';
+  const _arr = mobile.split('');
+  const _arr1 = _arr.map((it, i) => {
+    if (i > 2 && i < 9) return '*';
+    return it;
+  });
+  return _arr1.join('');
+};
+
 export default {
   isEqual,
   isGreatThen,
@@ -210,4 +220,5 @@ export default {
   getNameFromListByIDs,
   handleScrollAfterGetPriceFailed,
   scrollToTop,
+  formatMobile,
 };

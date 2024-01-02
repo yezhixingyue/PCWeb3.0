@@ -9,7 +9,7 @@
       @cancle="localVisible = false"
       class="mp-erp-invoice-confirm-comp-dialog-comp-wrap"
     >
-      <WxLoginComp type="mySettingPage" />
+      <WxLoginComp type="accountAndSecurity" />
   </CommonDialogComp>
 </template>
 

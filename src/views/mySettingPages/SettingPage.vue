@@ -2,7 +2,7 @@
   <article class="mp-pc-my-setting-pages-my-setup-page-wrap">
     <section class="order-setup">
       <header>
-        <span class="blue-v-line is-bold is-black">下单设置</span>
+        <span class="blue-v-line is-bold is-black">其他设置</span>
       </header>
       <div class="content">
         <div class="set-item">
@@ -17,32 +17,14 @@
         </div>
       </div>
     </section>
-
-    <!-- <section class="third-bind-setup">
-      <header>
-        <span class="blue-v-line is-bold is-black">微信绑定</span>
-      </header>
-      <ul class="content">
-        <li v-show="customerInfo">
-          <span v-if="!wechatBindInfo" class="ft-13 gray">当前尚未绑定微信账号，绑定后可使用微信扫码登录</span>
-          <span v-else class="ft-13">当前已绑定微信账号，微信昵称为：{{ wechatBindInfo.NickName }} <i class="is-gray ft-12">( 记录的为绑定时的微信昵称，可能和当前昵称不一致 )</i> </span>
-          <span v-if="!wechatBindInfo" class="blue-span ml-10" @click="visible = true">绑定微信</span>
-          <span v-else class="blue-span ml-10" @click="onUnbindClick">解绑</span>
-        </li>
-      </ul>
-    </section> -->
-    <WechatBindDialog v-if="!wechatBindInfo" :visible.sync="visible" />
   </article>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import WxCodeHandler from '@/assets/js/ClassType/WxCodeHandler';
-import WechatBindDialog from '@/components/MySettingComps/WechatBindDialog.vue';
 
 export default {
   components: {
-    WechatBindDialog,
   },
   data() {
     return {
@@ -82,44 +64,6 @@ export default {
         this.$store.commit('common/setKeepOrderData', newVal);
       },
     },
-    wechatBindInfo() {
-      return WxCodeHandler.getWechatBindInfo(this.customerInfo);
-    },
-  },
-  methods: {
-    handleBindSuccess(bool, result) {
-      const cb = () => {
-        if (result.query) {
-          this.$router.replace({ query: result.query });
-        }
-        if (bool) {
-          this.$store.commit('common/handleThirdBind', { isBind: true, info: result.authData });
-        }
-      };
-
-      if (bool) this.messageBox.successSingle({ title: '绑定成功', successFunc: cb, failFunc: cb });
-      else cb();
-    },
-    handleUnBindSuccess(info) {
-      const cb = () => {
-        this.$store.commit('common/handleThirdBind', { isBind: false, info });
-      };
-
-      this.messageBox.successSingle({ title: '解绑成功', successFunc: cb, failFunc: cb });
-    },
-    onUnbindClick() {
-      if (!this.wechatBindInfo) return;
-      this.messageBox.warnCancelBox({
-        title: '确定解除当前微信绑定吗 ?',
-        msg: `微信昵称：[ ${this.wechatBindInfo.NickName} ]`,
-        successFunc: () => {
-          WxCodeHandler.setWxUnbind(this.handleUnBindSuccess);
-        },
-      });
-    },
-  },
-  mounted() {
-    WxCodeHandler.bindByWxCode(this.$route.query, this.handleBindSuccess); // 处理微信绑定
   },
 };
 </script>
