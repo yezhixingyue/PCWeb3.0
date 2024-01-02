@@ -49,11 +49,12 @@
                 @setUserAgreeView='setUserAgreeView'
                 @setPanelLoading="setPanelLoading"
                 @changePanel="setActiveName"
+                @setAuthData="setAuthData"
                 :ThirdAuthList="ThirdAuthList"
               />
             </keep-alive>
           </div>
-          <WxLoginComp v-show="isWxLogin" @close="onWxLoginClick(false)" showClose  />
+          <WxLoginComp v-if="isWxLogin" @close="onWxLoginClick(false)" showClose  />
         </div>
       </div>
       <LegalAgreementDialog v-model="agreementvisible" />

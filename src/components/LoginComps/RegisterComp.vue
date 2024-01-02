@@ -205,7 +205,10 @@ export default {
           if (res.data.Status === 1000) {
             this.messageBox.successSingle({
               title: '注册成功,请登录',
-              successFunc: () => this.$emit('changePanel', 'first'),
+              successFunc: () => {
+                this.$emit('changePanel', 'first');
+                this.$emit('setAuthData', null);
+              },
             });
           } else {
             this.getImgCode();

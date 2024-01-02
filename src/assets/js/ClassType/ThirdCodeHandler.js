@@ -28,7 +28,7 @@ const OFFICIAL_ACCOUNT_WX_SETTINGS_INFO = {
 
 const PC_QQ_SETTINGS_INFO = {
   appid: '102085370',
-  redirectUri: 'http://file.ybz888.com:7632/OThirdAuth/QQ',
+  redirectUri: `${localUri}/OThirdAuth/QQ`,
   AuthPath: '/OThirdAuth/QQ', // QQ授权回调域的pathname属性值 - 即上方非域名部分 - 后面拓展中可能使用pc等前置路径
 };
 

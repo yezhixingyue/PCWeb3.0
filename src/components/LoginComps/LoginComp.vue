@@ -205,6 +205,9 @@ export default {
             const _obj = { Mobile, Password: pwd, Terminal: 1 };
             this.$emit('setPanelLoading', [true, '正在登录中...']);
             let key = true;
+
+            if (this.ThirdAuthList) _obj.ThirdAuthList = this.ThirdAuthList;
+
             const res = await this.api.getLogin(_obj).catch(() => { key = false; });
             this.$emit('setPanelLoading', [false, '']);
             if (key && res && res.data.Status === 1000) {

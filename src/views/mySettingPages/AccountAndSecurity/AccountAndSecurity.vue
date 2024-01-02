@@ -50,13 +50,13 @@
         </div>
 
         <!-- QQ账号 -->
-        <div class="item-box bindqq">
+        <!-- <div class="item-box bindqq">
           <h4 class="title">QQ账号</h4>
           <div class="mt-18 mid" :title="qqBindInfo ? qqBindInfo.NickName : ''">{{qqBindInfo ? qqBindInfo.NickName : ''}}</div>
           <div class="mt-16">
             <button class="cyan" @click="e => onclick(e, 'qq')">{{qqBindInfo ? '解除绑定' : '扫码绑定'}}</button>
           </div>
-        </div>
+        </div> -->
       </main>
     </section>
 
@@ -159,10 +159,10 @@ export default {
       }
     },
     handleBindSuccess(bool, result) {
+      if (result.query) {
+        this.$router.replace({ query: result.query });
+      }
       const cb = () => {
-        if (result.query) {
-          this.$router.replace({ query: result.query });
-        }
         if (bool) {
           this.$store.commit('common/handleThirdBind', { isBind: true, info: result.authData });
         }
