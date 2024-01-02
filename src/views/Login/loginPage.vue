@@ -24,14 +24,22 @@
         >
           <el-tabs v-model="activeName" stretch>
             <el-tab-pane label="用户登录" name="first"></el-tab-pane>
-            <el-tab-pane label="用户注册" name="second"></el-tab-pane>
+            <el-tab-pane label="新用户注册" name="second"></el-tab-pane>
           </el-tabs>
           <div class="panel-content">
+            <div class="hi">
+              <span v-if="authData && !authData.Token">
+                {{ authData.NickName }} ，您尚未绑定名片之家账号，现在{{ activeName === 'first' ? '登录' : '注册' }}完成绑定，即可使用{{ ThirdTypeName }}扫码登录
+              </span>
+            </div>
             <keep-alive>
               <LoginComp
                 v-if="activeName === 'first'"
                 @setPanelLoading="setPanelLoading"
                 @changePanel="setActiveName"
+                @setAuthData="setAuthData"
+                @wxLogin="onWxLoginClick(true)"
+                :ThirdAuthList="ThirdAuthList"
               />
             </keep-alive>
             <keep-alive>
@@ -41,9 +49,12 @@
                 @setUserAgreeView='setUserAgreeView'
                 @setPanelLoading="setPanelLoading"
                 @changePanel="setActiveName"
+                @setAuthData="setAuthData"
+                :ThirdAuthList="ThirdAuthList"
               />
             </keep-alive>
           </div>
+          <WxLoginComp v-if="isWxLogin" @close="onWxLoginClick(false)" showClose  />
         </div>
       </div>
       <LegalAgreementDialog v-model="agreementvisible" />
@@ -53,10 +64,15 @@
 </template>
 
 <script>
+
 import RegisterComp from '@/components/LoginComps/RegisterComp.vue';
 import LegalAgreementDialog from '@/components/common/AgreementComps/LegalAgreementDialog.vue';
 import UserAgreement from '@/components/common/AgreementComps/UserAgreement.vue';
 import { homeUrl } from '@/assets/js/setup';
+import { ThirdTypeEnum } from '@/assets/js/ClassType/ThirdCodeHandler';
+import { getNameFromListByIDs } from '@/assets/js/utils/utils';
+import getEnumList from '@/assets/js/utils/getEnumList';
+import WxLoginComp from '../../components/LoginComps/WxLoginComp.vue';
 import LoginComp from '../../components/LoginComps/LoginComp.vue';
 
 export default {
@@ -65,6 +81,7 @@ export default {
     RegisterComp,
     LegalAgreementDialog,
     UserAgreement,
+    WxLoginComp,
   },
   data() {
     return {
@@ -74,7 +91,26 @@ export default {
       agreementvisible: false,
       userAgreementvisible: false,
       homeUrl,
+      isWxLogin: false,
+      authData: null,
     };
+  },
+  computed: {
+    /** 转换authData为ThirdAuthList 用于登录和注册提交 */
+    ThirdAuthList() {
+      if (!this.authData) return null;
+
+      return [this.authData];
+    },
+    ThirdTypeName() {
+      if (this.authData) {
+        const { ThirdType } = this.authData;
+        const ThirdTypeEnumList = getEnumList(ThirdTypeEnum);
+        return getNameFromListByIDs(ThirdType, ThirdTypeEnumList);
+      }
+
+      return '';
+    },
   },
   methods: {
     setActiveName(val) {
@@ -89,6 +125,12 @@ export default {
     },
     setUserAgreeView() {
       this.userAgreementvisible = true;
+    },
+    onWxLoginClick(bool) {
+      this.isWxLogin = bool;
+    },
+    setAuthData(data) {
+      this.authData = data;
     },
   },
 };
@@ -169,7 +211,7 @@ export default {
       }
     }
     > div.content {
-      width: 460px;
+      width: 475px;
       height: calc(100% - 105px);
       margin: 0 auto;
       position: relative;
@@ -239,7 +281,19 @@ export default {
           }
         }
         .panel-content {
-          padding-top: 40px;
+          // padding-top: 40px;
+
+          > .hi {
+            min-height: 40px;
+            box-sizing: border-box;
+            font-size: 13px;
+            padding: 0 15px;
+            line-height: 19px;
+            letter-spacing: 1px;
+            padding-bottom: 17px;
+            padding-top: 4px;
+          }
+
           .el-form-item {
             .el-form-item__content {
               margin: 0 15px !important;
@@ -364,6 +418,16 @@ export default {
               }
             }
           }
+        }
+
+        .wx-login-content {
+          position: absolute;
+          left: 0;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #fff;
+          z-index: 9;
         }
       }
     }

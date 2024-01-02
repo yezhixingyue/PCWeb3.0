@@ -1,21 +1,14 @@
 <template>
-  <el-form :model="ruleForm" :rules="rules" :disabled='formDisabled' @submit.native.prevent
-    ref="ruleForm" label-width="0px" class="demo-ruleForm">
+  <el-form :model="ruleForm" :rules="rules" :disabled='formDisabled' @submit.native.prevent ref="ruleForm"
+    label-width="0px" class="demo-ruleForm">
     <el-form-item prop="Mobile">
       <el-input placeholder="请输入手机号码" clearable v-model.trim="Mobile">
-          <i slot="prefix" class="iconfont icon-shouji"></i>
+        <i slot="prefix" class="iconfont icon-shouji"></i>
       </el-input>
     </el-form-item>
     <el-form-item prop="Password">
-      <el-input
-       placeholder="请输入密码"
-       type="password"
-       clearable
-       v-model.trim="Password"
-       @submit.native.prevent
-       @focus="onPwdFocus"
-       @keyup.enter.native="submitForm('ruleForm')"
-       >
+      <el-input placeholder="请输入密码" type="password" clearable v-model.trim="Password" @submit.native.prevent
+        @focus="onPwdFocus" @keyup.enter.native="submitForm('ruleForm')">
         <i slot="prefix" class="iconfont icon-mima"></i>
       </el-input>
     </el-form-item>
@@ -28,12 +21,15 @@
     <!-- <p>{{ msg }}</p> -->
     <el-form-item>
       <el-button type="primary" :disabled='!disableLogin' @click="submitForm('ruleForm')">登录</el-button>
-      <p>
-        <span class="span-title-blue" @click="() => this.$emit('changePanel', 'second')">新用户注册</span>
-        <i class="mr-15 ml-15 gray">|</i>
-        <span class="span-title-blue" @click="() => messageBox.failSingleError({
-          msg: '正在开发中，请稍候...', title: '功能尚未上线'})">
-          <img src="@/assets/images/qq.png" style="width: 18px;vertical-align: -4px;" class="mr-3"> QQ登录</span>
+      <p class="text-btns">
+        <span class="span-title-blue third-icon" @click="() => this.$emit('changePanel', 'second')"><img
+            src="@/assets/images/xinyonghu.png" alt="">新用户注册</span>
+        <i class="separation"></i>
+        <span class="span-title-blue third-icon" @click.stop="onWxLoginClick"> <img
+            src="@/assets/images/wechat.png" alt="">微信登录</span>
+        <i class="separation"></i>
+        <span class="span-title-blue third-icon" @click.stop="onQQLoginClick"> <img
+            src="@/assets/images/QQIcon.png" alt="">QQ登录</span>
       </p>
     </el-form-item>
   </el-form>
@@ -44,9 +40,16 @@ import { Base64 } from 'js-base64';
 // eslint-disable-next-line object-curly-newline
 import { homeUrl, useCookie, domain } from '@/assets/js/setup';
 import Cookie from '@/assets/js/Cookie';
+import ThirdCodeHandler from '@/assets/js/ClassType/ThirdCodeHandler';
 import messageBox from '@/assets/js/utils/message';
 
 export default {
+  props: {
+    ThirdAuthList: {
+      type: Array,
+      default: null,
+    },
+  },
   data() {
     const validateMobile = (rule, value, callback) => {
       if (this.validateCheck(value, this.defineRules.Mobile, callback)) callback();
@@ -88,6 +91,7 @@ export default {
       // msg: '123',
       repath: '/placeOrder',
       formDisabled: false,
+      // authData: null,
     };
   },
   computed: {
@@ -116,7 +120,7 @@ export default {
     },
   },
   methods: {
-    handleSuccessLogin(token, rememberPwd, pwd) {
+    handleSuccessLogin(token, rememberPwd, pwd, isAuth = false) {
       this.$store.commit('Quotation/clearStateForNewCustomer');
       this.$store.commit('common/clearStateForNewCustomer');
       this.$store.commit('order/clearStateForNewCustomer');
@@ -127,14 +131,17 @@ export default {
       if (!useCookie) sessionStorage.setItem('token', token);
       const oneDay = 24 * 60 * 60;
       if (rememberPwd) {
-        const _obj2Keep = { ...this.ruleForm };
-        _obj2Keep.Password = pwd;
-        _obj2Keep.timeStamp = Date.now();
-        localStorage.setItem('info', JSON.stringify(_obj2Keep));
+        if (!isAuth) {
+          const _obj2Keep = { ...this.ruleForm };
+          _obj2Keep.Password = pwd;
+          _obj2Keep.timeStamp = Date.now();
+          localStorage.setItem('info', JSON.stringify(_obj2Keep));
+        }
+
         if (!useCookie) localStorage.setItem('token', token);
         else Cookie.setCookie('token', token, 30 * oneDay);
       } else {
-        localStorage.removeItem('info');
+        if (!isAuth) localStorage.removeItem('info');
         if (useCookie) Cookie.setCookie('token', token, oneDay);
         else localStorage.removeItem('token');
       }
@@ -179,6 +186,9 @@ export default {
         const obj = { Mobile, Password, Terminal: 1 };
         this.$emit('setPanelLoading', [true, '正在登录中...']);
         let key = true;
+
+        if (this.ThirdAuthList) obj.ThirdAuthList = this.ThirdAuthList;
+
         const res = await this.api.getLogin(obj).catch(() => { key = false; });
         this.$emit('setPanelLoading', [false, '']);
         if (key && res && res.data.Status === 1000) {
@@ -189,12 +199,15 @@ export default {
       } else {
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
-          // 成功
+            // 成功
             const { Mobile, Password, rememberPwd } = this.ruleForm;
             const pwd = Base64.encode(Password);
             const _obj = { Mobile, Password: pwd, Terminal: 1 };
             this.$emit('setPanelLoading', [true, '正在登录中...']);
             let key = true;
+
+            if (this.ThirdAuthList) _obj.ThirdAuthList = this.ThirdAuthList;
+
             const res = await this.api.getLogin(_obj).catch(() => { key = false; });
             this.$emit('setPanelLoading', [false, '']);
             if (key && res && res.data.Status === 1000) {
@@ -216,6 +229,12 @@ export default {
         this.isRemember = false;
       }
     },
+    onWxLoginClick() {
+      this.$emit('wxLogin');
+    },
+    onQQLoginClick() {
+      ThirdCodeHandler.onLoginByQQClick(this.$route);
+    },
   },
   watch: {
     Mobile(newVal, oldVal) {
@@ -224,7 +243,7 @@ export default {
       }
     },
   },
-  mounted() {
+  async mounted() {
     const info = localStorage.getItem('info');
     if (info) {
       const temp = JSON.parse(info);
@@ -245,10 +264,48 @@ export default {
     if (this.$route.query.redirect) {
       this.repath = this.$route.query.redirect;
     }
+
+    /** 处理三方登录回调 */
+    const result = await ThirdCodeHandler.authByThirdCode(this.$route.query);
+
+    if (result) {
+      if (result.query) {
+        this.$router.replace({ query: result.query });
+      }
+      if (result.authData) {
+        this.$emit('setAuthData', result.authData);
+
+        if (result.authData.Token) { // 授权获取到token
+          this.handleSuccessLogin(result.authData.Token, this.ruleForm.rememberPwd, '', true);
+        }
+      }
+    }
   },
 };
 </script>
 
-<style>
+<style lang="scss">
+.text-btns {
+  font-size: 13px;
+  margin: 0 -10px;
+  .separation {
+    margin: 0 8px;
+    margin-left: 13px;
+    width: 1px;
+    display: inline-block;
+    height: 20px;
+    background-color: #ddd;
+    vertical-align: -4px;
+  }
 
+  .third-icon {
+    img {
+      width: 20px;
+      height: 20px;
+      vertical-align: -4px;
+      margin-right: 8px;
+    }
+
+  }
+}
 </style>
