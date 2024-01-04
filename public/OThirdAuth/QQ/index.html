@@ -65,7 +65,7 @@
           url += queryStr;
         }
 
-        window.location = (window.location.origin + window.location.pathname).replace(AuthPath, '') + url;
+        window.location = (window.location.origin + window.location.pathname).replace(AuthPath, '').replace(/\/$/, '') + url;
       }
     }
   </script>

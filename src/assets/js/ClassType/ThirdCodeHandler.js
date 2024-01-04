@@ -2,7 +2,7 @@
 
 import api from '@/api';
 
-const localUri = `${window.location.origin}${window.location.pathname}`.replace(/\/$/, '');
+const localUri = `${window.location.origin}${window.location.pathname.replace(/\/\//, '/').replace(/\/$/, '')}`;
 
 const COMMON_SETTINGS = {
   PcTerminal: 1,
@@ -27,7 +27,7 @@ const OFFICIAL_ACCOUNT_WX_SETTINGS_INFO = {
 };
 
 const PC_QQ_SETTINGS_INFO = {
-  appid: '102085370',
+  appid: '102086652',
   redirectUri: `${localUri}/OThirdAuth/QQ`,
   AuthPath: '/OThirdAuth/QQ', // QQ授权回调域的pathname属性值 - 即上方非域名部分 - 后面拓展中可能使用pc等前置路径
 };
