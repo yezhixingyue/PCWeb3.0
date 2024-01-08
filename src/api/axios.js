@@ -288,6 +288,7 @@ axios.interceptors.response.use(
 
 if (baseUrl) axios.defaults.baseURL = baseUrl;
 // axios.defaults.baseURL = baseUrl;
+// axios.defaults.baseURL = 'https://file.ybz888.com:7001';
 // axios.defaults.timeout = 5 * 60 * 1000;
 
 export default axios;

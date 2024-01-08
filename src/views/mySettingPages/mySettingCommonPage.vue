@@ -3,21 +3,28 @@
     <header></header>
     <div class="content">
       <ul class="aside">
-        <router-link tag="li" to="/mySetting/account">企业信息</router-link>
-        <router-link tag="li" to="/mySetting/authentication" v-if="this.customerInfo && !this.customerInfo.Account.IsBranch">企业认证</router-link>
+        <!-- <router-link tag="li" to="/mySetting/account">企业信息</router-link>
+        <router-link tag="li" to="/mySetting/authentication" v-if="this.customerInfo && !this.customerInfo.Account.IsBranch">企业认证</router-link> -->
         <router-link tag="li" to="/MemberCenter" v-if="showMember && customerInfo.IsUpDown">会员中心</router-link>
         <router-link tag="li" to="/mySetting/address">收货地址</router-link>
         <router-link tag="li" to="/mySetting/couponCenter">领券中心</router-link>
         <router-link tag="li" to="/mySetting/certificate">证书管理</router-link>
         <router-link tag="li" to="/mySetting/myCoupons">我的优惠券</router-link>
-        <router-link tag="li" to="/mySetting/subAccountManage">账号管理</router-link>
-        <router-link tag="li" to="/mySetting/changePwd">修改密码</router-link>
-        <router-link tag="li" to="/mySetting/changeMobile">修改手机号</router-link>
+        <router-link tag="li" to="/mySetting/subAccountManage">子账号管理</router-link>
+        <!-- <router-link tag="li" to="/mySetting/changePwd">修改密码</router-link>
+        <router-link tag="li" to="/mySetting/changeMobile">修改手机号</router-link> -->
         <router-link tag="li" to="/mySetting/invoiceMakeup"
           v-if="hasInvoicePermission" :class="{disabled: $route.name==='InvoiceCombineMakeupPage'}">发票开具</router-link>
         <router-link tag="li" to="/mySetting/invoiceSearch"
           v-if="hasInvoicePermission" :class="{disabled: $route.name==='InvoiceSearchDetailPage'}">发票查询</router-link>
-        <router-link tag="li" to="/mySetting/setting">我的设置</router-link>
+        <router-link tag="li" to="/mySetting/accountAndSecurity" :class="{active: [
+                  'accountAndSecurity',
+                  'mySettingAccount',
+                  'mySettingAuthentication',
+                  'mySettingChangePwd',
+                  'mySettingChangeMobile',
+                  ].includes($route.name)}">账号与安全</router-link>
+        <router-link tag="li" to="/mySetting/setting">其他设置</router-link>
       </ul>
       <div class="right">
         <!-- <keep-alive> -->
@@ -83,7 +90,7 @@ export default {
           transition: 0.2s;
           visibility: hidden;
         }
-        &.router-link-active {
+        &.router-link-active, &.active {
           color: #428dfa;
           font-weight: 700;
           background-color: #e9f0fa;

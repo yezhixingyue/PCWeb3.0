@@ -1,0 +1,12 @@
+body .loginPanel .title {
+  display: none;
+}
+
+body .loginPanel img.qrcode {
+	width: 200px;
+	height: 200px;
+}
+body .loginPanel .wrp_code {
+	width: 300px;
+	height: 225px;
+}

@@ -53,6 +53,12 @@
 import Cookie from '../../assets/js/Cookie';
 
 export default {
+  props: {
+    ThirdAuthList: {
+      type: Array,
+      default: null,
+    },
+  },
   data() {
     const validateMobile = (rule, value, callback) => {
       if (this.validateCheck(value, this.defineRules.Mobile, callback)) callback();
@@ -190,13 +196,19 @@ export default {
             VertifyCode,
             Terminal: 1,
           };
+
+          if (this.ThirdAuthList) _obj.ThirdAuthList = this.ThirdAuthList;
+
           this.$emit('setPanelLoading', [true, '正在注册中...']);
           const res = await this.api.getReg(_obj);
           this.$emit('setPanelLoading', [false, '']);
           if (res.data.Status === 1000) {
             this.messageBox.successSingle({
               title: '注册成功,请登录',
-              successFunc: () => this.$emit('changePanel', 'first'),
+              successFunc: () => {
+                this.$emit('changePanel', 'first');
+                this.$emit('setAuthData', null);
+              },
             });
           } else {
             this.getImgCode();

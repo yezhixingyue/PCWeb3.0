@@ -109,4 +109,65 @@
     "https://tb.53kf.com/code/code/14ad3ef85e1f535e51e6c70a9081bb8d1/1";var s = document.getElementsByTagName("script")[0];
     s.parentNode.insertBefore(_53code, s);})();
   </script>
+
+  <!--  -->
+  <script>
+    window.onload = function () {
+      var searchStr = window.location.search.replace(/^\?/, '');
+      
+      if (!searchStr) return;
+
+      var obj = {};
+
+      function getParams(str) {
+        if (!str) {
+          return;
+        }
+
+        var arr = str.split('&');
+
+        for (var i = 0; i < arr.length; i++) {
+          var item = arr[i];
+          if (item) {
+            var tempArr = item.split('=');
+            if (tempArr.length === 2) {
+              obj[tempArr[0]] = tempArr[1];
+            }
+          }
+        }
+      }
+      
+      getParams(searchStr);
+
+      if (obj.state) {
+        getParams(decodeURIComponent(obj.state).replace(/\?/g, '&'));
+      }
+
+      if (obj.routePath) {
+        var routePath = obj.routePath;
+        var AuthPath = obj.AuthPath;
+
+        delete obj.state;
+        delete obj.routePath;
+        delete obj.AuthPath;
+
+        var keys = Object.keys(obj);
+        var queryArr = [];
+        for (var i = 0; i < keys.length; i++) {
+          var key = keys[i];
+          var val = obj[key];
+          queryArr.push(key + '=' + val);
+        }
+        var queryStr = queryArr.join('&');
+
+        var url = '/#' + routePath;
+        if (queryStr) {
+          url += '?';
+          url += queryStr;
+        }
+
+        window.location = (window.location.origin + window.location.pathname).replace(AuthPath, '') + url;
+      }
+    }
+  </script>
 </html>

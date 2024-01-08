@@ -8,6 +8,15 @@ const api = {
   getLogin(data) { // POST /Api/Customer/Login
     return instance.post('/Api/Customer/Login', data, { closeLoading: true });
   },
+  getThirdLoginOAuth(data) { // /Api/ThirdLogin/OAuth  获取授权
+    return instance.post('/Api/ThirdLogin/OAuth', data);
+  },
+  getThirdLoginBind(data) { // POST /Api/ThirdLogin/Bind 绑定
+    return instance.post('/Api/ThirdLogin/Bind', data);
+  },
+  getThirdLoginUnBind(thirdType) { // PUT /Api/ThirdLogin/UnBind 解绑
+    return instance.put('/Api/ThirdLogin/UnBind', null, { params: { thirdType } });
+  },
   getSmsCode(Mobile, Type = 0) {
     return instance.post('/Api/Sms/Send', { Mobile, Type });
   },

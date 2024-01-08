@@ -234,12 +234,7 @@ export default {
     },
     formatMobile(mobile) {
       if (!mobile || mobile.length !== 11) return '';
-      const _arr = mobile.split('');
-      const _arr1 = _arr.map((it, i) => {
-        if (i > 2 && i < 7) return '*';
-        return it;
-      });
-      return _arr1.join('');
+      return this.$utils.formatMobile(mobile);
     },
   },
 };
