@@ -631,7 +631,7 @@ export default {
     },
     /* 下单 - 预下单
     -------------------------------*/
-    async getOrderPreCreate({ state, commit }, { compiledName, fileContent, FileAuthorMobile, callBack }) {
+    async getOrderPreCreate({ state, commit }, { compiledName, fileContent, FileAuthorMobile, callBack, SelectCertificate }) {
       // 1. 配置组合生成请求对象
       const _requestObj = { List: [], OrderType: 2, PayInFull: false };
       const _itemObj = {};
@@ -656,6 +656,7 @@ export default {
       const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
+      _itemObj.CertificateFileList = [SelectCertificate];
 
       if (state.ProductQuotationResult) _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
 
@@ -731,7 +732,7 @@ export default {
     },
     /* 下单 - 保存购物车
     -------------------------------*/
-    async getQuotationSave2Car({ state, commit, rootState }, { FileList, fileContent, FileAuthorMobile, callBack, callbackOnError }) {
+    async getQuotationSave2Car({ state, commit, rootState }, { FileList, fileContent, FileAuthorMobile, callBack, callbackOnError, SelectCertificate }) {
       const _itemObj = { IgnoreRiskLevel: state.RiskWarningTipsTypes.PageTips };
       _itemObj.IsOrder = false; // 预下单false  正式下单 true
       if (FileList) {
@@ -749,6 +750,7 @@ export default {
       const ProductParams = QuotationClassType.transformToSubmit(productData, state.curProductInfo2Quotation, state.PropertiesAffectedByInteraction);
 
       _itemObj.ProductParams = ProductParams;
+      _itemObj.CertificateFileList = [SelectCertificate];
 
       if (state.ProductQuotationResult) _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
 

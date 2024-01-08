@@ -269,6 +269,15 @@ export default {
 
     isNextYear: new Date().getFullYear() > 2023,
     AuthenticationCompVisible: false,
+    /* 证书类型
+    -------------------------------*/
+    CertificateType: [
+      { label: '不限', value: '' },
+      { label: '商标注册证', value: 0 },
+      { label: '营业执照', value: 1 },
+      { label: '印刷委托书', value: 2 },
+      { label: '合同/授权证明', value: 3 },
+    ],
   },
   getters: {
     /* 细分类 物流配送方式列表

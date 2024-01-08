@@ -126,6 +126,9 @@
                 :class="{active: $route.name === 'mySettingCouponCenter'}"
                 command='couponCenter' icon="el-icon-s-goods">领券中心</el-dropdown-item>
               <el-dropdown-item
+                :class="{active: $route.name === 'mySettingCertificate'}"
+                command='certificate' icon="iconfont icon-zhengshuguanli">证书管理</el-dropdown-item>
+              <el-dropdown-item
                 :class="{active: $route.name === 'mySettingMyCoupons'}"
                 command='myCoupons' icon="el-icon-s-claim">我的优惠券</el-dropdown-item>
               <el-dropdown-item
@@ -358,6 +361,9 @@ export default {
           break;
         case 'couponCenter':
           _path = '/mySetting/couponCenter';
+          break;
+        case 'certificate':
+          _path = '/mySetting/certificate';
           break;
         case 'myCoupons':
           _path = '/mySetting/myCoupons';

@@ -396,6 +396,21 @@ const api = {
   //   return instance.get('/Api/Invoice/Cancel', { params: { invoiceID } });
   // },
 
+  /* 证书 api
+   ----------------------------------------------------------------------------------- */
+  getCustomerCertificateSave(data) { // POST /Api/Customer/Certificate/Save  证书编辑
+    return instance.post('/Api/Customer/Certificate/Save', data);
+  },
+  getCustomerCertificateList(data) { // POST /Api/Customer/Certificate/List  证书管理
+    return instance.post('/Api/Customer/Certificate/List', data);
+  },
+  getCustomerCertificateAll(data) { // POST /Api/Customer/Certificate/All  下单选择证书
+    return instance.post('/Api/Customer/Certificate/All', data);
+  },
+  getCustomerCertificateRemove(id) { // POST /Api/Customer/Certificate/Remove  删除证书
+    return instance.delete(`/Api/Customer/Certificate/Remove?id=${id}`);
+  },
+
 };
 
 export default api;
