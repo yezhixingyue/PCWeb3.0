@@ -7,11 +7,15 @@
     @open="onOpen"
     top="calc(50vh - 242px)"
     :close-on-click-modal='false'
+    :close-on-press-escape='false'
     :before-close='handleBeforeClose'
     @closed="onClosed"
   >
     <header slot="title">
-      <span> 选择证书</span>
+      <span style="display: flex;align-items: center;">
+        <img style="margin-right: 10px;" src="@/assets/images/select-certificateicon.png" alt="">
+        选择证书
+      </span>
     </header>
     <main>
       <p class="filtrate-box">
@@ -104,6 +108,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    SelectCertificate: {
+      type: Object,
+      default: () => null,
+    },
   },
   components: {
     AddCertificateDialog,
@@ -126,7 +134,7 @@ export default {
       } else {
         returnTemp = this.CertificateList.filter(item => item.CertificateName.search(this.KeyWords) !== -1);
       }
-      if (this.CertificateTypeData) {
+      if (this.CertificateTypeData !== '') {
         returnTemp = returnTemp.filter(item => item.CertificateType === this.CertificateTypeData);
       }
       return returnTemp;
@@ -150,6 +158,9 @@ export default {
       return ConvertTimeFormat(new Date(date));
     },
     onOpen() {
+      if (this.SelectCertificate) {
+        this.actionID = this.SelectCertificate.CertificateID;
+      }
       this.api.getCustomerCertificateAll().then(res => {
         if (res.data.Status === 1000) {
           this.CertificateList = res.data.Data;
@@ -158,14 +169,21 @@ export default {
     },
     onClosed() {
       this.CertificateList = [];
+      this.KeyWords = '';
+      this.CertificateTypeData = '';
+      this.actionID = '';
     },
     handleBeforeClose(done) {
       if (!this.loading) done();
     },
     onSubmit() {
       const selectTemp = this.FilterCertificateList.find(it => it.CertificateID === this.actionID);
-      this.$emit('submit', selectTemp);
-      this.localVisible = false;
+      if (selectTemp) {
+        this.$emit('submit', selectTemp);
+        this.localVisible = false;
+      } else {
+        this.messageBox.failSingleError({ title: '保存失败', msg: '请选择商标证书' });
+      }
     },
     refreshClick() {
       this.onOpen();
