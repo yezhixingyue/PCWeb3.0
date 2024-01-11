@@ -281,6 +281,15 @@ export default {
               tbody{
                 .product-name{
                   text-align: left;
+                  .el-radio{
+                    display: flex;
+                    align-items: center;
+                    .el-radio__label{
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                  }
                 }
                 .el-table__row{
                   td{

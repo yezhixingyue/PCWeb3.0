@@ -20,7 +20,7 @@
         <span class="text">搜索名称：</span>
         <el-input
           size="small"
-          @keyup.enter.native="getCertificateList"
+          @keyup.enter.native="getCertificateList()"
           v-model.trim='KeyWords'
           spellcheck="false"
           clearable
@@ -28,7 +28,7 @@
           placeholder="请输入搜索关键词"
           type="text"
         />
-        <el-button icon="el-icon-search" type="primary" @click="getCertificateList"></el-button>
+        <el-button icon="el-icon-search" type="primary" @click="getCertificateList()"></el-button>
       </section>
       <el-button type="text" @click="addCertificateClick">+ 添加证书</el-button>
       <AddCertificateDialog
