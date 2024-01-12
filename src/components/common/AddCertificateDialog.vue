@@ -7,13 +7,17 @@
     @open="onOpen"
     top="calc(50vh - 240px)"
     :close-on-click-modal='false'
+    :close-on-press-escape='false'
     :before-close='handleBeforeClose'
     @closed="onClosed"
     destroy-on-close
     append-to-body
   >
     <header slot="title">
-      <span> 添加证书</span>
+      <span style="display: flex;align-items: center;">
+        <img style="margin-right: 10px;" src="@/assets/images/add-certificateicon.png" alt="">
+        {{ formAddCertificate.CertificateID ? '编辑' : '添加' }}证书
+      </span>
     </header>
     <main>
       <el-form label-position="right" label-width="119px" :model="formAddCertificate">
@@ -35,6 +39,8 @@
           <el-date-picker
             v-model="formAddCertificate.Expire"
             type="date"
+            :picker-options="pickerOptions"
+            value-format="yyyy-MM-ddTHH:mm:ss"
             placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
@@ -44,7 +50,7 @@
             list-type="picture-card"
             ref="upload"
             drag
-            accept='.png,.jpeg,.jpg,.bmp'
+            accept='.png,.jpeg,.jpg,.gif'
             :multiple='true'
             :limit='3'
             :on-success='handllePictureUploaded'
@@ -58,6 +64,7 @@
             +添加图片
           </el-upload>
           <el-image-viewer
+            :on-close="() => showViewer = false"
             :showViewer.sync='showViewer'
             :PreviewSrc="PreviewSrc"
           />
@@ -114,12 +121,17 @@ export default {
         CertificateID: '',
         CertificateName: '',
         CertificatePics: [],
-        CertificateType: 0,
+        CertificateType: '',
         Expire: '',
       },
       uploadDisabled: false,
       showViewer: false,
       PreviewSrc: [],
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        },
+      },
     };
   },
   methods: {
@@ -143,11 +155,13 @@ export default {
             uid: new Date().getTime() + i,
             url: `${imgUrl}${res}`,
           }));
+          this.setUploadDisabled();
         }, 0);
       }
     },
     onClosed() {
       this.$refs.upload.uploadFiles = [];
+      this.uploadDisabled = false;
       this.formAddCertificate = {
         CertificateID: '',
         CertificateName: '',
@@ -161,12 +175,22 @@ export default {
     },
     onSubmit() {
       this.formAddCertificate.CertificatePics = this.$refs.upload.uploadFiles.map((res) => (res.response.Data.Url));
-      this.api.getCustomerCertificateSave(this.formAddCertificate).then(res => {
-        if (res.data.Status === 1000) {
-          this.$emit('succeed');
-          this.localVisible = false;
-        }
-      });
+      if (this.formAddCertificate.CertificateType === '') {
+        this.messageBox.failSingleError({ title: '保存失败', msg: '请选择证书类型' });
+      } else if (!this.formAddCertificate.CertificateName) {
+        this.messageBox.failSingleError({ title: '保存失败', msg: '请输入品牌名称' });
+      } else if (!this.formAddCertificate.Expire) {
+        this.messageBox.failSingleError({ title: '保存失败', msg: '请选择有效期' });
+      } else if (!this.formAddCertificate.CertificatePics.length) {
+        this.messageBox.failSingleError({ title: '保存失败', msg: '请上传证书' });
+      } else {
+        this.api.getCustomerCertificateSave(this.formAddCertificate).then(res => {
+          if (res.data.Status === 1000) {
+            this.$emit('succeed');
+            this.localVisible = false;
+          }
+        });
+      }
     },
     handleRemove() {
       this.setUploadDisabled();

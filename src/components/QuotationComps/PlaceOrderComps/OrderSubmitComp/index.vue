@@ -15,7 +15,7 @@
         <p class="credential-name">
           <span v-if="SelectCertificate" @click="checkClick()" :title="SelectCertificate.CertificateName"
           style="display: flex; align-items: center; cursor: pointer;">
-            <img src="@/assets/images/select-icon.png" alt="">
+            <img src="@/assets/images/img-icon.png" alt="">
             <p>{{SelectCertificate.CertificateName}}</p>
           </span>
         </p>
@@ -29,7 +29,7 @@
           :showViewer.sync='showViewer'
           :PreviewSrc="PreviewSrc"
         />
-        <SelectCertificateDialog :visible.sync="SelectCertificateVisible" @submit="SelectCertificateSubmit" top="2%"/>
+        <SelectCertificateDialog :SelectCertificate="SelectCertificate" :visible.sync="SelectCertificateVisible" @submit="SelectCertificateSubmit" top="2%"/>
       </div>
     </div>
     <div class="content">
@@ -206,7 +206,7 @@ export default {
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
       const { fileContent, FileAuthorMobile } = this.ruleForm;
-      const SelectCertificate = { ...this.SelectCertificate };
+      const SelectCertificate = this.SelectCertificate?.CertificateID || '';
       const resp = await this.$store.dispatch(
         'Quotation/getOrderPreCreate',
         {
@@ -291,7 +291,7 @@ export default {
       };
       const { fileContent, FileAuthorMobile } = this.ruleForm;
       const callbackOnError = this.handleSubmitOrJoinCarError;
-      const SelectCertificate = { ...this.SelectCertificate };
+      const SelectCertificate = this.SelectCertificate?.CertificateID || '';
       await this.$store.dispatch('Quotation/getQuotationSave2Car', {
         FileList, fileContent, FileAuthorMobile, callBack, callbackOnError, SelectCertificate,
       });
@@ -544,6 +544,7 @@ export default {
         // 弹框选择商标
         this.SelectCertificateVisible = true;
       } else {
+        this.SelectCertificate = null;
         this.radio = e;
       }
     },
@@ -767,7 +768,6 @@ export default {
         width: 164px;
         box-sizing: border-box;
         padding-right: 20px;
-        display: flex;
         align-items: center;
         color: #428DFA;
         p{
