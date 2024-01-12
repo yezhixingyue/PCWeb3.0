@@ -54,6 +54,9 @@
       <div class="form-item restart" v-if="authCompanyInfo.Status === 3">
         <el-button @click="againAuthentication" type="primary">重新认证</el-button>
       </div>
+      <div class="form-item restart" v-if="authCompanyInfo.Status === 2">
+        <el-button @click="goback" style="margin-top: 0;">返回</el-button>
+      </div>
     </section>
   </div>
 </template>
@@ -107,6 +110,9 @@ export default {
           break;
       }
       return _obj;
+    },
+    goback() {
+      this.$router.replace('/mySetting/accountAndSecurity');
     },
     handlePicturePreview(url) {
       const tempList = this.authCompanyInfo.CreditPath.map(it => imgUrl + it);
