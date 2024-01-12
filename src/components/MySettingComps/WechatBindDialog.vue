@@ -7,7 +7,7 @@
       cancelText="关闭"
       :visible.sync="localVisible"
       @cancle="localVisible = false"
-      class="mp-erp-invoice-confirm-comp-dialog-comp-wrap"
+      class="mp-wechat-bind-comp-dialog-comp-wrap"
     >
       <WxLoginComp type="accountAndSecurity" />
   </CommonDialogComp>
@@ -43,7 +43,7 @@ export default {
 };
 </script>
 <style lang='scss'>
-.mp-erp-invoice-confirm-comp-dialog-comp-wrap {
+.mp-wechat-bind-comp-dialog-comp-wrap {
   text-align: left;
   .el-dialog__body {
     padding-left: 35px;
