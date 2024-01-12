@@ -15,10 +15,12 @@
           <el-input type="password" clearable v-model.trim="changePwdForm.rePassword">
           </el-input>
         </el-form-item>
-        <el-button type="primary" @click="submitForm('changePwdForm')">保存</el-button>
+        <el-button type="primary" @click="submitForm('changePwdForm')" class="ml">保存</el-button>
+        <el-button @click="goback">返回</el-button>
       </el-form>
       <div v-else class="success-box">
         <i class="iconfont icon-wancheng"></i>修改成功
+        <el-button @click="goback" style="display: block;margin-top: 100px;width: 140px;">返回</el-button>
       </div>
     </div>
   </section>
@@ -94,6 +96,9 @@ export default {
         return false;
       });
     },
+    goback() {
+      this.$router.replace('/mySetting/accountAndSecurity');
+    },
   },
 };
 </script>
@@ -106,8 +111,11 @@ export default {
     > .el-form {
       > button {
         width: 140px;
-        margin-left: 145px;
         margin-top: 55px;
+
+        &.ml {
+          margin-left: 100px;
+        }
       }
       > .el-form-item {
         > label {

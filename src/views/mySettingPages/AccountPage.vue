@@ -51,6 +51,7 @@
     <footer>
       <span class="is-pink" v-if="customerInfo&&customerInfo.RefuseTips&&!AllowEdit">{{customerInfo.RefuseTips}}</span>
       <el-button type="primary" :disabled='!AllowEdit' @click="handleSubmit">保存</el-button>
+      <el-button @click="goback">返回</el-button>
     </footer>
   </section>
 </template>
@@ -234,6 +235,9 @@ export default {
           },
         });
       }
+    },
+    goback() {
+      this.$router.replace('/mySetting/accountAndSecurity');
     },
   },
   watch: {

@@ -21,14 +21,14 @@
           <label for="">统一社会信用代码：</label>
           <span>{{EnterpriseData.CreditCode}}</span>
         </li>
-        <li>
+        <!-- <li>
           <label for="">注册地址：</label>
           <span :class="EnterpriseData.RegisteredAddress?'':'is-gray'">{{EnterpriseData.RegisteredAddress || '未填写'}}</span>
         </li>
         <li>
           <label for="">注册电话：</label>
           <span :class="EnterpriseData.RegisteredTelephone?'':'is-gray'">{{EnterpriseData.RegisteredTelephone || '未填写'}}</span>
-        </li>
+        </li> -->
         <li>
           <label for="">开户银行：</label>
           <span :class="EnterpriseData.OpeningBank?'':'is-gray'">{{EnterpriseData.OpeningBank || '未填写'}}</span>
