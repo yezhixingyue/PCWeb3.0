@@ -59,8 +59,9 @@
         <i class="iconfont icon-wancheng"></i>修改成功
       </div>
     </div>
-    <footer v-if="active === 0 || active === 1">
-      <el-button type="primary" @click="next">下一步</el-button>
+    <footer>
+      <el-button type="primary" @click="next" v-if="active === 0 || active === 1">下一步</el-button>
+      <el-button v-if="active === 0 || active === 2" @click="goback">返回</el-button>
       <!-- <span class="span-title-blue" @click="() => this.$router.replace('/login')">返回登录界面</span> -->
     </footer>
   </section>
@@ -235,6 +236,9 @@ export default {
     formatMobile(mobile) {
       if (!mobile || mobile.length !== 11) return '';
       return this.$utils.formatMobile(mobile);
+    },
+    goback() {
+      this.$router.replace('/mySetting/accountAndSecurity');
     },
   },
 };
