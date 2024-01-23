@@ -160,6 +160,7 @@ const handleResponse = async (response) => {
     if (_url === '/Api/OrderAfterSale/Apply') _msg = '提交失败';
     if (_url === '/Api/OrderAfterSale/CancleApply') _msg = '取消失败';
     if (_url === '/Api/Shop/PrintBean/Buy') _msg = '充值失败';
+    if (_url === '/Api/Address/Search') _msg = '解析失败';
 
     _obj.title = _msg;
     messageBox.failSingleError(_obj);
