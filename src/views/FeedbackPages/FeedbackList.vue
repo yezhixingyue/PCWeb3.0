@@ -26,6 +26,7 @@
             :dateValue='condition4FeedbackList.DateType'
             :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
             label="下单时间"
+            minDate="2022-01-01 00:00:00"
             :dateList="dateList"
             :initDate='condition4FeedbackList.Date'
             dateType="daterange"
