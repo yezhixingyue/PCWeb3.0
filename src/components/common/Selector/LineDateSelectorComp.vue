@@ -30,6 +30,7 @@
         :format="format"
         :default-time='defaultTime'
         :clearable='false'
+        :picker-options="{disabledDate: getIsDisabledDate}"
         @focus='onPickerFocus'
         @blur="onPickerBlur"
         size="mini"
@@ -58,6 +59,10 @@ export default {
     dateValue: {
       type: String,
       default: 'today',
+    },
+    minDate: {
+      type: String,
+      default: undefined,
     },
     typeList: {
       type: Array,
@@ -254,6 +259,10 @@ export default {
     },
     onDocumentClick(e) {
       this.clickTarget = e;
+    },
+    getIsDisabledDate(e) { // 判断日期是否可选 - 暂只判断最小日期
+      if (!this.minDate) return false;
+      return new Date(e) < new Date(this.minDate);
     },
   },
   mounted() {
