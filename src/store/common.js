@@ -269,6 +269,15 @@ export default {
 
     isNextYear: new Date().getFullYear() > 2023,
     AuthenticationCompVisible: false,
+    /* 证书类型
+    -------------------------------*/
+    CertificateType: [
+      { label: '不限', value: '' },
+      { label: '商标注册证', value: 0 },
+      { label: '营业执照', value: 1 },
+      { label: '印刷委托书', value: 2 },
+      { label: '合同/授权证明', value: 3 },
+    ],
   },
   getters: {
     /* 细分类 物流配送方式列表
@@ -523,7 +532,7 @@ export default {
         commit('setCustomerInfo', [res.data.Data, true]);
         if (useCookie) Cookie.setCookie('customerInfo', JSON.stringify(res.data.Data), 'Session');
         else sessionStorage.setItem('customerInfo', JSON.stringify(res.data.Data));
-        if (!res.data.Data.QQ && key) {
+        if (!res.data.Data.AuthenInfo.DetailAddress && key) {
           massage.warnCancelBox({
             title: '企业信息未完善',
             msg: '您尚有资料未完善，无法享受优惠价格',
