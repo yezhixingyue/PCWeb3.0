@@ -7,7 +7,7 @@
         <InputComp :disabled='!AllowEdit' v-model="AuthenInfo4Submit.CustomerName"  title='企业简称' required />
         <!-- <InputComp :disabled='!AllowEdit'
          v-model="AuthenInfo4Submit.AuthenInfo.CompanyName"  title='企业全称' placeholder='须与营业执照上的名称一致' /> -->
-         <InputComp :disabled='!AllowEdit' v-model="QQ"  title='QQ' placeholder='联系QQ' required/>
+         <InputComp :disabled='!AllowEdit' v-model="QQ"  title='QQ' placeholder='联系QQ'/>
       </div>
       <div class="second">
       </div>
@@ -132,7 +132,7 @@ export default {
         { strategy: 'isNotZero', errorMsg: '请选择县/区' },
       ],
       QQRules: [
-        { strategy: 'isNotEmpty', errorMsg: '请输入QQ' },
+        // { strategy: 'isNotEmpty', errorMsg: '请输入QQ' },
         { strategy: 'maxLength:11', errorMsg: 'QQ号长度不应超过11位' },
 
       ],
