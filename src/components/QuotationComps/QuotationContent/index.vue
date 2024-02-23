@@ -142,12 +142,12 @@
     <div class="show-empty-bg" v-else>
       <img src="@/assets/images/placeorderisempty.png" alt="">
       <p class="is-gray">当前尚未选择产品，请通过左侧产品分类选择产品吧...</p>
-      <p class="is-gray is-font-13" style="margin-top:12px">名片之家服务升级，请您点击添加全国统一业务QQ：
+      <!-- <p class="is-gray is-font-13" style="margin-top:12px">名片之家服务升级，请您点击添加全国统一业务QQ：
         <a rel="nofollow" target="_blank" href="tencent://message/?uin=800051518&amp;Site=名片之家&amp;Menu=yes" class='is-blue'>
           <i class='icon-kefuqq iconfont'></i>
           <span> 800051518</span>
         </a>
-      </p>
+      </p> -->
     </div>
     <!-- <AsideIntroComp
      :asideAboutData='asideAboutData'

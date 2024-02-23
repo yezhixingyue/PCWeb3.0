@@ -27,7 +27,7 @@
                 <hr>
               </div>
             </li> -->
-            <li>
+            <!-- <li>
               <p class="title">
                 <i class="iconfont icon-QQ1"></i>
                 <span class="is-gray">客服QQ：</span>
@@ -41,7 +41,7 @@
                 </p>
                 <hr>
               </div>
-            </li>
+            </li> -->
             <li>
               <p class="title">
                 <i class="iconfont icon-wodekefu"></i>
