@@ -30,6 +30,7 @@ export default {
       Status: '',
       KeyWords: '',
       FieldType: 3,
+      OrderBySendTime: false,
     },
     /** 当前订单详情数据
     ---------------------------------------- */
@@ -98,6 +99,7 @@ export default {
         Status: '',
         KeyWords: '',
         FieldType: 3,
+        OrderBySendTime: false,
       };
     },
     /** 设置当前订单详情数据
@@ -159,6 +161,7 @@ export default {
         Status: '',
         KeyWords: '',
         FieldType: 3,
+        OrderBySendTime: false,
       };
       state.curOrderDetailData = null;
       state.shouldGetNewListData = true;

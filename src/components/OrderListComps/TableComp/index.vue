@@ -32,7 +32,7 @@
       @itemHover="handleItemHover"
       @itemHoverLeave="handleItemHoverLeave"
       fixedRight
-      :style="`width:${widthObj.w15 + 2}px`"
+      :style="`width:${widthObj.w16 + 2}px`"
       @detail="onDetailClick"
     />
     <SubmitConfirmDialog
@@ -68,22 +68,24 @@ export default {
         w1: 100,
         w2: 150,
         w3: 120,
-        w4: 160,
-        w5: 105,
+        w4: 120,
+        w5: 160,
         w6: 105,
-        w7: 110,
-        w8: 55,
-        w9: 65,
-        w10: 75,
-        w11: 65,
+        w7: 105,
+        w8: 110,
+        w9: 55,
+        w10: 65,
+        w11: 75,
         w12: 65,
-        w13: 55,
-        w14: 110,
-        w15: 150,
+        w13: 65,
+        w14: 55,
+        w15: 110,
+        w16: 150,
       },
       titleList: [
         '订单号',
         '产品名称',
+        '平台单号',
         '尺寸',
         '物料',
         '工艺',

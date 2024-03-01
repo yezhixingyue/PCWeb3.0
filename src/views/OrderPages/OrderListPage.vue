@@ -13,6 +13,7 @@
           :typeList="[['ProductClass', 'First'],['ProductClass', 'Second'],['ProductID', '']]"
          /> -->
          <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
+         <el-checkbox v-model="OrderBySendTime" class="checkbox">优先显示已发货订单</el-checkbox>
         </li>
         <li class="second">
           <LineDateSelectorComp
@@ -168,6 +169,16 @@ export default {
         this.$store.dispatch('order/getOrderList');
       },
     },
+    OrderBySendTime: {
+      get() {
+        return this.condition4OrderList.OrderBySendTime;
+      },
+      set(newVal) {
+        // // console.log(newVal);
+        this.$store.commit('order/setCondition4OrderList', [['OrderBySendTime', ''], newVal]);
+        this.$store.dispatch('order/getOrderList');
+      },
+    },
     showDateText() {
       if (this.condition4OrderList && this.condition4OrderList.DateType !== 'all') {
         if (this.condition4OrderList.DateType) {
@@ -303,6 +314,14 @@ export default {
           padding-top: 1px;
           padding-left: 12px;
         }
+
+        > .el-checkbox {
+          margin-left: 30px;
+          .el-checkbox__label {
+            font-size: 12px;
+          }
+        }
+
         &.second {
           padding-top: 28px;
           .mp-line-date-selector-wrap {
