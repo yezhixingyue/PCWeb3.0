@@ -2,6 +2,7 @@
   <CanFreeCreateSelectComp
     v-if="!isRadio && !isMultiple"
     v-model="checkVal"
+    isOptionType
     :placeholder="placeholder"
     :isDisabled="isDisabled"
     :allow-create="Allow"
