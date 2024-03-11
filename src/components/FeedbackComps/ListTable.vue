@@ -121,6 +121,9 @@ export default {
         case 3:
           str = '已退全款或全部补印';
           break;
+        case 4:
+          str = '发票开具中或已开发票'; // 后端区分 开票中/已开票 状态的时候较为麻烦切性能不好
+          break;
         case 255:
           str = '超出售后期';
           break;

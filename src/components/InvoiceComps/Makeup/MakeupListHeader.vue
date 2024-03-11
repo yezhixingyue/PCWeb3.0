@@ -57,6 +57,7 @@
       <el-tab-pane v-for="it in InvoiceMakeUpStatusEnumList" :key="it.ID" :label="it.Name" :name="`${it.ID}`">
       </el-tab-pane>
     </el-tabs>
+    <p class="hint-masage">特别注意：订单开票（含开票中）后，不再支持售后；售后中的订单请在完成售后后再申请开票。</p>
     <InvoicePolicyDialog :visible.sync="visible" />
   </header>
 </template>
@@ -149,6 +150,7 @@ export default {
 </script>
 <style lang="scss">
 .mp-pc-invoice-make-up-list-page-header-comp-wrap {
+  position: relative;
   > .page-title {
     padding-bottom: 30px;
     overflow: hidden;
@@ -279,6 +281,13 @@ export default {
       left: 0px;
       z-index: 99;
     }
+  }
+  .hint-masage{
+    position: absolute;
+    left: 300px;
+    bottom: 0px;
+    line-height: 36px;
+    color: #f4a307;
   }
 }
 </style>
