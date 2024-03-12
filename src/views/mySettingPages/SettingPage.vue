@@ -22,6 +22,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import LocalCatchHandler from '@/assets/js/LocalCatchHandler';
 
 export default {
   components: {
@@ -54,13 +55,8 @@ export default {
         return this.keepOrderData;
       },
       set(newVal) {
-        const str = localStorage.getItem('localCacheDataByMpzj');
-        const obj = str ? JSON.parse(str) : {};
-        const key = this.customerInfo?.Account?.AccountID;
-        if (!key) return;
-        if (!obj.keepOrderData) obj.keepOrderData = {};
-        obj.keepOrderData[key] = newVal;
-        localStorage.setItem('localCacheDataByMpzj', JSON.stringify(obj));
+        if (!this.customerInfo?.Account?.AccountID) return;
+        LocalCatchHandler.setFieldFromLocalStorage(this.customerInfo?.Account?.AccountID, 'keepOrderData', newVal);
         this.$store.commit('common/setKeepOrderData', newVal);
       },
     },

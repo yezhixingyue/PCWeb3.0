@@ -19,9 +19,12 @@
         <div class="upload-btn-box">
           <FileSelectComp @change="handleFileChange" v-show="customer" :disabled="!canSelectFile || !isLegal" :accept='accept'
            :selectTitle='selectTitle' ref="oFileBox" />
-          <el-checkbox v-show="customer" class="legal" v-model="isLegal" label="">印刷内容合法</el-checkbox>
-          <span v-show="customer" class="blue-span agreement" @click="legalVisible = true">查看“承印品协议书”</span>
+          <el-tooltip class="item" effect="dark" content="勾选此处则下单时弹出订单信息复核弹窗，确认后再进行提交。" placement="top-start">
+            <el-checkbox v-show="customer" class="legal" v-model="needToastPreDialog" label="">弹窗确认后再提交</el-checkbox>
+          </el-tooltip>
           <FailListComp :failedList='failedList' />
+          <el-checkbox v-show="customer" class="legal" style="margin-left: 360px;" v-model="isLegal" label="">印刷内容合法</el-checkbox>
+          <span v-show="customer" class="blue-span agreement" @click="legalVisible = true">查看“承印品协议书”</span>
         </div>
         <MainTableComp
           ref="oTableWrap"
@@ -108,6 +111,7 @@ import BatchUploadFooterComp from '@/packages/BatchUploadComps/Footer/BatchUploa
 import BatchUploadClass from '@/assets/js/ClassType/BatchUploadClass';
 import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
 import { mapState, mapGetters } from 'vuex';
+import LocalCatchHandler from '@/assets/js/LocalCatchHandler';
 import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
 import PreCreateDialog from '../../packages/PreCreateDialog';
 import LegalAgreementDialog from '../../components/common/AgreementComps/LegalAgreementDialog.vue';
@@ -169,6 +173,7 @@ export default {
         number: 0,
         errNum: 0,
       },
+      notToastPreDialog: false, // 是否不弹出直接提交
     };
   },
   computed: {
@@ -235,6 +240,16 @@ export default {
     },
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
+    },
+    needToastPreDialog: {
+      get() {
+        return !this.notToastPreDialog;
+      },
+      set(newVal) {
+        if (!this.customerInfo?.Account?.AccountID) return;
+        LocalCatchHandler.setFieldFromLocalStorage(this.customerInfo?.Account?.AccountID, 'notToastPreDialog', !newVal);
+        this.notToastPreDialog = !newVal;
+      },
     },
   },
   methods: {
@@ -431,9 +446,7 @@ export default {
       this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
     },
     async handleBatchUploadFiles(list) { // 执行单个文件上传或批量上传 （使用同一个方法） -- 在最终下单前 在客户界面 需进行预下单弹窗确认
-      const _usePreCreate = false; // 是否使用预下单
-
-      if (!_usePreCreate) { // 不使用预下单
+      if (this.notToastPreDialog) { // 不使用预下单
         const temp = {
           ...this.basicObj,
           PayInFull: true,
@@ -499,6 +512,10 @@ export default {
       handler() {
         if (this.customer?.PermissionInfo?.BatchUpload === false) {
           this.$router.replace('/placeOrder');
+        }
+        if (this.customerInfo?.Account?.AccountID) {
+          const _localCatchVal = LocalCatchHandler.getFieldFromLocalStorage(this.customerInfo.Account.AccountID, 'notToastPreDialog');
+          if (_localCatchVal) this.notToastPreDialog = true;
         }
       },
       immediate: true,
