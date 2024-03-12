@@ -56,7 +56,8 @@
               <span>已驳回</span>
             </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 7)">
-              补印：款数：<span class="is-pink">{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span class="is-pink">{{AfterSaleInfo.SuccessNumber}}</span> 张
+              补印：款数：<span class="is-pink">{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span class="is-pink">{{AfterSaleInfo.SuccessNumber}}</span>
+              {{productInfo.Unit}}
               <span style="margin-left: 20px;">补印订单号：{{ AfterSaleInfo.ReprintOrderID }}
                 <i @click="copy(AfterSaleInfo.ReprintOrderID)">复制</i>
                 可在订单中查看进度

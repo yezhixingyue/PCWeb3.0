@@ -101,6 +101,7 @@ export default {
         if (this.condition4InvoiceMakeupList.MakeupStatus === +val) return;
         this.setCondition([['MakeupStatus'], +val]);
         this.getList(true);
+        this.$emit('conditionChange');
       },
     },
     localProductList: { // 产品一级类别 多选
