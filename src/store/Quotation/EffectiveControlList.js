@@ -35,7 +35,7 @@ export const creatNewTargetValue = (DefaultOrDisabledValue, _El) => {
  * @param {*}
  * @return {*}
  */
-const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize, isGroup) => {
+const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, isSize, isGroup, _needNumberic) => {
   const temp = {
     ElName: '',
     ElValue: null,
@@ -76,12 +76,14 @@ const getElementTypeValue = (Element, FixedType, ElementValList, ElementList, is
     const [{ ID, Name, Value, IsOpen }] = t.CustomerInputValues;
     _Value = ID || Name || IsOpen;
     if (_Value && !ID && Name && _El.Type === 2 && _El.OptionAttribute.IsRadio) {
-      _Value = '00000000-0000-0000-0000-000000000000';
+      if (_needNumberic) _Value = _El.OptionAttribute.CustomizeValue;
+      else _Value = '00000000-0000-0000-0000-000000000000';
     }
     if (!_Value && _Value !== false) _Value = Value;
     if (isSize && ID) {
       const _t = _El.OptionAttribute.OptionList.find(it => it.ID === ID);
-      temp.ElValue = _t ? _t.Value : '';
+      if (!_needNumberic) temp.ElValue = ID;
+      else temp.ElValue = _t ? _t.Value : '';
       return temp;
     }
   }
@@ -348,9 +350,10 @@ const getSiztTypeValue = (Size, SizeGroup, Element, FixedType, SizeName) => {
   } else {
     _list = List;
   }
-  _list = _list.map(it => ({ ElementID: it.ElementID, Value: getElementTypeValue({ ID: it.ElementID }, null, _list, SizeGroup.GroupInfo.ElementList, true).ElValue }));
+  const _needNumberic = !!(FixedType || FixedType === 0);
+  _list = _list.map(it => ({ ElementID: it.ElementID, Value: getElementTypeValue({ ID: it.ElementID }, null, _list, SizeGroup.GroupInfo.ElementList, true, false, _needNumberic).ElValue }));
 
-  if (FixedType || FixedType === 0) {
+  if (_needNumberic) {
     _list = _list.map(it => it.Value).filter(it => it);
     switch (FixedType) {
       case 5: // 最短边
