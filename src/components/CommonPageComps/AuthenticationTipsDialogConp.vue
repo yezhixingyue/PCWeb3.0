@@ -158,18 +158,42 @@ export default {
             letter-spacing: 2px;
             // 并且未认证
             &.authentication0{
-              background-color: #605F74;
-              border: 1px solid #605F74;
+              background-color: #00194E;
+              border: 1px solid #00194E;
+              &:hover{
+                background-color: #003097;
+                border: 1px solid #003097;
+              }
+              &:active{
+                background-color: #1962FF;
+                border: 1px solid #1962FF;
+              }
             }
             // 并且认证中
             &.authentication1{
               background-color: #3874F6;
               border: 1px solid #3874F6;
+              &:hover{
+                background-color: #709DFF;
+                border: 1px solid #709DFF;
+              }
+              &:active{
+                background-color: #0043D4;
+                border: 1px solid #0043D4;
+              }
             }
             // 并且未通过
             &.authentication3{
               background-color: #FF0000;
               border: 1px solid #FF0000;
+              &:hover{
+                background-color: #FF7E7E;
+                border: 1px solid #FF7E7E;
+              }
+              &:active{
+                background-color: #CF0000;
+                border: 1px solid #CF0000;
+              }
             }
           }
         }
