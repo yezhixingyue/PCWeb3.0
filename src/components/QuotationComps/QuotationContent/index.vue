@@ -137,6 +137,7 @@
         :getCheckResult='getCheckResult'
         ref="oSubmitBox"
         @clearAdd='clearAdd'
+        @removeCoupon="removeCoupon"
       />
     </section>
     <div class="show-empty-bg" v-else>
@@ -279,6 +280,9 @@ export default {
           resolve(list.length === 0 ? true : list);
         });
       });
+    },
+    removeCoupon(CouponCode) {
+      this.couponList = this.couponList.filter(it => it.CouponCode !== CouponCode);
     },
     async go2GetProductPrice() { // 计算价格
       // 校验
