@@ -93,7 +93,7 @@ export default {
         if (Array.isArray(it.List)) {
           it.List.forEach((part, index) => {
             const ContentList = ShowProductDetail.getDisplayContentFromPartDataByDetailData(it.Attributes.DisplayOrderList, part);
-            const Name = it.List.length > 1 && index > 0 ? `${it.Attributes.Name}${index + 1}` : it.Attributes.Name;
+            const Name = it.List.length > 1 ? `${it.Attributes.Name}${index + 1}` : it.Attributes.Name;
             const temp = {
               Name,
               Type: 'Part',
