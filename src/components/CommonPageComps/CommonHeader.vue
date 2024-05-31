@@ -63,12 +63,11 @@
             <!-- <i class="iconfont icon-zhangdan"></i> -->
             <span>账单</span>
           </router-link>
-          <router-link class="normal-item" tag="li" to="/feedbackList" :class="{
+          <!-- <router-link class="normal-item" tag="li" to="/feedbackList" :class="{
               active: $route.name === 'feedback',
             }">
-            <!-- <i class="iconfont icon-zhangdan"></i> -->
             <span>申请售后</span>
-          </router-link>
+          </router-link> -->
           <router-link class="normal-item" tag="li" to="/serviceAfterSales" :class="{
               active: $route.name === 'serviceAfterSalesDetails',
             }">
