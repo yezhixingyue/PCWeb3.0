@@ -55,7 +55,9 @@
             <!-- <i class="iconfont icon-weifukuan"></i> -->
             <span>未付款</span>
           </router-link>
-          <router-link class="normal-item" tag="li" to="/order">
+          <router-link class="normal-item" tag="li" to="/order"  :class="{
+              active: $route.name === 'AfterSalesApply',
+            }">
             <!-- <i class="iconfont icon-dingdan"></i> -->
             <span>订单</span>
           </router-link>

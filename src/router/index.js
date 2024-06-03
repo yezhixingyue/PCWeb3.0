@@ -413,14 +413,14 @@ const routes = [
         ],
       },
       {
-        path: '/feedback',
-        name: 'feedback',
+        path: '/AfterSalesApply',
+        name: 'AfterSalesApply',
         meta: {
           requiresAuth: true,
           y: 0,
           title: '问题反馈提交 - 郑州名片之家电子商务有限公司',
         },
-        component: () => import('../views/FeedbackPages/FeedbackAdd.vue'),
+        component: () => import('../views/AfterSalesApplyPages/AfterSalesApply.vue'),
       },
       // {
       //   path: '/feedbackList',

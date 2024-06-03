@@ -5,30 +5,22 @@
         <ul class="header-content">
           <li>
             <SingleSelector v-model="AfterSalesStatus" :optionList='AfterSalesStatusList' title="售后进度" />
-            <!-- <ProductSelector
-              :changePropsFunc='setCondition4ServiceAfterSaleList'
-              :requestFunc='getServiceAfterSaleList'
-              :ClassID='condition4ServiceAfterSaleList.Product.ClassID'
-              :TypeID='condition4ServiceAfterSaleList.Product.TypeID'
-              :ProductID='condition4ServiceAfterSaleList.Product.ProductID'
-              :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
-            /> -->
             <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
           </li>
           <li class="second">
-          <LineDateSelectorComp
-            :changePropsFunc='setCondition4ServiceAfterSaleList'
-            :requestFunc='getServiceAfterSaleList'
-            :isFull="false"
-            :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
-            :dateValue='condition4ServiceAfterSaleList.DateType'
-            :initDate='condition4ServiceAfterSaleList.Date'
-            :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
-            label="申请时间"
-            minDate="2022-01-01 00:00:00"
-            :dateList="dateList"
-            dateType="daterange"
-          />
+            <LineDateSelectorComp
+              :changePropsFunc='setCondition4ServiceAfterSaleList'
+              :requestFunc='getServiceAfterSaleList'
+              :isFull="false"
+              :typeList="[['DateType', ''], ['Date', 'First'], ['Date', 'Second']]"
+              :dateValue='condition4ServiceAfterSaleList.DateType'
+              :initDate='condition4ServiceAfterSaleList.Date'
+              :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
+              label="申请时间"
+              minDate="2022-01-01 00:00:00"
+              :dateList="dateList"
+              dateType="daterange"
+            />
             <search-input-comp
               title="关键词"
               placeholder="请输入搜索关键词"
@@ -45,44 +37,49 @@
       <div class="content-wrap" v-if="ServiceAfterSaleList.length">
         <div class="content">
           <div class="table-wrap">
-
             <el-table stripe border
               :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
-              <el-table-column prop="AfterSaleCode" label="服务单号" width="81" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="OrderID" label="订单号" width="92" show-overflow-tooltip>
+              <el-table-column prop="AfterSaleCode" label="售后单号" width="66" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="OrderID" label="订单号" width="72" show-overflow-tooltip>
               </el-table-column>
-              <el-table-column label="产品名称" width="116" show-overflow-tooltip>
+              <el-table-column label="产品" width="101" show-overflow-tooltip>
                 <span slot-scope="scope">{{ scope.row.ProductName }}</span>
               </el-table-column>
-              <el-table-column label="文件内容" show-overflow-tooltip width="116">
+              <el-table-column label="文件名" show-overflow-tooltip width="78">
                 <template slot-scope="scope">{{ scope.row.Content }}</template>
               </el-table-column>
-              <el-table-column label="数量/款数" show-overflow-tooltip width="85">
-                <template slot-scope="scope">
-                  {{ scope.row.ProductAmount }}{{ scope.row.Unit }} {{ scope.row.KindCount }}款
-                </template>
+              <el-table-column label="金额" show-overflow-tooltip width="45">
+                <template slot-scope="scope">{{ scope.row.Content }}</template>
               </el-table-column>
-              <el-table-column label="尺寸" show-overflow-tooltip width="108">
-                <template slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</template>
+              <el-table-column label="运费" show-overflow-tooltip width="35">
+                <template slot-scope="scope">{{ scope.row.Content }}</template>
               </el-table-column>
-              <el-table-column label="工艺" show-overflow-tooltip width="128">
-                <template slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</template>
+              <el-table-column label="诉求" show-overflow-tooltip width="116">
+                <template slot-scope="scope">{{ scope.row.Content }}</template>
               </el-table-column>
-              <el-table-column label="处理结果" show-overflow-tooltip width="107">
+              <el-table-column label="申请时间" show-overflow-tooltip width="107">
+                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              </el-table-column>
+              <el-table-column label="申请渠道" show-overflow-tooltip width="71">
+                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              </el-table-column>
+              <el-table-column label="处理结果" show-overflow-tooltip width="137">
                 <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
               </el-table-column>
-              <el-table-column label="申请时间" width="135" show-overflow-tooltip>
+              <el-table-column label="额外支付" show-overflow-tooltip width="72">
+                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              </el-table-column>
+              <el-table-column label="状态" show-overflow-tooltip width="40">
+                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              </el-table-column>
+              <el-table-column label="处理人" show-overflow-tooltip width="62">
+                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              </el-table-column>
+              <el-table-column label="最后操作时间" width="104" show-overflow-tooltip>
                 <template slot-scope="scope"
                 >{{scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
               </el-table-column>
-              <el-table-column label="售后进度" width="76" show-overflow-tooltip>
-                <template slot-scope="scope">
-                  <span :class="{
-                    'coloraaa': isAccomplish(scope.row.AfterSaleStatus),
-                    }">{{getAfterSaleStatusText(scope.row.AfterSaleStatus)}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="155" show-overflow-tooltip>
+              <el-table-column label="操作" width="68" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <div class="operate">
                     <span @click="$router.push( { name: 'serviceAfterSalesDetails', query: {data: JSON.stringify(scope.row)} })">查看</span>

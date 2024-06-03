@@ -1,62 +1,47 @@
 <template>
-  <section class="mp-mpzj-order-feedback-add-page-wrap">
+  <section class="mp-mpzj-order-after-sales-apply-page-wrap">
     <section class="content" v-if="queryData">
-      <header>
-        <span class="is-bold is-black">订单号：{{queryData.OrderID}}</span>
-      </header>
-      <div>
-        <el-table stripe border v-if="queryData"
-          :data="[queryData]" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="ProductName" label="商品名称" width="156" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="ProductName" label="物料" width="168" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.MaterialList | formatListItemMaterial}}</span>
-          </el-table-column>
-          <el-table-column label="尺寸" show-overflow-tooltip width="148">
-            <span slot-scope="scope" v-if="scope.row.SizeList.length">{{ scope.row.SizeList | formatListItemSize }}</span>
-          </el-table-column>
-          <el-table-column label="数量" width="68" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductAmount }}{{ scope.row.Unit }}</span>
-          </el-table-column>
-          <el-table-column label="款数" width="48" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.KindCount }}款</span>
-          </el-table-column>
-          <el-table-column label="工艺" show-overflow-tooltip width="64">
-            <!-- ================================== -->
-            <span slot-scope="scope" v-if="scope.row.CraftList && scope.row.CraftList.length">{{ scope.row.CraftList | formatListItemSize }}</span>
-          </el-table-column>
-          <el-table-column prop="Content" label="文件内容" width="146" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="FinalPrice" label="成交价" width="85" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.FinalPrice ? `${scope.row.FinalPrice}元` : ''}}</span>
-          </el-table-column>
-          <el-table-column prop="OrderID" label="运费" width="58" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.IsUnion ? '-' : scope.row.Freight}}元</span>
-          </el-table-column>
-          <el-table-column prop="OrderID" label="总计" width="88" show-overflow-tooltip>
-            <span slot-scope="scope">
-              <b class="is-pink">
-                {{scope.row.Freight + scope.row.FinalPrice}}元
-              </b>
-            </span>
-          </el-table-column>
-          <el-table-column prop="OrderID" label="已售后(含运费)" width="110" show-overflow-tooltip>
-            <span slot-scope="scope">{{scope.row.Refund +  scope.row.RefundFreight}}元</span>
-          </el-table-column>
-        </el-table>
-
-        <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm1" label-width="100px" class="demo-ruleForm"
+      <div class="order-info">
+        <header>订单信息</header>
+        <ul>
+          <li>
+            <div>订单号：</div>
+            <p>{{queryData.OrderID}}</p>
+          </li>
+          <li>
+            <div>已售后次数：</div>
+            <p>0</p>
+          </li>
+          <li>
+            <div>产品数量：</div>
+            <p>{{ queryData.ProductName }} {{ queryData.ProductAmount }}{{ queryData.Unit }}</p>
+          </li>
+          <li>
+            <div>尺寸规格：</div>
+            <p>{{ queryData.SizeList | formatListItemSize }} {{ queryData.CraftList | formatListItemSize }}</p>
+          </li>
+          <li>
+            <div>成交价：</div>
+            <p>{{queryData.FinalPrice ? `${queryData.FinalPrice}元` : ''}}</p>
+          </li>
+          <li>
+            <div>运费：</div>
+            <p>{{queryData.IsUnion ? '-' : queryData.Freight}}元</p>
+          </li>
+          <li>
+            <div>内容：</div>
+            <p>{{ queryData.Content }}</p>
+          </li>
+        </ul>
+      </div>
+      <div class="line"></div>
+      <div class="after-sales-apply">
+        <header>申请售后</header>
+        <el-form label-position="right" size="small" :model="ruleForm" :rules="rules" ref="ruleForm1" label-width="100px" class="demo-ruleForm"
           style="min-height: calc(100vh - 115px - 22px - 350px);"
         >
-          <el-form-item label="诉求意向：" prop="AppealType">
-            <div class="intention">
-              <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
-              <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退货/退款</span>
-              <span :class="ruleForm.AppealType===3 ? 'action' : ''" @click="ruleForm.AppealType = 3">优惠减款</span>
-              <span :class="ruleForm.AppealType===255 ? 'action' : ''" @click="ruleForm.AppealType = 255">其它</span>
-            </div>
-          </el-form-item>
-
-          <template v-if="ruleForm.AppealType!==null">
-            <el-form-item class="QuestionTypeList" label="问题类型：" prop="QuestionTypeList" style="margin-bottom:0">
+          <template>
+            <el-form-item class="QuestionTypeList" label="问题：" prop="QuestionTypeList" style="margin-bottom:0">
               <CheckButton
                 @CheckChange="ApplyQuestionCheckChange"
                 :checkList="ApplyQuestionList"
@@ -70,15 +55,13 @@
             <!--  -->
 
             <el-form-item label="问题描述：" prop="QuestionRemark">
+              <label for="QuestionRemark" slot="label" class="el-form-item__label QuestionRemark">问题描述<span>(选填)</span>：</label>
               <el-input type="textarea" v-model="ruleForm.QuestionRemark"
               @input='ruleForm.QuestionRemark.length > 300 ? ruleForm.QuestionRemark=ruleForm.QuestionRemark.slice(0, 300) : ruleForm.QuestionRemark'
               maxlength="300" autosize show-word-limit placeholder="请输入具体问题描述"></el-input>
             </el-form-item>
 
             <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList" :required='isUpImg'>
-              <label for="QuestionPicList" slot="label" class="el-form-item__label">上传图片：
-                <!-- <span class="remark">拍照时请将成品10份以上呈平铺或扇形展开，并对产品的包装、标签、整体、问题局部特写等多角度拍摄，为您带来麻烦，深表歉意！</span> -->
-              </label>
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
                 list-type="picture-card"
@@ -93,14 +76,11 @@
                 :before-upload='beforeUpload'
                 :class="{'uploadDisabled':uploadDisabled}"
                 >
-                <!-- :on-success='handllePictureUploaded'
-                :on-remove="handleRemove" -->
                 <i class="el-icon-plus"></i>
               </el-upload>
               <el-dialog :visible.sync="dialogVisible" top="8vh" title="查看图片">
                 <img width="100%" :src="dialogImageUrl" alt="">
               </el-dialog>
-              <!-- <p v-if="!canEdit && fileList.length === 0">未上传照片</p> -->
               <div class="upload-Remark">
                 <p class="is-font-12 gray">1、拍照时请将成品10份以上呈平铺或扇形展开，并对产品的包装、标签、整体、问题局部特写等多角度拍摄，为您带来麻烦，深表歉意！</p>
                 <p class="is-font-12 gray">2、照片支持bmp、gif、png、jpg、jpeg，最多可上传9张图片，每张图片大小不超过15M。</p>
@@ -108,32 +88,38 @@
                 <p class="is-font-12 gray">4、若服务方式为第三方“快递或快运”类订单需补充“快递面单、货物标签、第三方交易详情”等相关凭证。</p>
               </div>
             </el-form-item>
+            <el-form-item label="诉求意向：" prop="AppealType">
+              <div class="intention">
+                <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退款</span>
+                <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
+              </div>
+            </el-form-item>
+            <div class="linkman">
+              <el-form-item label="金额：" prop="ContactName">
+                <el-input v-model="ruleForm.ContactName" :disabled='!canEdit'
+                  show-word-limit placeholder="请输入金额"></el-input> 元
+              </el-form-item>
+              <el-form-item label="补印数量：" prop="ContactName">
+                <el-input v-model="ruleForm.ContactName" :disabled='!canEdit'
+                  show-word-limit placeholder="请输入补印数量"></el-input> {{ queryData.Unit }}
+              </el-form-item>
+              <!-- <el-form-item label="联系人：" prop="ContactName">
+                <el-input v-model="ruleForm.ContactName" maxlength="20" :disabled='!canEdit'
+                  show-word-limit placeholder="请输入联系人"></el-input>
+              </el-form-item> -->
+              <el-form-item label="联系电话：" prop="Mobile">
+                <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
+                  show-word-limit placeholder="请输入手机号码"></el-input>
+              </el-form-item>
+              <el-form-item label="QQ：" prop="QQ">
+                <el-input v-model="ruleForm.QQ" maxlength="11" :disabled='!canEdit'
+                  show-word-limit placeholder="请输入QQ号码"></el-input>
+              </el-form-item>
+            </div>
           </template>
         </el-form>
-        <div v-if="ruleForm.AppealType!==null" class="line"></div>
-        <el-form v-if="ruleForm.AppealType!==null"
-          label-position="left" :model="ruleForm"
-          :rules="rules" ref="ruleForm2" label-width="100px" class="demo-ruleForm">
-          <div class="linkman">
-            <el-form-item label="联系人：" prop="ContactName">
-              <el-input v-model="ruleForm.ContactName" maxlength="20" :disabled='!canEdit'
-                show-word-limit placeholder="请输入联系人"></el-input>
-            </el-form-item>
-
-            <el-form-item label="联系电话：" prop="Mobile">
-              <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入手机号码"></el-input>
-            </el-form-item>
-            <el-form-item label="QQ号码：" prop="QQ">
-              <el-input v-model="ruleForm.QQ" maxlength="11" :disabled='!canEdit'
-                show-word-limit placeholder="请输入QQ号码"></el-input>
-            </el-form-item>
-          </div>
-
-        </el-form>
         <div class="btn-box">
-          <el-button v-if="ruleForm.AppealType!==null" type="primary" @click="submitForm()" >立即提交</el-button>
-          <!-- <span class="blue-span is-font-12" style="margin: 0 60px 0 30px" @click="resetForm('ruleForm')" v-if='canEdit'>重置</span> -->
+          <el-button type="primary" @click="submitForm()" >立即提交</el-button>
           <el-button  @click="handleReturn" style="color: #428DFA; border-color: #428DFA;">
             返回
           </el-button>
@@ -273,7 +259,6 @@ export default {
           { validator: validateQuestionTypeList, trigger: 'blur' },
         ],
         QuestionRemark: [
-          { required: true, message: '请您对问题进行简单描述', trigger: 'change' },
           {
             min: 3, max: 300, message: '长度在 3 到 300 个字符', trigger: 'change',
           },
@@ -319,7 +304,7 @@ export default {
       this.$refs.ruleForm2.validate();
       if (this.ruleForm.QuestionTypeList.length === 0) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题类型' });
-      } else if (this.ruleForm.QuestionRemark === '' || this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300) {
+      } else if (this.ruleForm.QuestionRemark !== '' && (this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300)) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述并在3到300个字符' });
       } else if (this.ruleForm.ContactName === '') {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入联系人' });
@@ -339,9 +324,6 @@ export default {
           return;
         }
         this.ruleForm.QuestionPicList = _list || [];
-        if (!this.$route.query.isEdit) {
-          this.ruleForm.AfterSaleCode = 0;
-        }
         const res = await this.api.getApplyQuestionApply(this.ruleForm);
         if (res.data.Status === 1000) {
           this.submitSuccessVsible = true;
@@ -460,36 +442,14 @@ export default {
     },
   },
   async mounted() {
-    const isEdit = Number(this.$route.query.isEdit);
-    this.queryData = JSON.parse(this.$route.query.data);
-    console.log(this.queryData);
-    if (isEdit) {
-      this.ruleForm.AppealType = this.queryData.AppealType;
-      // this.ruleForm.QuestionTypeList = this.queryData.QuestionTypeTitleList;
-      this.ruleForm.QuestionPicList = this.queryData.QuestionPicList || [];
-      this.ruleForm.QuestionRemark = this.queryData.QuestionRemark;
-      this.ruleForm.ContactName = this.queryData.ContactName;
-      this.ruleForm.QQ = this.queryData.ContactQQ;
-      this.ruleForm.Mobile = this.queryData.Mobile;
-      // this.fileList = this.ruleForm.QuestionPicList.map(path => ({ url: `${imgUrl}${path}` }));
-      setTimeout(() => { this.initPicList(this.ruleForm.QuestionPicList); }, 500);
-    } else {
-      this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
-      this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
-      this.ruleForm.QQ = this.customerInfo?.QQ || '';
-    }
+    this.queryData = JSON.parse(this.$route.params.data);
+    this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
+    this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
+    this.ruleForm.QQ = this.customerInfo?.QQ || '';
     // 获取问题类型数据
     this.api.getApplyQuestionList().then(res => {
       if (res.data.Status === 1000) {
         this.ApplyQuestionList = res.data.Data;
-        if (isEdit) {
-          // 查找选中的问题类型ID
-          const { QuestionTypeTitleList } = this.queryData; // ?.split(',');
-          this.ruleForm.QuestionTypeList = QuestionTypeTitleList.map(item => {
-            const temp = this.ApplyQuestionList.filter(i => i.Title === item);
-            return temp.length ? temp[0].ID : '';
-          });
-        }
       }
     });
 
@@ -545,7 +505,7 @@ export default {
     }
   }
 }
-.mp-mpzj-order-feedback-add-page-wrap {
+.mp-mpzj-order-after-sales-apply-page-wrap {
   width: 100%;
   margin-top: 25px;
   // background-color: #fff;
@@ -558,26 +518,59 @@ export default {
     min-height: calc(100vh - 115px - 42px) \0;
     margin: 0 auto;
     background-color: #fff;
-    padding: 30px;
+    // padding: 30px;
     box-sizing: border-box;
     margin-bottom: 80px;
-    > header {
-      border-bottom: 1px dashed #EEEEEE;
-      padding-bottom: 15px;
-      margin-bottom: 15px;
-    }
+    display: flex;
+    color: #000;
     > div {
       width: 100%;
+      font-size: 12px;
+      >header{
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 30px;
+      }
+      &.order-info{
+        width: 302px;
+        box-sizing: border-box;
+        padding: 0 15px;
+        >ul{
+          margin-top: 50px;
+          >li{
+            display: flex;
+            margin-bottom: 15px;
+            line-height: 15px;
+            >div{
+              min-width: 72px;
+              text-align: right;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+      &.line{
+        width: 1px;
+        min-height: calc(100% - 60px - 138px);
+        background-color: #eee;
+        margin-top: 60px;
+        margin-bottom: 138px;
+      }
+      &.after-sales-apply{
+        width: 887px;
+        padding: 0 153px 0 15px;
+        box-sizing: border-box;
+      }
       > .el-form{
         margin-top: 22px;
         .QuestionTypeList{
           .el-form-item__error{
-            top: calc(100% - 30px);
+            top: calc(100% - 22px);
           }
         }
         .QuestionPicList{
           .el-form-item__error{
-            top: calc(100% - 95px);
+            top: calc(100% - 114px);
           }
           >.el-form-item__content{
             >div{
@@ -590,9 +583,11 @@ export default {
                 margin-bottom: -10px;
                 vertical-align: middle;
                 .el-upload-list__item{
+                  margin-right: 9px;
                   display: inline-block;
-                  // display: flex;
-                  // margin: 0 8px 17px;
+                  &:nth-child(4n){
+                    margin-right: 0;
+                  }
                 }
               }
               .el-upload--picture-card{
@@ -628,11 +623,6 @@ export default {
           }
         }
       }
-      > .line{
-        border-bottom: 1px dashed #EEEEEE;
-        margin-top: -16px;
-        margin-bottom: 30px;
-      }
       .el-textarea__inner {
         min-height: 88px !important;
       }
@@ -642,8 +632,9 @@ export default {
       // 诉求意向
       .intention{
         display: flex;
-        height: 40px;
+        height: 32px;
         align-items: center;
+        font-size: 14px;
         span:hover{
           cursor:pointer;
           color: #428DFA;
@@ -661,10 +652,10 @@ export default {
         }
         }
         span{
-          width: 140px;
-          line-height: 40px;
+          width: 122px;
+          line-height: 32px;
           border-radius: 5px;
-          height: 40px;
+          height: 32px;
           text-align: center;
           border: 1px solid #efefef;
           margin-right: 20px;
@@ -706,6 +697,8 @@ export default {
       .check-button{
         display: flex;
         flex-wrap: wrap;
+        margin-bottom: 7px;
+        font-size: 12px;
         .action{
           background-color: #428dfa;
           border-color: #428dfa;
@@ -717,15 +710,18 @@ export default {
           }
         }
         li{
-          width: 100px;
-          height: 30px;
-          border-radius: 5px;
-          line-height: 30px;
+          width: 102px;
+          height: 32px;
+          border-radius: 3px;
+          line-height: 32px;
           border: 1px solid #E6E6E6;
-          margin: 0px 30px 30px 0;
+          margin: 0px 60px 15px 0;
           text-align: center;
           color: #888888;
           position: relative;
+          &:nth-child(4n){
+            margin-right: 22px;
+          }
           >div:hover{
             cursor:pointer;
             color: #428DFA;
@@ -746,10 +742,9 @@ export default {
       // 联系人
       .linkman{
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         .el-input{
-          width: 200px;
-          margin-right: 140px;
+          width: 180px;
         }
       }
       .mp-select {
@@ -812,11 +807,13 @@ export default {
       }
       .el-form-item__label {
         font-weight: 700;
-        .remark {
-          font-weight: 400;
-          font-weight: 500;
-          font-size: 12px;
-          color: #ff3769;
+        font-size: 12px;
+        padding-right: 0;
+        color: #000000;
+        .QuestionRemark {
+          >span{
+            color: #AEAEAE;
+          }
         }
       }
       .is-disabled + .el-upload {
