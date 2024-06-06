@@ -10,7 +10,14 @@
           </li>
           <li>
             <div>已售后次数：</div>
-            <p>0</p>
+            <p>
+              <!-- <template>
+                0次
+              </template> -->
+              <span @click="viewDetailsClick" class="seeDetails">
+                0次（点击查看详情）
+              </span>
+            </p>
           </li>
           <li>
             <div>产品数量：</div>
@@ -95,11 +102,11 @@
               </div>
             </el-form-item>
             <div class="linkman">
-              <el-form-item label="金额：" prop="ContactName">
+              <el-form-item v-if="ruleForm.AppealType === 2" label="金额：" prop="ContactName">
                 <el-input v-model="ruleForm.ContactName" :disabled='!canEdit'
                   show-word-limit placeholder="请输入金额"></el-input> 元
               </el-form-item>
-              <el-form-item label="补印数量：" prop="ContactName">
+              <el-form-item v-if="ruleForm.AppealType === 7" label="补印数量：" prop="ContactName">
                 <el-input v-model="ruleForm.ContactName" :disabled='!canEdit'
                   show-word-limit placeholder="请输入补印数量"></el-input> {{ queryData.Unit }}
               </el-form-item>
@@ -141,6 +148,42 @@
         <span slot="footer" class="dialog-footer">
           <p>
             <el-button @click="DescribeShow = false;" >关闭</el-button>
+          </p>
+        </span>
+      </el-dialog>
+      <el-dialog
+        :visible.sync="viewDetailsDialog"
+        @cancle="viewDetailsDialog = false"
+        submitText='确定'
+        title="问题类型描述"
+        width='716px'
+        top="30vh"
+        class="view-details-dialog"
+        >
+        <el-table stripe border
+          :data="[queryData]" style="width: 100%" class="ft-14-table">
+          <el-table-column prop="AfterSaleCode" label="售后单号" width="88" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="OrderID" label="问题" width="64" show-overflow-tooltip>
+          </el-table-column>
+          <el-table-column label="问题描述" width="108" show-overflow-tooltip>
+            <span slot-scope="scope">{{ scope.row.ProductName }}</span>
+          </el-table-column>
+          <el-table-column label="解决方案" show-overflow-tooltip width="88">
+            <template slot-scope="scope">{{ scope.row.Content }}</template>
+          </el-table-column>
+          <el-table-column label="处理时间" show-overflow-tooltip width="132">
+            <template slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
+          </el-table-column>
+          <el-table-column label="额外支付" show-overflow-tooltip width="68">
+            <template slot-scope="scope">{{ scope.row.Content }}</template>
+          </el-table-column>
+          <el-table-column label="处理人" show-overflow-tooltip width="96">
+            <template slot-scope="scope">{{ scope.row.Content }}</template>
+          </el-table-column>
+        </el-table>
+        <span slot="footer" class="dialog-footer">
+          <p>
+            <el-button @click="viewDetailsDialog = false;" >关闭</el-button>
           </p>
         </span>
       </el-dialog>
@@ -201,33 +244,9 @@ export default {
         callback();
       }
     };
-    // const validateRefundAmount = (rule, value, callback) => {
-    //   if (value === 0) {
-    //     callback(new Error('退款金额不能为0'));
-    //   } else if (value === undefined) {
-    //     callback(new Error('请输入退款金额'));
-    //   } else {
-    //     callback();
-    //   }
-    // };
-    // const validateNumber = (rule, value, callback) => {
-    //   if (value > this.queryData.ProductAmount) {
-    //     callback(new Error(`不能大于'${this.queryData.ProductAmount}'`));
-    //   } else if (!value) {
-    //     callback(new Error('不能为空'));
-    //   } else {
-    //     callback();
-    //   }
-    // };
-    // const validateKindCount = (rule, value, callback) => {
-    //   if (!value) {
-    //     callback(new Error('不能为空'));
-    //   } else {
-    //     callback();
-    //   }
-    // };
     return {
       submitSuccessVsible: false,
+      viewDetailsDialog: false,
       Describe: '',
       DescribeShow: false,
       ApplyQuestionList: [],
@@ -301,11 +320,13 @@ export default {
       const phomReg = /^1[3456789]\d{9}$/;
       const QQRege = /[1-9][0-9]{4,14}/;
       this.$refs.ruleForm1.validate();
-      this.$refs.ruleForm2.validate();
+      console.log(this.ruleForm.QuestionRemark);
       if (this.ruleForm.QuestionTypeList.length === 0) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题类型' });
       } else if (this.ruleForm.QuestionRemark !== '' && (this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300)) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述并在3到300个字符' });
+      } else if (!this.ruleForm.AppealType) {
+        this.messageBox.failSingleError({ title: '提交失败', msg: '请选择诉求意向' });
       } else if (this.ruleForm.ContactName === '') {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入联系人' });
       } else if (this.ruleForm.Mobile === '') {
@@ -327,12 +348,6 @@ export default {
         const res = await this.api.getApplyQuestionApply(this.ruleForm);
         if (res.data.Status === 1000) {
           this.submitSuccessVsible = true;
-          // this.messageBox.successSingle({
-          //   title: '提交成功',
-          //   successFunc: () => {
-          //     this.$router.replace('/feedbackList');
-          //   },
-          // });
         }
       }
     },
@@ -438,10 +453,16 @@ export default {
     DialogClick(Describe) {
       this.Describe = Describe;
       this.DescribeShow = true;
-      console.log(Describe);
+    },
+    viewDetailsClick() {
+      this.viewDetailsDialog = true;
     },
   },
   async mounted() {
+    if (!this.$route.params.data) {
+      this.handleReturn();
+      return;
+    }
     this.queryData = JSON.parse(this.$route.params.data);
     this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
     this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
@@ -473,7 +494,7 @@ export default {
 </script>
 
 <style lang='scss'>
-.question-type-desc{
+.question-type-desc, .view-details-dialog{
   .el-dialog{
     .el-dialog__header{
       padding: 11px;
@@ -546,6 +567,13 @@ export default {
               text-align: right;
               font-weight: 700;
             }
+            .seeDetails{
+              &:hover{
+                text-decoration: underline;
+              }
+              color: #428DFA;
+              cursor: pointer;
+            }
           }
         }
       }
@@ -574,12 +602,7 @@ export default {
           }
           >.el-form-item__content{
             >div{
-              // display: flex;
-              // flex-wrap: wrap;
-              // min-height: 156px;
               .el-upload-list{
-                // display: flex;
-                // flex-wrap: wrap;
                 margin-bottom: -10px;
                 vertical-align: middle;
                 .el-upload-list__item{
@@ -602,7 +625,6 @@ export default {
             overflow: hidden;
           }
           .upload-Remark{
-            // margin-top: -1em;
             line-height: 1.3em;
           }
         }
@@ -662,37 +684,6 @@ export default {
           color: #888888;
         }
       }
-      // 补印
-      .make-up-for{
-        display: flex;
-        color: #888888;
-        height: 32px;
-        .item{
-          display: flex;
-          margin-right: 120px;
-          align-items: center;
-          .el-form-item{
-            .el-form-item__content{
-              line-height: 32px;
-
-              color: #888888;
-            }
-          }
-          >span{
-            font-size: 12px;
-            margin-left: 20px;
-            color: #aaa;
-            >span{
-              color: #FF3769;
-            }
-          }
-          .el-input-number{
-            width: 80px;
-            text-align: center;
-            margin-right: 10px;
-          }
-        }
-      }
       // 问题类型
       .check-button{
         display: flex;
@@ -747,29 +738,28 @@ export default {
           width: 180px;
         }
       }
-      .mp-select {
-        .el-form-item__content {
-          // height: 40px;
-          > .mp-pc-common-comps-select-comp-wrap {
-            width: 300px;
-            display: block;
-            > header {
-              display: none;
-            }
-            > .el-select {
-              width: 300px;
-              height: auto;
-              .el-input__inner {
-                width: 300px;
-                height: 40px;
-              }
-              .el-input__suffix .el-input__icon::before {
-                top: 11px;
-              }
-            }
-          }
-        }
-      }
+      // .mp-select {
+      //   .el-form-item__content {
+      //     > .mp-pc-common-comps-select-comp-wrap {
+      //       width: 300px;
+      //       display: block;
+      //       > header {
+      //         display: none;
+      //       }
+      //       > .el-select {
+      //         width: 300px;
+      //         height: auto;
+      //         .el-input__inner {
+      //           width: 300px;
+      //           height: 40px;
+      //         }
+      //         .el-input__suffix .el-input__icon::before {
+      //           top: 11px;
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
       .btn-box {
         padding-bottom: 60px;
         margin-top: 20px;
@@ -789,13 +779,6 @@ export default {
             margin-left: 100px;
           }
         }
-      }
-      .text {
-        padding-left: 13px;
-        font-size: 13px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
       }
       .el-upload-list__item-thumbnail {
         object-fit: cover;
@@ -818,14 +801,6 @@ export default {
       }
       .is-disabled + .el-upload {
         display: none;
-      }
-      .mp-feedback-progress-box {
-        padding: 20px 0;
-        margin-top: 35px;
-        border-radius: 4px;
-        border: 1px solid #eee;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.08);
-        background-color: rgb(253, 253, 253);
       }
       .el-form-item__content {
         > .el-dialog__wrapper {
