@@ -28,7 +28,9 @@
             您提供的认证信息不规范已驳回，请修改并重新提交
           </template>
         </p>
-        <p class="is-pink" style="text-align: center; font-size: 18px; font-weight: 700;">认证通过后有更多惊喜福利领取哦</p>
+        <p class="is-pink" style="text-align: center; font-size: 18px; font-weight: 700; padding: 0;">
+          认证通过后，将赠送一套超值优惠券包，更多认证福利等你开启！
+        </p>
       </div>
       <footer v-if="!this.customerInfo.Account.IsBranch">
         <el-button :class="`authentication${this.customerInfo.AuthStatus}`" type="primary" @click="toAuthentication">
