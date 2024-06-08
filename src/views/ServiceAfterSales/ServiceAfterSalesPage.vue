@@ -82,7 +82,7 @@
               <el-table-column label="操作" width="68" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <div class="operate">
-                    <span @click="$router.push( { name: 'serviceAfterSalesDetails', query: {data: JSON.stringify(scope.row)} })">查看</span>
+                    <span @click="$router.push( { name: 'serviceAfterSalesDetails', params: {data: JSON.stringify(scope.row)} })">查看</span>
                     <template v-if="scope.row.AfterSaleStatus === 30">
                       <span class="after-sale" v-if="!scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
                       <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
