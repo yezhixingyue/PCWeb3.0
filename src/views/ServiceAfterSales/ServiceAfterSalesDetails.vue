@@ -106,6 +106,12 @@
           </div>
         </div>
       </main>
+      <footer>
+        <el-button type="primary">立即提交</el-button>
+        <el-button  @click="handleReturn" style="color: #428DFA; border-color: #428DFA;">
+          返回
+        </el-button>
+      </footer>
     </section>
   </section>
 </template>
@@ -176,7 +182,7 @@ export default {
     width: 1200px;
     margin: 0 auto;
     box-sizing: border-box;
-    margin-bottom: 80px;
+    margin-bottom: 20px;
     font-size: 12px;
     padding-top: 15px;
     >.line{
@@ -314,6 +320,10 @@ export default {
           }
         }
       }
+    }
+    >footer{
+      text-align: center;
+      padding: 30px 0 20px 0;
     }
   }
 }
