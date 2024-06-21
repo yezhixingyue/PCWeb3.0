@@ -20,6 +20,8 @@ export default {
         fileDefaultName: '客户订单流水', // 导出文件默认名称
         fileDate: { First: '', Second: '' }, // 导出的时间区间
         downFunc() {}, // 下载函数
+        maxNumber: 0, // 最大支持导出数量
+        tipTitle: '',
       }),
     },
   },
@@ -30,6 +32,12 @@ export default {
         this.messageBox.warnSingleError({ msg: '[ 当前条件没有可导出的数据 ]', title: '暂无数据' });
         return;
       }
+
+      if (this.configObj.maxNumber && this.configObj.count > this.configObj.maxNumber) {
+        this.messageBox.warnSingleError({ msg: `每次最多可导出${this.configObj.maxNumber}条${this.configObj.tipTitle || '数据'}`, title: '导出失败' });
+        return;
+      }
+
       this.messageBox.warnCancelNullMsg({
         title: '确定导出Excel数据吗?',
         successFunc: this.handleDownFunc,
