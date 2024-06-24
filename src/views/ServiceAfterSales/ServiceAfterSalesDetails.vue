@@ -56,7 +56,8 @@
               <span>已驳回</span>
             </p>
             <p class="reprint" v-if="AfterSaleInfo.SolutionTypes.find(it => it === 7)">
-              补印：款数：<span class="is-pink">{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span class="is-pink">{{AfterSaleInfo.SuccessNumber}}</span> 张
+              补印：款数：<span class="is-pink">{{AfterSaleInfo.SuccessKindCount}}</span>款，数量：<span class="is-pink">{{AfterSaleInfo.SuccessNumber}}</span>
+              {{productInfo.Unit}}
               <span style="margin-left: 20px;">补印订单号：{{ AfterSaleInfo.ReprintOrderID }}
                 <i @click="copy(AfterSaleInfo.ReprintOrderID)">复制</i>
                 可在订单中查看进度
@@ -145,13 +146,13 @@
             </p>
           </template>
           <p style="margin-top:30px;color:#585858" v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
-            <span>是否已解决您的问题？若未解决{{productInfo.AppealStatus===3?'可联系处理人员': '可点击再次申请售后服务'}}</span>
+            <span>是否已解决您的问题？若未解决{{AfterSaleInfo.AppealStatus===3?'可联系处理人员': '可点击再次申请售后服务'}}</span>
           </p>
           <div class="btns" v-if="AfterSaleInfo.Status !== 255">
             <template v-if="AfterSaleInfo.Status >= 30 && AfterSaleInfo.Status != 255">
-              <el-button @click="toAfterSale" v-if="productInfo.AppealStatus === 1">申请售后</el-button>
+              <el-button @click="toAfterSale" v-if="AfterSaleInfo.AppealStatus === 1">申请售后</el-button>
               <el-tooltip v-else
-                effect="dark" :content="getAppealStatusText(productInfo.AppealStatus)" placement="top">
+                effect="dark" :content="getAppealStatusText(AfterSaleInfo.AppealStatus)" placement="top">
                 <span style="margin-right: 10px;">
                   <el-button disabled style="color: #999; border-color: #999;">申请售后</el-button>
                 </span>
@@ -372,6 +373,9 @@ export default {
           break;
         case 3:
           str = '已退全款或全部补印';
+          break;
+        case 4:
+          str = '发票开具中或已开发票'; // 后端区分 开票中/已开票 状态的时候较为麻烦切性能不好
           break;
         case 255:
           str = '超出售后期';

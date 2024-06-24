@@ -19,9 +19,12 @@
         <div class="upload-btn-box">
           <FileSelectComp @change="handleFileChange" v-show="customer" :disabled="!canSelectFile || !isLegal" :accept='accept'
            :selectTitle='selectTitle' ref="oFileBox" />
-          <el-checkbox v-show="customer" class="legal" v-model="isLegal" label="">印刷内容合法</el-checkbox>
-          <span v-show="customer" class="blue-span agreement" @click="legalVisible = true">查看“承印品协议书”</span>
+          <el-tooltip class="item" effect="dark" content="勾选此处则下单时弹出订单信息复核弹窗，确认后再进行提交。" placement="top-start">
+            <el-checkbox v-show="customer" class="legal" v-model="needToastPreDialog" label="">弹窗确认后再提交</el-checkbox>
+          </el-tooltip>
           <FailListComp :failedList='failedList' />
+          <el-checkbox v-show="customer" class="legal" style="margin-left: 360px;" v-model="isLegal" label="">印刷内容合法</el-checkbox>
+          <span v-show="customer" class="blue-span agreement" @click="legalVisible = true">查看“承印品协议书”</span>
         </div>
         <MainTableComp
           ref="oTableWrap"
@@ -38,14 +41,20 @@
           @itemUpload='handleItemUpload'
           @multipleSelect='handleMultipleSelect'
           @droped='onDroped' />
-        <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21' showPayGroup showPayDescription />
+        <QrCodeForPayDialogComp v-model="QrCodeVisible" :payInfoData="payInfoData" @success='handlePaidSuccess' payType='21' showPayGroup showPayDescription>
+          <div class="pay-info-box">
+            <span>本次支付包含 <i>{{ successResult.number }}</i> 个已成功上传的订单</span>
+            <span v-if="successResult.errNum">；另有 <i>{{ successResult.errNum }}</i> 个订单上传失败，请稍候再试。</span>
+          </div>
+        </QrCodeForPayDialogComp>
         <PreCreateDialog
          :visible.sync="preCreateVisible"
          :subExpressList='subExpressList'
          :PreCreateData="PreCreateData"
          :OriginList='preCreateOriginDataList'
          @submit="onOrderSubmit"
-         />
+         >
+        </PreCreateDialog>
       </div>
     </main>
     <footer>
@@ -102,6 +111,7 @@ import BatchUploadFooterComp from '@/packages/BatchUploadComps/Footer/BatchUploa
 import BatchUploadClass from '@/assets/js/ClassType/BatchUploadClass';
 import ShowProductDetail from '@/store/Quotation/ShowProductDetail';
 import { mapState, mapGetters } from 'vuex';
+import LocalCatchHandler from '@/assets/js/LocalCatchHandler';
 import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
 import PreCreateDialog from '../../packages/PreCreateDialog';
 import LegalAgreementDialog from '../../components/common/AgreementComps/LegalAgreementDialog.vue';
@@ -159,6 +169,11 @@ export default {
       isLegal: true,
       legalVisible: false,
       ExpressTip: '',
+      successResult: { // 上传文件及订单提交相关结果
+        number: 0,
+        errNum: 0,
+      },
+      notToastPreDialog: false, // 是否不弹出直接提交
     };
   },
   computed: {
@@ -225,6 +240,16 @@ export default {
     },
     scrollChange() {
       return this.ScrollInfo.scrollTop + this.ScrollInfo.scrollHeight + this.ScrollInfo.offsetHeight;
+    },
+    needToastPreDialog: {
+      get() {
+        return !this.notToastPreDialog;
+      },
+      set(newVal) {
+        if (!this.customerInfo?.Account?.AccountID) return;
+        LocalCatchHandler.setFieldFromLocalStorage(this.customerInfo?.Account?.AccountID, 'notToastPreDialog', !newVal);
+        this.notToastPreDialog = !newVal;
+      },
     },
   },
   methods: {
@@ -389,23 +414,49 @@ export default {
       }
       this.$store.commit('common/setCustomerBalance', temp);
     },
-    handleSubmitSuccess(list, resp) { // 创建订单成功后的回调函数，打开支付窗口
+    handleSubmitSuccess(list, resp, errLen) { // 创建订单成功后的回调函数，打开支付窗口
       this.cbToClearSuccessItem(list);
       this.preCreateVisible = false;
       this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
+
+      this.successResult.number = list.length;
+      this.successResult.errNum = errLen;
+
       if (resp) {
         this.payInfoData = resp;
         this.QrCodeVisible = true;
         this.handleBalance(resp);
-      } else {
-        this.messageBox.successSingle({ title: '下单成功' });
+        return;
       }
+
+      const msg = errLen ? `共有${list.length}个订单下单成功，另有${errLen}个订单文件上传失败` : undefined;
+      this.messageBox.successSingle({ title: '下单成功', msg });
+
+      // if (resp) {
+      //   this.payInfoData = resp;
+      //   this.QrCodeVisible = true;
+      //   this.handleBalance(resp);
+      // } else {
+      //   const title = errLen ? `除${errLen}个订单文件上传失败外，共${list.length}个订单下单成功` : '下单成功';
+      //   this.messageBox.successSingle({ title });
+      // }
     },
     handlePaidSuccess() {
       this.messageBox.successSingle({ title: '下单并支付成功' });
       this.$store.dispatch('common/getCustomerFundBalance'); // 重新获取客户余额信息
     },
     async handleBatchUploadFiles(list) { // 执行单个文件上传或批量上传 （使用同一个方法） -- 在最终下单前 在客户界面 需进行预下单弹窗确认
+      if (this.notToastPreDialog) { // 不使用预下单
+        const temp = {
+          ...this.basicObj,
+          PayInFull: true,
+          UsePrintBean: false,
+        };
+        BatchUploadClass.BatchUploadFiles(list, temp, this.handleSubmitSuccess);
+
+        return;
+      }
+
       // 预下单
       this.preCreateOriginDataList = [];
       const t = list.find(it => it.uploadStatus === 'fail' && it.error === '文件找不到');
@@ -461,6 +512,10 @@ export default {
       handler() {
         if (this.customer?.PermissionInfo?.BatchUpload === false) {
           this.$router.replace('/placeOrder');
+        }
+        if (this.customerInfo?.Account?.AccountID) {
+          const _localCatchVal = LocalCatchHandler.getFieldFromLocalStorage(this.customerInfo.Account.AccountID, 'notToastPreDialog');
+          if (_localCatchVal) this.notToastPreDialog = true;
         }
       },
       immediate: true,
@@ -590,6 +645,22 @@ export default {
       margin: 0 auto;
       position: relative;
       left: -8px;
+    }
+  }
+
+  .pay-info-box {
+    background-color: #FFEBF0;
+    line-height: 33px;
+    margin-top: 16px;
+    color: #ff3769;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 0 20px;
+    min-width: 350px;
+    display: inline-block;
+
+    i {
+      font-size: 16px;
     }
   }
 }

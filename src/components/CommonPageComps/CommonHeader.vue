@@ -98,6 +98,10 @@
           <span v-if="customerInfo.IsUpDown" @click="toMemberCenter" class="member-level" :class="{pointer: showMember}"  to="/MemberCenter" >
             <img :src="require(`@/assets/images/v/v${customerInfo.Grade.Third}.png`)" alt="">
           </span>
+          <span v-if="customerInfo.Grade.First === 36 || customerInfo.Grade.First === 38" class="member-level"  >
+            <img v-if="customerInfo.Grade.First === 36" :src="require(`@/assets/images/v/2988.png`)" alt="">
+            <img v-if="customerInfo.Grade.First === 38" :src="require(`@/assets/images/v/4988.png`)" alt="">
+          </span>
           <!-- <span class="member-level">
           </span> -->
           <el-dropdown trigger="click" @command='onCommand'>

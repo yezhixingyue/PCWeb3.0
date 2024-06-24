@@ -14,6 +14,19 @@ import FileTypeClass from '@/assets/js/ClassType/FileTypeClass';
 export default class BatchUpload {
   FileSuffixList4Cache = null; // 缓存的允许上传格式列表
 
+  static getErrorMsg(resp, defaultMsg = '请求失败') {
+    if (resp && resp.data && resp.data.Message && resp.data.Status !== 1000) return resp.data.Message;
+
+    if (resp && resp.message === 'Network Error') {
+      return '网络错误';
+    }
+    if (resp && resp.message && resp.message.includes('timeout')) {
+      return '网络超时';
+    }
+
+    return defaultMsg;
+  }
+
   /**
    * 单个文件解析
    *
@@ -45,8 +58,10 @@ export default class BatchUpload {
       ...basicObj,
       FileList: [{ Second: file.name }],
     };
-    const resp = await api.getFileNameAnalysis(temp).catch(() => null);
-    if (resp && resp.data.Status === 1000 && resp.data.Data.length === 1 && resp.data.Data[0]?.IsAnalysisSucceed && resp.data.Data[0]?.HavePrice === true) {
+    const resp = await api.getFileNameAnalysis(temp).catch((err) => (err));
+
+    if (resp && resp.data && resp.data.Status === 1000
+      && resp.data.Data.length === 1 && resp.data.Data[0]?.IsAnalysisSucceed && resp.data.Data[0]?.HavePrice === true) {
       return {
         file,
         result: resp.data.Data[0],
@@ -65,8 +80,8 @@ export default class BatchUpload {
         },
       };
     }
-    let error = resp && resp.data && resp.data.Message && resp.data.Status !== 1000 ? resp.data.Message : '文件解析失败';
-    if (resp && resp.data.Status === 1000 && resp.data.Data.length === 1 && resp.data.Data[0]?.Message) error = resp.data.Data[0].Message;
+    let error = this.getErrorMsg(resp, '文件解析失败');
+    if (resp && resp.data && resp.data.Status === 1000 && resp.data.Data.length === 1 && resp.data.Data[0]?.Message) error = resp.data.Data[0].Message;
     const errorStatus = resp && resp.data && resp.data.Status && resp.data.Status !== 1000 ? resp.data.Status : 0;
     return {
       file,
@@ -164,6 +179,7 @@ export default class BatchUpload {
       }
     };
     const uploadResult = await FileTypeClass.UploadFileByBreakPoint(item.file, item.uniqueName, onUploadProgressFunc);
+
     if (uploadResult && uploadResult.status === true) {
       _item.uploadStatus = 'success'; // 上传成功 继续向后面进行
     } else {
@@ -273,7 +289,7 @@ export default class BatchUpload {
     });
     const temp = this.generateCommitData(list, basicObj, true);
     const resp = await api.getOrderPreCreate(temp).catch(() => null);
-    console.log(resp);
+
     if (resp && resp.data.Status === 1000) {
       return resp.data.Data;
     }
@@ -317,14 +333,19 @@ export default class BatchUpload {
     // const i = uploadedList.findIndex(it => !it || (typeof it === 'object' && it.status === false));
     const failList = uploadedList.filter(it => !it || (typeof it === 'object' && it.status === false));
     if (failList.length > 0) {
-      const msg = uploadedList.length === 1 ? '文件上传失败' : `${failList.length}个文件上传失败，请检查`;
-      const cb = () => {
-        const dom = document.querySelector('.mp-c-batch-upload-page-main-table-status-display-column-comp-wrap .label.is-pink');
-        handleScrollAfterGetPriceFailed(dom.parentElement, 130, 60);
-      };
-      messageBox.failSingleError({ title: '上传失败', msg, successFunc: cb, failFunc: cb });
-      loadingInstance.close();
-      return;
+      // eslint-disable-next-line no-param-reassign
+      list = list.filter(it => it.uploadStatus === 'success');
+
+      if (list.length === 0) {
+        const msg = uploadedList.length === 1 ? '文件上传失败' : `${failList.length}个文件上传失败，请检查`;
+        const cb = () => {
+          const dom = document.querySelector('.mp-c-batch-upload-page-main-table-status-display-column-comp-wrap .label.is-pink');
+          handleScrollAfterGetPriceFailed(dom.parentElement, 130, 60);
+        };
+        messageBox.failSingleError({ title: '上传失败', msg, successFunc: cb, failFunc: cb });
+        loadingInstance.close();
+        return;
+      }
     }
     // 4. 生成提交数据列表
     loadingInstance.text = '正在提交，请稍候...';
@@ -344,7 +365,7 @@ export default class BatchUpload {
     // 7. 清除已选列表中已上传文件
     if (isSuccess) {
       const cb = () => {
-        if (handleSuccessFunc) handleSuccessFunc(list, resp.data.Data);
+        if (handleSuccessFunc) handleSuccessFunc(list, resp.data.Data, failList.length);
       };
       // messageBox.successSingle('下单成功', cb, cb);
       cb();

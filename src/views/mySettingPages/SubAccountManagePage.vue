@@ -25,7 +25,7 @@
           <span class="span-title-pink" @click="handleDel(item)" v-if="IsPrimaryAccount">删除</span>
           <!-- <span class="span-title-pink disabled" v-else>删除</span> -->
         </div>
-        <div class="account-item-sign">主账号</div>
+        <div class="account-item-sign">管理员</div>
       </li>
       <li class="add-new-account-box" @click="handleAddNewAccount" v-if="IsPrimaryAccount">
         <i class="el-icon-plus"></i>

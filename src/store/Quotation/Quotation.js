@@ -756,8 +756,8 @@ export default {
 
       const res = await api.getQuotationSave(_itemObj).catch(() => {});
 
-      const handleSuccess = async () => { // 处理成功后的函数
-        massage.successSingle({ title: '添加成功!', successFunc: callBack });
+      const handleSuccess = async ({ Coupon }) => { // 处理成功后的函数
+        massage.successSingle({ title: '添加成功!', successFunc: () => callBack({ Coupon }) });
         commit('setSelectedCoupon', null);
         if (!rootState.common.keepOrderData) {
           const _obj = JSON.parse(JSON.stringify(state.curProductInfo2Quotation));
@@ -783,13 +783,13 @@ export default {
               successFunc: async () => {
                 _itemObj.IgnoreRiskLevel = state.RiskWarningTipsTypes.All;
                 const resp = await api.getQuotationSave(_itemObj).catch(() => {});
-                if (resp && resp.data.Status === 1000) handleSuccess();
+                if (resp && resp.data.Status === 1000) handleSuccess({ Coupon: _itemObj.Coupon });
                 else handleError(resp);
               },
             });
           }
         } else {
-          handleSuccess();
+          handleSuccess({ Coupon: _itemObj.Coupon });
         }
       } else if (res && [9166, 9167, 9168, 9169, 9170, 9171, 9172].includes(res.data.Status)) {
         massage.warnCancelBox({
@@ -799,7 +799,7 @@ export default {
             commit('setSelectedCoupon', null);
             delete _itemObj.Coupon;
             const resp = await api.getQuotationSave(_itemObj).catch(() => {});
-            if (resp && resp.data.Status === 1000) handleSuccess();
+            if (resp && resp.data.Status === 1000) handleSuccess({ Coupon: _itemObj.Coupon });
             else handleError(resp);
           },
         });

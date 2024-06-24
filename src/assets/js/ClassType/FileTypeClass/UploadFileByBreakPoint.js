@@ -57,8 +57,17 @@ async function uploadFile(chunkCount, curChunkNum, {
   let lastedPercentage = _getPercentage(beginNode + chunkSize, data.size); // 当次最终百分比
   lastedPercentage = lastedPercentage > finalPercentage ? +finalPercentage : lastedPercentage;
   const res = await api.UploadFileBreakpointResume(file, uniqueName, beginNode, beginNode + chunkSize, data.size, (e) => _onUploadProgressFunc(e, { initPercentage, lastedPercentage, onUploadProgressFunc })); // 上传(传入header Content-Range中所需要的信息)
-  if (res && res.data && res.data.Status === 1000) await uploadFile(chunkCount - 1, beginNode + chunkSize, { data, uniqueName, onUploadProgressFunc }); // 递归调用
-  else throw new Error(res.data.Message);
+  if (res && res.data && res.data.Status === 1000) {
+    await uploadFile(
+      chunkCount - 1,
+      beginNode + chunkSize,
+      {
+        data, uniqueName, onUploadProgressFunc, finalPercentage,
+      },
+    ); // 递归调用
+  } else {
+    throw new Error(res.data.Message);
+  }
 }
 
 /**

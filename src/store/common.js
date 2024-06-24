@@ -5,6 +5,7 @@ import router from '@/router';
 import massage from '@/assets/js/utils/message';
 import { useCookie } from '@/assets/js/setup';
 import Cookie from '@/assets/js/Cookie';
+import LocalCatchHandler from '@/assets/js/LocalCatchHandler';
 
 export default {
   namespaced: true,
@@ -340,14 +341,8 @@ export default {
       state.customerInfo = { ...data, Address };
       if (!data) return;
 
-      const str = localStorage.getItem('localCacheDataByMpzj'); // 在设置客户信息的时候 设置下是否保留下单面板数据
-      if (str) {
-        const obj = JSON.parse(str);
-        const key = data.Account?.AccountID;
-        if (key && obj.keepOrderData?.[key]) {
-          state.keepOrderData = true;
-        }
-      }
+      const keepOrderDataValue = LocalCatchHandler.getFieldFromLocalStorage(data.Account?.AccountID, 'keepOrderData');
+      if (keepOrderDataValue) state.keepOrderData = true; // 在设置客户信息的时候 设置下是否保留下单面板数据
 
       if (!data || !data.FundInfo) return;
       if (bool) {
@@ -532,7 +527,7 @@ export default {
         commit('setCustomerInfo', [res.data.Data, true]);
         if (useCookie) Cookie.setCookie('customerInfo', JSON.stringify(res.data.Data), 'Session');
         else sessionStorage.setItem('customerInfo', JSON.stringify(res.data.Data));
-        if (!res.data.Data.QQ && key) {
+        if (!res.data.Data.AuthenInfo.DetailAddress && key) {
           massage.warnCancelBox({
             title: '企业信息未完善',
             msg: '您尚有资料未完善，无法享受优惠价格',

@@ -5,11 +5,21 @@
         <div class="product-item-header-left" v-if="fixedLeft">
           <span class="product-item-header-amount-box gray is-font-14">产品金额：<i class="is-pink"
             >{{totalOriginalPrice}}元</i></span>
-          <span class="freight-box" v-if="OutPlatNo"> <i class="gray">平台单号：</i><em class="is-font-12">{{OutPlatNo}}</em></span>
           <span class="freight-box"> <i class="gray">运费：</i>{{totalFreight}}元</span>
           <span class="add-detail">
             <i class="express-box">{{data.Address.ExpressText}}</i>
-            <i class="gray">配送地址：</i>{{localAddressDetail}}
+            <span v-if="LogisticsListText" class="code" style="max-width:280px;margin-right: 20px;">
+              <i class="gray">运单号：</i>
+              <el-tooltip popper-class="table-item"
+                :content="LogisticsListText" placement="top-start">
+                <em class="is-font-12">{{LogisticsListText}}</em>
+              </el-tooltip>
+            </span>
+            <i class="gray">配送地址：</i>
+            <el-tooltip popper-class="table-item" :enterable='false'
+              :content="localAddressDetail" placement="top-start">
+              <em class="is-font-12">{{localAddressDetail}}</em>
+            </el-tooltip>
           </span>
         </div>
         <div class="product-item-header-right" @click="handleCollapse">
@@ -35,38 +45,45 @@
                 <span>{{item | getFullName}}</span>
               </el-tooltip>
             </div>
+            <!-- 平台单号 -->
             <div :style="wStyles[2]">
+              <el-tooltip popper-class="table-item" :enterable='false'
+                :content="item.OutPlatSN" placement="top-start">
+                <span>{{item.OutPlatSN}}</span>
+              </el-tooltip>
+            </div>
+            <div :style="wStyles[3]">
               <el-tooltip popper-class="table-item" :enterable='false'
                 :content="item.SizeList | formatListItemSize" placement="top-start">
                 <span>{{item.SizeList | formatListItemSize}}</span>
               </el-tooltip>
             </div>
-            <div :style="wStyles[3]">
+            <div :style="wStyles[4]">
               <el-tooltip popper-class="table-item" :enterable='false'
                 :content="item.MaterialList | formatListItemMaterial" placement="top-start">
                 <span>{{item.MaterialList | formatListItemMaterial}}</span>
               </el-tooltip>
             </div>
-            <div :style="wStyles[4]">
+            <div :style="wStyles[5]">
               <el-tooltip popper-class="table-item" :enterable='false'
                 :content="item.CraftList | formatListItemCraft" placement="top-start">
                 <span>{{item.CraftList | formatListItemCraft}}</span>
               </el-tooltip>
             </div>
-            <div :style="wStyles[5]">
+            <div :style="wStyles[6]">
               <el-tooltip popper-class="table-item" :enterable='false'
                 :content="item | formarProductAmount" placement="top-start">
                 <span>{{item | formarProductAmount}}</span>
               </el-tooltip>
             </div>
-            <div :style="wStyles[6]" class="is-font-12 gray">
+            <div :style="wStyles[7]" class="is-font-12 gray">
               <el-tooltip popper-class="table-item" :enterable='false' v-if="item.Content"
                 :content="item.Content" placement="top-start">
                 <span>{{item.Content}}</span>
               </el-tooltip>
               <span v-else>无</span>
             </div>
-            <div :style="wStyles[7]" :class="{
+            <div :style="wStyles[8]" :class="{
               'is-font-12': 1,
               'yellow-color': 1,
               'is-gray': [253, 254, 255, 35].includes(item.Status),
@@ -78,15 +95,15 @@
               </el-tooltip>
               <!-- {{item.Status | formatStatus}} -->
             </div>
-            <div :style="wStyles[8]">{{item.Funds.FinalPrice}}元</div>
-            <div :style="wStyles[9]">
+            <div :style="wStyles[9]">{{item.Funds.FinalPrice}}元</div>
+            <div :style="wStyles[10]">
               <i v-if="item.Funds.CouponAmount>0">-</i>{{item.Funds.CouponAmount}}元</div>
-            <div :style="wStyles[10]">{{item.Funds.HavePaid}}元</div>
-            <div :style="wStyles[11]">{{item.Funds.Unpaid}}元</div>
-            <div :style="wStyles[12]">{{item.Funds.Refund}}元</div>
-            <div :style="wStyles[13]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
+            <div :style="wStyles[11]">{{item.Funds.HavePaid}}元</div>
+            <div :style="wStyles[12]">{{item.Funds.Unpaid}}元</div>
+            <div :style="wStyles[13]">{{item.Funds.Refund}}元</div>
+            <div :style="wStyles[14]" class="is-font-12 gray">{{item.PayTime | format2MiddleLangTypeDate}}</div>
           </template>
-          <div :style="wStyles[14]" class="is-font-12 gray btn-wrap" v-if="!fixedLeft" :class="{hide: !fixedRight}">
+          <div :style="wStyles[15]" class="is-font-12 gray btn-wrap" v-if="!fixedLeft" :class="{hide: !fixedRight}">
             <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
             <span class="span-title-blue" @click="goToFeedback(item)"
               v-if="item.AllowAfterSale">售后</span>
@@ -161,8 +178,8 @@ export default {
     totalFreight() {
       return +(this.data.Freight.toFixed(2));
     },
-    OutPlatNo() {
-      return this.data.OutPlate && this.data.OutPlate.Second ? this.data.OutPlate.Second : '';
+    LogisticsListText() {
+      return this.data.LogisticsList && this.data.LogisticsList.length ? this.data.LogisticsList.join('、') : '';
     },
     localAddressDetail() {
       if (!this.data || !this.data.Address || !this.data.Address.Address) return '';
@@ -308,7 +325,15 @@ export default {
           font-size: 14px;
         }
         &.add-detail {
-          max-width: 550px;
+          max-width: 740px;
+
+          .code {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: top;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         }
         > i.express-box {
           margin-right: 32px;

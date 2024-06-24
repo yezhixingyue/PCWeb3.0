@@ -283,11 +283,13 @@ export default {
         }
       }
       // 下面执行加购提交操作
-      const callBack = () => {
+      const callBack = ({ Coupon } = {}) => {
         this.setRuleFormInit();
         this.scrollToTop();
         this.SelectCertificate = null;
         this.radio = 1;
+        // 清除优惠券
+        if (Coupon && Coupon.CouponCode) this.$emit('removeCoupon', Coupon.CouponCode);
       };
       const { fileContent, FileAuthorMobile } = this.ruleForm;
       const callbackOnError = this.handleSubmitOrJoinCarError;

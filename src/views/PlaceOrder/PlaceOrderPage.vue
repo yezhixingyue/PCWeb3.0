@@ -80,7 +80,7 @@ export default {
       this.$store.commit('Quotation/setInitPageText', '');
     },
     setInfoLackTip() {
-      if (!this.customerInfo || this.customerInfo.QQ) return;
+      if (!this.customerInfo || this.customerInfo.AuthenInfo.DetailAddress) return;
       // console.log(this.AuthenticationCompVisible);
       if (!this.AuthenticationCompVisible) {
         this.messageBox.warnCancelBox({

@@ -13,6 +13,7 @@
           :typeList="[['ProductClass', 'First'],['ProductClass', 'Second'],['ProductID', '']]"
          /> -->
          <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
+         <el-checkbox v-model="OrderBySendTime" class="checkbox">优先显示已发货订单</el-checkbox>
         </li>
         <li class="second">
           <LineDateSelectorComp
@@ -145,6 +146,8 @@ export default {
         fileDefaultName: '名片之家订单列表',
         fileDate: this.condition4OrderList.Date,
         downFunc: data => this.api.getCustomerOrderList4Excel(data),
+        maxNumber: 15000,
+        tipTitle: '订单',
       };
     },
     condition() {
@@ -165,6 +168,16 @@ export default {
       set(newVal) {
         // // console.log(newVal);
         this.$store.commit('order/setCondition4OrderList', [['Status', ''], newVal]);
+        this.$store.dispatch('order/getOrderList');
+      },
+    },
+    OrderBySendTime: {
+      get() {
+        return this.condition4OrderList.OrderBySendTime;
+      },
+      set(newVal) {
+        // // console.log(newVal);
+        this.$store.commit('order/setCondition4OrderList', [['OrderBySendTime', ''], newVal]);
         this.$store.dispatch('order/getOrderList');
       },
     },
@@ -303,6 +316,14 @@ export default {
           padding-top: 1px;
           padding-left: 12px;
         }
+
+        > .el-checkbox {
+          margin-left: 30px;
+          .el-checkbox__label {
+            font-size: 12px;
+          }
+        }
+
         &.second {
           padding-top: 28px;
           .mp-line-date-selector-wrap {
