@@ -146,6 +146,8 @@ export default {
         fileDefaultName: '名片之家订单列表',
         fileDate: this.condition4OrderList.Date,
         downFunc: data => this.api.getCustomerOrderList4Excel(data),
+        maxNumber: 15000,
+        tipTitle: '订单',
       };
     },
     condition() {
