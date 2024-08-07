@@ -11,11 +11,8 @@
           <li>
             <div>已售后次数：</div>
             <p>
-              <!-- <template>
-                0次
-              </template> -->
               <span @click="viewDetailsClick" class="seeDetails">
-                0次（点击查看详情）
+                {{OrderApplyCount}}次（点击查看详情）
               </span>
             </p>
           </li>
@@ -48,11 +45,11 @@
           style="min-height: calc(100vh - 115px - 22px - 350px);"
         >
           <template>
-            <el-form-item class="QuestionTypeList" label="问题：" prop="QuestionTypeList" style="margin-bottom:0">
+            <el-form-item class="QuestionTypes" label="问题：" prop="QuestionTypes" style="margin-bottom:0">
               <CheckButton
                 @CheckChange="ApplyQuestionCheckChange"
                 :checkList="ApplyQuestionList"
-                :ActiveList="ruleForm.QuestionTypeList"
+                :ActiveList="ruleForm.QuestionTypes"
                 LabelKey="Title"
                 ValueKey="ID"
                 @DialogClick="DialogClick"
@@ -68,7 +65,7 @@
               maxlength="300" autosize show-word-limit placeholder="请输入具体问题描述"></el-input>
             </el-form-item>
 
-            <el-form-item label="上传图片：" prop="QuestionPicList" class="QuestionPicList" :required='isUpImg'>
+            <el-form-item label="上传图片：" prop="QuestionPics" class="QuestionPics" :required='isUpImg'>
               <el-upload
                 :action="baseUrl + '/Api/Upload/Image?type=3'"
                 list-type="picture-card"
@@ -97,29 +94,25 @@
             </el-form-item>
             <el-form-item label="诉求意向：" prop="AppealType">
               <div class="intention">
-                <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="ruleForm.AppealType = 2">退款</span>
-                <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="ruleForm.AppealType = 7">补印</span>
+                <span :class="ruleForm.AppealType===2 ? 'action' : ''" @click="AppealTypeClick(2)">退款</span>
+                <span :class="ruleForm.AppealType===7 ? 'action' : ''" @click="AppealTypeClick(7)">补印</span>
               </div>
             </el-form-item>
             <div class="linkman">
-              <el-form-item v-if="ruleForm.AppealType === 2" label="金额：" prop="ContactName">
-                <el-input v-model="ruleForm.ContactName" :disabled='!canEdit'
+              <el-form-item v-if="ruleForm.AppealType === 2" label="金额：" prop="ApplyRefundAmount">
+                <el-input v-model="ruleForm.ApplyRefundAmount"
                   show-word-limit placeholder="请输入金额"></el-input> 元
               </el-form-item>
-              <el-form-item v-if="ruleForm.AppealType === 7" label="补印数量：" prop="ContactName">
-                <el-input v-model="ruleForm.ContactName" :disabled='!canEdit'
+              <el-form-item v-if="ruleForm.AppealType === 7" label="补印数量：" prop="ApplyRePrintNumber">
+                <el-input v-model="ruleForm.ApplyRePrintNumber"
                   show-word-limit placeholder="请输入补印数量"></el-input> {{ queryData.Unit }}
               </el-form-item>
-              <!-- <el-form-item label="联系人：" prop="ContactName">
-                <el-input v-model="ruleForm.ContactName" maxlength="20" :disabled='!canEdit'
-                  show-word-limit placeholder="请输入联系人"></el-input>
-              </el-form-item> -->
               <el-form-item label="联系电话：" prop="Mobile">
-                <el-input v-model="ruleForm.Mobile" maxlength="11" :disabled='!canEdit'
+                <el-input v-model="ruleForm.Mobile" maxlength="11"
                   show-word-limit placeholder="请输入手机号码"></el-input>
               </el-form-item>
               <el-form-item label="QQ：" prop="QQ">
-                <el-input v-model="ruleForm.QQ" maxlength="11" :disabled='!canEdit'
+                <el-input v-model="ruleForm.QQ" maxlength="11"
                   show-word-limit placeholder="请输入QQ号码"></el-input>
               </el-form-item>
             </div>
@@ -154,31 +147,28 @@
       <el-dialog
         :visible.sync="viewDetailsDialog"
         @cancle="viewDetailsDialog = false"
+        @open="initOrderApplyRecord"
         submitText='确定'
-        title="问题类型描述"
+        title="订单已售后次数"
         width='716px'
         top="30vh"
         class="view-details-dialog"
         >
         <el-table stripe border
-          :data="[queryData]" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="AfterSaleCode" label="售后单号" width="88" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="OrderID" label="问题" width="64" show-overflow-tooltip>
+          :data="OrderApplyRecord.AfterSaleRecords" style="width: 100%" class="ft-14-table">
+          <el-table-column prop="AfterSaleCode" label="售后单号" min-width="88" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="QuestionTypeTitles" label="问题" min-width="64" show-overflow-tooltip>
           </el-table-column>
-          <el-table-column label="问题描述" width="108" show-overflow-tooltip>
-            <span slot-scope="scope">{{ scope.row.ProductName }}</span>
+          <el-table-column prop="QuestionRemark" label="问题描述" min-width="108" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="88"></el-table-column>
+          <el-table-column label="处理时间" show-overflow-tooltip min-width="132">
+            <template slot-scope="scope">{{ scope.row.LastOperateTime | format2MiddleLangTypeDate }}</template>
           </el-table-column>
-          <el-table-column label="解决方案" show-overflow-tooltip width="88">
+          <el-table-column label="额外支付" show-overflow-tooltip min-width="68">
             <template slot-scope="scope">{{ scope.row.Content }}</template>
           </el-table-column>
-          <el-table-column label="处理时间" show-overflow-tooltip width="132">
-            <template slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
-          </el-table-column>
-          <el-table-column label="额外支付" show-overflow-tooltip width="68">
-            <template slot-scope="scope">{{ scope.row.Content }}</template>
-          </el-table-column>
-          <el-table-column label="处理人" show-overflow-tooltip width="96">
-            <template slot-scope="scope">{{ scope.row.Content }}</template>
+          <el-table-column label="处理人" show-overflow-tooltip min-width="96">
+            <template slot-scope="scope">{{ scope.row.OperaterUserName }}</template>
           </el-table-column>
         </el-table>
         <span slot="footer" class="dialog-footer">
@@ -205,7 +195,7 @@
         </div>
         <span slot="footer" class="dialog-footer">
           <p>
-            <el-button type="primary" @click="submitSuccessVsible = false; $router.replace('/feedbackList')" >确定</el-button>
+            <el-button type="primary" @click="submitSuccessVsible = false; handleReturn()" >确定</el-button>
           </p>
         </span>
       </el-dialog>
@@ -233,7 +223,7 @@ export default {
         callback();
       }
     };
-    const QuestionPicList = (rule, value, callback) => {
+    const QuestionPics = (rule, value, callback) => {
       const _list = this.$refs.upload.uploadFiles.map(it => {
         if (it.response && it.response.Status === 1000) return it.response.Data.Url; // 此处需额外处理编辑时的已有图片类型
         return '';
@@ -251,29 +241,27 @@ export default {
       DescribeShow: false,
       ApplyQuestionList: [],
       fileList: [],
-      canEdit: true,
       uploadDisabled: false,
+      OrderApplyCount: 0, // 订单售后次数
+      OrderApplyRecord: [], // 订单售后记录
       ruleForm: {
-
+        QuestionTypes: [],
+        QuestionPics: [],
+        ApplyRefundAmount: '',
+        ApplyRePrintNumber: '',
         OrderID: 0, // 订单号
         AfterSaleCode: null,
         Source: 2, // 下单类型
         ChannelType: 0, // 售后渠道
         AppealType: null, // 诉求意向
-        QuestionTypeList: [ // 问题类型数组
-        ],
         QuestionRemark: '', // 问题描述
-        QuestionPicList: [ // 问题图片
-          '',
-        ],
-        ContactName: '', // 联系人
         QQ: '', // QQ号码
         Mobile: '', // 电话
 
       },
       intentionAction: 0,
       rules: {
-        QuestionTypeList: [
+        QuestionTypes: [
           { required: true, message: '请选择售后原因', trigger: 'change' },
           { validator: validateQuestionTypeList, trigger: 'blur' },
         ],
@@ -282,15 +270,12 @@ export default {
             min: 3, max: 300, message: '长度在 3 到 300 个字符', trigger: 'change',
           },
         ],
-        QuestionPicList: [
-          { validator: QuestionPicList, trigger: 'change' },
+        QuestionPics: [
+          { validator: QuestionPics, trigger: 'change' },
           { required: false, message: '请您上传问题证明图片（晚货/丢货无需上传）', trigger: 'change' },
         ],
         AppealType: [
           { required: true, message: '请选择诉求意向', trigger: 'blur' },
-        ],
-        ContactName: [
-          { required: true, message: '请输入联系人', trigger: 'blur' },
         ],
         Mobile: [
           { required: true, message: '请输入手机号码', trigger: 'blur' },
@@ -308,27 +293,24 @@ export default {
     };
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'AppealList']),
-    ...mapState('summary', ['editFeedbackData', 'RejectReasonList']),
+    ...mapState('common', ['customerInfo']),
     isUpImg() {
-      const ActionQuestionList = this.ApplyQuestionList.filter(res => this.ruleForm.QuestionTypeList.find(item => item === res.ID));
+      const ActionQuestionList = this.ApplyQuestionList.filter(res => this.ruleForm.QuestionTypes.find(item => item === res.ID));
       return ActionQuestionList.filter(res => res.IsUploadPic).length !== 0;
     },
   },
   methods: {
     async submitForm() {
+      console.log(this.ruleForm);
       const phomReg = /^1[3456789]\d{9}$/;
       const QQRege = /[1-9][0-9]{4,14}/;
       this.$refs.ruleForm1.validate();
-      console.log(this.ruleForm.QuestionRemark);
-      if (this.ruleForm.QuestionTypeList.length === 0) {
+      if (this.ruleForm.QuestionTypes.length === 0) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题类型' });
       } else if (this.ruleForm.QuestionRemark !== '' && (this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300)) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述并在3到300个字符' });
       } else if (!this.ruleForm.AppealType) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请选择诉求意向' });
-      } else if (this.ruleForm.ContactName === '') {
-        this.messageBox.failSingleError({ title: '提交失败', msg: '请输入联系人' });
       } else if (this.ruleForm.Mobile === '') {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入联系电话' });
       } else if (!phomReg.test(this.ruleForm.Mobile)) {
@@ -344,7 +326,7 @@ export default {
           this.messageBox.failSingleError({ title: '提交失败', msg: '请上传问题图片' });
           return;
         }
-        this.ruleForm.QuestionPicList = _list || [];
+        this.ruleForm.QuestionPics = _list || [];
         const res = await this.api.getApplyQuestionApply(this.ruleForm);
         if (res.data.Status === 1000) {
           this.submitSuccessVsible = true;
@@ -352,16 +334,8 @@ export default {
       }
     },
 
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      if (this.customerInfo) {
-        this.ruleForm.Mobile = this.customerInfo.Account.Mobile;
-        this.ruleForm.ContactName = this.customerInfo.CustomerName;
-        this.ruleForm.QQ = this.customerInfo.QQ;
-      }
-    },
     handleRemove() {
-      this.$refs.ruleForm1.validateField('QuestionPicList');
+      this.$refs.ruleForm1.validateField('QuestionPics');
       this.setUploadDisabled();
     },
     beforeUpload(file) {
@@ -400,7 +374,7 @@ export default {
         });
         this.$refs.upload.uploadFiles = this.$refs.upload.uploadFiles.filter(it => it.status === 'success' && it.response && it.response.Status === 1000);
       }
-      this.$refs.ruleForm1.validateField('QuestionPicList');
+      this.$refs.ruleForm1.validateField('QuestionPics');
       this.setUploadDisabled();
     },
     handleUploadError() {
@@ -415,12 +389,12 @@ export default {
       this.$router.back();
     },
     ApplyQuestionCheckChange(keys) {
-      this.ruleForm.QuestionTypeList = keys;
-      this.$refs.ruleForm1.validateField('QuestionTypeList');
-      this.$refs.ruleForm1.validateField('QuestionPicList');
+      this.ruleForm.QuestionTypes = keys;
+      this.$refs.ruleForm1.validateField('QuestionTypes');
+      this.$refs.ruleForm1.validateField('QuestionPics');
     },
     initPicList() {
-      this.$refs.upload.uploadFiles = this.ruleForm.QuestionPicList.map((path, i) => ({
+      this.$refs.upload.uploadFiles = this.ruleForm.QuestionPics.map((path, i) => ({
         name: '（…）',
         percentage: 100,
         raw: {},
@@ -441,12 +415,6 @@ export default {
         status: 'success',
         uid: new Date().getTime() + i,
         url: `${imgUrl}${path}`,
-        // response: {
-        //   Status: 1000,
-        //   Data: {
-        //     Url: path,
-        //   },
-        // },
       }));
       this.setUploadDisabled();
     },
@@ -454,8 +422,28 @@ export default {
       this.Describe = Describe;
       this.DescribeShow = true;
     },
+    AppealTypeClick(val) {
+      this.ruleForm.AppealType = val;
+      this.$refs.ruleForm1.validateField('AppealType');
+    },
+    getOrderAfterSaleOrderApplyRecord() {
+      this.viewDetailsDialog = true;
+      // 获取问题类型数据
+      this.api.getOrderAfterSaleOrderApplyRecord(this.queryData.OrderID).then(res => {
+        if (res.data.Status === 1000) {
+          this.OrderApplyRecord = res.data.Data;
+        }
+      });
+    },
     viewDetailsClick() {
       this.viewDetailsDialog = true;
+    },
+    initOrderApplyRecord() {
+      this.api.getOrderAfterSaleOrderApplyRecord(this.queryData.OrderID).then(res => {
+        if (res.data.Status === 1000) {
+          this.OrderApplyRecord = res.data.Data;
+        }
+      });
     },
   },
   async mounted() {
@@ -465,7 +453,6 @@ export default {
     }
     this.queryData = JSON.parse(this.$route.params.data);
     this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
-    this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
     this.ruleForm.QQ = this.customerInfo?.QQ || '';
     // 获取问题类型数据
     this.api.getApplyQuestionList().then(res => {
@@ -475,15 +462,20 @@ export default {
     });
 
     this.ruleForm.OrderID = this.queryData.OrderID;
-    this.ruleForm.AfterSaleCode = this.queryData.AfterSaleCode || 0;
+    this.ruleForm.AfterSaleCode = this.queryData.AfterSaleCode;
     this.$store.dispatch('summary/getRejectReasonList');
+
+    this.api.getOrderAfterSaleOrderApplyCount(this.queryData.OrderID).then(res => {
+      if (res.data.Status === 1000) {
+        this.OrderApplyCount = res.data.Data;
+      }
+    });
   },
   watch: {
     customerInfo: {
       handler(newVal) {
         if (newVal && !this.ruleForm.Mobile) {
           this.ruleForm.Mobile = this.customerInfo?.Account.Mobile || '';
-          this.ruleForm.ContactName = this.customerInfo?.CustomerName || '';
           this.ruleForm.QQ = this.customerInfo?.QQ || '';
         }
       },
@@ -591,12 +583,12 @@ export default {
       }
       > .el-form{
         margin-top: 22px;
-        .QuestionTypeList{
+        .QuestionTypes{
           .el-form-item__error{
             top: calc(100% - 22px);
           }
         }
-        .QuestionPicList{
+        .QuestionPics{
           .el-form-item__error{
             top: calc(100% - 114px);
           }
@@ -738,28 +730,6 @@ export default {
           width: 180px;
         }
       }
-      // .mp-select {
-      //   .el-form-item__content {
-      //     > .mp-pc-common-comps-select-comp-wrap {
-      //       width: 300px;
-      //       display: block;
-      //       > header {
-      //         display: none;
-      //       }
-      //       > .el-select {
-      //         width: 300px;
-      //         height: auto;
-      //         .el-input__inner {
-      //           width: 300px;
-      //           height: 40px;
-      //         }
-      //         .el-input__suffix .el-input__icon::before {
-      //           top: 11px;
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
       .btn-box {
         padding-bottom: 60px;
         margin-top: 20px;

@@ -3,11 +3,7 @@
     <section>
       <header>
         <ul class="header-content">
-          <li>
-            <SingleSelector v-model="AfterSalesStatus" :optionList='AfterSalesStatusList' title="售后进度" />
-            <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
-          </li>
-          <li class="second">
+          <li class="first">
             <LineDateSelectorComp
               :changePropsFunc='setCondition4ServiceAfterSaleList'
               :requestFunc='getServiceAfterSaleList'
@@ -21,15 +17,28 @@
               :dateList="dateList"
               dateType="daterange"
             />
+            <!-- <SingleSelector v-model="AfterSalesStatus" :optionList='AfterSalesStatusList' title="售后进度" /> -->
+            <EpCascader :list="allProductClassify" v-model="EpCascaderProductValue" :showLine="false" />
+          </li>
+          <li class="second">
+            <div class="schedule">
+              <span>售后进度：</span>
+              <el-tabs
+                v-model="AfterSalesStatus"
+              >
+                <el-tab-pane v-for="it in AfterSalesStatusList" :key="it.value" :label="it.label" :name="`${it.value}`">
+                </el-tab-pane>
+              </el-tabs>
+            </div>
             <search-input-comp
-              title="关键词"
-              placeholder="请输入搜索关键词"
-              :typeList="[['KeyWords', '']]"
-              :requestFunc="getServiceAfterSaleList"
-              :changePropsFunc="setCondition4ServiceAfterSaleList"
-              :word="condition4ServiceAfterSaleList.KeyWords"
-              @reset="clearCondition4ServiceAfterSaleList"
-              :searchWatchKey="ServiceAfterSaleList"
+            title="关键词"
+            placeholder="请输入搜索关键词"
+            :typeList="[['KeyWords', '']]"
+            :requestFunc="getServiceAfterSaleList"
+            :changePropsFunc="setCondition4ServiceAfterSaleList"
+            :word="condition4ServiceAfterSaleList.KeyWords"
+            @reset="clearCondition4ServiceAfterSaleList"
+            :searchWatchKey="ServiceAfterSaleList"
             />
           </li>
         </ul>
@@ -39,60 +48,60 @@
           <div class="table-wrap">
             <el-table stripe border
               :data="ServiceAfterSaleList" style="width: 100%" class="ft-14-table">
-              <el-table-column prop="AfterSaleCode" label="售后单号" width="66" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="OrderID" label="订单号" width="72" show-overflow-tooltip>
+              <el-table-column prop="AfterSaleCode" label="售后单号" minWidth="70" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="OrderID" label="订单号" minWidth="88" show-overflow-tooltip>
               </el-table-column>
-              <el-table-column label="产品" width="101" show-overflow-tooltip>
+              <el-table-column label="产品" minWidth="101" show-overflow-tooltip>
                 <span slot-scope="scope">{{ scope.row.ProductName }}</span>
               </el-table-column>
-              <el-table-column label="文件名" show-overflow-tooltip width="78">
-                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              <el-table-column label="金额" show-overflow-tooltip minWidth="60">
+                <template slot-scope="scope">{{ scope.row.OrderProductPrice }}</template>
               </el-table-column>
-              <el-table-column label="金额" show-overflow-tooltip width="45">
-                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              <el-table-column label="运费" show-overflow-tooltip minWidth="35">
+                <template slot-scope="scope">{{ scope.row.OrderFreight }}</template>
               </el-table-column>
-              <el-table-column label="运费" show-overflow-tooltip width="35">
-                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              <el-table-column label="诉求" show-overflow-tooltip minWidth="116">
+                <template slot-scope="scope">{{ scope.row.AppealContent }}</template>
               </el-table-column>
-              <el-table-column label="诉求" show-overflow-tooltip width="116">
-                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              <el-table-column label="申请时间" show-overflow-tooltip minWidth="107">
+                <template slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate}}</template>
               </el-table-column>
-              <el-table-column label="申请时间" show-overflow-tooltip width="107">
-                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              <el-table-column label="申请渠道" show-overflow-tooltip minWidth="71">
+                <template slot-scope="scope">{{ scope.row.ChannelType === 0 ? '网页端' : '移动端' }}</template>
               </el-table-column>
-              <el-table-column label="申请渠道" show-overflow-tooltip width="71">
-                <template slot-scope="scope">{{ scope.row.Content }}</template>
+              <el-table-column label="处理结果" show-overflow-tooltip minWidth="137">
+                <template slot-scope="scope">
+                  <template v-if="scope.row.IsReject">
+                    驳回{{scope.row.RejectReason}}
+                  </template>
+                  <template v-else>
+                    {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
+                  </template>
+                </template>
               </el-table-column>
-              <el-table-column label="处理结果" show-overflow-tooltip width="137">
-                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              <el-table-column label="额外支付" show-overflow-tooltip minWidth="60">
+                <template slot-scope="scope">
+                  {{ scope.row.ExtraPayAmount }}
+                </template>
               </el-table-column>
-              <el-table-column label="额外支付" show-overflow-tooltip width="72">
-                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              <el-table-column label="状态" show-overflow-tooltip minWidth="58">
+                <template slot-scope="scope">{{ getAfterSaleStatusText(scope.row.Status) }} </template>
               </el-table-column>
-              <el-table-column label="状态" show-overflow-tooltip width="40">
-                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
+              <el-table-column label="处理人" show-overflow-tooltip minWidth="58">
+                <template slot-scope="scope">{{ scope.row.Operater }} </template>
               </el-table-column>
-              <el-table-column label="处理人" show-overflow-tooltip width="62">
-                <template slot-scope="scope">{{ getSolutions(scope.row.SolutionTypes) }} </template>
-              </el-table-column>
-              <el-table-column label="最后操作时间" width="104" show-overflow-tooltip>
+              <el-table-column label="最后操作时间" minWidth="104" show-overflow-tooltip>
                 <template slot-scope="scope"
-                >{{scope.row.CreateTime | format2MiddleLangTypeDate }}</template>
+                >{{scope.row.OperateTime | format2MiddleLangTypeDate }}</template>
               </el-table-column>
-              <el-table-column label="操作" width="68" show-overflow-tooltip>
+              <el-table-column label="操作" minWidth="65" show-overflow-tooltip>
                 <template slot-scope="scope">
                   <div class="operate">
-                    <span @click="$router.push( { name: 'serviceAfterSalesDetails', params: {data: JSON.stringify(scope.row)} })">查看</span>
-                    <template v-if="scope.row.AfterSaleStatus === 30">
-                      <span class="after-sale" v-if="!scope.row.IsEvaluate" @click="estimateClick(scope.row.AfterSaleCode)">售后评价</span>
-                      <span class="after-sale" v-else @click="seeEstimateClick(scope.row.AfterSaleCode)">查看评价</span>
-                    </template>
-                    <span class="view-more" v-if="scope.row.AfterSaleStatus===0" @click="cancelAfterSale(scope.row.AfterSaleCode)">取消服务单</span>
+                    <span @click="$router.push( { name: 'serviceAfterSalesDetails', params: {data: JSON.stringify(scope.row)} })">查看详情</span>
                   </div>
                 </template>
               </el-table-column>
             </el-table>
-
           </div>
           <div class="content-footer">
             <Count
@@ -102,7 +111,6 @@
               :pageSize='12'
               class="float"
             />
-              <!-- :DownLoadConfigObj='DownLoadConfigObj' -->
           </div>
           <transition name="el-fade-in-linear">
             <div class="content-footer floating" v-show="isFootFixed">
@@ -114,7 +122,6 @@
                   :pageSize='12'
                   class="float"
                 />
-                  <!-- :DownLoadConfigObj='DownLoadConfigObj' -->
               </div>
             </div>
           </transition>
@@ -127,22 +134,7 @@
             去下单<i class="el-icon-arrow-right"></i>
           </router-link>
         </p>
-        <!-- <p class="is-gray"></p> -->
       </div>
-
-      <!-- 售后评价 -->
-      <EstimateDialogComp
-      :AfterSaleCode='AfterSaleCode'
-      :visible='estimateVisible'
-      @closed="estimateClosed"
-      @submit="estimateSubmit"></EstimateDialogComp>
-      <!-- 查看售后评价 -->
-      <SeeEstimateDialogComp
-      :AfterSaleCode='AfterSaleCode'
-      :visible='seeEstimateVisible'
-      @closed="seeEstimateVisible = false"
-      @submit="seeEstimateVisible = false"></SeeEstimateDialogComp>
-
     </section>
   </article>
 </template>
@@ -154,10 +146,6 @@ import {
 import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
-import EstimateDialogComp from '@/components/common/EstimateDialogComp/EstimateDialogComp.vue';
-import SeeEstimateDialogComp from '@/components/common/EstimateDialogComp/SeeEstimateDialogComp.vue';
-// import ProductSelector from '@/components/common/Selector/ProductSelectorIndex.vue';
-import SingleSelector from '@/components/common/Selector/SingleSelector.vue';
 import CommonClassType from '../../store/CommonClassType';
 import EpCascader from '../../packages/EpCascader/index.vue';
 
@@ -166,17 +154,13 @@ export default {
     Count,
     LineDateSelectorComp,
     SearchInputComp,
-    EstimateDialogComp,
-    SeeEstimateDialogComp,
-    // ProductSelector,
-    SingleSelector,
     EpCascader,
   },
   computed: {
     ...mapState('common', ['ScrollInfo']),
     ...mapState('summary', ['condition4ServiceAfterSaleList', 'ServiceAfterSaleList', 'ServiceAfterSaleListNumber']),
     ...mapGetters('Quotation', ['allProductClassify']),
-    EpCascaderProductValue: { // :typeList="[['Product', 'ClassID'],['Product', 'TypeID'],['Product', 'ProductID']]"
+    EpCascaderProductValue: {
       get() {
         const list = [
           this.condition4ServiceAfterSaleList.Product.ClassID,
@@ -215,15 +199,6 @@ export default {
       }
       return _t;
     },
-    // DownLoadConfigObj() { // 不需要导出功能了
-    //   return {
-    //     condition: this.condition,
-    //     count: this.ServiceAfterSaleListNumber,
-    //     fileDefaultName: '名片之家售后单',
-    //     fileDate: this.condition4ServiceAfterSaleList.Date,
-    //     downFunc: data => this.api.getServiceListData2Excel(data),
-    //   };
-    // },
     showDateText() {
       if (this.condition4ServiceAfterSaleList && this.condition4ServiceAfterSaleList.DateType !== 'all') {
         if (this.condition4ServiceAfterSaleList.DateType) {
@@ -250,24 +225,14 @@ export default {
   },
   data() {
     return {
-      seeEstimateVisible: false,
-      estimateVisible: false,
-      AfterSaleCode: null,
-
-      form: {
-        name: 0,
-        region: '',
-      },
-      h: 0,
       isFootFixed: false,
       // AfterSalesStatus: '',
       AfterSalesStatusList: [
         { label: '不限', value: null },
-        { label: '待处理', value: '0' },
+        { label: '待处理', value: 0 },
         { label: '处理中', value: 10 },
-        { label: '退款中', value: 20 },
-        { label: '处理完成', value: 30 },
-        { label: '已驳回', value: 40 },
+        { label: '已挂起', value: 25 },
+        { label: '已处理', value: 30 },
         { label: '已取消', value: 255 },
       ],
       // eslint-disable-next-line max-len
@@ -277,27 +242,7 @@ export default {
   methods: {
     ...mapMutations('summary', ['setCondition4ServiceAfterSaleList', 'clearCondition4ServiceAfterSaleList']),
     ...mapActions('summary', ['getServiceAfterSaleList']),
-    getSolutions(SolutionTypes) {
-      let str = '';
-      SolutionTypes.forEach((element, index) => {
-        if (index) {
-          str += '，';
-        }
-        if (element === 2) {
-          str += '退款';
-        }
-        if (element === 7) {
-          str += '补印';
-        }
-        if (element === 8) {
-          str += '赠送优惠券';
-        }
-        if (element === 255) {
-          str += '其他';
-        }
-      });
-      return str;
-    },
+
     getAfterSaleStatusText(status) {
       let str = '';
       switch (status) {
@@ -310,8 +255,11 @@ export default {
         case 20:
           str = '退款中';
           break;
+        case 25:
+          str = '已挂起';
+          break;
         case 30:
-          str = '处理完成';
+          str = '已完成';
           break;
         case 40:
           str = '已驳回';
@@ -324,23 +272,6 @@ export default {
       }
       return str;
     },
-    isAccomplish(status) {
-      let bool = false;
-      switch (status) {
-        case 30:
-          bool = '处理完成';
-          break;
-        case 40:
-          bool = '已驳回';
-          break;
-        case 255:
-          bool = '已取消';
-          break;
-        default:
-          break;
-      }
-      return bool;
-    },
     handlePageChange(page) {
       this.$store.dispatch('summary/getServiceAfterSaleList', page);
     },
@@ -348,32 +279,6 @@ export default {
       if (!oEl) return;
       const { scrollTop, scrollHeight, offsetHeight } = oEl;
       this.$store.commit('common/setScrollInfo', { scrollTop, scrollHeight, offsetHeight });
-    },
-    onOpen() {},
-    problemType() {},
-    // 售后评价
-    estimateClick(AfterSaleCode) {
-      this.estimateVisible = true;
-      this.AfterSaleCode = AfterSaleCode;
-    },
-    // 售后评价弹窗关闭
-    estimateClosed() {
-      this.estimateVisible = false;
-      this.AfterSaleCode = null;
-    },
-    estimateSubmit(data) {
-      this.api.getOrderAfterSaleEvaluate(data).then(res => {
-        if (res.data.Status === 1000) {
-          this.$store.dispatch('summary/getServiceAfterSaleList', this.condition4ServiceAfterSaleList.Page);
-        }
-      });
-      this.estimateVisible = false;
-      this.AfterSaleCode = null;
-    },
-    // 查看评价
-    seeEstimateClick(AfterSaleCode) {
-      this.seeEstimateVisible = true;
-      this.AfterSaleCode = AfterSaleCode;
     },
     cancelAfterSale(code) {
       // this.messageBox
@@ -443,18 +348,65 @@ export default {
             padding-top: 1px;
             padding-left: 12px;
           }
-          &.second {
-            padding-top: 28px;
+          &.first {
+            display: flex;
+            .mp-line-date-selector-wrap{
+              min-width: 600px;
+            }
             .mp-line-date-selector-wrap > .box {
-              width: 600px;
+              width: 500px;
               &::after {
                 display: none;
+              }
+            }
+            .mp-common-comps-ep-cascader-comp-wrap{
+              margin-top: -10px;
+            }
+          }
+          &.second {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 28px;
+            .schedule{
+              display: flex;
+              >span{
+                text-align: right;
+                color: #444;
+                font-size: 14px;
+                font-weight: 700;
+                min-width: 5em;
+                display: inline-block;
+                margin-right: 10px;
+              }
+              .el-tabs {
+                .el-tabs__active-bar {
+                  height: 3px;
+                }
+                display: inline-block;
+                > .el-tabs__header {
+                  margin: 0;
+                  .el-tabs__item {
+                    line-height: unset;
+                    height: 38px;
+                    color: #585858;
+                    line-height: 12px\0;
+                    &.is-active, &:hover {
+                      color: #428DFA;
+                    }
+                    &.is-active {
+                      font-weight: 700;
+                    }
+                  }
+                  .el-tabs__nav-wrap::after {
+                    display: none;
+                  }
+                }
               }
             }
             .mp-common-comps-search-box {
               vertical-align: 25px;
               margin-left: 64px;
-              // margin-right: -10px;
+              margin-top: -10px;
             }
           }
         }
@@ -470,22 +422,6 @@ export default {
         padding-top: 25px;
         > .table-wrap {
           min-height: calc(100vh - 457px);
-          // > .table{
-          //   >.column{
-          //     display: inline-block;
-          //     border: 1px solid #efefef;
-          //     border-right: none;
-          //     text-align: center;
-          //     .lable{
-          //       background-color: #efefef;
-          //       padding: 10px;
-          //     }
-          //     .content{
-          //       line-height: 32px;
-          //       padding: 0 5px;
-          //     }
-          //   }
-          // }
           .el-table{
             .coloraaa{
               color: #AAAAAA;

@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 const TerserPlugin = require('terser-webpack-plugin');
 
-// let proxyUrl = 'http://192.168.3.253';
-let proxyUrl = 'http://192.168.2.238:8050';
+let proxyUrl = 'http://192.168.2.234:8050'; // 吕
+// let proxyUrl = 'http://192.168.2.238:8050';
 // let proxyUrl = 'http://erp.ybz888.com/';
 let publicPath = '';
 // 测试开发环境：调用92接口
@@ -30,6 +30,13 @@ module.exports = {
       '/Api': {
         target: proxyUrl,
         // target: 'http://218.28.143.10:8156',
+        ws: true, // 开启websockets
+        changeOrigin: true, // 开启代理
+        proxyTimeout: 10 * 60 * 1000,
+        timeout: 10 * 60 * 1000,
+      },
+      '/AfterSaleImage': {
+        target: proxyUrl,
         ws: true, // 开启websockets
         changeOrigin: true, // 开启代理
         proxyTimeout: 10 * 60 * 1000,
