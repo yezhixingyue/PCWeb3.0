@@ -12,7 +12,7 @@
           <i></i> <span class="is-bold">服务进度：</span>
         </p>
         <ul v-if="AfterSaleInfo">
-          <li v-for="item in AfterSaleInfo.ServiceProgresses" :key="item.CreateTime">
+          <li v-for="(item, i) in AfterSaleInfo.ServiceProgresses" :key="item.CreateTime+i">
             <img src="@/assets/images/动线剪头.png" alt="">
             <p class="time" :title="item.CreateTime | format2MiddleLangTypeDate">{{item.CreateTime | format2MiddleLangTypeDate}}</p>
             <p class="is-bold" :title="item.ServiceContent">{{item.ServiceContent}}</p>
@@ -61,17 +61,16 @@
           <header class="is-bold"><img src="" alt="">申请信息</header>
           <div style="margin-top: 16px;">
             <p><span class="label">问题：</span> <span class="value">{{AfterSaleInfo.QuestionTypeTitles.join('、')}}</span></p>
-            <p><span class="label">问题描述：</span> <span class="value">{{AfterSaleInfo.QuestionRemark}}</span></p>
-            <p><span class="label">诉求：</span> <span class="value">{{AfterSaleInfo.AppealContent}}</span></p>
-            <p><span class="label">联系方式：</span> <span class="value">{{AfterSaleInfo.Mobile}}</span></p>
-            <p><span class="label">QQ：</span> <span class="value">{{AfterSaleInfo.QQ }}</span></p>
-            <p><span class="label">图片凭证：</span></p>
-            <p>
+            <p v-if="AfterSaleInfo.QuestionRemark"><span class="label">问题描述：</span> <span class="value">{{AfterSaleInfo.QuestionRemark}}</span></p>
+            <p v-if="AfterSaleInfo.AppealContent"><span class="label">诉求：</span> <span class="value">{{AfterSaleInfo.AppealContent}}</span></p>
+            <p v-if="AfterSaleInfo.Mobile"><span class="label">联系方式：</span> <span class="value">{{AfterSaleInfo.Mobile}}</span></p>
+            <p v-if="AfterSaleInfo.QQ"><span class="label">QQ：</span> <span class="value">{{AfterSaleInfo.QQ }}</span></p>
+            <p v-if="AfterSaleInfo.QuestionPics"><span class="label">图片凭证：</span></p>
+            <p v-if="AfterSaleInfo.QuestionPics">
               <span class="value" style="display: flex; flex-wrap: wrap">
                 <el-image :preview-src-list="AfterSaleInfo.QuestionPics" :mpCloseViewer='closeViewer'
                 v-for="(item, index) in AfterSaleInfo.QuestionPics" :key="index + item" :src="item" fit="cover" ></el-image>
                 <span v-if="AfterSaleInfo.QuestionPics.length === 0">暂无图片</span>
-                <!-- <img v-for="item in AfterSaleInfo.QuestionPics" :key="item" :src="item" alt=""> -->
               </span>
             </p>
           </div>
@@ -80,7 +79,7 @@
           <header class="is-bold"><img src="" alt="">处理状态及结果</header>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 0"> <img src="@/assets/images/待处理.png" alt=""> 客服暂未处理，请耐心等待！</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 10"> <img src="@/assets/images/处理中.png" alt=""> 处理中请您耐心等待！</p>
-          <p class="is-bold" v-if="AfterSaleInfo.Status === 25"> <img src="@/assets/images/已挂起.png" alt=""> 已挂起</p>
+          <p class="is-bold" v-if="AfterSaleInfo.Status === 25"> <img src="@/assets/images/已挂起.png" alt=""> 已挂起（{{AfterSaleInfo.HangReasonTypeTitle}}）</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 30 && AfterSaleInfo.IsReject"> <img src="@/assets/images/未发现问题.png" alt=""> 未发现问题</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 30 && !AfterSaleInfo.IsReject"> <img src="@/assets/images/已处理.png" alt=""> 已处理</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 255"> <img src="@/assets/images/取消申请.png" alt=""> 您取消了申请</p>
@@ -107,7 +106,6 @@
               <span class="value" style="display: flex; flex-wrap: wrap">
                 <el-image :preview-src-list="AfterSaleInfo.SupplementalQuestionPics" :mpCloseViewer='closeViewer'
                 v-for="(item, index) in AfterSaleInfo.SupplementalQuestionPics" :key="index + item" :src="item" fit="cover" ></el-image>
-                <!-- <img v-for="item in AfterSaleInfo.SupplementalQuestionPics" :key="item" :src="item" alt=""> -->
               </span>
             </p>
           </div>

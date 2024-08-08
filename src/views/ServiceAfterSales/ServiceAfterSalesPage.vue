@@ -61,27 +61,41 @@
                 <template slot-scope="scope">{{ scope.row.OrderFreight }}</template>
               </el-table-column>
               <el-table-column label="诉求" show-overflow-tooltip minWidth="116">
-                <template slot-scope="scope">{{ scope.row.AppealContent }}</template>
+                <template slot-scope="scope">{{ scope.row.AppealContent || '-' }}</template>
               </el-table-column>
               <el-table-column label="申请时间" show-overflow-tooltip minWidth="107">
                 <template slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate}}</template>
               </el-table-column>
               <el-table-column label="申请渠道" show-overflow-tooltip minWidth="71">
-                <template slot-scope="scope">{{ scope.row.ChannelType === 0 ? '网页端' : '移动端' }}</template>
+                <template slot-scope="scope">
+                  {{ AfterSaleChannel.find(it => it.ID === scope.row.AfterSaleChannel) ?
+                  AfterSaleChannel.find(it => it.ID === scope.row.AfterSaleChannel).name : ''}}
+                </template>
               </el-table-column>
               <el-table-column label="处理结果" show-overflow-tooltip minWidth="137">
                 <template slot-scope="scope">
-                  <template v-if="scope.row.IsReject">
-                    驳回{{scope.row.RejectReason}}
+                  <template v-if="scope.row.SolutionResults.length">
+                    <template v-if="scope.row.IsReject">
+                      未发现问题{{scope.row.RejectReason}}
+                    </template>
+                    <template v-else>
+                      {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
+                    </template>
                   </template>
                   <template v-else>
-                    {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
+                    -
                   </template>
                 </template>
               </el-table-column>
               <el-table-column label="额外支付" show-overflow-tooltip minWidth="60">
                 <template slot-scope="scope">
-                  {{ scope.row.ExtraPayAmount }}
+                  <el-tooltip v-if="scope.row.ExtraPayAmount" :disabled="!scope.row.ExtraPayRemark" effect="dark"
+                  :content="scope.row.ExtraPayRemark" placement="top">
+                    <span>{{scope.row.ExtraPayAmount}}元</span>
+                  </el-tooltip>
+                  <template v-else>
+                    -
+                  </template>
                 </template>
               </el-table-column>
               <el-table-column label="状态" show-overflow-tooltip minWidth="58">
@@ -235,8 +249,18 @@ export default {
         { label: '已处理', value: 30 },
         { label: '已取消', value: 255 },
       ],
-      // eslint-disable-next-line max-len
-      dateList: [{ label: '近七天', value: 'last7Date' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      AfterSaleChannel: [
+        { name: '网页端', ID: 0 },
+        { name: '移动端', ID: 1 },
+        { name: '人工客服', ID: 2 },
+      ],
+      dateList: [
+        { label: '近七天', value: 'last7Date' },
+        { label: '今天', value: 'today' },
+        { label: '昨天', value: 'yesterday' },
+        { label: '本月', value: 'curMonth' },
+        { label: '上月', value: 'lastMonth' },
+      ],
     };
   },
   methods: {
