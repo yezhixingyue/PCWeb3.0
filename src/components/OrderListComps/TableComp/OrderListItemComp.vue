@@ -109,7 +109,7 @@
               v-if="item.AllowAfterSale">售后</span>
             <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>售后</span>
             <span class="span-title-pink" @click="handleOrderCancel(item)"
-              v-if="[20, 30, 35, 40].includes(item.Status) && !item.OriginalID">取消</span>
+              v-if="[20, 30, 35, 40, 42].includes(item.Status) && !item.OriginalID">取消</span>
             <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>取消</span>
           </div>
         </li>
