@@ -65,12 +65,12 @@
             <p v-if="AfterSaleInfo.AppealContent"><span class="label">诉求：</span> <span class="value">{{AfterSaleInfo.AppealContent}}</span></p>
             <p v-if="AfterSaleInfo.Mobile"><span class="label">联系方式：</span> <span class="value">{{AfterSaleInfo.Mobile}}</span></p>
             <p v-if="AfterSaleInfo.QQ"><span class="label">QQ：</span> <span class="value">{{AfterSaleInfo.QQ }}</span></p>
-            <p v-if="AfterSaleInfo.QuestionPics"><span class="label">图片凭证：</span></p>
-            <p v-if="AfterSaleInfo.QuestionPics">
+            <p v-if="AfterSaleInfo.QuestionPics.length"><span class="label">图片凭证：</span></p>
+            <p v-if="AfterSaleInfo.QuestionPics.length">
               <span class="value" style="display: flex; flex-wrap: wrap">
                 <el-image :preview-src-list="AfterSaleInfo.QuestionPics" :mpCloseViewer='closeViewer'
                 v-for="(item, index) in AfterSaleInfo.QuestionPics" :key="index + item" :src="item" fit="cover" ></el-image>
-                <span v-if="AfterSaleInfo.QuestionPics.length === 0">暂无图片</span>
+                <span v-if="AfterSaleInfo.QuestionPics.length === 0" class="is-gray">暂无图片</span>
               </span>
             </p>
           </div>
@@ -124,7 +124,8 @@
       </main>
       <footer>
         <!-- <el-button type="primary" v-if="[30, 40, 255].find(it => it === AfterSaleInfo.Status)" @click="goToAfterSalesApply">再次申请</el-button> -->
-        <el-button type="primary" @click="cancelAfterSaleClick" v-if="AfterSaleInfo && AfterSaleInfo.Status === 0">取消申请</el-button>
+        <el-button type="primary" @click="cancelAfterSaleClick"
+        v-if="AfterSaleInfo && [0, 10, 25].findIndex(it => it === AfterSaleInfo.Status) !== -1">取消申请</el-button>
         <el-button  @click="handleReturn" style="color: #428DFA; border-color: #428DFA;">
           返回列表
         </el-button>

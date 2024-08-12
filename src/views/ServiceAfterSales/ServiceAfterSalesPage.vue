@@ -74,16 +74,18 @@
               </el-table-column>
               <el-table-column label="处理结果" show-overflow-tooltip minWidth="137">
                 <template slot-scope="scope">
-                  <template v-if="scope.row.SolutionResults.length">
-                    <template v-if="scope.row.IsReject">
-                      未发现问题{{scope.row.RejectReason}}
-                    </template>
-                    <template v-else>
-                      {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
-                    </template>
+                  <template v-if="scope.row.IsReject">
+                    <span>
+                      未发现问题
+                    </span>
                   </template>
                   <template v-else>
-                    -
+                    <template v-if="scope.row.SolutionResults.length">
+                      {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
+                    </template>
+                    <template v-else>
+                      -
+                    </template>
                   </template>
                 </template>
               </el-table-column>
@@ -246,7 +248,7 @@ export default {
         { label: '待处理', value: 0 },
         { label: '处理中', value: 10 },
         { label: '已挂起', value: 25 },
-        { label: '已处理', value: 30 },
+        { label: '已完成', value: 30 },
         { label: '已取消', value: 255 },
       ],
       AfterSaleChannel: [

@@ -11,9 +11,10 @@
           <li>
             <div>已售后次数：</div>
             <p>
-              <span @click="viewDetailsClick" class="seeDetails">
+              <span @click="viewDetailsClick" v-if="OrderApplyCount" class="seeDetails">
                 {{OrderApplyCount}}次（点击查看详情）
               </span>
+              <span v-else>{{OrderApplyCount}}次</span>
             </p>
           </li>
           <li>
@@ -100,11 +101,11 @@
             </el-form-item>
             <div class="linkman">
               <el-form-item v-if="ruleForm.AppealType === 2" label="金额：" prop="ApplyRefundAmount">
-                <el-input v-model="ruleForm.ApplyRefundAmount"
+                <el-input key="ApplyRefundAmount" v-model="ruleForm.ApplyRefundAmount" oninput="value=value.match(/^\d*(\.?\d{0,2})/g)[0]"
                   show-word-limit placeholder="请输入金额"></el-input> 元
               </el-form-item>
               <el-form-item v-if="ruleForm.AppealType === 7" label="补印数量：" prop="ApplyRePrintNumber">
-                <el-input v-model="ruleForm.ApplyRePrintNumber"
+                <el-input key="ApplyRePrintNumber" v-model="ruleForm.ApplyRePrintNumber" oninput="value=value.replace(/[^\d]/g,'')"
                   show-word-limit placeholder="请输入补印数量"></el-input> {{ queryData.Unit }}
               </el-form-item>
               <el-form-item label="联系电话：" prop="Mobile">
@@ -151,20 +152,22 @@
         submitText='确定'
         title="订单已售后次数"
         width='716px'
-        top="30vh"
+        top="15vh"
         class="view-details-dialog"
         >
         <el-table stripe border
-          :data="OrderApplyRecord.AfterSaleRecords" style="width: 100%" class="ft-14-table">
-          <el-table-column prop="AfterSaleCode" label="售后单号" min-width="88" show-overflow-tooltip></el-table-column>
+          :data="OrderApplyRecord.AfterSaleRecords" style="width: 100%" height="500" class="ft-14-table">
+          <el-table-column prop="AfterSaleCode" label="售后单号" min-width="80" show-overflow-tooltip></el-table-column>
           <el-table-column prop="QuestionTypeTitles" label="问题" min-width="64" show-overflow-tooltip>
           </el-table-column>
           <el-table-column prop="QuestionRemark" label="问题描述" min-width="108" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="88"></el-table-column>
-          <el-table-column label="处理时间" show-overflow-tooltip min-width="132">
+          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="70">
+            <template slot-scope="scope">{{ getSolution(scope.row) || '其他' }}</template>
+          </el-table-column>
+          <el-table-column label="处理时间" show-overflow-tooltip min-width="130">
             <template slot-scope="scope">{{ scope.row.LastOperateTime | format2MiddleLangTypeDate }}</template>
           </el-table-column>
-          <el-table-column label="额外支付" show-overflow-tooltip min-width="68">
+          <el-table-column label="额外支付" show-overflow-tooltip min-width="60">
             <template slot-scope="scope">{{ scope.row.Content }}</template>
           </el-table-column>
           <el-table-column label="处理人" show-overflow-tooltip min-width="96">
@@ -218,7 +221,7 @@ export default {
   data() {
     const validateQuestionTypeList = (rule, value, callback) => {
       if (value?.length === 0) {
-        callback(new Error('请选择问题类型'));
+        callback(new Error('请选择问题'));
       } else {
         callback();
       }
@@ -262,7 +265,7 @@ export default {
       intentionAction: 0,
       rules: {
         QuestionTypes: [
-          { required: true, message: '请选择售后原因', trigger: 'change' },
+          { required: true, message: '请选择问题', trigger: 'change' },
           { validator: validateQuestionTypeList, trigger: 'blur' },
         ],
         QuestionRemark: [
@@ -301,12 +304,11 @@ export default {
   },
   methods: {
     async submitForm() {
-      console.log(this.ruleForm);
       const phomReg = /^1[3456789]\d{9}$/;
       const QQRege = /[1-9][0-9]{4,14}/;
       this.$refs.ruleForm1.validate();
       if (this.ruleForm.QuestionTypes.length === 0) {
-        this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题类型' });
+        this.messageBox.failSingleError({ title: '提交失败', msg: '请选择问题' });
       } else if (this.ruleForm.QuestionRemark !== '' && (this.ruleForm.QuestionRemark.length < 3 || this.ruleForm.QuestionRemark.length > 300)) {
         this.messageBox.failSingleError({ title: '提交失败', msg: '请输入问题描述并在3到300个字符' });
       } else if (!this.ruleForm.AppealType) {
@@ -332,6 +334,22 @@ export default {
           this.submitSuccessVsible = true;
         }
       }
+    },
+    getSolution(solution) {
+      const arr = [];
+      if (solution.SolutionTypes.find(it => it === 2)) {
+        arr.push('退款');
+      }
+      if (solution.SolutionTypes.find(it => it === 7)) {
+        arr.push('补印');
+      }
+      if (solution.SolutionTypes.find(it => it === 8)) {
+        arr.push('赠送优惠券');
+      }
+      if (solution.SolutionTypes.find(it => it === 255)) {
+        arr.push('其他');
+      }
+      return arr.join('、');
     },
 
     handleRemove() {
