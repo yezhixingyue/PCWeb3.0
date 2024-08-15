@@ -11,7 +11,7 @@
           <li>
             <div>已售后次数：</div>
             <p>
-              <span @click="viewDetailsClick" v-if="OrderApplyCount" class="seeDetails">
+              <span @click="viewDetailsClick" v-if="Number(OrderApplyCount)" class="seeDetails">
                 {{OrderApplyCount}}次（点击查看详情）
               </span>
               <span v-else>{{OrderApplyCount}}次</span>
@@ -260,7 +260,6 @@ export default {
         QuestionRemark: '', // 问题描述
         QQ: '', // QQ号码
         Mobile: '', // 电话
-
       },
       intentionAction: 0,
       rules: {
