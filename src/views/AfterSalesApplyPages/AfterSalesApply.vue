@@ -158,17 +158,42 @@
         <el-table stripe border
           :data="OrderApplyRecord.AfterSaleRecords" style="width: 100%" height="500" class="ft-14-table">
           <el-table-column prop="AfterSaleCode" label="售后单号" min-width="80" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="QuestionTypeTitles" label="问题" min-width="64" show-overflow-tooltip>
+          <el-table-column prop="QuestionTypeTitles" label="问题" min-width="80" show-overflow-tooltip>
           </el-table-column>
-          <el-table-column prop="QuestionRemark" label="问题描述" min-width="108" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="70">
-            <template slot-scope="scope">{{ getSolution(scope.row) || '其他' }}</template>
+          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="180">
+            <template slot-scope="scope">
+              <template v-if="scope.row.IsReject">
+                <span>未发现问题</span>
+              </template>
+              <template v-else>
+                <template v-if="scope.row.SolutionResults.length">
+                  <template v-if="scope.row.SolutionResults[0]">
+                    {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
+                    <template v-if="scope.row.SolutionResults[0].CouponContents.length">
+                      {{scope.row.CouponIsExtra?'额外':''}}赠送优惠券：
+                      {{ scope.row.SolutionResults[0].CouponContents.join('、') }}
+                    </template>
+                  </template>
+                </template>
+                <template v-else>
+                  -
+                </template>
+              </template>
+            </template>
+          </el-table-column>
+          <el-table-column label="额外支出" show-overflow-tooltip min-width="70">
+            <template slot-scope="scope">
+              <el-tooltip v-if="scope.row.ExtraPayAmount" :disabled="!scope.row.ExtraPayRemark" effect="dark"
+              :content="scope.row.ExtraPayRemark" placement="top">
+                <span>{{scope.row.ExtraPayAmount}}元</span>
+              </el-tooltip>
+              <template v-else>
+                -
+              </template>
+            </template>
           </el-table-column>
           <el-table-column label="处理时间" show-overflow-tooltip min-width="130">
             <template slot-scope="scope">{{ scope.row.LastOperateTime | format2MiddleLangTypeDate }}</template>
-          </el-table-column>
-          <el-table-column label="额外支付" show-overflow-tooltip min-width="60">
-            <template slot-scope="scope">{{ scope.row.Content }}</template>
           </el-table-column>
           <el-table-column label="处理人" show-overflow-tooltip min-width="96">
             <template slot-scope="scope">{{ scope.row.OperaterUserName }}</template>

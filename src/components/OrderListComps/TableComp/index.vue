@@ -80,7 +80,7 @@ export default {
         w13: 65,
         w14: 55,
         w15: 110,
-        w16: 150,
+        w16: 170,
       },
       titleList: [
         '订单号',

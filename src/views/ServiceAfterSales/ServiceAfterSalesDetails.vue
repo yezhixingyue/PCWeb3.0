@@ -90,17 +90,25 @@
                 {{ AfterSaleInfo.RejectReason }}
               </span>
             </p>
-            <p v-else>
-              <span class="label">{{AfterSaleInfo.SolutionResults[0].SolutionName}}：</span>
-              <span class="value">
-                {{ AfterSaleInfo.SolutionResults[0].SolutionContent }}
-              </span>
-            </p>
-            <p v-if="AfterSaleInfo.SolutionResults[0] && AfterSaleInfo.SolutionResults[0].CouponContent"><span class="label">赠送优惠券：</span>
-              <span class="value">{{AfterSaleInfo.SolutionResults[0].CouponContent}}</span>
-            </p>
-            <p v-if="AfterSaleInfo.ExtraPayAmount"><span class="label">额外支付：</span> <span class="value">{{AfterSaleInfo.ExtraPayAmount}}</span></p>
-            <p v-if="AfterSaleInfo.ExtraPayAmount"><span class="label">支出说明：</span> <span class="value">{{AfterSaleInfo.ExtraPayRemark}}</span></p>
+            <template v-else>
+              <p v-if="AfterSaleInfo.SolutionResults[0].SolutionName !== '赠送优惠劵'">
+                <span class="label">{{AfterSaleInfo.SolutionResults[0].SolutionName}}：</span>
+                <span class="value">
+                  {{ AfterSaleInfo.SolutionResults[0].SolutionContent }}
+                </span>
+              </p>
+              <p v-if="AfterSaleInfo.SolutionResults[0].CouponContents.length"
+              style="display: flex;">
+                <span class="label">{{AfterSaleInfo.CouponIsExtra?'额外':''}}赠送优惠券：</span>
+                <span class="value" style="flex: 1;">
+                  <p class="coupon-item" :title="it" v-for="it in AfterSaleInfo.SolutionResults[0].CouponContents" :key="it">{{it}}</p>
+                </span>
+              </p>
+              <p v-if="AfterSaleInfo.ExtraPayAmount"><span class="label">额外支付：</span> <span class="value">{{AfterSaleInfo.ExtraPayAmount}}</span></p>
+              <p v-if="AfterSaleInfo.ExtraPayAmount && AfterSaleInfo.ExtraPayRemark">
+                <span class="label">支出说明：</span> <span class="value">{{AfterSaleInfo.ExtraPayRemark}}</span>
+              </p>
+            </template>
             <p v-if="AfterSaleInfo && AfterSaleInfo.SupplementalQuestionPics.length"><span class="label">客服补充图片：</span></p>
             <p v-if="AfterSaleInfo && AfterSaleInfo.SupplementalQuestionPics.length">
               <span class="value" style="display: flex; flex-wrap: wrap">
@@ -366,6 +374,12 @@ export default {
           >p{
             margin-bottom: 10px;
             line-height: 15px;
+            .coupon-item{
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+              width: 260px;
+            }
             .label{
               color: #888;
             }
