@@ -75,7 +75,7 @@
               <el-table-column label="处理结果" show-overflow-tooltip minWidth="137">
                 <template slot-scope="scope">
                   <template v-if="scope.row.IsReject">
-                    <span>未发现问题</span>
+                    <span style="color: #52c41a;">未发现问题</span>
                   </template>
                   <template v-else>
                     <template v-if="scope.row.SolutionResults.length">

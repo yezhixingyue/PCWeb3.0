@@ -158,9 +158,9 @@
         <el-table stripe border
           :data="OrderApplyRecord.AfterSaleRecords" style="width: 100%" height="500" class="ft-14-table">
           <el-table-column prop="AfterSaleCode" label="售后单号" min-width="80" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="QuestionTypeTitles" label="问题" min-width="80" show-overflow-tooltip>
+          <el-table-column prop="QuestionTypeTitles" label="问题" min-width="90" show-overflow-tooltip>
           </el-table-column>
-          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="180">
+          <el-table-column prop="SolutionResultRemark" label="解决方案" show-overflow-tooltip width="190">
             <template slot-scope="scope">
               <template v-if="scope.row.IsReject">
                 <span>未发现问题</span>
@@ -192,10 +192,10 @@
               </template>
             </template>
           </el-table-column>
-          <el-table-column label="处理时间" show-overflow-tooltip min-width="130">
+          <el-table-column label="处理时间" show-overflow-tooltip min-width="140">
             <template slot-scope="scope">{{ scope.row.LastOperateTime | format2MiddleLangTypeDate }}</template>
           </el-table-column>
-          <el-table-column label="处理人" show-overflow-tooltip min-width="96">
+          <el-table-column label="处理人" show-overflow-tooltip min-width="80">
             <template slot-scope="scope">{{ scope.row.OperaterUserName }}</template>
           </el-table-column>
         </el-table>
