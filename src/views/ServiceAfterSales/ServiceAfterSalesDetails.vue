@@ -23,38 +23,40 @@
       <main >
         <div class="order-info">
           <header class="is-bold"><img src="" alt="">订单信息</header>
-          <div style="margin-top: 16px;" v-if="OrderInfo">
-            <p><span class="label">订单号：</span> <span class="value">{{OrderInfo.OrderID}}</span></p>
-            <OrderDetailDisplayItem :ShowData='ProductShowData' :hiddenFactory="true" />
-            <OrderDetailDisplayItem v-for="it in PartShowDataList" :ShowData='it' :key="it.Name" />
-          </div>
-          <div style="margin-top: 30px;" v-if="OrderInfo">
-            <p><span class="label">下单方式：</span> <span class="value">{{OrderInfo.OrderType === 2 ? '自助上传' : '代客下单'}}</span></p>
-            <p><span class="label">下单时间：</span> <span class="value">
-              <span class="text is-gray">{{getDayDate(OrderInfo.CreateTime)}} </span>
-              <span class="text is-gray">{{getMiDate(OrderInfo.CreateTime)}}</span>
-            </span></p>
-            <p><span class="label">付款时间：</span> <span class="value">
-              <span class="text is-gray">{{getDayDate(OrderInfo.PayTime)}} </span>
-              <span class="text is-gray">{{getMiDate(OrderInfo.PayTime)}}</span>
-            </span></p>
-            <p v-if="[254, 255].indexOf(OrderInfo.Status) === -1
-              && OrderInfo.ProducePeriod && OrderInfo.ProducePeriod.TotalTime">
-              <span class="label">
-                {{OrderInfo.ProducePeriod.IncludeDiliveryTime ? '预计送达：' : '预计发货：'}}
-              </span> <span class="value">
-                {{getDayDate(OrderInfo.ProducePeriod.TotalTime)}}
-              </span>
-            </p>
-          </div>
-          <div style="margin-top: 30px;" v-if="OrderInfo">
-            <p><span class="label">原价：</span> <span class="value">{{OrderInfo.OriginalPrice}}</span></p>
-            <p><span class="label">成交价：</span> <span class="value is-pink is-bold">{{OrderInfo.FinalPrice}}元</span></p>
-            <p><span class="label">已付：</span> <span class="value">{{OrderInfo.PaidAmount}}元</span></p>
-            <p><span class="label">未付：</span> <span class="value">{{OrderInfo.UnPaidAmount}}元</span></p>
-            <p><span class="label">退款：</span> <span class="value">{{OrderInfo.RefundOrderAmount}}元</span></p>
-            <p><span class="label">优惠券：</span> <span class="value is-pink">{{OrderInfo.CouponAmount}}元</span></p>
-            <p><span class="label">运费：</span> <span class="value">{{OrderInfo.FreightAmount}}元</span></p>
+          <div class="box">
+            <div style="margin-top: 16px;" v-if="OrderInfo">
+              <p><span class="label">订单号：</span> <span class="value">{{OrderInfo.OrderID}}</span></p>
+              <OrderDetailDisplayItem :ShowData='ProductShowData' :hiddenFactory="true" />
+              <OrderDetailDisplayItem v-for="it in PartShowDataList" :ShowData='it' :key="it.Name" />
+            </div>
+            <div style="margin-top: 30px;" v-if="OrderInfo">
+              <p><span class="label">下单方式：</span> <span class="value">{{OrderInfo.OrderType === 2 ? '自助上传' : '代客下单'}}</span></p>
+              <p><span class="label">下单时间：</span> <span class="value">
+                <span class="text is-gray">{{getDayDate(OrderInfo.CreateTime)}} </span>
+                <span class="text is-gray">{{getMiDate(OrderInfo.CreateTime)}}</span>
+              </span></p>
+              <p><span class="label">付款时间：</span> <span class="value">
+                <span class="text is-gray">{{getDayDate(OrderInfo.PayTime)}} </span>
+                <span class="text is-gray">{{getMiDate(OrderInfo.PayTime)}}</span>
+              </span></p>
+              <p v-if="[254, 255].indexOf(OrderInfo.Status) === -1
+                && OrderInfo.ProducePeriod && OrderInfo.ProducePeriod.TotalTime">
+                <span class="label">
+                  {{OrderInfo.ProducePeriod.IncludeDiliveryTime ? '预计送达：' : '预计发货：'}}
+                </span> <span class="value">
+                  {{getDayDate(OrderInfo.ProducePeriod.TotalTime)}}
+                </span>
+              </p>
+            </div>
+            <div style="margin-top: 30px;" v-if="OrderInfo">
+              <p><span class="label">原价：</span> <span class="value">{{OrderInfo.OriginalPrice}}</span></p>
+              <p><span class="label">成交价：</span> <span class="value is-pink is-bold">{{OrderInfo.FinalPrice}}元</span></p>
+              <p><span class="label">已付：</span> <span class="value">{{OrderInfo.PaidAmount}}元</span></p>
+              <p><span class="label">未付：</span> <span class="value">{{OrderInfo.UnPaidAmount}}元</span></p>
+              <p><span class="label">退款：</span> <span class="value">{{OrderInfo.RefundOrderAmount}}元</span></p>
+              <p><span class="label">优惠券：</span> <span class="value is-pink">{{OrderInfo.CouponAmount}}元</span></p>
+              <p><span class="label">运费：</span> <span class="value">{{OrderInfo.FreightAmount}}元</span></p>
+            </div>
           </div>
         </div>
         <div class="apply-info" v-if="AfterSaleInfo">
@@ -190,9 +192,9 @@ export default {
       };
     },
     PartList() {
-      if (!this.showData) return [];
-      if (!this.showData.ProductParams) return [];
-      return this.showData.ProductParams.PartList;
+      if (!this.OrderInfo) return [];
+      if (!this.OrderInfo.ProductParams) return [];
+      return this.OrderInfo.ProductParams.PartList;
     },
     PartShowDataList() {
       const arr = [];
@@ -370,7 +372,7 @@ export default {
         height: 654px;
         border: 1px solid #DCDFE6;
         border-radius: 10px;
-        >div{
+        >div, .box>div{
           >p{
             margin-bottom: 10px;
             line-height: 15px;
@@ -412,20 +414,24 @@ export default {
         }
         &.order-info{
           width: 302px;
-          >div{
-            padding-left: 46px;
-            box-sizing: border-box;
-            .mp-order-detail-item-comp-wrap{
-              >li{
-                line-height: 15px;
-                margin-top: 10px;
-                >.text{
-                  min-height: 15px;
-                  font-size: 12px !important;
-                  font-weight: 400;
-                  .craft-content-list{
-                    line-height: 15px;
-                    padding: 0;
+          >.box{
+            height: calc(100% - 37px);
+            overflow-y: auto;
+            >div{
+              padding-left: 46px;
+              box-sizing: border-box;
+              .mp-order-detail-item-comp-wrap{
+                >li{
+                  line-height: 15px;
+                  margin-top: 10px;
+                  >.text{
+                    min-height: 15px;
+                    font-size: 12px !important;
+                    font-weight: 400;
+                    .craft-content-list{
+                      line-height: 15px;
+                      padding: 0;
+                    }
                   }
                 }
               }

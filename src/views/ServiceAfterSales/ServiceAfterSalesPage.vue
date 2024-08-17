@@ -74,22 +74,24 @@
               </el-table-column>
               <el-table-column label="处理结果" show-overflow-tooltip minWidth="137">
                 <template slot-scope="scope">
-                  <template v-if="scope.row.IsReject">
-                    <span style="color: #52c41a;">未发现问题</span>
-                  </template>
-                  <template v-else>
-                    <template v-if="scope.row.SolutionResults.length">
-                      <template v-if="scope.row.SolutionResults[0]">
-                        {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
-                        <template v-if="scope.row.SolutionResults[0].CouponContents.length">
-                          {{scope.row.CouponIsExtra?'额外':''}}赠送优惠券：
-                          {{ scope.row.SolutionResults[0].CouponContents.join('、') }}
+                  <template v-if="scope.row.Status === 30">
+                    <template v-if="scope.row.IsReject">
+                      <span style="color: #52c41a;">未发现问题</span>
+                    </template>
+                    <template v-else>
+                      <template v-if="scope.row.SolutionResults.length">
+                        <template v-if="scope.row.SolutionResults[0]">
+                          {{ scope.row.SolutionResults[0] ? scope.row.SolutionResults[0].SolutionContent : '' }}
+                          <template v-if="scope.row.SolutionResults[0].CouponContents.length">
+                            {{scope.row.CouponIsExtra?'额外':''}}赠送优惠券：
+                            {{ scope.row.SolutionResults[0].CouponContents.join('、') }}
+                          </template>
                         </template>
                       </template>
                     </template>
-                    <template v-else>
-                      -
-                    </template>
+                  </template>
+                  <template v-else>
+                    -
                   </template>
                 </template>
               </el-table-column>
