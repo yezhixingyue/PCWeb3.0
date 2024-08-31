@@ -22,7 +22,7 @@
       </header>
       <main >
         <div class="order-info">
-          <header class="is-bold"><img src="" alt="">订单信息</header>
+          <header class="is-bold"><img src="@/assets/images/订单信息.png" alt="">订单信息</header>
           <div class="box">
             <div style="margin-top: 16px;" v-if="OrderInfo">
               <p><span class="label">订单号：</span> <span class="value">{{OrderInfo.OrderID}}</span></p>
@@ -61,7 +61,7 @@
           </div>
         </div>
         <div class="apply-info" v-if="AfterSaleInfo">
-          <header class="is-bold"><img src="" alt="">申请信息</header>
+          <header class="is-bold"><img src="@/assets/images/申请信息.png" alt="">申请信息</header>
           <div style="margin-top: 16px;">
             <p><span class="label">问题：</span> <span class="value">{{AfterSaleInfo.QuestionTypeTitles.join('、')}}</span></p>
             <p v-if="AfterSaleInfo.QuestionRemark"><span class="label">问题描述：</span> <span class="value">{{AfterSaleInfo.QuestionRemark}}</span></p>
@@ -79,7 +79,7 @@
           </div>
         </div>
         <div class="result" v-if="AfterSaleInfo">
-          <header class="is-bold"><img src="" alt="">处理状态及结果</header>
+          <header class="is-bold"><img src="@/assets/images/处理状态.png" alt="">处理状态及结果</header>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 0"> <img src="@/assets/images/待处理.png" alt=""> 客服暂未处理，请耐心等待！</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 10"> <img src="@/assets/images/处理中.png" alt=""> 处理中请您耐心等待！</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 25"> <img src="@/assets/images/已挂起.png" alt=""> 已挂起（{{AfterSaleInfo.HangReasonTypeTitle}}）</p>
@@ -412,6 +412,12 @@ export default {
           margin: -1px 0 0 -1px;
           color: #444;
           font-size: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          img{
+            margin-right: 5px;
+          }
         }
         &.order-info{
           width: 302px;
