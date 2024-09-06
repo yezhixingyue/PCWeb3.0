@@ -253,7 +253,6 @@ export default {
         { label: '不限', value: null },
         { label: '待处理', value: 0 },
         { label: '处理中', value: 10 },
-        { label: '已挂起', value: 25 },
         { label: '已完成', value: 30 },
         { label: '已取消', value: 255 },
       ],
@@ -288,7 +287,7 @@ export default {
           str = '退款中';
           break;
         case 25:
-          str = '已挂起';
+          str = '处理中';
           break;
         case 30:
           str = '已完成';

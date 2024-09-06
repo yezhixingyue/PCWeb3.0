@@ -274,7 +274,7 @@ export default {
       OrderApplyRecord: [], // 订单售后记录
       ruleForm: {
         QuestionTypes: [],
-        QuestionPics: [],
+        QuestionPics: [''],
         ApplyRefundAmount: '',
         ApplyRePrintNumber: '',
         OrderID: 0, // 订单号

@@ -82,7 +82,7 @@
           <header class="is-bold"><img src="@/assets/images/处理状态.png" alt="">处理状态及结果</header>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 0"> <img src="@/assets/images/待处理.png" alt=""> 客服暂未处理，请耐心等待！</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 10"> <img src="@/assets/images/处理中.png" alt=""> 处理中请您耐心等待！</p>
-          <p class="is-bold" v-if="AfterSaleInfo.Status === 25"> <img src="@/assets/images/已挂起.png" alt=""> 已挂起（{{AfterSaleInfo.HangReasonTypeTitle}}）</p>
+          <p class="is-bold" v-if="AfterSaleInfo.Status === 25"> <img src="@/assets/images/处理中.png" alt=""> 处理中（{{AfterSaleInfo.HangReasonTypeTitle}}）</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 30 && AfterSaleInfo.IsReject"> <img src="@/assets/images/未发现问题.png" alt=""> 未发现问题</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 30 && !AfterSaleInfo.IsReject"> <img src="@/assets/images/已处理.png" alt=""> 已处理</p>
           <p class="is-bold" v-if="AfterSaleInfo.Status === 255"> <img src="@/assets/images/取消申请.png" alt=""> 您取消了申请</p>
