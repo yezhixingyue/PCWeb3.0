@@ -51,7 +51,7 @@
         <div slot-scope="scope" class="is-font-12 btn-wrap operation-btns">
           <span class="view-more disabled" v-if="scope.row.AfterSaleStatus === null">查看</span>
           <span class="view-more" v-else
-            @click="$router.push({ name: 'serviceAfterSalesDetails', query: {data:JSON.stringify(scope.row)} })">查看</span>
+            @click="$router.push({ name: 'serviceAfterSalesDetails', params: {data:JSON.stringify(scope.row)} })">查看</span>
 
           <el-tooltip v-if="scope.row.AppealStatus !== 1"
             effect="dark" :content="getAppealStatusText(scope.row.AppealStatus)" placement="top">
@@ -135,7 +135,7 @@ export default {
     toAfterSale(item) {
       if (item.AppealStatus === 0) return;
 
-      this.$router.push({ name: 'feedback', query: { isEdit: 0, data: JSON.stringify(item) } });
+      this.$router.push({ name: 'AfterSalesApply', query: { isEdit: 0, data: JSON.stringify(item) } });
     },
   },
 };

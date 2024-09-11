@@ -105,11 +105,11 @@
           </template>
           <div :style="wStyles[15]" class="is-font-12 gray btn-wrap" v-if="!fixedLeft" :class="{hide: !fixedRight}">
             <span class="span-title-blue" @click="goToDetailPage(item)">订单详情</span>
-            <span class="span-title-blue" @click="goToFeedback(item)"
-              v-if="item.AllowAfterSale">售后</span>
-            <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>售后</span>
+            <span class="span-title-blue" @click="goToAfterSalesApply(item)"
+              v-if="item.AllowAfterSale">申请售后</span>
+            <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>申请售后</span>
             <span class="span-title-pink" @click="handleOrderCancel(item)"
-              v-if="[20, 30, 35, 40].includes(item.Status) && !item.OriginalID">取消</span>
+              v-if="[20, 30, 35, 40, 42].includes(item.Status) && !item.OriginalID">取消</span>
             <span class="is-cancel" :style="{paddingLeft:'6px', paddingRight:'6px'}" v-else>取消</span>
           </div>
         </li>
@@ -234,13 +234,13 @@ export default {
       // this.$router.push('/order/detail');
       this.$emit('detail', data.OrderID);
     },
-    goToFeedback(item) {
+    goToAfterSalesApply(item) {
       const _obj = { ...item };
       _obj.FinalPrice = item.Funds.FinalPrice;
       _obj.Freight = item.Funds.Freight;
       _obj.Refund = item.Funds.Refund;
       _obj.RefundFreight = this.data.RefundFreight;
-      this.$router.push({ name: 'feedback', query: { data: JSON.stringify(_obj) } });
+      this.$router.push({ name: 'AfterSalesApply', params: { data: JSON.stringify(_obj) } });
     },
     handleOrderCancel({ OrderID }) {
       this.messageBox.warnCancelBox({

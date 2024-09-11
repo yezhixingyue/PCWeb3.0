@@ -293,9 +293,6 @@ const api = {
   getApplyQuestionApply(data) { // POST /Api/OrderAfterSale/Apply  售后申请
     return instance.post('/Api/OrderAfterSale/Apply', data);
   },
-  getCancleApply(code) { // POST /Api/OrderAfterSale/CancleApply  取消售后申请
-    return instance.put(`/Api/OrderAfterSale/CancleApply?afterSaleCode=${code}`);
-  },
   getSolutionQuestionList() { // POST /Api/OrderAfterSale/SolutionQuestionList  获取售后常见问题分类列表
     return instance.get('/Api/OrderAfterSale/SolutionQuestionList');
   },
@@ -307,6 +304,21 @@ const api = {
   },
   getOrderAfterSaleEvaluate(data) { // POST /Api/OrderAfterSale/EvaluateDetail  设置售后评价
     return instance.post('/Api/OrderAfterSale/Evaluate', data);
+  },
+  getCancleApply(code) { // POST /Api/OrderAfterSale/CancleApply  取消售后申请
+    return instance.put(`/Api/OrderAfterSale/CancleApply?afterSaleCode=${code}`);
+  },
+  getOrderAfterSaleOrderApplyRecord(orderID) { // POST /Api/OrderAfterSale/OrderApplyRecord  订单售后记录
+    return instance.get(`/Api/OrderAfterSale/OrderApplyRecord?orderID=${orderID}`);
+  },
+  getOrderAfterSaleOrderApplyCount(orderID) { // GET /Api/OrderAfterSale/OrderApplyCount  获取订单售后次数
+    return instance.get(`/Api/OrderAfterSale/OrderApplyCount?orderID=${orderID}`, { closeLoading: true });
+  },
+  getOrderAfterSaleDetail(afterSaleCode) { // GET /Api/OrderAfterSale/Detail  获取售后详情
+    return instance.get(`/Api/OrderAfterSale/Detail?afterSaleCode=${afterSaleCode}`);
+  },
+  getAfterSaleOrderDetail(orderID) { // GET /Api/AfterSaleOrder/Detail  获取售后订单详情
+    return instance.get(`/Api/AfterSaleOrder/Detail?orderID=${orderID}`);
   },
   // 新售后不需要导出功能了
   // getServiceListData2Excel(data) { // POST /Api/AfterSales/Excel
