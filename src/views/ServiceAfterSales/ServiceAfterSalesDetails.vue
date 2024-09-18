@@ -71,8 +71,8 @@
             <p v-if="AfterSaleInfo.QuestionPics.length"><span class="label">图片凭证：</span></p>
             <p v-if="AfterSaleInfo.QuestionPics.length">
               <span class="value" style="display: flex; flex-wrap: wrap">
-                <el-image :preview-src-list="AfterSaleInfo.QuestionPics" :mpCloseViewer='closeViewer'
-                v-for="(item, index) in AfterSaleInfo.QuestionPics" :key="index + item" :src="item" fit="cover" ></el-image>
+                <el-image :preview-src-list="AfterSaleInfo.QuestionPics.map(it => baseUrl + it)" :mpCloseViewer='closeViewer'
+                v-for="(item, index) in AfterSaleInfo.QuestionPics.map(it => baseUrl + it)" :key="index + item" :src="item" fit="cover" ></el-image>
                 <span v-if="AfterSaleInfo.QuestionPics.length === 0" class="is-gray">暂无图片</span>
               </span>
             </p>
@@ -115,8 +115,8 @@
             <p v-if="AfterSaleInfo && AfterSaleInfo.SupplementalQuestionPics.length"><span class="label">客服补充图片：</span></p>
             <p v-if="AfterSaleInfo && AfterSaleInfo.SupplementalQuestionPics.length">
               <span class="value" style="display: flex; flex-wrap: wrap">
-                <el-image :preview-src-list="AfterSaleInfo.SupplementalQuestionPics" :mpCloseViewer='closeViewer'
-                v-for="(item, index) in AfterSaleInfo.SupplementalQuestionPics" :key="index + item" :src="item" fit="cover" ></el-image>
+                <el-image :preview-src-list="AfterSaleInfo.SupplementalQuestionPics.map(it => baseUrl + it)" :mpCloseViewer='closeViewer'
+                v-for="(item, index) in AfterSaleInfo.SupplementalQuestionPics.map(it => baseUrl + it)" :key="index + item" :src="item" fit="cover" ></el-image>
               </span>
             </p>
           </div>

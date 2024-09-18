@@ -35,7 +35,7 @@ export default {
         TypeID: '',
         ProductID: '',
       },
-      Status: null,
+      Status: '-1',
       ProductID: '',
       ApplyDate: {
         First: '',
@@ -136,7 +136,7 @@ export default {
           TypeID: '',
           ProductID: '',
         },
-        Status: null,
+        Status: '-1',
         ProductID: '',
         ApplyDate: {
           First: '',
@@ -189,7 +189,7 @@ export default {
           TypeID: '',
           ProductID: '',
         },
-        Status: null,
+        Status: '-1',
         ProductID: '',
         ApplyDate: {
           First: '',

@@ -63,10 +63,10 @@
               <el-table-column label="诉求" show-overflow-tooltip minWidth="116">
                 <template slot-scope="scope">{{ scope.row.AppealContent || '-' }}</template>
               </el-table-column>
-              <el-table-column label="申请时间" show-overflow-tooltip minWidth="107">
+              <el-table-column label="申请时间" show-overflow-tooltip minWidth="100">
                 <template slot-scope="scope">{{ scope.row.CreateTime | format2MiddleLangTypeDate}}</template>
               </el-table-column>
-              <el-table-column label="申请渠道" show-overflow-tooltip minWidth="71">
+              <el-table-column label="申请渠道" show-overflow-tooltip minWidth="64">
                 <template slot-scope="scope">
                   {{ AfterSaleChannel.find(it => it.ID === scope.row.AfterSaleChannel) ?
                   AfterSaleChannel.find(it => it.ID === scope.row.AfterSaleChannel).name : ''}}
@@ -112,7 +112,7 @@
               <el-table-column label="处理人" show-overflow-tooltip minWidth="58">
                 <template slot-scope="scope">{{ scope.row.Operater }} </template>
               </el-table-column>
-              <el-table-column label="最后操作时间" minWidth="104" show-overflow-tooltip>
+              <el-table-column label="最后操作时间" minWidth="100" show-overflow-tooltip>
                 <template slot-scope="scope"
                 >{{scope.row.OperateTime | format2MiddleLangTypeDate }}</template>
               </el-table-column>
@@ -250,7 +250,7 @@ export default {
       isFootFixed: false,
       // AfterSalesStatus: '',
       AfterSalesStatusList: [
-        { label: '不限', value: null },
+        { label: '不限', value: '-1' },
         { label: '待处理', value: 0 },
         { label: '处理中', value: 10 },
         { label: '已完成', value: 30 },
@@ -454,6 +454,15 @@ export default {
         > .table-wrap {
           min-height: calc(100vh - 457px);
           .el-table{
+            .el-table__body-wrapper{
+              .el-table__row{
+                td{
+                  .cell{
+                    padding: 0 5px;
+                  }
+                }
+              }
+            }
             .coloraaa{
               color: #AAAAAA;
             }
