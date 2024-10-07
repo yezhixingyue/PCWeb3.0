@@ -207,7 +207,8 @@
       </el-dialog>
       <el-dialog
         :visible.sync="submitSuccessVsible"
-        @cancle="submitSuccessVsible = false"
+        @cancle="onCancle"
+        @closed="onClosed"
         submitText='确定'
         width='472px'
         >
@@ -223,7 +224,7 @@
         </div>
         <span slot="footer" class="dialog-footer">
           <p>
-            <el-button type="primary" @click="submitSuccessVsible = false; handleReturn()" >确定</el-button>
+            <el-button type="primary" @click="onCancle" >确定</el-button>
           </p>
         </span>
       </el-dialog>
@@ -429,6 +430,12 @@ export default {
     },
     handleReturn() {
       this.$router.back();
+    },
+    onClosed() {
+      this.handleReturn();
+    },
+    onCancle() {
+      this.submitSuccessVsible = false;
     },
     ApplyQuestionCheckChange(keys) {
       this.ruleForm.QuestionTypes = keys;
