@@ -7,7 +7,7 @@
     v-if="AllowCreate && filterOptions.length === 0"
     size="small"
     class="mp-erp-number-type-element-display-input-comp"
-    :maxlength="isOptionType ? undefined : 9"
+    :maxlength="isOptionType ? 20 : 9"
     :style="`width:${localDisplayWidth}px`"
     :disabled='isDisabled'
   ></el-input>
@@ -201,10 +201,11 @@ export default {
       };
 
       try {
-        if (oInpBox && !this.isOptionType && !this.isMaterial) {
-          const oInps = oInpBox.$el.getElementsByClassName('el-input__inner');
-          const [oInp] = [...oInps];
-          if (oInp) {
+        const oInps = oInpBox.$el.getElementsByClassName('el-input__inner');
+        const [oInp] = [...oInps];
+        if (oInp) {
+          oInp.setAttribute('maxlength', '20');
+          if (oInpBox && !this.isOptionType && !this.isMaterial) {
             oInp.setAttribute('maxlength', '9');
           }
         }
