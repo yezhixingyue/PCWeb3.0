@@ -26,7 +26,7 @@
           <div class="box">
             <div style="margin-top: 16px;" v-if="OrderInfo">
               <p><span class="label">订单号：</span> <span class="value">{{OrderInfo.OrderID}}</span></p>
-              <p><span class="label" v-if="ProductShowData.FactoryName">工厂：</span> <span class="value">{{ProductShowData.FactoryName}}</span></p>
+              <!-- <p><span class="label" v-if="ProductShowData.FactoryName">工厂：</span> <span class="value">{{ProductShowData.FactoryName}}</span></p> -->
               <OrderDetailDisplayItem :ShowData='ProductShowData' :hiddenFactory="true" />
               <OrderDetailDisplayItem v-for="it in PartShowDataList" :ShowData='it' :key="it.Name" />
             </div>
