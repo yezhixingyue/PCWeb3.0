@@ -8,7 +8,7 @@ const uploadTracking = (config, Url) => {
   if (tracking === true && timerStart && url) {
     const Duration = Date.now() - timerStart;
 
-    if (Duration < 1000) return;
+    if (Duration < 1500) return;
 
     try {
       api.getApiSaveRecord({ Url, Duration });
