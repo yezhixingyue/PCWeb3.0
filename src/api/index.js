@@ -408,6 +408,9 @@ const api = {
   getInvoiceDetail(invoiceID) { // GET /Api/Invoice/Detail    发票详情
     return instance.get('/Api/Invoice/Detail', { params: { invoiceID } });
   },
+  getInvoiceOrderExportExcel(params) { // get /Api/InvoiceOrder/ExportExcel 发票订单导出Excel
+    return instance.get('/Api/InvoiceOrder/ExportExcel', { responseType: 'arraybuffer', params });
+  },
   // 获取认证信息 (新)
   getAuthenticationInfo(ID) {
     return instance.get(`/Api/Company/Authentication/Info?customerID=${ID}`);

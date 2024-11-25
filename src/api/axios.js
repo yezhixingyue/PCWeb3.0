@@ -109,7 +109,7 @@ axios.interceptors.request.use(
 
 const handleResponse = async (response) => {
   if (getShowLoading(response.config) && loadingInstance) handleLoadingClose();
-  const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel', '/Api/Customer/FundBillExcel'];
+  const _list2NotNeed2Toast = ['/Api/AfterSales/Excel', '/Api/Customer/OrderExcel', '/Api/Customer/FundBillExcel', '/Api/InvoiceOrder/ExportExcel'];
 
   // IE 8-9
   if (response.data == null && response.config.responseType === 'json' && response.request.responseText != null) {

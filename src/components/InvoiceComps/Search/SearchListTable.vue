@@ -10,7 +10,7 @@
     :class="{loading: loading}"
   >
     <el-table-column label="申请单号" width="85" prop="InvoiceID" show-overflow-tooltip></el-table-column>
-    <el-table-column label="开票类别" prop="InvoiceCategoryName" width="130" show-overflow-tooltip></el-table-column>
+    <el-table-column label="开票类别" prop="InvoiceCategoryName" width="110" show-overflow-tooltip></el-table-column>
     <el-table-column label="抬头名称" prop="InvoiceTitle" width="150" show-overflow-tooltip>
       <template slot-scope="scope">{{ scope.row | formatInvoiceTitle }}</template>
     </el-table-column>
@@ -41,6 +41,13 @@
           >查看</span>
         <!-- <span
           class="blue-span"
+          :class="{disabled: [InvoiceStatusEnums.canceled.ID].includes(scope.row.InvoiceStatus)}"
+          @click="onExcelClick(scope.row)"
+          >订单导出</span> -->
+        <DownLoadExcelComp :configObj="getDownLoadConfigObj(scope.row)" link btnText="订单导出" warningTipTitle="确定导出所含订单Excel数据吗?"
+         :disabled="[InvoiceStatusEnums.canceled.ID].includes(scope.row.InvoiceStatus)" class="load-btn" />
+        <!-- <span
+          class="blue-span"
           :class="{disabled: ![InvoiceStatusEnums.pendingCheck.ID, InvoiceStatusEnums.rejected.ID].includes(scope.row.InvoiceStatus)}"
           @click="onCancelClick(scope.row)"
           >取消</span> -->
@@ -53,11 +60,15 @@
 </template>
 
 <script>
+import DownLoadExcelComp from '@/components/common/UploadComp/DownLoadExcelComp.vue';
 import {
   InvoiceStatusEnumList, InvoiceStatusEnums, InvoiceTypeEnums, InvoiceTitleEnums,
 } from '../../../packages/InvoiceComps/enums';
 
 export default {
+  components: {
+    DownLoadExcelComp,
+  },
   props: {
     list: {
       type: Array,
@@ -103,6 +114,24 @@ export default {
         },
       });
     },
+    getDownLoadConfigObj(item) {
+      return {
+        condition: { invoiceID: item.InvoiceID },
+        count: 1,
+        fileDefaultName: `发票[${item.InvoiceID}]所含订单列表`,
+        // fileDate: this.condition4OrderList.Date,
+        downFunc: data => this.api.getInvoiceOrderExportExcel(data),
+        maxNumber: 15000,
+        tipTitle: '订单',
+        withoutSuffixTime: true,
+      };
+    },
+    onExcelClick(item) {
+      if ([InvoiceStatusEnums.canceled.ID].includes(item.InvoiceStatus)) {
+        return;
+      }
+      console.log('onExcelClick', item);
+    },
   },
 };
 </script>
@@ -120,9 +149,14 @@ export default {
         .cell {
           font-size: 13px;
           .blue-span {
+          // font-size: 12px;
             & + .blue-span {
               margin-left: 13px;
             }
+          }
+
+          .load-btn {
+            margin-left: 13px;
           }
         }
       }

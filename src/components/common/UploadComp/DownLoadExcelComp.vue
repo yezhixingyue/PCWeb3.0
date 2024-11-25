@@ -1,6 +1,6 @@
 <template>
-  <el-button type='primary' class="mp-common-download-to-excel-comp-wrap" @click="onClick">
-    导出Excel
+  <el-button type='primary' class="mp-common-download-to-excel-comp-wrap" :class="{link: link}" @click="onClick" :disabled="disabled">
+    {{ btnText }}
   </el-button>
 </template>
 
@@ -22,7 +22,24 @@ export default {
         downFunc() {}, // 下载函数
         maxNumber: 0, // 最大支持导出数量
         tipTitle: '',
+        withoutSuffixTime: false, // 是否不添加后缀时间
       }),
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    link: {
+      type: Boolean,
+      default: false,
+    },
+    btnText: {
+      type: String,
+      default: '导出Excel',
+    },
+    warningTipTitle: {
+      type: String,
+      default: '确定导出Excel数据吗?',
     },
   },
   methods: {
@@ -39,7 +56,7 @@ export default {
       }
 
       this.messageBox.warnCancelNullMsg({
-        title: '确定导出Excel数据吗?',
+        title: this.warningTipTitle,
         successFunc: this.handleDownFunc,
       });
       // this.handleDownFunc();
@@ -49,22 +66,22 @@ export default {
 
       delete config.Page;
       delete config.PageSize;
-      // // console.log('导出-1', 'fileName----fileName');
       const res = await this.configObj.downFunc(config);
-      // // console.log('导出-2', 'fileName----fileName', res);
 
-      // // console.log(res, config);
       if (res.status !== 200) {
         this.messageBox.failSingleError({ title: '导出失败', msg: `[ 失败原因：${res.statusText} ]` });
         return;
       }
-      // // console.log('导出-3', 'fileName----fileName');
       const { data } = res;
       const blobData = new Blob([data]);
-      // // console.log('blob', 'fileName----fileName');
-      const _d = ConvertTimeFormat(new Date());
-      let fileName = `${this.configObj.fileDefaultName}(截止到${_d}日全部订单).xls`;
-      if (this.configObj.fileDate) {
+      let fileName = this.configObj.fileDefaultName;
+
+      if (!this.configObj.withoutSuffixTime) {
+        const _d = ConvertTimeFormat(new Date());
+        fileName += `(截止到${_d}日全部订单)`;
+      }
+
+      if (this.configObj.fileDate && !this.configObj.withoutSuffixTime) {
         const { First, Second } = this.configObj.fileDate;
         if (First && Second) {
           const f = First.split('T')[0];
@@ -76,10 +93,11 @@ export default {
             _second = Second;
           }
           const t2 = _second ? ConvertTimeFormat(new Date(new Date(_second.replace('Z', '')).getTime())) : '';
-          if (f) fileName = `${this.configObj.fileDefaultName}(${f}至${t2}).xls`;
+          if (f) fileName = `${this.configObj.fileDefaultName}(${f}至${t2})`;
         }
       }
-      // // console.log(fileName, 'fileName----fileName');
+
+      fileName += '.xls';
       if (window.navigator && window.navigator.msSaveOrOpenBlob) {
         window.navigator.msSaveOrOpenBlob(blobData, fileName);
       } else {
@@ -103,4 +121,22 @@ export default {
 </script>
 
 <style lang='scss'>
+.mp-common-download-to-excel-comp-wrap.link {
+  padding: 0;
+  border: none;
+  background-color: rgba($color: #000000, $alpha: 0) !important;
+  color: #428dfa;
+
+  &:hover {
+    opacity: 0.8;
+  }
+  &:active {
+    color: #0b58ca;
+    opacity: 1;
+  }
+  &.is-disabled {
+    color: #cbcbcb;
+    opacity: 1;
+  }
+}
 </style>
