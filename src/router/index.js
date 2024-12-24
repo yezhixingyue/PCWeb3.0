@@ -122,6 +122,18 @@ const routes = [
               // record: true, // 是否记录滚动位置
             },
             component: () => import('../views/OrderPages/OrderListPage.vue'),
+            children: [
+              {
+                path: '/order/detail',
+                name: 'orderDetail',
+                meta: {
+                  requiresAuth: true,
+                  y: 0,
+                  title: '我的订单详情 - 郑州名片之家电子商务有限公司',
+                },
+                component: () => import('../views/OrderPages/OrderDetailView/OrderDetailView.vue'),
+              },
+            ],
           },
           // {
           //   path: '/order/detail',

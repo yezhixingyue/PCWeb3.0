@@ -4,7 +4,7 @@
       <span @click="onReturnClick"><i class="el-icon-arrow-left is-font-24 is-cancel"></i> 返回我的订单列表</span>
     </header>
     <ul class="content">
-      <li>
+      <!-- <li>
         <OrderDetailHeader :info4OrderSummary='info4OrderSummary' :afterPay='true' />
       </li>
       <li>
@@ -15,8 +15,8 @@
         @setPackDataCompleted='setPackDataCompleted'
         :Express='this.curOrderDetailData.Express' />
       </li>
-      <li class="last-item">
-        <OrderDetailCommonComp @setDetailDataCompleted='setDetailDataCompleted' :orderDetail='curOrderDetailData'>
+      <li class="last-item"> -->
+        <!-- <OrderDetailCommonComp @setDetailDataCompleted='setDetailDataCompleted' :orderDetail='curOrderDetailData'>
           <div class="price-wrap">
             <div class="price-box"  v-if="curOrderDetailData">
               <div class="price-left">
@@ -56,8 +56,8 @@
               </span>
             </p>
           </div>
-        </OrderDetailCommonComp>
-      </li>
+        </OrderDetailCommonComp> -->
+      <!-- </li> -->
     </ul>
     <AsideIndexComp ref="AsideIndexComp" />
   </section>
@@ -66,10 +66,10 @@
 <script>
 import { mapState } from 'vuex';
 
-import OrderDetailHeader from '@/components/OrderListComps/OrderDetail/OrderDetailHeader.vue';
-import OrderProgress from '@/components/OrderListComps/OrderDetail/OrderProgress.vue';
-import OrderPackageList from '@/components/OrderListComps/OrderDetail/OrderPackageList.vue';
-import OrderDetailCommonComp from '@/components/common/OrderCommonComps/OrderDetailCommonComp.vue';
+// import OrderDetailHeader from '@/components/OrderListComps/OrderDetail/OrderDetailHeader.vue';
+// import OrderProgress from '@/components/OrderListComps/OrderDetail/OrderProgress.vue';
+// import OrderPackageList from '@/components/OrderListComps/OrderDetail/OrderPackageList.vue';
+// import OrderDetailCommonComp from '@/components/common/OrderCommonComps/OrderDetailCommonComp.vue';
 import AsideIndexComp from '@/components/OrderListComps/OrderDetail/AsideIndexComp.vue';
 
 export default {
@@ -81,10 +81,10 @@ export default {
     };
   },
   components: {
-    OrderDetailHeader,
-    OrderProgress,
-    OrderPackageList,
-    OrderDetailCommonComp,
+    // OrderDetailHeader,
+    // OrderProgress,
+    // OrderPackageList,
+    // OrderDetailCommonComp,
     AsideIndexComp,
   },
   computed: {

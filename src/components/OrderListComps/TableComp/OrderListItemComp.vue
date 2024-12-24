@@ -230,9 +230,9 @@ export default {
     },
     goToDetailPage(data) {
       if (!data) return;
-      // this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
-      // this.$router.push('/order/detail');
-      this.$emit('detail', data.OrderID);
+      this.$store.commit('order/setCurOrderDetailData', { ...data, OutPlate: this.data.OutPlate, Address: this.data.Address });
+      this.$router.push('/order/detail');
+      // this.$emit('detail', data.OrderID);
     },
     goToAfterSalesApply(item) {
       const _obj = { ...item };

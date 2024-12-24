@@ -6,6 +6,20 @@
   "description": "mpzj前台下单网站图标集合",
   "glyphs": [
     {
+      "icon_id": "4300256",
+      "name": "放大镜",
+      "font_class": "fangdajing",
+      "unicode": "e69b",
+      "unicode_decimal": 59035
+    },
+    {
+      "icon_id": "42798489",
+      "name": "包裹列表",
+      "font_class": "baoguoliebiao",
+      "unicode": "e69c",
+      "unicode_decimal": 59036
+    },
+    {
       "icon_id": "4880424",
       "name": "注释",
       "font_class": "zhushi",

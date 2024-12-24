@@ -10,7 +10,7 @@
         <template slot-scope="scope">{{ scope.row.NewAmount }}{{BillTypeUnit}}</template>
       </el-table-column>
       <el-table-column label="交易类型" width="100" show-overflow-tooltip>
-        <span slot-scope="scope" :class="{'is-pink': scope.row.Type === 21, 'is-success': scope.row.Type === 11}"
+        <span slot-scope="scope" :class="{'': scope.row.Type === 21, 'is-origin': scope.row.Type === 11}"
          >{{ scope.row.Type | formatTransactionType }}</span>
       </el-table-column>
       <el-table-column label="渠道" show-overflow-tooltip width="120">

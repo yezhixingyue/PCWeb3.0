@@ -94,6 +94,8 @@
       <img src="../../assets/images/order-empty.png" alt="">
       <p class="is-gray">{{showDateText}}</p>
     </section>
+
+    <router-view></router-view>
   </article>
 </template>
 

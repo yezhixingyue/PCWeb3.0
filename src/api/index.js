@@ -416,6 +416,11 @@ const api = {
     return instance.get(`/Api/Company/Authentication/Info?customerID=${ID}`);
   },
 
+  /** get /Api/Order/Thumbnail  查看订单缩略图 */
+  getOrderThumbnail(orderID) {
+    return instance.get(`/Api/Order/Thumbnail?orderID=${orderID}`, { closeLoading: true });
+  },
+
   // getInvoiceCancel(invoiceID) { // GET /Api/Invoice/Cancel  取消
   //   return instance.get('/Api/Invoice/Cancel', { params: { invoiceID } });
   // },
