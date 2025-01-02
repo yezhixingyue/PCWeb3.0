@@ -1,7 +1,8 @@
 <template>
   <section class="mp-pc-sys-common-child-temp-page-wrap">
+    <div ref="oGuard"></div>
     <hr class="line" :class="showShadow ? 'shadow' : ''">
-    <main class="content" ref="oCCTMain">
+    <main class="content">
       <slot></slot>
     </main>
 
@@ -21,7 +22,7 @@ export default {
   data() {
     return {
       intersectionObserver: null,
-      showShadow: false,
+      showShadow: true,
     };
   },
   methods: {
@@ -32,11 +33,13 @@ export default {
 
       this.intersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          this.showShadow = !entry.isIntersecting;
+          if (entry.target === this.$refs.oGuard) {
+            this.showShadow = !entry.isIntersecting;
+          }
         });
       }, options);
 
-      this.intersectionObserver.observe(this.$refs.oCCTMain);
+      this.intersectionObserver.observe(this.$refs.oGuard);
     },
   },
   mounted() {

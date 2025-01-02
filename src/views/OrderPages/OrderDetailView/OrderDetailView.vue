@@ -87,17 +87,31 @@ export default {
 
         > header {
           height: 36px;
-          border-radius: 6px;
-          background-color: #428dfa;
-          color: #fff;
+          // border-radius: 6px;
+          // background-color: #428dfa;
+          color: #333;
           font-weight: 700;
           font-size: 14px;
-          text-align: center;
+          // text-align: center;
           line-height: 36px;
+          border-bottom: 1px dashed #eee;
+          padding: 0;
+          box-sizing: border-box;
+
+          &::before {
+            content: '';
+            display: inline-block;
+            width: 1px;
+            height: 100%;
+            background-color: #428dfa;
+            vertical-align: top;
+          }
 
           img {
-            vertical-align: text-top;
+            vertical-align: middle;
+            vertical-align: -8px;
             margin-right: 10px;
+            margin-left: 15px;
           }
 
         }
@@ -129,6 +143,7 @@ export default {
     padding-top: 20px;
     padding-bottom: 30px;
     border-radius: 4px;
+    margin-bottom: 10px;
 
     button {
       width: 120px;

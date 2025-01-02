@@ -206,7 +206,7 @@ export default {
         width: 100%;
         tbody {
           tr {
-            border: 1px solid #E8F1FE;
+            border: 1px solid #eee;
             td {
               line-height: 20px;
               padding: 5px;

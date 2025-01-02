@@ -243,7 +243,6 @@ export default {
       }
     },
     handleScrollToEnd(boolean) {
-      console.log('scrollToEnd', boolean);
       this.isScrollEnd = boolean;
     },
   },

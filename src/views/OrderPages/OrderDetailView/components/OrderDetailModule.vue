@@ -96,12 +96,16 @@ export default {
     font-size: 12px !important;
   }
 
+  > header span {
+    font-size: 14px !important;
+  }
+
   > main {
     height: 576px;
 
     > .code-list {
       padding: 11px 0 10px 0;
-      border-bottom: 1px dashed #E8F1FE;
+      border-bottom: 1px dashed #eee;
       box-sizing: border-box;
 
       li {
@@ -121,7 +125,7 @@ export default {
 
     > .detail {
       height: 280px;
-      border-bottom: 1px dashed #E8F1FE;
+      border-bottom: 1px dashed #eee;
       box-sizing: border-box;
       padding: 12px 0 10px 0;
       margin-bottom: 12px;
@@ -169,7 +173,7 @@ export default {
 
   > footer {
     height: 96px;
-    border-top: 1px dashed #E8F1FE;
+    border-top: 1px dashed #eee;
     padding: 0 !important;
     margin: 0 20px;
     .mp-common-comps-order-detail-price-box-comp-wrap {

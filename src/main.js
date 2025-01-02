@@ -28,8 +28,6 @@ Vue.prototype.api = api;
 Vue.prototype.utils = utils;
 Vue.prototype.$utils = utils;
 
-console.log(Clickoutside);
-
 Vue.directive('clickoutside', Clickoutside);
 // Vue.use(Element);
 

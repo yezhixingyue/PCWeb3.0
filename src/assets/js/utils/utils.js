@@ -171,7 +171,6 @@ export const handleScrollAfterGetPriceFailed = (dom, topDis = 130, bottomDis = 0
           duration: 400,
           easing: 'easeInOutSine',
           complete() {
-            console.log(0);
             if (complete) complete();
           },
         });

@@ -68,7 +68,7 @@ export default {
       height: 1px;
       top: 50%;
       // background-color: #E8F1FE;
-      border-bottom: 1px dashed #E8F1FE;
+      border-bottom: 1px dashed #eee;
       box-sizing: border-box;
     }
   }

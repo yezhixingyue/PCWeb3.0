@@ -290,7 +290,6 @@ export default {
     async handlePreCreateSubmit(list) {
       const res = await this.$store.dispatch('shoppingCar/getOrderPreCreateFromShoppingCar', list);
       if (res) {
-        console.log(res);
         const { PreCreateData, OriginList } = res;
         this.PreCreateData = PreCreateData;
         this.preCreateOriginDataList = OriginList;

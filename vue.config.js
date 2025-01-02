@@ -1,19 +1,17 @@
-/* eslint-disable max-len */
 const TerserPlugin = require('terser-webpack-plugin');
 
 // let proxyUrl = 'http://192.168.2.234:8050'; // 吕
 let proxyUrl = 'http://192.168.2.238:8050';
 // let proxyUrl = 'http://erp.ybz888.com/';
-let publicPath = '';
+
 // 测试开发环境：调用92接口
 if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'test-development') proxyUrl = 'http://192.168.1.92:8050';
 // 测试开发环境：调用正式接口
-if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-development') {
-  proxyUrl = 'http://erp.ybz888.com';
-}
-if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'withPcPath') { // 打包测试环境的代码(路径中带/pc/)
-  publicPath = '/pc/';
-}
+if (process.env.VUE_APP_BASE_URL && process.env.VUE_APP_BASE_URL === 'pro-development') proxyUrl = 'http://erp.ybz888.com';
+
+let publicPath = '';
+// 打包测试环境的代码(路径中带/pc/)
+if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BASE_URL === 'withPcPath') publicPath = '/pc/';
 
 module.exports = {
   productionSourceMap: process.env.NODE_ENV === 'development', // 是否打包sourcemap

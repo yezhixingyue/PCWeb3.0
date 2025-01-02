@@ -39,7 +39,6 @@ export default {
       if (val) {
         setTimeout(() => {
           const model = document.querySelector('.mp-common-image-viewer-comp .el-image-viewer__mask');
-          console.log(model);
           model.addEventListener('click', this.onClose);
         }, 10);
       }
