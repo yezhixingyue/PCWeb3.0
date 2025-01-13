@@ -40,6 +40,13 @@ module.exports = {
         proxyTimeout: 10 * 60 * 1000,
         timeout: 10 * 60 * 1000,
       },
+      '/License': {
+        target: proxyUrl,
+        ws: true, // 开启websockets
+        changeOrigin: true, // 开启代理
+        proxyTimeout: 10 * 60 * 1000,
+        timeout: 10 * 60 * 1000,
+      },
     },
   },
   configureWebpack: {

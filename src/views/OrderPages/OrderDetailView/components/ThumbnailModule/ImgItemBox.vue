@@ -1,5 +1,5 @@
 <template>
-  <div class="mp-pc-sys-order-list-page-order-detail-page-wrap-file-preview-comp-img-box">
+  <div class="mp-pc-sys-order-list-page-order-detail-page-wrap-file-preview-comp-img-box" ref="oELImgBox">
     <el-image
       style="width: 100%; height: 100%"
       :src="src"
@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import { useElImgPreviewMaskClick2Close } from '@/assets/js/utils/useElImgPreviewMaskClick2Close';
+
 export default {
   props: {
     item: {
@@ -38,6 +40,9 @@ export default {
         if (img) img.click();
       }
     },
+  },
+  mounted() {
+    if (this.$refs.oELImgBox) useElImgPreviewMaskClick2Close(this.$refs.oELImgBox);
   },
 };
 </script>
@@ -106,10 +111,14 @@ export default {
         margin-right: 4px;
       }
     }
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
-  &:hover .mask {
-    opacity: 1;
-  }
+  // &:hover .mask {
+  //   opacity: 1;
+  // }
 }
 </style>

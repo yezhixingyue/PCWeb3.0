@@ -88,4 +88,8 @@ export default {
     min-height: calc(100vh - 115px - 42px)\0;
   }
 }
+
+html:has(.mp-pc-sys-common-child-temp-page-wrap) {
+  overflow: hidden;
+}
 </style>

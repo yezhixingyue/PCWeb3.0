@@ -1,5 +1,5 @@
 <template>
-  <section class="mp-pc-sys-order-list-page-order-detail-page-wrap-order-detail-comp module">
+  <section class="mp-pc-sys-order-list-page-order-detail-page-wrap-order-detail-comp module" :class="{flex: canUseflex}">
     <header>
       <img src="../../../../assets/images/order-detail/detail.png" alt="">
       <span>订单详情</span>
@@ -24,7 +24,11 @@
         <!-- 下单信息 -->
         <ul class="other mp-scroll-wrap">
           <li>
-            <label>文件内容：</label> <div class="content">{{ OrderDetail.Content }}</div>
+            <label>文件内容：</label>
+            <div class="content" v-if="!OrderDetail.Content || OrderDetail.Content.length < 40">{{ OrderDetail.Content }}</div>
+            <el-tooltip class="item" v-else effect="dark" :content="OrderDetail.Content" placement="top-start" popper-class="mp-order-detail-content-popper">
+              <div class="content">{{ OrderDetail.Content }}</div>
+            </el-tooltip>
           </li>
           <li v-if="OrderDetail.FileAuthorMobile">
             <label>传稿人电话：</label> <div>{{ OrderDetail.FileAuthorMobile.trim() }}</div>
@@ -60,6 +64,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import OrderDetailContent from '@/components/QuotationComps/PlaceOrderComps/OrderSubmitComp/SubmitConfirmDialog/ProductInfoComp/OrderDetailContent.vue';
 import OrderDetailPriceBox from '@/packages/OrderDetailPriceBox';
 
@@ -79,6 +84,7 @@ export default {
     OrderDetailPriceBox,
   },
   computed: {
+    ...mapState('common', ['canUseflex']),
     ProducePeriod() {
       return !(this.OrderDetail && [200, 254, 255].includes(this.OrderDetail.Status)) && this.OrderDetail.ProducePeriod;
     },
@@ -195,5 +201,42 @@ export default {
       }
     }
   }
+
+  &.flex > main {
+    display: flex;
+    flex-direction: column;
+
+    > .code-list {
+      flex: none;
+    }
+
+    > .detail {
+      height: unset;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    > .other {
+      flex: none;
+      height: unset;
+      // overflow: hidden;
+      overflow: visible;
+      padding-bottom: 6px;
+
+      > li > div.content {
+        max-height: 32px;
+        overflow: hidden; /* 隐藏超出部分 */
+        text-overflow: ellipsis; /* 超出部分用打点表示 */
+        white-space: -webkit-box; /* 使用WebKit的换行算法 */
+        -webkit-line-clamp: 2; /* 限制在2行 */
+        -webkit-box-orient: vertical; /* 垂直排列盒子 */
+        display: -webkit-inline-box; /* 使用WebKit的弹性盒子模型布局 */
+      }
+    }
+  }
+}
+
+.mp-order-detail-content-popper {
+  max-width: 275px;
 }
 </style>
