@@ -385,13 +385,16 @@ export default {
               min-width: 600px;
             }
             .mp-line-date-selector-wrap > .box {
-              width: 500px;
+              width: 700px;
               &::after {
                 display: none;
               }
             }
             .mp-common-comps-ep-cascader-comp-wrap{
               margin-top: -10px;
+              >.title{
+                margin-right: 16px;
+              }
             }
           }
           &.second {
@@ -436,7 +439,7 @@ export default {
             }
             .mp-common-comps-search-box {
               vertical-align: 25px;
-              margin-left: 64px;
+              // margin-left: 64px;
               margin-top: -10px;
             }
           }
