@@ -34,7 +34,7 @@
         :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
         label="下单时间"
         :dateList="dateList"
-        minDate="2022-01-01 00:00:00"
+        minDate="2023-01-01 00:00:00"
         dateType="daterange"
       />
       <SearchInputComp

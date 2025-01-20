@@ -13,7 +13,7 @@
               :initDate='condition4ServiceAfterSaleList.Date'
               :UserDefinedTimeIsActive='UserDefinedTimeIsActive'
               label="申请时间"
-              minDate="2022-01-01 00:00:00"
+              minDate="2024-01-01 00:00:00"
               :dateList="dateList"
               dateType="daterange"
             />
