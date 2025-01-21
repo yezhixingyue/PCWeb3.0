@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import order from './order';
+import childViewStore from './childViewStore';
 import Authentication from './Authentication';
 import common from './common';
 import summary from './summary';
@@ -24,6 +25,7 @@ const store = new Vuex.Store({
     shoppingCar,
     timeSelectModule,
     Authentication,
+    childViewStore,
   },
 });
 

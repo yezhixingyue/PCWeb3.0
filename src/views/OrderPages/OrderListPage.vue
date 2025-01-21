@@ -96,6 +96,14 @@
     </section>
 
     <router-view></router-view>
+
+    <div>
+      <ElImageViewer
+        :showViewer='detailPreview.showViewer'
+        :PreviewSrc="detailPreview.previewSrcList"
+        @update:showViewer="setDetailPreview"
+      />
+    </div>
   </article>
 </template>
 
@@ -106,6 +114,7 @@ import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorC
 import Count from '@/components/common/Count.vue';
 import SearchInputComp from '@/components/common/Selector/SearchInputComp.vue';
 import TableComp from '@/components/OrderListComps/TableComp/index.vue';
+import ElImageViewer from '@/components/common/ImageViewer.vue';
 import {
   mapState, mapMutations, mapActions, mapGetters,
 } from 'vuex';
@@ -124,6 +133,7 @@ export default {
     TableComp,
     MyScrollBar,
     EpCascader,
+    ElImageViewer,
   },
   data() {
     return {
@@ -136,6 +146,7 @@ export default {
   },
   computed: {
     ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
+    ...mapState('childViewStore', ['detailPreview']),
     ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount', 'showOrderListNumber', 'loading']),
     ...mapGetters('Quotation', ['allProductClassify']),
     scrollChange() {
@@ -228,6 +239,7 @@ export default {
   },
   methods: {
     ...mapMutations('order', ['setCondition4OrderList', 'clearCondition4OrderList']),
+    ...mapMutations('childViewStore', ['setDetailPreview']),
     ...mapActions('order', ['getOrderList']),
     handlePageChange(page) {
       this.$store.dispatch('order/getOrderList', page);

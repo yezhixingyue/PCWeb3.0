@@ -5,7 +5,8 @@
     </header>
     <main>
       <div class="img-list">
-        <ImgItemBox v-for="it in fragmentSrcList" :key="it.bigSrc + it.src" :src="it.src" :item="it" :previewSrcList="previewFragmentSrcList" class="img-box" />
+        <ImgItemBox v-for="it in fragmentSrcList" :key="it.bigSrc + it.src" :src="it.src" :item="it"
+         :previewSrcList="previewFragmentSrcList" :autoPreview="false" class="img-box" @preview="onPreview" />
       </div>
     </main>
     <footer>
@@ -15,6 +16,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 import ImgItemBox from './ImgItemBox.vue';
 
 export default {
@@ -39,9 +42,14 @@ export default {
       return this.fragmentSrcList.filter(it => it.success).map(it => it.src);
     },
   },
-  methods: {
+  methods: { // setDetailPreview
+    ...mapMutations('childViewStore', ['setDetailPreview']),
     onMoreClick() {
       this.$emit('more', this.title.replace('：', ''), this.list);
+    },
+    onPreview(list) {
+      if (!list || list.length === 0) return;
+      this.setDetailPreview({ showViewer: true, previewSrcList: list });
     },
   },
 };

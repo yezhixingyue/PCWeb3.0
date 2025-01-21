@@ -64,9 +64,9 @@ export default {
   overflow: auto;
   background-color: #f5f5f5 !important;
 
-  &:has(.el-image-viewer__wrapper) {
-    z-index: 10000;
-  }
+  // &:has(.el-image-viewer__wrapper) {
+    // z-index: 10000;
+  // }
 
   > hr.line {
     margin: 0;

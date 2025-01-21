@@ -5,7 +5,7 @@
       :src="src"
       lazy
       ref="imgRef"
-      :preview-src-list="item.success ? previewSrcList : undefined"
+      :preview-src-list="item.success && autoPreview ? previewSrcList : undefined"
       :fit="item.success ? 'contain' : 'cover'"
       :class="item.success ? 'border' : ''"
       />
@@ -32,17 +32,36 @@ export default {
       type: Array,
       required: true,
     },
+    autoPreview: {
+      type: Boolean,
+      default: true,
+    },
   },
   methods: {
     onclick() {
-      if (this.$refs.imgRef && this.$refs.imgRef.$el) {
+      if (this.autoPreview && this.$refs.imgRef && this.$refs.imgRef.$el) {
         const img = this.$refs.imgRef.$el.querySelector('img');
         if (img) img.click();
+      }
+
+      if (this.item.success && !this.autoPreview) {
+        const list = [...this.previewSrcList];
+        const index = this.previewSrcList.findIndex(it => it === this.src);
+
+        if (index >= 0) {
+          const restList = list.splice(index);
+          restList.push(...list);
+
+          this.$emit('preview', restList);
+          return;
+        }
+
+        this.$emit('preview', list);
       }
     },
   },
   mounted() {
-    if (this.$refs.oELImgBox) useElImgPreviewMaskClick2Close(this.$refs.oELImgBox);
+    if (this.$refs.oELImgBox && this.autoPreview) useElImgPreviewMaskClick2Close(this.$refs.oELImgBox);
   },
 };
 </script>
