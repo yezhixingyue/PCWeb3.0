@@ -62,6 +62,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import InterAction from '@/store/Quotation/Interaction';
+import QuotationClassType from '@/store/Quotation/QuotationClassType';
 import { creatNewTargetValue } from '@/store/Quotation/EffectiveControlList';
 import HelpTipsComp from '@/components/QuotationComps/PlaceOrderComps/HelpTipsComp';
 import NumberTypeItemComp from './ElementDisplayTypeComps/NumberTypeItemComp.vue';
@@ -305,9 +306,18 @@ export default {
           hiddenByInteraction: this.hidden,
           DisabledValue,
         };
+
         this.$nextTick(() => {
-          const value = this.getElementSubmitValue(unable ? this.DisabledValue : this.PropValue, unable);
+          // 1. 找到默认值 QuotationClassType.getInitCustomerInputValues(this.Property)
+          let value;
+          if (this.Property.Type === 2 && this.Property.OptionAttribute.IsRadio) { // 仅单选
+            value = this.getElementSubmitValue(unable ? this.DisabledValue : QuotationClassType.getInitCustomerInputValues(this.Property), true);
+          } else {
+            value = this.getElementSubmitValue(unable ? this.DisabledValue : this.PropValue, unable);
+          }
+          // const value = this.getElementSubmitValue(unable ? this.DisabledValue : this.PropValue, unable);
           if (!value) return;
+
           this.$emit('input', value);
           this.handleInteractionEmit();
         });
