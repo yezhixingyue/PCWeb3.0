@@ -182,7 +182,7 @@ export default {
   },
   data() {
     return {
-      PayInFull: false,
+      PayInFull: true,
       localDetailData: null,
       loading: false,
       activeName: '',
@@ -195,7 +195,7 @@ export default {
     onOpen() {
       this.$store.dispatch('common/getExpressList');
       this.getLocalDetailData();
-      this.PayInFull = false;
+      this.PayInFull = true;
       this.UsePrintBean = false;
       if (this.isFullType) this.activeName = 'detail';
     },
