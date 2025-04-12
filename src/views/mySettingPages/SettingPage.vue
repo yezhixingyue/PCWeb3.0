@@ -15,6 +15,10 @@
           <el-checkbox v-model="keepDataChecked">保留下单面板数据</el-checkbox>
           <p>如果选中保留订单参数，则在每次成功“加入购物车”或“直接下单”后，下单面板数据不清空，保留已选择和已填写的数据</p>
         </div>
+        <div class="set-item">
+          <el-checkbox v-model="localAutoCheckedPayInFull">自动选中支付全款</el-checkbox>
+          <p>如选中此项，则自动勾选支付全款选项，反之则自动不勾选</p>
+        </div>
       </div>
     </section>
   </article>
@@ -33,7 +37,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('common', ['customerInfo', 'keepOrderData']),
+    ...mapState('common', ['customerInfo', 'keepOrderData', 'AutoCheckedPayInFull']),
     isAcceptNotify: {
       get() {
         if (this.customerInfo && this.customerInfo.Config.IsAcceptNotify) return true;
@@ -58,6 +62,16 @@ export default {
         if (!this.customerInfo?.Account?.AccountID) return;
         LocalCatchHandler.setFieldFromLocalStorage(this.customerInfo?.Account?.AccountID, 'keepOrderData', newVal);
         this.$store.commit('common/setKeepOrderData', newVal);
+      },
+    },
+    localAutoCheckedPayInFull: {
+      get() {
+        return this.AutoCheckedPayInFull;
+      },
+      set(newVal) {
+        if (!this.customerInfo?.Account?.AccountID) return;
+        LocalCatchHandler.setFieldFromLocalStorage(this.customerInfo?.Account?.AccountID, 'AutoCheckedPayInFull', newVal);
+        this.$store.commit('common/setAutoCheckedPayInFull', newVal);
       },
     },
   },

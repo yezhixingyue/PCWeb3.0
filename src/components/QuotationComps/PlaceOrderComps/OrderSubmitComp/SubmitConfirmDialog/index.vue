@@ -121,7 +121,7 @@ export default {
     PaymentPriceDisplayComp,
   },
   computed: {
-    ...mapState('common', ['canUseflex']),
+    ...mapState('common', ['canUseflex', 'AutoCheckedPayInFull']),
     localVisible: {
       get() {
         return this.visible;
@@ -195,7 +195,7 @@ export default {
     onOpen() {
       this.$store.dispatch('common/getExpressList');
       this.getLocalDetailData();
-      this.PayInFull = false;
+      this.PayInFull = this.AutoCheckedPayInFull || false;
       this.UsePrintBean = false;
       if (this.isFullType) this.activeName = 'detail';
     },

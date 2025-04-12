@@ -266,6 +266,7 @@ export default {
     /** 下单成功后是否保存原有订单面板数据
     ---------------------------------------- */
     keepOrderData: false,
+    AutoCheckedPayInFull: false, // 是否默认全款支付
     canUseflex: false, // 页面是否支持flex
 
     isNextYear: new Date().getFullYear() > 2023,
@@ -324,6 +325,9 @@ export default {
     setKeepOrderData(state, bool) {
       state.keepOrderData = bool;
     },
+    setAutoCheckedPayInFull(state, bool) {
+      state.AutoCheckedPayInFull = bool;
+    },
     /** 修改认证状态
     ---------------------------------------- */
     setAuthStatus(state, status) {
@@ -333,6 +337,7 @@ export default {
     ---------------------------------------- */
     setCustomerInfo(state, [data, bool]) {
       state.keepOrderData = false;
+      state.AutoCheckedPayInFull = false;
       if (!data) {
         state.customerInfo = null;
         return;
@@ -343,6 +348,9 @@ export default {
 
       const keepOrderDataValue = LocalCatchHandler.getFieldFromLocalStorage(data.Account?.AccountID, 'keepOrderData');
       if (keepOrderDataValue) state.keepOrderData = true; // 在设置客户信息的时候 设置下是否保留下单面板数据
+
+      // 在设置客户信息的时候 设置下是否默认全款支付
+      state.AutoCheckedPayInFull = LocalCatchHandler.getFieldFromLocalStorage(data.Account?.AccountID, 'AutoCheckedPayInFull') || false;
 
       if (!data || !data.FundInfo) return;
       if (bool) {
