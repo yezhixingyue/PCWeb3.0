@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
 import authenticationFrom from '@/components/AuthenticationComps/authenticationFrom.vue';
 import authenticationInfo from '@/components/AuthenticationComps/authenticationInfo.vue';
 
@@ -45,6 +45,7 @@ export default {
     },
   },
   methods: {
+    ...mapMutations('common', ['setAuthStatus']),
     ...mapActions('Authentication', ['getAuthCompanyInfo']),
     async AuthCompanyInit() {
       if (this.customerInfo) {
@@ -52,6 +53,9 @@ export default {
           this.$router.push('/placeOrder');
         } else {
           await this.getAuthCompanyInfo();
+          if (this.authCompanyInfo) {
+            this.setAuthStatus(this.authCompanyInfo?.Status);
+          }
         }
       }
       this.isLoadding = true;
