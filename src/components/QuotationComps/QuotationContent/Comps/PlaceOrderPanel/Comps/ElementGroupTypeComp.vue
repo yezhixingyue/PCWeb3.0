@@ -17,7 +17,6 @@
           <ElementTypeComp
             v-for="(it) in Property.ElementList"
             :key="it.ID + item.key"
-            :needInit="needInit"
             :Property="it"
             :value="getItemValue(index, it)"
             :isDisabled='disabled'
@@ -66,10 +65,6 @@ export default {
     value: {
       type: Array,
       default: () => [],
-    },
-    needInit: { // 弃用 不再需要从组件这里初始化部分数据
-      type: Boolean,
-      default: true,
     },
     fillWidth: {
       type: Boolean,

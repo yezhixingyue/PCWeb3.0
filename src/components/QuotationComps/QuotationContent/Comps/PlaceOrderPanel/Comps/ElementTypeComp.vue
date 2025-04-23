@@ -80,10 +80,6 @@ export default {
       default: false,
     },
     value: {},
-    needInit: {
-      type: Boolean,
-      default: true,
-    },
     isNumberic: {
       type: Boolean,
       default: false,
@@ -211,7 +207,7 @@ export default {
       // 排除isDisabled；因为其由上一级传来且只能是元素组或尺寸时才会传递，（尺寸组和元素组不再允许禁用或隐藏，所以该值废弃，不再考虑（其发生改变时本地无隐藏值，也需传递））
       // return this.hidden || this.isDisabled || this.disabled;
       const unable = this.hidden || this.disabled;
-      return `${unable}${JSON.stringify(this.DisabledValue)}`;
+      return `${unable}-${JSON.stringify(this.DisabledValue)}`;
     },
     localTipTitle() {
       if (this.Property.IsNameHidden) return '提示';
@@ -310,7 +306,7 @@ export default {
         this.$nextTick(() => {
           // 1. 找到默认值 QuotationClassType.getInitCustomerInputValues(this.Property)
           let value;
-          if (this.Property.Type === 2 && this.Property.OptionAttribute.IsRadio) { // 仅单选
+          if (this.Property.Type === 2 && this.Property.OptionAttribute.IsRadio && oldVal !== undefined) { // 仅单选
             value = this.getElementSubmitValue(unable ? this.DisabledValue : QuotationClassType.getInitCustomerInputValues(this.Property), true);
           } else {
             value = this.getElementSubmitValue(unable ? this.DisabledValue : this.PropValue, unable);
