@@ -8,6 +8,7 @@ import { useCookie, baseUrl } from '../assets/js/setup';
 import LocalCancelToken from './CancelToken';
 import sendError from './sendError';
 import trackinghandler from './trackinghandler';
+import getAuthString from './_auth'; // eslint-disable-line no-unused-vars
 // import { delay } from '../assets/js/utils/utils';
 
 const getRelativePath = (config) => {
@@ -48,7 +49,7 @@ const handleLoadingClose = () => { // 关闭弹窗
 };
 
 axios.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const curConfig = config;
     let token;
     if (useCookie) token = Cookie.getCookie('token');
@@ -58,6 +59,7 @@ axios.interceptors.request.use(
     closeTip = curConfig.closeTip;
     const _url = getRelativePath(config);
     const arrWithOutToken = ['/Api/Customer/Reg', '/Api/Customer/Login'];
+
     if (token && !arrWithOutToken.includes(_url)) curConfig.headers.common.Authorization = `Bearer ${token}`;
     if (_url === '/Api/Sms/Send/VerificationCode') {
       curConfig.headers.common.SessionID = Cookie.getCookie('SessionID');
@@ -93,8 +95,11 @@ axios.interceptors.request.use(
         customClass: _customClass,
       });
     }
-
     if (config.tracking === true) curConfig.timerStart = Date.now();
+    if (config['s-req-dat']) {
+      const str = await getAuthString(token, config.ignoreMobile);
+      curConfig.headers.common['s-req-dat'] = str;
+    }
 
     localCancelToken.setCancelToken(config);
 

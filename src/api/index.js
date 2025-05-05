@@ -6,7 +6,7 @@ const api = {
   /* 登录注册部分 与 账号相关等 api
   ----------------------------------------------------------------------------------- */
   getLogin(data) { // POST /Api/Customer/Login
-    return instance.post('/Api/Customer/Login', data, { closeLoading: true });
+    return instance.post('/Api/Customer/Login', data, { closeLoading: true, 's-req-dat': true, ignoreMobile: true });
   },
   getThirdLoginOAuth(data) { // /Api/ThirdLogin/OAuth  获取授权
     return instance.post('/Api/ThirdLogin/OAuth', data);
@@ -85,7 +85,7 @@ const api = {
   getProductDetail([productID, closeLoading]) { // 根据产品ID获取到产品详细信息  GET /Api/Product/Detail  productID
     return instance.get(
       `/Api/Product/Detail?productID=${productID}&includeTips=${true}`,
-      { closeLoading },
+      { closeLoading, 's-req-dat': true },
     );
   },
   getProductIntroDetail(productID) { // GET /Api/Product/GetProductDetail  获取下单时 右侧侧边栏 推荐列表
@@ -93,7 +93,7 @@ const api = {
   },
   getProductPrice(data) { // 价格信息计算  POST /Api/Calculate/ProductPrice
     // return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { closeLoading: true });
-    return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { tracking: true });
+    return instance.post('/Api/Calculate/ProductPrice', { Terminal: 1, ...data }, { tracking: true, 's-req-dat': true });
   },
   getOrderPreCreate(data) { // POST /Api/Order/PreCreate  直接下单 - 预下单
     const { closeTip } = data;
@@ -138,6 +138,10 @@ const api = {
   ----------------------------------------------------------------------------------- */
   getCustomerDetail() { // GET /Api/Customer/Detail  客户基础信息
     return instance.get('/Api/Customer/Detail', { closeLoading: true });
+  },
+  // /Api/Timestamp
+  getTimestamp() { // 获取服务器时间
+    return instance.get('/Api/Timestamp', { closeLoading: true });
   },
   getExpressList() { // 获取配送方式
     return instance.get('/Api/Express/List', { closeLoading: true });
@@ -232,7 +236,7 @@ const api = {
   /* 订单部分 api
    ----------------------------------------------------------------------------------- */
   getCustomerOrderList(data) { // POST /Api/Customer/OrderList 获取订单列表
-    return instance.post('/Api/Customer/OrderList', data, { tracking: true });
+    return instance.post('/Api/Customer/OrderList', data, { tracking: true, 's-req-dat': true });
   },
   getOrderProgress(OrderID, closeLoading = false) { // GET /Api/Order/Progress  订单进度
     return instance.get('/Api/Order/Progress', { params: { OrderID }, closeLoading });
@@ -260,7 +264,7 @@ const api = {
   /* 文件批量上传api
   ----------------------------------------------------------------------------------- */
   getFileNameAnalysis(data) { // POST /Api/FileName/Analysis 文件名解析
-    return instance.post('/Api/FileName/Analysis', data, { closeLoading: true, closeTip: true });
+    return instance.post('/Api/FileName/Analysis', data, { closeLoading: true, closeTip: true, 's-req-dat': true });
   },
   getFileSuffixList() { // /Api/File/SuffixList 获取批量上传支持的文件格式
     return instance.get('/Api/File/SuffixList', { closeLoading: true });
@@ -328,7 +332,7 @@ const api = {
   /* 未付款订单部分 api
    ----------------------------------------------------------------------------------- */
   getUnpayList() { // 获取未付款单列表 POST /Api/Customer/UnpaidList
-    return instance.post('/Api/Customer/UnpaidList', {});
+    return instance.post('/Api/Customer/UnpaidList', {}, { 's-req-dat': true });
   },
   getUnpayOrderCancle({ PayCode, isAddPrepare, closeTip }) { // 未付款单取消
     return instance.put(`/Api/PaymentOrder/Cancle?PayCode=${PayCode}&isAddPrepare=${isAddPrepare}`, { closeTip });
