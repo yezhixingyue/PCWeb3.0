@@ -6,10 +6,10 @@
     "serve": "vue-cli-service serve --port 8068",
     "serve.test": "vue-cli-service serve --port 8078 --mode testdevelopment",
     "serve.pro": "vue-cli-service serve --port 8088 --mode prodevelopment",
-    "build.test": "vue-cli-service build --mode alpha",
-    "build.pro": "vue-cli-service build",
-    "build.pc": "vue-cli-service build --mode pc",
-    "lint": "vue-cli-service lint"
+    "build.test.pc": "vue-cli-service build --mode pc",
+    "build.prod": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "build.test.likeprod": "vue-cli-service build --mode alpha"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
