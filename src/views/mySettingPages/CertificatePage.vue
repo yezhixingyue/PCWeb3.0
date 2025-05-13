@@ -69,7 +69,7 @@
             已审核
           </template>
           <div v-if="scope.row.CheckStatus === 2">
-            <p style="line-height: 1em; font-size: 12px;" class="is-pink">审核失败</p>
+            <p style="line-height: 1em; font-size: 12px;" class="is-pink">未通过</p>
             <p style="line-height: 1em; font-size: 11px;margin-top: 5px;" class="is-pink">{{scope.row.CheckRemark}}</p>
           </div>
         </template>
