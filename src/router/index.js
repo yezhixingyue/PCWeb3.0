@@ -287,6 +287,16 @@ const routes = [
             component: () => import('../views/mySettingPages/CouponCenterPage.vue'),
           },
           {
+            path: '/mySetting/certificate',
+            name: 'mySettingCertificate',
+            meta: {
+              requiresAuth: true,
+              y: 0,
+              title: '证书管理 - 郑州名片之家电子商务有限公司',
+            },
+            component: () => import('../views/mySettingPages/CertificatePage.vue'),
+          },
+          {
             path: '/mySetting/myCoupons',
             name: 'mySettingMyCoupons',
             meta: {

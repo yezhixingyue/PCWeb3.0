@@ -14,6 +14,7 @@ import './assets/css/common.scss';
 import './assets/css/summary.scss';
 import './assets/css/iconfont/iconfont.css';
 import './assets/css/iconfont-member/iconfont.css'; // 两个图标 企业认证和会员中心
+import './assets/css/zhengshuguanli/iconfont.css'; // 一个图标 证书管理
 import './assets/js/utils/message';
 import utils from './assets/js/utils/utils';
 import './assets/js/filters/filters';
