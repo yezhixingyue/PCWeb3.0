@@ -5,6 +5,32 @@
       <span class="left is-bold">印刷内容</span>
       <el-checkbox class="legal ft-13" v-model="isLegal" label="">印刷内容合法</el-checkbox>
       <span class="blue-span" @click="legalVisible = true">查看“承印品协议书”</span>
+      <div class="select-credential">
+        <p>
+          <el-radio-group :value="radio" @input="selectTrademark">
+            <el-radio :label="1" >无注册商标</el-radio>
+            <el-radio :label="2" >带注册商标</el-radio>
+          </el-radio-group>
+        </p>
+        <p class="credential-name">
+          <span v-if="SelectCertificate" @click="checkClick()" :title="SelectCertificate.CertificateName"
+          style="display: flex; align-items: center; cursor: pointer;">
+            <img src="@/assets/images/img-icon.png" alt="">
+            <p>{{SelectCertificate.CertificateName}}</p>
+          </span>
+        </p>
+        <p class="reselection">
+          <span v-if="SelectCertificate" @click="reselect"
+          style="display: flex; align-items: center; cursor: pointer;">
+            <img src="@/assets/images/select-icon.png" alt=""> 重新选择
+          </span>
+        </p>
+        <el-image-viewer
+          :showViewer.sync='showViewer'
+          :PreviewSrc="PreviewSrc"
+        />
+        <SelectCertificateDialog :SelectCertificate="SelectCertificate" :visible.sync="SelectCertificateVisible" @submit="SelectCertificateSubmit" top="2%"/>
+      </div>
     </div>
     <div class="content">
       <ul v-if="FileList && FileList.length > 0">
@@ -78,6 +104,8 @@
 <script>
 import { mapState } from 'vuex';
 import { Loading } from 'element-ui';
+import { imgUrl } from '@/assets/js/setup';
+import ElImageViewer from '@/components/common/ImageViewer.vue';
 import Dialog2Pay from '@/components/QuotationComps/PreCreateComps/Dialog2Pay.vue';
 import TipsBox from '@/components/QuotationComps/QuotationContent/Comps/TipsBox';
 // import ComputedResultComp from '../../ProductQuotationContentComps/NewPcComps/ComputedResultComp.vue';
@@ -86,6 +114,7 @@ import DesignDocumentPopoverComp from './DesignDocumentPopoverComp.vue';
 import FileListForm from './FileListForm/index.vue';
 import SubmitConfirmDialog from './SubmitConfirmDialog/index.vue';
 import LegalAgreementDialog from '../../../common/AgreementComps/LegalAgreementDialog.vue';
+import SelectCertificateDialog from './SelectCertificateDialog.vue';
 
 export default {
   components: {
@@ -93,9 +122,11 @@ export default {
     DesignDocumentPopoverComp,
     FileListForm,
     SubmitConfirmDialog,
+    SelectCertificateDialog,
     Dialog2Pay,
     TipsBox,
     LegalAgreementDialog,
+    ElImageViewer,
   },
   props: {
     asyncInputchecker: {
@@ -144,6 +175,8 @@ export default {
   },
   data() {
     return {
+      radio: 1,
+      SelectCertificateVisible: false,
       title: '', // 用于弹窗标题显示   下单 | 添加购物车   后面自动添加失败2字
       visible: false,
       OrderPreData: null,
@@ -159,6 +192,10 @@ export default {
       },
       isLegal: true, // 印刷内容是合法的
       legalVisible: false,
+      SelectCertificate: null, // 选择的证书
+      imgUrl,
+      showViewer: false,
+      PreviewSrc: null,
     };
   },
   methods: {
@@ -169,7 +206,13 @@ export default {
       const result = await this.handleSummaryChecker(); // 总校验是否通过
       if (!result) return;
       const { fileContent, FileAuthorMobile } = this.ruleForm;
-      const resp = await this.$store.dispatch('Quotation/getOrderPreCreate', { compiledName: '', fileContent, FileAuthorMobile });
+      const SelectCertificate = this.SelectCertificate?.CertificateID || '';
+      const resp = await this.$store.dispatch(
+        'Quotation/getOrderPreCreate',
+        {
+          compiledName: '', fileContent, FileAuthorMobile, SelectCertificate,
+        },
+      );
       if (resp) {
         if (Array.isArray(resp)) {
           const [PreCreateData, requestObj] = resp;
@@ -243,13 +286,16 @@ export default {
       const callBack = ({ Coupon } = {}) => {
         this.setRuleFormInit();
         this.scrollToTop();
+        this.SelectCertificate = null;
+        this.radio = 1;
         // 清除优惠券
         if (Coupon && Coupon.CouponCode) this.$emit('removeCoupon', Coupon.CouponCode);
       };
       const { fileContent, FileAuthorMobile } = this.ruleForm;
       const callbackOnError = this.handleSubmitOrJoinCarError;
+      const SelectCertificate = this.SelectCertificate?.CertificateID || '';
       await this.$store.dispatch('Quotation/getQuotationSave2Car', {
-        FileList, fileContent, FileAuthorMobile, callBack, callbackOnError,
+        FileList, fileContent, FileAuthorMobile, callBack, callbackOnError, SelectCertificate,
       });
     },
     handleSubmitOrJoinCarError() { // 加入购物车及预下单失败（未设置）后的处理函数 暂无用 不做处理
@@ -495,6 +541,28 @@ export default {
       // if (this.$refs.contentValidateForm) this.$refs.contentValidateForm.resetFields();
       if (this.$refs.FileForm) this.$refs.FileForm.clearAllFile();
     },
+    selectTrademark(e) {
+      if (e === 2) {
+        // 弹框选择商标
+        this.SelectCertificateVisible = true;
+      } else {
+        this.SelectCertificate = null;
+        this.radio = e;
+      }
+    },
+    SelectCertificateSubmit(Data) {
+      this.SelectCertificate = Data;
+      this.radio = 2;
+    },
+    reselect() {
+      this.SelectCertificateVisible = true;
+    },
+    checkClick(url) {
+      const tempList = this.SelectCertificate.CertificatePics.map(it => imgUrl + it);
+      const index = tempList.findIndex(it => it === url);
+      this.PreviewSrc = [...tempList.slice(index), ...tempList.slice(0, index)];
+      this.showViewer = true;
+    },
   },
   mounted() {
     // this.$store.dispatch('Quotation/getFileTypeList');
@@ -683,6 +751,41 @@ export default {
       top: 1px;
       font-size: 13px;
       text-decoration: underline;
+    }
+    .select-credential{
+      float: right;
+      display: flex;
+      height: 100%;
+      img{
+        margin-right: 5px;
+      }
+      .reselection{
+        font-size: 14px;
+        width: 76px;
+        display: flex;
+        align-items: center;
+        color: #AEAEAE;
+      }
+      .credential-name{
+        width: 164px;
+        box-sizing: border-box;
+        padding-right: 20px;
+        align-items: center;
+        color: #428DFA;
+        p{
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      .el-radio-group{
+        .el-radio{
+          margin-right: 20px;
+          .el-radio__label{
+            padding-left: 5px;
+          }
+        }
+      }
     }
   }
 }

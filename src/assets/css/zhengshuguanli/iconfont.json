@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "128323804",
+      "name": "证书管理",
+      "font_class": "zhengshuguanli",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
+    }
+  ]
+}
