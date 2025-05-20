@@ -231,7 +231,7 @@ const api = {
     return instance.post('/Api/Customer/FundBill', data);
   },
   getCustomerFundBillExcel(data) { // /Api/Customer/FundBill 获取账单流水
-    return instance.post('/Api/Customer/FundBillExcel', data, { responseType: 'arraybuffer' });
+    return instance.post('/Api/Customer/FundBillExcel', data, { responseType: 'arraybuffer', 's-req-dat': true });
   },
   /* 订单部分 api
    ----------------------------------------------------------------------------------- */
@@ -255,7 +255,7 @@ const api = {
     return instance.delete(`/Api/Order/Cancle?orderID=${OrderID}`);
   },
   getCustomerOrderList4Excel(data) { // 导出客户订单列表 POST /Api/Customer/OrderExcel
-    return instance.post('/Api/Customer/OrderExcel', data, { responseType: 'arraybuffer' });
+    return instance.post('/Api/Customer/OrderExcel', data, { responseType: 'arraybuffer', 's-req-dat': true });
   },
   getPackageProgress(packageID, expressID) { // GET /Api/Package/ExpressProgress 通过包裹号查询包裹配送进度
     return instance.get(`/Api/Package/ExpressProgress?packageID=${packageID}&expressID=${expressID}`, { closeLoading: true });
@@ -413,7 +413,7 @@ const api = {
     return instance.get('/Api/Invoice/Detail', { params: { invoiceID } });
   },
   getInvoiceOrderExportExcel(params) { // get /Api/InvoiceOrder/ExportExcel 发票订单导出Excel
-    return instance.get('/Api/InvoiceOrder/ExportExcel', { responseType: 'arraybuffer', params });
+    return instance.get('/Api/InvoiceOrder/ExportExcel', { responseType: 'arraybuffer', params, 's-req-dat': true });
   },
   // 获取认证信息 (新)
   getAuthenticationInfo(ID) {
