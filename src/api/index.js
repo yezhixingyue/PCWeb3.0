@@ -141,7 +141,7 @@ const api = {
   },
   // /Api/Timestamp
   getTimestamp() { // 获取服务器时间
-    return instance.get('/Api/Timestamp', { closeLoading: true });
+    return instance.get('/Api/Timestamp', { closeLoading: true, params: { t: Date.now() } });
   },
   getExpressList() { // 获取配送方式
     return instance.get('/Api/Express/List', { closeLoading: true });

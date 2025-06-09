@@ -31,7 +31,7 @@ const getAuthString = async (token, config) => {
 
   const key = k();
 
-  const timestampUint8Array = await _getTimestamp(config);
+  const { timestampUint8Array, timeContent } = await _getTimestamp();
 
   // Base64编码字符串(MD5(时间戳二进制数组+ (手机号码+Token+Key)二进制数组)+";"二进制+时间戳二进制数组)
   const mobile = config.ignoreMobile ? '' : store.state.common.customerInfo.Account.Mobile;
@@ -42,7 +42,10 @@ const getAuthString = async (token, config) => {
 
   const _content = new Uint8Array([...md5.array(combineUint8Array), ...string2Uint8Array(';'), ...timestampUint8Array]);
 
-  return base64.fromByteArray(_content);
+  return {
+    authStr: base64.fromByteArray(_content),
+    timeContent,
+  };
 };
 
 export default getAuthString;

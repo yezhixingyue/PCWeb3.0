@@ -31,6 +31,8 @@ function timestampToUint8Array(timestamp, littleEndian) {
 }
 
 let diff = 0;
+let serverTimestamp = 0;
+let getServerTimestampTime = 0;
 const _getTimestamp = async () => {
   if (diff) {
     return diff + Date.now();
@@ -46,21 +48,24 @@ const _getTimestamp = async () => {
 
   const timestamp = await _fetchTimestamp();
   if (timestamp) {
-    diff = timestamp - Date.now();
+    serverTimestamp = timestamp;
+    getServerTimestampTime = Date.now();
+
+    diff = timestamp - getServerTimestampTime;
+
     return diff + Date.now();
   }
 
   return Date.now();
 };
 
-const getTimestamp = async (config) => {
-  const timestamp = await _getTimestamp();
+const getTimestamp = async () => {
+  const timestamp2Server = await _getTimestamp();
 
-  const nowTimestamp = Date.now();
-  const _config = config;
-  _config.headers.common['s-req-time'] = `${nowTimestamp}-${timestamp}-${new Date(nowTimestamp).toLocaleString()}-${diff}`;
-
-  return timestampToUint8Array(timestamp, true);
+  return {
+    timestampUint8Array: timestampToUint8Array(timestamp2Server, true),
+    timeContent: `${Date.now()}-${timestamp2Server}-${serverTimestamp}-${getServerTimestampTime}-${diff}`,
+  };
 };
 
 export default getTimestamp;

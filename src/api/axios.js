@@ -96,10 +96,12 @@ axios.interceptors.request.use(
       });
     }
     if (config.tracking === true) curConfig.timerStart = Date.now();
-    curConfig.headers.common['s-req-time'] = Date.now();
+    curConfig.headers.common['s-req-time'] = `${Date.now()}`;
     if (config['s-req-dat']) {
-      const str = await getAuthString(token, config); // config.ignoreMobile
-      curConfig.headers.common['s-req-dat'] = str;
+      const { authStr, timeContent } = await getAuthString(token, config); // config.ignoreMobile
+      curConfig.headers.common['s-req-dat'] = authStr;
+
+      curConfig.headers.common['s-req-time'] = encodeURIComponent(timeContent);
     }
 
     localCancelToken.setCancelToken(config);
@@ -123,6 +125,7 @@ const handleResponse = async (response) => {
       // eslint-disable-next-line no-param-reassign
       response.data = JSON.parse(response.request.responseText);
     } catch (e) {
+      console.log(e);
       // ignored
     }
   }
@@ -183,6 +186,7 @@ const handleResponse = async (response) => {
 axios.interceptors.response.use(
   handleResponse,
   async (error) => {
+    console.log('axios response error:', error);
     // if (error.response && error.response.status === 200) {
     //   // 未知错误 --- 该情况已验证 - 不会出现 - 后续可删除
     //   sendError(error, true);

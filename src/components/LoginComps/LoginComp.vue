@@ -208,12 +208,18 @@ export default {
 
             if (this.ThirdAuthList) _obj.ThirdAuthList = this.ThirdAuthList;
 
-            const res = await this.api.getLogin(_obj).catch(() => { key = false; });
+            const res = await this.api.getLogin(_obj).catch((e) => {
+              console.log('catch getLogin e:', e);
+              key = false;
+            });
             this.$emit('setPanelLoading', [false, '']);
             if (key && res && res.data.Status === 1000) {
               this.handleSuccessLogin(res.data.Data, rememberPwd, _obj.Password);
             } else {
-              this.handleFailLogin(res.data.Status);
+              this.handleFailLogin(res && res.data ? res.data.Status : undefined);
+            }
+            if (!key) {
+              this.$message.error('登录失败');
             }
           }
           return false;
