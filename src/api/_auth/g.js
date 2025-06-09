@@ -53,6 +53,14 @@ const _getTimestamp = async () => {
   return Date.now();
 };
 
-const getTimestamp = async () => timestampToUint8Array(await _getTimestamp(), true);
+const getTimestamp = async (config) => {
+  const timestamp = await _getTimestamp();
+
+  const nowTimestamp = Date.now();
+  const _config = config;
+  _config.headers.common['s-req-time'] = `${nowTimestamp}-${timestamp}-${new Date(nowTimestamp).toLocaleString()}-${diff}`;
+
+  return timestampToUint8Array(timestamp, true);
+};
 
 export default getTimestamp;

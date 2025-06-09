@@ -96,8 +96,9 @@ axios.interceptors.request.use(
       });
     }
     if (config.tracking === true) curConfig.timerStart = Date.now();
+    curConfig.headers.common['s-req-time'] = Date.now();
     if (config['s-req-dat']) {
-      const str = await getAuthString(token, config.ignoreMobile);
+      const str = await getAuthString(token, config); // config.ignoreMobile
       curConfig.headers.common['s-req-dat'] = str;
     }
 

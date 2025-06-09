@@ -22,19 +22,19 @@ const string2Uint8Array = (str) => {
   return bytes;
 };
 
-const getAuthString = async (token, ignoreMobile = false) => {
-  if (!ignoreMobile && !store.state.common.customerInfo) {
+const getAuthString = async (token, config) => {
+  if (!config.ignoreMobile && !store.state.common.customerInfo) {
     await delay(1000);
 
-    return getAuthString(token);
+    return getAuthString(token, config);
   }
 
   const key = k();
 
-  const timestampUint8Array = await _getTimestamp();
+  const timestampUint8Array = await _getTimestamp(config);
 
   // Base64编码字符串(MD5(时间戳二进制数组+ (手机号码+Token+Key)二进制数组)+";"二进制+时间戳二进制数组)
-  const mobile = ignoreMobile ? '' : store.state.common.customerInfo.Account.Mobile;
+  const mobile = config.ignoreMobile ? '' : store.state.common.customerInfo.Account.Mobile;
 
   const strUint8Array = string2Uint8Array(mobile + (token || '') + key);
 
