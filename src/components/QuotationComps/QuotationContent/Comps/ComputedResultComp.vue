@@ -60,6 +60,10 @@
           <template>理论重量：</template>
           <i>{{ ProductQuotationResult.Weight }}kg</i>
         </span>
+        <span v-if="ProductQuotationResult.Volume && ProductQuotationResult.Volume > 0">
+          <template>理论体积：</template>
+          <i>{{ ProductQuotationResult.Volume }}cm³</i>
+        </span>
         <span class="mg-left"  v-if="!isPrice"> )</span>
       </div>
     </li>
