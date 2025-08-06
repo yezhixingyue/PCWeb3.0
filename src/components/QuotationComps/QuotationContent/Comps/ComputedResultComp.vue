@@ -60,7 +60,8 @@
           <template>理论重量：</template>
           <i>{{ ProductQuotationResult.Weight }}kg</i>
         </span>
-        <span v-if="ProductQuotationResult.Volume && ProductQuotationResult.Volume > 0">
+        <span v-if="ProductQuotationResult.Volume && ProductQuotationResult.Volume > 0
+         && Number((ProductQuotationResult.Volume / (100 * 100 * 100)).toFixed(2)) > 0">
           <template>理论体积约：</template>
           <i>{{ Number((ProductQuotationResult.Volume / (100 * 100 * 100)).toFixed(2)) }}m³</i>
         </span>
