@@ -61,8 +61,8 @@
           <i>{{ ProductQuotationResult.Weight }}kg</i>
         </span>
         <span v-if="ProductQuotationResult.Volume && ProductQuotationResult.Volume > 0">
-          <template>理论体积：</template>
-          <i>{{ ProductQuotationResult.Volume }}cm³</i>
+          <template>理论体积约：</template>
+          <i>{{ Number((ProductQuotationResult.Volume / (100 * 100 * 100)).toFixed(2)) }}m³</i>
         </span>
         <span class="mg-left"  v-if="!isPrice"> )</span>
       </div>
