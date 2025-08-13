@@ -1,14 +1,18 @@
 <template>
   <section class="mp-duration-content-swiper-classify-comp-wrap"
    :class="{'show-scroll': scrollLeft > 0, 'show-end': isEnd}">
-    <el-tabs v-model="activeName" type="card" :onTabScroll='onTabScroll' ref="tabs">
+    <!-- <el-tabs v-model="activeId" type="card" :onTabScroll='onTabScroll' ref="tabs">
       <el-tab-pane
         v-for="item in classiftList"
         :key="item.ID"
         :label="item.ShowName"
         :name="item.ID">
       </el-tab-pane>
-    </el-tabs>
+    </el-tabs> -->
+
+    <div class="tab-list" ref="boxDom">
+      <span v-for="it in classiftList" :key="it.ID" :class="{active:activeId===it.ID}" @click="activeId=it.ID">{{ it.ShowName }}</span>
+    </div>
   </section>
 </template>
 
@@ -20,6 +24,7 @@ export default {
     return {
       scrollLeft: 0,
       isEnd: false,
+      boxDom: null,
     };
   },
   computed: {
@@ -35,7 +40,7 @@ export default {
       }
       return [];
     },
-    activeName: {
+    activeId: {
       get() {
         return this.curProductID;
       },
@@ -52,6 +57,7 @@ export default {
   methods: {
     onTabScroll({ navSize, containerSize, navOffset }) {
       this.scrollLeft = navOffset;
+      console.log(this.scrollLeft);
       if (navSize === containerSize + navOffset) this.isEnd = true;
       else this.isEnd = false;
     },
@@ -73,13 +79,45 @@ export default {
         this.handleProductSelected(newVal);
       }
     },
+    async classiftList(newVal) {
+      if (newVal.length) {
+        await this.$nextTick();
+
+        const { boxDom } = this.$refs;
+        if (boxDom) {
+          const spans = Array.prototype.slice.call(boxDom.getElementsByTagName('span')).map(span => ({
+            span,
+            top: span.offsetTop,
+          }));
+
+          const arr = [];
+
+          let currentTop = 0;
+          spans.forEach(item => {
+            if (item.top !== currentTop) {
+              currentTop = item.top;
+              arr.push([item]);
+            } else {
+              arr[arr.length - 1].push(item);
+            }
+          });
+
+          arr.forEach(spanWraps => {
+            if (spanWraps.length > 0) {
+              spanWraps[0].span.classList.add('first');
+              spanWraps[spanWraps.length - 1].span.classList.add('last');
+            }
+          });
+        }
+      }
+    },
   },
 };
 </script>
 
 <style lang='scss'>
 .mp-duration-content-swiper-classify-comp-wrap {
-  padding-bottom: 35px;
+  padding-bottom: 30px;
   padding-right: 32px;
 
   .el-tabs {
@@ -99,7 +137,9 @@ export default {
         height: 18px;
         right: -38px;
         &.el-tabs__nav-prev {
-          display: none;
+          // display: none;
+          position: relative;
+          left: -22px;
         }
         > i {
           height: 18px;
@@ -186,6 +226,47 @@ export default {
         &.el-tabs__nav-next {
           display: none;
         }
+      }
+    }
+  }
+
+  > div.tab-list {
+    margin-left: 1px;
+    > span {
+      display: inline-block;
+      height: 34px;
+      line-height: 34px;
+      padding: 0 14px;
+      border: 1px solid #e8e8e8;
+      color: #888;
+      cursor: pointer;
+      user-select: none;
+      min-width: 5em;
+      text-align: center;
+      margin-bottom: 10px;
+      margin-left: -1px;
+      position: relative;
+
+      &.active {
+        border-color: #428dfa;
+        color: #428dfa;
+        z-index: 1;
+        font-weight: bold;
+        background: #F7F9FF;
+      }
+
+      &:hover {
+        color: #428dfa;
+      }
+
+      &.first {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+      }
+
+      &.last {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
       }
     }
   }

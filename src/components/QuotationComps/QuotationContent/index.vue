@@ -503,7 +503,7 @@ export default {
       padding-bottom: 25px;
       > .content-title {
         overflow: hidden;
-        margin-bottom: 28px;
+        margin-bottom: 20px;
         height: 30px;
         line-height: 30px;
         display: flex;
