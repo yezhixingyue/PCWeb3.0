@@ -79,37 +79,40 @@ export default {
         this.handleProductSelected(newVal);
       }
     },
-    async classiftList(newVal) {
-      if (newVal.length) {
-        await this.$nextTick();
+    classiftList: {
+      async handler(newVal) {
+        if (newVal.length) {
+          await this.$nextTick();
 
-        const { boxDom } = this.$refs;
-        if (boxDom) {
-          const spans = Array.prototype.slice.call(boxDom.getElementsByTagName('span')).map(span => ({
-            span,
-            top: span.offsetTop,
-          }));
+          const { boxDom } = this.$refs;
+          if (boxDom) {
+            const spans = Array.prototype.slice.call(boxDom.getElementsByTagName('span')).map(span => ({
+              span,
+              top: span.offsetTop,
+            }));
 
-          const arr = [];
+            const arr = [];
 
-          let currentTop = 0;
-          spans.forEach(item => {
-            if (item.top !== currentTop) {
-              currentTop = item.top;
-              arr.push([item]);
-            } else {
-              arr[arr.length - 1].push(item);
-            }
-          });
+            let currentTop = 0;
+            spans.forEach(item => {
+              if (item.top !== currentTop) {
+                currentTop = item.top;
+                arr.push([item]);
+              } else {
+                arr[arr.length - 1].push(item);
+              }
+            });
 
-          arr.forEach(spanWraps => {
-            if (spanWraps.length > 0) {
-              spanWraps[0].span.classList.add('first');
-              spanWraps[spanWraps.length - 1].span.classList.add('last');
-            }
-          });
+            arr.forEach(spanWraps => {
+              if (spanWraps.length > 0) {
+                spanWraps[0].span.classList.add('first');
+                spanWraps[spanWraps.length - 1].span.classList.add('last');
+              }
+            });
+          }
         }
-      }
+      },
+      immediate: true,
     },
   },
 };
