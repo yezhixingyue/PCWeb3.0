@@ -115,6 +115,7 @@ import FileListForm from './FileListForm/index.vue';
 import SubmitConfirmDialog from './SubmitConfirmDialog/index.vue';
 import LegalAgreementDialog from '../../../common/AgreementComps/LegalAgreementDialog.vue';
 import SelectCertificateDialog from './SelectCertificateDialog.vue';
+import { FileAuthorMobileRegxp } from '../../../../assets/js/regExp';
 
 export default {
   components: {
@@ -185,7 +186,7 @@ export default {
       submitText: '直接下单',
       loadingInstance: null,
       uploadType: '',
-      phoneRegxp: /^\d{11}$|^\d{7,12}$|^\d{3,4}-\d{6,8}$/,
+      phoneRegxp: FileAuthorMobileRegxp,
       ruleForm: {
         fileContent: '',
         FileAuthorMobile: '',

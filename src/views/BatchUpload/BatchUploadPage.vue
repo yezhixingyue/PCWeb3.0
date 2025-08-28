@@ -19,11 +19,16 @@
         <div class="upload-btn-box">
           <FileSelectComp @change="handleFileChange" v-show="customer" :disabled="!canSelectFile || !isLegal" :accept='accept'
            :selectTitle='selectTitle' ref="oFileBox" />
+
+          <div style="display: inline-block;margin-right: 25px;">
+            <span>传稿人电话：</span>
+            <el-input v-model.trim="FileAuthorMobile" maxlength="20" placeholder="请输入传稿人电话，方便核对问题订单" style="width: 180px;" size="mini" />
+          </div>
           <el-tooltip class="item" effect="dark" content="勾选此处则下单时弹出订单信息复核弹窗，确认后再进行提交。" placement="top-start">
             <el-checkbox v-show="customer" class="legal" v-model="needToastPreDialog" label="">弹窗确认后再提交</el-checkbox>
           </el-tooltip>
-          <FailListComp :failedList='failedList' />
-          <el-checkbox v-show="customer" class="legal" style="margin-left: 360px;" v-model="isLegal" label="">印刷内容合法</el-checkbox>
+          <FailListComp :failedList='failedList' :offset="45" />
+          <el-checkbox v-show="customer" class="legal" style="margin-left: 120px;" v-model="isLegal" label="">印刷内容合法</el-checkbox>
           <span v-show="customer" class="blue-span agreement" @click="legalVisible = true">查看“承印品协议书”</span>
         </div>
         <MainTableComp
@@ -115,6 +120,7 @@ import LocalCatchHandler from '@/assets/js/LocalCatchHandler';
 import QrCodeForPayDialogComp from '../../packages/QrCodeForPayDialogComp';
 import PreCreateDialog from '../../packages/PreCreateDialog';
 import LegalAgreementDialog from '../../components/common/AgreementComps/LegalAgreementDialog.vue';
+import { FileAuthorMobileRegxp } from '../../assets/js/regExp';
 
 export default {
   name: 'OrderBatchUploadPage',
@@ -151,6 +157,8 @@ export default {
       failedList: [], // 解析失败的文件列表 -- 错误信息展示尚未完成  后续处理 ！！！
       successedList: [], // 解析成功的文件列表
       multipleSelection: [], // 文件选中列表
+      phoneRegxp: FileAuthorMobileRegxp,
+      FileAuthorMobile: '', // 传稿人电话
       QrCodeVisible: false,
       payInfoData: null,
       IsBatchUpload: true,
@@ -351,6 +359,11 @@ export default {
     },
     handleUploadSelected() { // 上传选中文件
       if (this.successedList.length === 0 || this.multipleSelection.length === 0) return;
+
+      if (this.FileAuthorMobile && !this.phoneRegxp.test(this.FileAuthorMobile)) {
+        this.messageBox.failSingleError({ title: '上传失败', msg: '传稿人电话输入格式不正确' });
+        return;
+      }
       // 需要筛选掉已上传成功的文件（已失败文件待定）
       this.handleBatchUploadFiles(this.multipleSelection);
     },
@@ -451,6 +464,7 @@ export default {
           ...this.basicObj,
           PayInFull: true,
           UsePrintBean: false,
+          FileAuthorMobile: this.FileAuthorMobile,
         };
         BatchUploadClass.BatchUploadFiles(list, temp, this.handleSubmitSuccess);
 
@@ -478,6 +492,7 @@ export default {
         ...this.basicObj,
         PayInFull,
         UsePrintBean,
+        FileAuthorMobile: this.FileAuthorMobile,
       };
       BatchUploadClass.BatchUploadFiles(OriginList, temp, this.handleSubmitSuccess);
     },
@@ -516,6 +531,14 @@ export default {
         if (this.customerInfo?.Account?.AccountID) {
           const _localCatchVal = LocalCatchHandler.getFieldFromLocalStorage(this.customerInfo.Account.AccountID, 'notToastPreDialog');
           if (_localCatchVal) this.notToastPreDialog = true;
+        }
+      },
+      immediate: true,
+    },
+    customerInfo: {
+      handler(newVal, oldVal) {
+        if (newVal && !oldVal) {
+          this.FileAuthorMobile = this.customerInfo && this.customerInfo.Account && this.customerInfo.Account.Mobile ? this.customerInfo.Account.Mobile : '';
         }
       },
       immediate: true,
