@@ -260,6 +260,7 @@ export default {
         { name: '网页端', ID: 0 },
         { name: '移动端', ID: 1 },
         { name: '人工客服', ID: 2 },
+        { name: '物流配送', ID: 3 },
       ],
       dateList: [
         { label: '近七天', value: 'last7Date' },
