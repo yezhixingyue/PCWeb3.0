@@ -136,6 +136,7 @@ export default {
       min-height: 260px;
       max-height: 420px;
       overflow: auto;
+      padding-top: 3px;
       .el-loading-spinner {
         top: 30%;
       }
