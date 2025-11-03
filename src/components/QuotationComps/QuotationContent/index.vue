@@ -331,12 +331,16 @@ export default {
     handleChange(list) {
       if (list.length === 0) return; // 关闭
       if (this.isCouponGet && !this.isOpenCouponCenter) return;
-      const _obj = { UseStatus: 0 };
-      _obj.Product = {
-        ClassID: this.curProductClass.First,
-        TypeID: this.curProductClass.Second,
-        ProductID: this.curProductID,
+
+      const _obj = {
+        UseStatus: 0,
+        Product: {
+          ClassID: this.curProductClass.FirstLevel.ID,
+          TypeID: this.curProductClass.SecondLevel.ID,
+          ProductID: this.curProductID,
+        },
       };
+
       this.couponList = [];
       setTimeout(async () => {
         const res = await this.api.getCouponList(_obj).catch(() => null);
