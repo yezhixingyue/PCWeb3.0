@@ -145,7 +145,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('common', ['OrderStatusList', 'ScrollInfo']),
+    ...mapState('common', ['OrderStatusList', 'ScrollInfo', 'customerInfo']),
     ...mapState('childViewStore', ['detailPreview']),
     ...mapState('order', ['condition4OrderList', 'OrderList', 'OrderListNumber', 'orderTotalAmount', 'showOrderListNumber', 'loading']),
     ...mapGetters('Quotation', ['allProductClassify']),
@@ -156,7 +156,7 @@ export default {
       return {
         condition: this.condition,
         count: this.OrderListNumber,
-        fileDefaultName: '名片之家订单列表',
+        fileDefaultName: `${this.customerInfo ? `${this.customerInfo.CustomerSN}-` : ''}名片之家订单列表`,
         fileDate: this.condition4OrderList.Date,
         downFunc: data => this.api.getCustomerOrderList4Excel(data),
         maxNumber: 15000,
