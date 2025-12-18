@@ -19,7 +19,7 @@ let _securityJsCode = '2ee878caa1e9a356e068582cdd5faa46';
  * 开发 ---- 测试环境
  */
 if (mode === 'test-development' || mode === 'withPcPath') {
-  _imgUrl = `${testProtocol}://192.168.1.92:8050/`; // 图片和接口地址
+  _imgUrl = `${testProtocol}://219.157.151.220:8050/`; // 图片和接口地址
 }
 
 /**
@@ -38,8 +38,8 @@ if (mode === 'pro-development') {
  * 正式 ---- 测试环境
  */
 if (mode === 'test-production') {
-  _imgUrl = `${testProtocol}://192.168.1.92:8050/`; // 图片和接口地址
-  _baseUrl = `${testProtocol}://192.168.1.92:8050/`;
+  _imgUrl = `${testProtocol}://219.157.151.220:8050/`; // 图片和接口地址
+  _baseUrl = `${testProtocol}://219.157.151.220:8050/`;
 }
 
 /**
