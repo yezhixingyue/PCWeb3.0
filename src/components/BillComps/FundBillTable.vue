@@ -10,11 +10,11 @@
         <template slot-scope="scope">{{ scope.row.NewAmount }}{{BillTypeUnit}}</template>
       </el-table-column>
       <el-table-column label="交易类型" width="100" show-overflow-tooltip>
-        <span slot-scope="scope" :class="{'': scope.row.Type === 21, 'is-origin': scope.row.Type === 11}"
-         >{{ scope.row.Type | formatTransactionType }}</span>
+        <span slot-scope="scope" :class="{'is-origin': scope.row.Type === BillTypeEnumObj.Income}"
+         >{{ getTypeText(scope.row.Type) }}</span>
       </el-table-column>
       <el-table-column label="渠道" show-overflow-tooltip width="120">
-        <template slot-scope="scope">{{ scope.row.Currency | formatTransactionCurrency }}</template>
+        <template slot-scope="scope">{{ getModeText(scope.row.Mode) }}</template>
       </el-table-column>
       <el-table-column prop="Remark" label="备注" min-width="100" show-overflow-tooltip></el-table-column>
       <el-table-column prop="OrderIDString" label="订单号" width="150" show-overflow-tooltip></el-table-column>
@@ -27,6 +27,7 @@
 
 <script>
 import { BillTypeEnums } from '@/assets/js/ClassType/Summary/ConditionForBillList';
+import { BillTypeEnumList, BillModeEnumList, BillTypeEnumObj } from '@/packages/enums/billEnumList';
 
 export default {
   props: {
@@ -42,6 +43,7 @@ export default {
   data() {
     return {
       h: 0,
+      BillTypeEnumObj,
     };
   },
   computed: {
@@ -66,6 +68,12 @@ export default {
     setHeight() {
       const tempHeight = this.getHeight();
       this.h = tempHeight;
+    },
+    getTypeText(type) {
+      return BillTypeEnumList.find(it => it.ID === type)?.Name || '';
+    },
+    getModeText(mode) {
+      return BillModeEnumList.find(it => it.ID === mode)?.Name || '';
     },
   },
   // mounted() {

@@ -29,7 +29,7 @@ export default class ConditionForBillList {
 
   PageSize = 12
 
-  Type = ''
+  CustomerBillType = ''
 
   BillType = BillTypeEnums.FundCash.ID
 }

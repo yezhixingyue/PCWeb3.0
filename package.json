@@ -7,7 +7,7 @@
     "serve.test": "vue-cli-service serve --port 8078 --mode testdevelopment",
     "serve.prod": "vue-cli-service serve --port 8088 --mode prodevelopment",
     "build.test.pc": "vue-cli-service build --mode pc",
-    "build.prod": "vue-cli-service build",
+    "build.prod": "node beforeBuild.js && vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build.test.likeprod": "vue-cli-service build --mode alpha"
   },

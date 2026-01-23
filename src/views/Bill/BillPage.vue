@@ -2,7 +2,10 @@
   <section class="mp-pc-bill-page-wrap">
     <header>
       <div class="header-content">
-        <SingleSelector v-model="Type" :optionList='TransactionTypeList' />
+        <SingleSelector v-model="Type" :optionList='newBillTypeEnumList' useEmpty :defaultProps="{
+          label: 'Name',
+          value: 'ID',
+        }" />
         <LineDateSelectorComp
           :changePropsFunc='setCondition4FundBillList'
           :requestFunc='getFundBillList'
@@ -48,6 +51,7 @@ import Count from '@/components/common/Count.vue';
 import LineDateSelectorComp from '@/components/common/Selector/LineDateSelectorComp.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
 import { BillTypeEnumList, BillTypeEnums } from '@/assets/js/ClassType/Summary/ConditionForBillList';
+import { BillTypeEnumList as newBillTypeEnumList } from '@/packages/enums/billEnumList';
 import CommonClassType from '../../store/CommonClassType';
 
 export default {
@@ -67,10 +71,10 @@ export default {
     },
     Type: {
       get() {
-        return this.condition4FundBillList.Type;
+        return this.condition4FundBillList.CustomerBillType;
       },
       set(newVal) {
-        this.$store.commit('summary/setCondition4FundBillList', [['Type', ''], newVal]);
+        this.$store.commit('summary/setCondition4FundBillList', [['CustomerBillType', ''], newVal]);
         this.$store.dispatch('summary/getFundBillList');
       },
     },
@@ -113,7 +117,7 @@ export default {
       if (!this.condition4FundBillList) return {};
       let _t = JSON.parse(JSON.stringify(this.condition4FundBillList));
       CommonClassType.setDate(_t);
-      _t = CommonClassType.filter(_t);
+      _t = CommonClassType.filter(_t, true);
       return _t;
     },
   },
@@ -122,6 +126,7 @@ export default {
       billValue: '',
       // eslint-disable-next-line max-len
       dateList: [{ label: '近七天账单', value: 'last7Date' }, { label: '今天', value: 'today' }, { label: '昨天', value: 'yesterday' }, { label: '前天', value: 'beforeyesterday' }, { label: '本月', value: 'curMonth' }, { label: '上月', value: 'lastMonth' }],
+      newBillTypeEnumList,
     };
   },
   methods: {

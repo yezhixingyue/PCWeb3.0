@@ -164,20 +164,20 @@ export default {
     BeanNumberBalance: 0,
     /** 客户账单交易类型筛选方式列表
     ---------------------------------------- */
-    TransactionTypeList: [
-      {
-        label: '所有',
-        value: '',
-      },
-      {
-        label: '充值',
-        value: '11',
-      },
-      {
-        label: '支出',
-        value: '21',
-      },
-    ],
+    // TransactionTypeList: [
+    //   {
+    //     label: '所有',
+    //     value: '',
+    //   },
+    //   {
+    //     label: '充值',
+    //     value: '11',
+    //   },
+    //   {
+    //     label: '支出',
+    //     value: '21',
+    //   },
+    // ],
     /** 客户账单交易渠道列表
     ---------------------------------------- */
     formatTransactionCurrencyList: [

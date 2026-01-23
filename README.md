@@ -6,6 +6,10 @@ build.test.likeprod  -- 测试代码  单独部署（部署方式和正式保持
 
 build.prod -- 正式代码 - 单独部署
 
+## 如果报错：请检查src/packages是否为最新代码
+1. 检查本地src/packages代码是否为最新代码
+2. 检查本地git remote是否已配置且名称应为origin
+3. 检查远程分支是否为master分支
 
 
 # 优惠券状态 useState

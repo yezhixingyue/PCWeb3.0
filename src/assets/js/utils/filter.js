@@ -10,14 +10,14 @@ Vue.filter('numToFixed2', num => {
 /**
  * 客户账号交易类型
  */
-const { TransactionTypeList } = store.state.common;
-Vue.filter('formatTransactionType', Type => {
-  // // console.log(Type);
-  const _t = TransactionTypeList.find(_it => +_it.value === +Type);
-  // // console.log(TransactionTypeList, _t);
-  if (_t) return _t.label;
-  return '';
-});
+// const { TransactionTypeList } = store.state.common;
+// Vue.filter('formatTransactionType', Type => {
+//   // // console.log(Type);
+//   const _t = TransactionTypeList.find(_it => +_it.value === +Type);
+//   // // console.log(TransactionTypeList, _t);
+//   if (_t) return _t.label;
+//   return '';
+// });
 
 const { formatTransactionCurrencyList } = store.state.common;
 Vue.filter('formatTransactionCurrency', Currency => {
