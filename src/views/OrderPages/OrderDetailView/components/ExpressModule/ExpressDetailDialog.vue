@@ -6,6 +6,7 @@
     width="680px"
     destroy-on-close
     :before-close='close'
+    :close-on-press-escape="false"
     @open="onOpen"
     append-to-body
     custom-class="mp-order-detail-express-detail-list-dialog-comp--wrap"
@@ -64,6 +65,7 @@ export default {
           obj.afterTime = afterTime;
           obj.year = year;
         }
+        if (it.Pics && it.Pics.length > 0) obj.Pics = it.Pics;
         arr.push(obj);
       });
       const newArr = arr.map((item, index) => {

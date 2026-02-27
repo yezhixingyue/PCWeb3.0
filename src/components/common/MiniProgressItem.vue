@@ -11,22 +11,35 @@
       <span class="express-point"></span>
     </section>
     <section :class="data.isNewest ? 'right-progress-wrap active' : 'right-progress-wrap'">
-      <span v-if="data.showLine" class="line"></span>
-      <span>{{ data.expressDetail }}</span>
-      <span v-if="data.operator" class="operator"
-        ><i>/</i>{{ data.operator }}</span
-      >
+      <div>
+        <span v-if="data.showLine" class="line"></span>
+        <span>{{ data.expressDetail }}</span>
+        <span v-if="data.operator" class="operator"
+          ><i>/</i>{{ data.operator }}</span
+        >
+      </div>
+      <div v-if="data.Pics && data.Pics.length > 0" class="express-pics-wrap">
+        <span class="blue-span">查看签收图片</span>
+        <el-image :src="imgSrc" :preview-src-list="data.Pics" :close-on-press-escape="false" />
+      </div>
     </section>
   </li>
 </template>
 
 <script>
+const imgSrc = require('@/assets/images/arrow.png');
+
 export default {
   props: {
     data: {
       type: Object,
       default: () => {},
     },
+  },
+  data() {
+    return {
+      imgSrc,
+    };
   },
 };
 </script>
@@ -91,7 +104,7 @@ export default {
     display: inline-block;
     vertical-align: top;
     position: relative;
-    > .line {
+    > div > .line {
       height: calc(100% + 8px);
       position: absolute;
       width: 1px;
@@ -100,7 +113,7 @@ export default {
       top: 16px;
       z-index: 9;
     }
-    &.active > .line {
+    &.active > div > .line {
       height: calc(100% + 6px);
       top: 20px;
     }
@@ -115,6 +128,25 @@ export default {
         margin-right: 8px;
       }
     }
+
+    .express-pics-wrap {
+      .el-image {
+        margin-left: -72px;
+        width: 72px;
+        height: 20px;
+        position: relative;
+        top: 5px;
+      }
+      .el-image__inner.el-image__preview, .el-image__error {
+        opacity: 0;
+      }
+
+      .is-gray {
+        user-select: none;
+        opacity: 0.7;
+      }
+    }
+
   }
   &.active {
     color: $--color-text-primary;
