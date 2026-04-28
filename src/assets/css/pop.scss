@@ -384,6 +384,91 @@
     
         }
     }
+    &.order-cancel-success {
+        width: 340px !important;
+        padding-top: 30px;
+        min-height: 160px;
+
+        .el-message-box__title {
+            color: #444;
+
+            > span {
+                font-size: 18px;
+            }
+        }
+
+        .el-message-box__headerbtn {
+            display: none;
+        }
+
+        > .el-message-box__content {
+            padding: 10px 0 0 0;
+        }
+    }
+
+    &.order-fund-gone-dialog {
+        width: 360px !important;
+        padding-top: 30px;
+
+        .el-message-box__header {
+            height: 0;
+        }
+        .el-message-box__title {
+            display: none;
+        }
+
+        .el-message-box__content {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .el-message-box__btns {
+            padding-top: 2px;
+        }
+
+        .order-cancel-fund-gone-content {
+            > header {
+                user-select: none;
+                line-height: 36px;
+                h2 {
+                    display: inline;
+                    color: #444;
+                    font-size: 20px;
+                    font-weight: 700;
+                }
+
+                img {
+                    vertical-align: -10px;
+                    height: 36px;
+                    margin-right: 5px;
+                }
+            }
+
+            > main {
+                padding-top: 13px;
+                min-height: 54px;
+
+                .msg {
+                    color:#888;
+                    font-size:14px;
+                    min-height: 32px;
+                    letter-spacing: 0;
+                    line-height: 16px;
+
+                    &:has(.time) {
+                        display: flex;
+                        text-align: left;
+                        .time {
+                            flex: 1 0 auto;
+                            margin-right: 10px;
+                            text-align: right;
+                            max-width: 125px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     &.two-btns {
         .el-message-box__btns{
             button {

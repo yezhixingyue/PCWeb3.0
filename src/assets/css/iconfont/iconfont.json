@@ -6,6 +6,41 @@
   "description": "mpzj前台下单网站图标集合",
   "glyphs": [
     {
+      "icon_id": "13644675",
+      "name": "会员",
+      "font_class": "huiyuan",
+      "unicode": "e633",
+      "unicode_decimal": 58931
+    },
+    {
+      "icon_id": "34988952",
+      "name": "企业认证",
+      "font_class": "qiyerenzheng",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "35075265",
+      "name": "会员中心pc用",
+      "font_class": "huiyuanzhongxinpcyong",
+      "unicode": "e749",
+      "unicode_decimal": 59209
+    },
+    {
+      "icon_id": "38780321",
+      "name": "证书管理",
+      "font_class": "zhengshuguanli",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
+    },
+    {
+      "icon_id": "25965311",
+      "name": "时间",
+      "font_class": "shijian",
+      "unicode": "e69d",
+      "unicode_decimal": 59037
+    },
+    {
       "icon_id": "4300256",
       "name": "放大镜",
       "font_class": "fangdajing",

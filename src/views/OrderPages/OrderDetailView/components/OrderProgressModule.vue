@@ -15,7 +15,8 @@
           <el-tooltip popper-class="table-item" :content="item.Description" placement="top-start" :visible-arrow='false'>
             <span class="progress-text">{{item.Description}}</span>
           </el-tooltip>
-          <span v-show="item.FinishPercent || item.FinishPercent === 0">{{ item.FinishPercent }}%</span>
+          <span class="fund-gone" v-if="showFundGone && [253, 254].includes(item.Status)" @click="onFundGoneClick(item)"><i>￥</i>钱款去向</span>
+          <span v-else v-show="item.FinishPercent || item.FinishPercent === 0">{{ item.FinishPercent }}%</span>
         </li>
       </ul>
     </main>
@@ -34,6 +35,18 @@ export default {
     curProgressData() {
       return this.OrderProgress.dataList;
     },
+    showFundGone() { // 是否展示钱款去向
+      if (this.curProgressData.length < 2) return false;
+
+      const [last, secondLast] = this.curProgressData.filter(it => it.FinishPercent === 100);
+
+      return last && secondLast && [253, 254].includes(last.Status) && secondLast.Status !== 10;
+    },
+  },
+  methods: {
+    onFundGoneClick() {
+      this.$emit('showFundGone');
+    },
   },
 };
 </script>
@@ -47,7 +60,7 @@ export default {
     margin-top: 10px;
     padding-top: 6px !important;
     padding-right: 2px !important;
-    li {
+    ul.list > li {
       > .point-box {
         display: inline-block;
         vertical-align: top;
@@ -112,6 +125,40 @@ export default {
         > .el-progress > .el-progress-bar > .el-progress-bar__outer > .el-progress-bar__inner {
           background-image: linear-gradient(90deg, #428dfa 0%,#26bcf9 100%);
           opacity: 1;
+        }
+      }
+
+      position: relative;
+      .fund-gone {
+        position: absolute;
+        right: 13px;
+        top: -3px;
+        font-size: 12px;
+        color: #428dfa !important;
+        line-height: 15px;
+        cursor: pointer;
+        padding: 3px 4px;
+        border-radius: 2px;
+        user-select: none;
+
+        i {
+          color: #fff;
+          background-color: #428dfa;
+          display: inline-block;
+          border-radius: 50%;
+          width: 15px;
+          height: 15px;
+          text-align: center;
+          font-weight: 100;
+          margin-right: 3px;
+        }
+
+        &:hover {
+          background-color: rgba($color: #428dfa, $alpha: 0.15);
+        }
+
+        &:active {
+          background-color: rgba($color: #428dfa, $alpha: 0.25);
         }
       }
     }

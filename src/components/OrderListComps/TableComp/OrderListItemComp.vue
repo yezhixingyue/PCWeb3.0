@@ -114,12 +114,15 @@
           </div>
         </li>
       </TransitionGroupCollapse4ShopCar>
+
+      <OrderCancelDialog :visible.sync="cancelVisible" :OrderItem="OrderItem" @submit="cancelOrder" />
     </div>
 </template>
 
 <script>
 import TransitionGroupCollapse4ShopCar from '@/components/common/TransitionGroupCollapse4ShopCar.vue';
 import { mapState } from 'vuex';
+import OrderCancelDialog from './OrderCancelDialog.vue';
 
 export default {
   props: {
@@ -166,6 +169,7 @@ export default {
   components: {
     // Test,
     TransitionGroupCollapse4ShopCar,
+    OrderCancelDialog,
   },
   computed: {
     ...mapState('shoppingCar', ['curShoppingCarDataBeforeFirstPlace']),
@@ -193,6 +197,8 @@ export default {
       isActive: true,
       curOrderID4Detail: null,
       oApp: null,
+      cancelVisible: false, // 订单取消
+      OrderItem: null, // 订单条目数据
     };
   },
   methods: {
@@ -242,20 +248,21 @@ export default {
       _obj.RefundFreight = this.data.RefundFreight;
       this.$router.push({ name: 'AfterSalesApply', params: { data: JSON.stringify(_obj) } });
     },
-    handleOrderCancel({ OrderID }) {
-      this.messageBox.warnCancelBox({
-        title: '确定取消该订单吗?',
-        msg: `订单号：[ ${OrderID} ]`,
-        successFunc: () => {
-          this.cancelOrder(OrderID);
-        },
-      });
+    handleOrderCancel(OrderItem) {
+      this.OrderItem = OrderItem;
+      this.cancelVisible = true;
     },
     async cancelOrder(OrderID) {
+      this.cancelVisible = false;
+
       const res = await this.api.getOrderCancle(OrderID).catch(() => null);
       if (res && res.data.Status === 1000) {
         this.messageBox.successSingle({
           title: '取消成功',
+          customClass: 'order-cancel-success',
+          dangerouslyUseHTMLString: true,
+          msg: '<span style="color:#F4A307">如有疑问请联系官方客服</span>',
+          confirmButtonText: '关闭',
           successFunc: () => {
             this.$store.commit('order/handleCancelOrder', [OrderID, this.data.ID]);
             this.$store.dispatch('common/getCustomerFundBalance');

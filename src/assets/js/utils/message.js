@@ -173,11 +173,20 @@ function warnCancelNullMsg({ title, successFunc, failFunc }) {
  * @param {boolean} [canCloseOnPressEscape=true]
  */
 function successSingle({
-  title, successFunc, failFunc, canCloseOnPressEscape = true, msg = '', confirmButtonText = '确定', cancelButtonText = '关闭', showCancelButton,
+  title,
+  successFunc,
+  failFunc,
+  canCloseOnPressEscape = true,
+  msg = '',
+  confirmButtonText = '确定',
+  cancelButtonText = '关闭',
+  showCancelButton,
+  customClass = '',
+  dangerouslyUseHTMLString = false,
 }) {
-  let customClass = msg ? 'mp-order-del-pop-success hasMsg' : 'mp-order-del-pop-success';
+  let _customClass = msg ? 'mp-order-del-pop-success hasMsg' : 'mp-order-del-pop-success';
   if (showCancelButton) {
-    customClass = `${customClass} two-btns`;
+    _customClass = `${_customClass} two-btns`;
   }
   MessageBox({
     showClose: true,
@@ -185,9 +194,10 @@ function successSingle({
     title,
     message: msg,
     closeOnPressEscape: canCloseOnPressEscape,
-    customClass,
+    customClass: `${customClass} ${_customClass}`,
     showCancelButton,
     cancelButtonText,
+    dangerouslyUseHTMLString,
   // eslint-disable-next-line no-nested-ternary
   }).then(() => successFunc && successFunc()).catch(() => (failFunc ? failFunc() : successFunc ? successFunc() : ''));
 }

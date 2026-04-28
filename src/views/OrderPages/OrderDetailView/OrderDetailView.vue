@@ -17,7 +17,10 @@
 
         <div class="col right">
           <!-- 订单进度 -->
-          <OrderProgressModule :OrderProgress="localManageData.OrderProgress" />
+          <OrderProgressModule :OrderProgress="localManageData.OrderProgress" @showFundGone="onShowFundGone" />
+
+          <!-- 退款去向 -->
+          <RefundDetailDialog :visible.sync="visible" :RefundDetail="OrderRefundDetail" />
         </div>
       </main>
 
@@ -36,6 +39,12 @@ import OrderDetailModule from './components/OrderDetailModule.vue';
 import ExpressModule from './components/ExpressModule/ExpressModule.vue';
 import ThumbnailModule from './components/ThumbnailModule/ThumbnailModule.vue';
 import OrderProgressModule from './components/OrderProgressModule.vue';
+import api from '../../../api';
+import RefundDetailDialog from './components/RefundDetailDialog/RefundDetailDialog.vue';
+
+// const succesImg = require('../../../assets/images/fund-gone/success.png');
+// const ingImg = require('../../../assets/images/fund-gone/ing.png');
+// const failImg = require('../../../assets/images/fund-gone/fail.png');
 
 export default {
   components: {
@@ -44,6 +53,7 @@ export default {
     ExpressModule,
     ThumbnailModule,
     OrderProgressModule,
+    RefundDetailDialog,
   },
   computed: {
     ...mapState('order', { currentRow: 'curOrderDetailData' }),
@@ -51,11 +61,23 @@ export default {
   data() {
     return {
       localManageData: null,
+      visible: false,
+      OrderRefundDetail: null,
     };
   },
   methods: {
     goback() {
       this.$router.replace('/order/list');
+    },
+    async onShowFundGone() { // 显示钱款去向
+      const OrderID = this.currentRow?.OrderID;
+      if (!OrderID) return;
+
+      const resp = await api.getOrderRefundDetail(OrderID);
+      if (resp && resp.data.Status === 1000) {
+        this.OrderRefundDetail = resp.data.Data;
+        this.visible = true;
+      }
     },
   },
   mounted() {

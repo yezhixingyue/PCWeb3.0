@@ -443,7 +443,12 @@ const api = {
   getCustomerCertificateRemove(id) { // POST /Api/Customer/Certificate/Remove  删除证书
     return instance.delete(`/Api/Customer/Certificate/Remove?id=${id}`);
   },
-
+  /* 钱款去向 api
+   ----------------------------------------------------------------------------------- */
+  /** get /Api/Order/RefundDetail  查看订单退款详情 */
+  getOrderRefundDetail(orderID) {
+    return instance.get('/Api/Order/RefundDetail', { params: { orderID } });
+  },
 };
 
 export default api;
