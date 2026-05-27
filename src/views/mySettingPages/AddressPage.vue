@@ -2,7 +2,7 @@
   <section class="mp-pc-my-setting-page-address-page-wrap">
     <header>
       <span class="blue-v-line is-bold is-black">收货地址</span>
-      <span class="is-font-12">（ 最多可添加<i class="is-pink is-font-16"> 3 </i>个收货地址 ）</span>
+      <span class="is-font-12">（ 最多可添加<i class="is-pink is-font-16"> 6 </i>个收货地址 ）</span>
     </header>
     <ul class="content" v-if="customerInfo">
       <li v-for="(item,i) in customerInfo.Address" :key="item.AddressID + i"
@@ -46,7 +46,7 @@
           <img src="../../assets/images/add-line.png" alt="">
         </div>
       </li>
-      <li class="add-new-address-box" @click="handleAddNewAccount" v-if="customerInfo.Address.length < 3">
+      <li class="add-new-address-box" @click="handleAddNewAccount" v-if="customerInfo.Address.length < 6">
         <i class="el-icon-plus"></i>
         <span>新增收货地址</span>
         <div class="img-box top">

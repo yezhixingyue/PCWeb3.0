@@ -275,7 +275,7 @@ export default {
     &::after {
       width: 22px;
       height: 1px;
-      content: "";
+      // content: "";
       position: absolute;
       background-color: #e6e6e6;
       top: 60px;
