@@ -203,7 +203,7 @@ export default {
         const {
           Latitude, Longitude, Mobile, AddressDetail, Consignee, ExpressArea,
         } = Address;
-        if (!Latitude || !Longitude || !Mobile || !AddressDetail || !Consignee || !ExpressArea) return false;
+        if (((!Latitude || !Longitude) && this.customer.Type.First !== 8) || !Mobile || !AddressDetail || !Consignee || !ExpressArea) return false;
         const { RegionalID, CityID, CountyID } = ExpressArea;
         if ((!RegionalID && RegionalID !== 0) || (!CityID && CityID !== 0) || (!CountyID && CountyID !== 0)) return false;
       }
