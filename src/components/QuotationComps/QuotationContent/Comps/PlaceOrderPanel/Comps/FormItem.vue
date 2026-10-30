@@ -148,7 +148,7 @@ export default {
       if (this.curTypeName === '物料') str = this.placeData.MaterialDisplayName || '物料';
       if (this.target.Name) str = this.target.Name;
       if (this.target.GroupInfo?.Name) str = this.target.GroupInfo.Name;
-      if (Object.prototype.toString.call(this.target) === '[object Object]' && this.target.IsNameHidden) {
+      if (Object.prototype.toString.call(this.target) === '[object Object]' && (this.target.IsNameHidden || this.target.GroupInfo?.IsNameHidden)) {
         str = '';
       }
       return str ? `${str}：` : '';
@@ -224,6 +224,19 @@ export default {
         if (this.target) {
           const t = this.target.ElementList.find(it => !it.HiddenToCustomer);
           return !!t;
+        }
+      }
+      if (this.curTypeName === '尺寸组' && this.target) {
+        let haveValidFixedSize = false;
+        if (Array.isArray(this.target.SizeList) && this.target.SizeList.find(it => !it.HiddenToCustomer)) {
+          haveValidFixedSize = true;
+        }
+
+        if (!haveValidFixedSize) {
+          if (!this.target.GroupInfo.ElementList) return false;
+
+          const el = this.target.GroupInfo.ElementList.find(it => !it.HiddenToCustomer);
+          if (!el) return false;
         }
       }
       if (this.AffectedHidden) return false;

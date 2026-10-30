@@ -320,6 +320,13 @@ export default {
       },
       immediate: true,
     },
+    hidden: {
+      handler(newVal, oldVal) {
+        if (newVal === oldVal) return;
+        this.$emit('switchHidden', newVal);
+      },
+      immediate: true,
+    },
   },
 };
 </script>

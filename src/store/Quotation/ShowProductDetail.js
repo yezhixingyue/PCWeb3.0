@@ -213,7 +213,7 @@ const getGroupValueText = (List, Group, AffectedPropList, isDetail) => {
     List.forEach((item, i) => {
       const arr = [];
       item.List.forEach(({ ElementID, CustomerInputValues }) => {
-        const t = Group.ElementList.find((_it) => _it.ID === ElementID);
+        const t = Group.ElementList.filter(_it => !_it.HiddenToCustomer).find((_it) => _it.ID === ElementID);
         if (t) {
           const _SingleAffectedPropList = AffectedPropList.filter(_it => _it.Property
            && _it.Property.Group && _it.Property.Group.ID === Group.ID && _it.Property.Element);

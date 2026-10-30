@@ -38,7 +38,7 @@ export default {
   computed: {
     switchValue: {
       get() {
-        return this.value;
+        return this.value || false;
       },
       set(val) {
         this.$emit('input', val);

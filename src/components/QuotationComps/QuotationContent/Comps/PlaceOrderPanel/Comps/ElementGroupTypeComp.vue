@@ -15,7 +15,7 @@
       >
         <div>
           <ElementTypeComp
-            v-for="(it) in Property.ElementList"
+            v-for="(it) in Property.ElementList.filter(it => !it.HiddenToCustomer)"
             :key="it.ID + item.key"
             :Property="it"
             :value="getItemValue(index, it)"
@@ -165,6 +165,11 @@ export default {
       this.$emit('changeValidate');
       if (this.affectedElementGroupIDsByInteraction.includes(this.Property.ID)) {
         this.onTriggerInteractionClick();
+      } else if (this.isCraftUse && Array.isArray(this.subGroupAffectedPropList) && this.subGroupAffectedPropList.length > 0) {
+        const bool = this.subGroupAffectedPropList.some(arr => arr.find(it => it.Property?.Group?.ID === this.Property.ID));
+        if (bool) {
+          this.onTriggerInteractionClick();
+        }
       }
     },
     onDelClick(index) {

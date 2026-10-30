@@ -25,6 +25,7 @@
           :label="it.Name && !it.IsNameHidden ? `${it.Name}：` : ''"
           :prop="it.ID"
           :rules="[{ validator: validateCraftValueItem, trigger: 'change' }]"
+          v-show="!hiddenedElIDs.includes(it.ID)"
         >
           <ElementTypeComp
             hiddenLabel
@@ -34,6 +35,7 @@
             :AffectedPropList='getElementAffectedPropList(it)'
             @interaction="getLocalAffectedPropList"
             @input="handleElementChange($event, it)"
+            @switchHidden="(e) => { if (e) { hiddenedElIDs.push(it.ID) } else { hiddenedElIDs = hiddenedElIDs.filter(id => id !== it.ID) } }"
           />
           <template slot="error" slot-scope="row">
             <div class='el-form-item__error' :title="row.error">{{row.error}}</div>
@@ -192,6 +194,7 @@ export default {
       AffectedPropLists: [],
       subGroupAffectedPropLists: [],
       localAffectedPropList: [], // 弹窗内使用本地交互列表，以实现实时响应数据
+      hiddenedElIDs: [], // 被隐藏的直接子元素id列表
     };
   },
   methods: {
